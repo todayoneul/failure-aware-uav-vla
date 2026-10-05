@@ -4,6 +4,10 @@
 
 **Project AirSim에서 AeroVLA가 가상 드론을 조종하고, 예상치 못한 장애를 직접 넣어 보는 오픈소스소프트웨어 과목 텀프로젝트입니다.** 영상 흐림, 가림, 조종 편향 같은 상황을 만들고, 이후 감지·복구 기능으로 확장할 계획입니다.
 
+![Project AirSim에서 비행 중인 드론의 가까운 외부 시점](outputs/examples/hero_drone.png)
+
+Project AirSim의 실제 드론입니다. 관찰 카메라를 가까이 배치해 기체와 주변 장애물을 함께 볼 수 있습니다.
+
 ## What It Does
 
 앞·아래 카메라 영상과 자연어 지시를 AeroVLA에 전달합니다. 모델이 출력한 전진·상하 이동·회전 값을 안전 범위로 제한해 드론을 움직이고, 새 영상을 받아 반복합니다.
@@ -15,9 +19,25 @@
 - ✅ single-step 및 **10/10 closed loop**
 - ✅ 기본 blur·control drift 데모 — **모델 없는 별도 script 시험**
 
+### 드론이 어떻게 움직이나요?
+
+![실제 scripted flight의 전진과 회전](outputs/examples/drone_flight.gif)
+
+실제 simulator에서 촬영한 약 8초의 전진·회전 시연입니다. 이 GIF는 관찰 화면을 보여주기 위한 scripted control이며, 아래의 AeroVLA 실행 기록과 구분합니다.
+
+큰 Chase 화면 옆에 Front/Down 영상과 현재 명령·고도·방향을 함께 보여주는 [관찰 창](outputs/examples/observer_view.png)도 준비했습니다. 실행: `./scripts/run_demo_view.ps1` — [사용 안내](docs/setup.md#관찰-화면-demo).
+
+### AeroVLA는 무엇을 보고 판단하나요?
+
 ![실제 10번째 decision의 Front/Down 영상과 AeroVLA 출력](outputs/examples/closed_loop.png)
 
-저장된 실제 실행 화면입니다. [드론 화면](outputs/examples/drone_view.png)과 [blur·drift 데모](outputs/examples/control_drift.png)도 볼 수 있습니다.
+AeroVLA에 전달된 Front/Down RGB와 생성된 forward/down/yaw 행동입니다. 기존 10-step closed loop의 실제 저장 화면입니다.
+
+### 장애 상황은 어떻게 보여주나요?
+
+![기존 blur와 control drift 시연](outputs/examples/control_drift.png)
+
+모델 없는 별도 script에서 영상 흐림과 조종 편향을 주입한 데모입니다. 자동 감지·복구는 이후 구현합니다. [이전 드론 화면](outputs/examples/drone_view.png)도 그대로 보존했습니다.
 
 ## System Architecture
 
@@ -42,7 +62,7 @@ src/integration/   모델·카메라·행동 변환과 실행 코드
 src/failures/      다음 기능을 위한 빈 자리
 configs/           baseline 설정과 패키지 버전
 scripts/ · tests/  준비·측정 스크립트와 테스트
-outputs/examples/  실제 데모 이미지 3장
+outputs/examples/  드론·관찰·AI·장애 화면과 짧은 GIF
 ```
 
 ## Current Status

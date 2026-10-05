@@ -90,6 +90,26 @@ WINDOWS_HOST=$(ip -4 route show default | awk '/default/ {print $3; exit}')
 
 Runner를 재실행하면 기존 로컬 결과 파일 일부가 갱신된다. 완료된 feasibility 시험을 자동 반복하지 않는다. 디버그 viewer는 Windows client 환경에서 `integration_debug_viewer.py --output outputs/communication_final`을 별도로 실행할 수 있다.
 
+## 관찰 화면 Demo
+
+Windows에서 준비된 Blocks와 client를 사용해 외부 시점 위주의 별도 관찰 창을 연다. 큰 Chase 화면, 작은 Front/Down 화면, 현재 command·clearance·heading·position을 보여준다.
+
+```powershell
+.\scripts\run_demo_view.ps1
+```
+
+기본 Close Chase는 뒤 1.9m, 위 0.55m, FOV 60°다. `-View medium` 또는 `-View elevated`로 다른 구도를 선택할 수 있다. 드론 mesh/physics, baseline Front/Down, AeroVLA와 closed-loop 코드는 변경하지 않는다. `outputs/demo_views/sim_config/`에 Chase만 바꾼 별도 설정을 만든다.
+
+Scripted takeoff → hover → forward → yaw → forward → hover → land/disarm 순서다. **AeroVLA 추론이나 failure injection을 실행하지 않는다.** 현재 simulator/client를 먼저 종료해야 하며, launcher가 자기 simulator를 시작하고 완료 후 종료한다. Escape로 중단하면 착륙을 시도한다. 카메라 비교와 약 8초의 비행을 촬영하며 전체 실행은 약 25초였다.
+
+Chase는 official topic을 구독하고 Front/Down은 관찰용으로 약 0.6초 간격 갱신한다. 이 화면 갱신 주기는 AI input camera 설정을 바꾸지 않는다. 후보·raw frame·telemetry는 `outputs/demo_views/`에만 남는다. 선택한 이미지를 README용으로 복사하고 GIF를 만들 때:
+
+```powershell
+.\assets\projectairsim-env\Scripts\python.exe scripts/export_demo_media.py
+```
+
+GIF는 실제 기록 시각 간격을 유지하며 4MiB보다 크면 공개하지 않는다. 새 캡처의 Windows client는 Python 3.12.14, Project AirSim 1.0.2, OpenCV 5.0.0.93, NumPy 2.5.3, Pillow 12.3.0이었다. 이전 baseline 환경 기록과 구별하며, 이번 작업에서 package 설치·교체는 하지 않았다.
+
 ## 모델 없는 기존 데모 / 테스트
 
 `run_projectairsim_demo.ps1`는 자체 simulator를 시작하므로 기존 simulator와 동시에 실행하지 않는다. 기존 B/W toggle 및 자동 blur/drift를 보여주는 **model-free** 시험이다.

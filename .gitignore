@@ -6,6 +6,9 @@
 !/outputs/examples/closed_loop.png
 !/outputs/examples/control_drift.png
 !/outputs/examples/drone_view.png
+!/outputs/examples/hero_drone.png
+!/outputs/examples/drone_flight.gif
+!/outputs/examples/observer_view.png
 
 # Downloaded simulator, datasets and model weights.
 /assets/

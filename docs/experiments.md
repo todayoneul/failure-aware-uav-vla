@@ -17,6 +17,25 @@
 
 최종 loop의 GPU global peak는 **9.76GiB**, Windows RAM peak는 **30.07GiB**다. Timeout·OOM·simulator crash는 없었다. 비행 중 collision event는 0건이며, 초기 platform 접촉과 착륙 접촉은 별도로 남겼다. 자동 장애 감지·복구 또는 navigation benchmark는 수행하지 않았다.
 
-이 repository 정리에서는 새 비행·모델·simulator 다운로드를 하지 않았다. 기존 adapter 테스트와 Git에 없는 조사 파일 없이 scene 설정을 준비하는 회귀 테스트 **6/6이 통과**했다. Python compile, PowerShell 8개·Bash 3개 문법 검사도 통과했다. baseline 카메라 설정과 공개 예제 이미지 3장의 원본 일치를 확인했다.
+초기 repository 정리에서는 새 비행·모델·simulator 다운로드를 하지 않았다. 당시 adapter·설정 회귀 테스트 **6/6**, Python compile, PowerShell 8개·Bash 3개 문법 검사도 통과했다. baseline 카메라 설정과 기존 공개 예제 이미지 3장의 원본 일치를 확인했다.
+
+## 외부 관찰 화면 개선 — 2026-10-05
+
+기존 Blocks에서 **모델 없는 별도 scripted flight**를 촬영했다. AeroVLA 성능 시험을 다시 수행한 것이 아니다. 원본 Front/Down·vehicle geometry·dynamics·integration 코드와 기존 3장 이미지는 유지했다.
+
+| Chase 후보 | 후방 / 위쪽 | FOV | 관찰 |
+|---|---|---|---|
+| 기존 | 10 / 1m | 90° | 드론이 작아 처음 보는 사람이 구별하기 어려움 |
+| Close | 1.9 / 0.55m | 60° | 기체와 네 로터가 가장 명확해 **선택** |
+| Medium | 2.8 / 0.75m | 60° | 주변 공간이 더 넓게 보임 |
+| Elevated | 2.4 / 1m | 60° | 기체 위쪽 형상이 잘 보임 |
+
+후보 3개의 `set_camera_pose` / `set_field_of_view`는 실제 True를 반환했다. Raw Chase는 960×540이며, 외부 관찰 창에는 Front/Down과 command·clearance·heading·position을 표시했다. 기존 baseline의 Chase 256×256과 구별한다.
+
+첫 촬영은 순차 camera RPC와 저장 때문에 약 3fps였다. Chase topic 구독으로 바꾼 최종 촬영은 **90개 실제 frame, 약 10.67fps**였다. GIF는 **8.34초 / 480×270 / 3,448,620 bytes (3.29MiB)**이며 실제 기록 간격을 유지한다. Frame 생성·보간·시간 가속은 하지 않았다.
+
+전진·yaw·전진·hover 명령은 True, 실제 이동을 state로 확인했다. 기존과 같이 takeoff 반환은 False였지만 실제 climb·airborne 조건을 통과했다. 마지막 land는 True, disarm 후 landed state 0, cleanup error는 없었다. Simulator/client는 종료했다. 새 모델·map·package를 다운로드하거나 failure 기능을 구현하지 않았다.
+
+회귀 테스트는 **10/10**이다. Chase만 바뀌고 physics와 AI camera 설정은 보존되는지, camera optical axis, GIF의 기록 시각 보존을 추가 검사했다. 후보·최종 촬영 raw frames·세 차례 촬영의 결과 JSON은 로컬 `outputs/demo_views/`에 보존하고 선택한 media만 공개한다.
 
 상세 기록: [최종 loop](archive/final_closed_loop_validation.md), [통신](archive/communication_stability_test.md), [NF4](archive/aerovla_int4_validation.md), [Project AirSim](archive/projectairsim_smoke_test.md), [이전 기록 목록](archive/README.md).
