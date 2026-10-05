@@ -13,7 +13,7 @@ try {
     $taskCommand=Join-NativeArguments (@($taskScript)+$taskExpected)
     $taskProcess=Start-Process -FilePath $taskPython -ArgumentList $taskCommand -WindowStyle Hidden -Wait -PassThru -RedirectStandardOutput $taskStdout -RedirectStandardError $taskStderr
     if ($taskProcess.ExitCode -ne 0) { throw 'Argument probe failed' }
-    $taskActual=@(Get-Content $taskStdout -Raw | ConvertFrom-Json)
+    $taskActual=Get-Content $taskStdout -Raw | ConvertFrom-Json
     if ($taskActual.Count -ne $taskExpected.Count) { throw 'Argument count changed' }
     for ($taskIndex=0;$taskIndex -lt $taskExpected.Count;$taskIndex++) {
         if ($taskActual[$taskIndex] -cne $taskExpected[$taskIndex]) { throw "Argument $taskIndex changed" }
@@ -24,7 +24,7 @@ try {
     $taskWslArgs=@('-d','Ubuntu','--exec','/usr/bin/python3',$taskWslScript)+$taskWslExpected
     $taskProcess=Start-Process -FilePath 'wsl.exe' -ArgumentList (Join-NativeArguments $taskWslArgs) -WindowStyle Hidden -Wait -PassThru -RedirectStandardOutput $taskStdout -RedirectStandardError $taskStderr
     if ($taskProcess.ExitCode -ne 0) { throw 'WSL argument probe failed' }
-    $taskActual=@(Get-Content $taskStdout -Raw | ConvertFrom-Json)
+    $taskActual=Get-Content $taskStdout -Raw | ConvertFrom-Json
     if ($taskActual.Count -ne $taskWslExpected.Count) { throw 'WSL argument count changed' }
     for ($taskIndex=0;$taskIndex -lt $taskWslExpected.Count;$taskIndex++) {
         if ($taskActual[$taskIndex] -cne $taskWslExpected[$taskIndex]) { throw "WSL argument $taskIndex changed" }

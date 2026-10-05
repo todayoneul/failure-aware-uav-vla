@@ -1,3 +1,10 @@
+function Enable-ProcessExitTracking {
+    param([System.Diagnostics.Process]$Process)
+    # Cache the native handle while the child is alive. Windows PowerShell 5.1
+    # otherwise loses redirected WSL exit codes after HasExited/Refresh polling.
+    $null=$Process.Handle
+}
+
 function Join-NativeArguments {
     param([string[]]$Arguments)
     # Windows CRT argv quoting, not shell interpolation or JSON escaping.

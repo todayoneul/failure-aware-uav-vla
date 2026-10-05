@@ -12,6 +12,8 @@ PowerShell을 열어 저장소 폴더로 이동한 뒤 한 명령을 실행한�
 
 이미 준비한 Windows Blocks와 client, WSL2 Ubuntu inference 환경, local OpenVLA/AeroVLA checkpoint를 재사용한다. Launcher가 simulator, 관찰 창, resource monitor, WSL model runner를 시작한다. 모델·map·package는 다운로드하지 않는다. 다른 simulator/client가 켜져 있으면 먼저 그 창을 종료한다.
 
+Windows PowerShell 5.1과 PowerShell 7 모두 지원한다. 초기화·종료 제어는 Python 파일을 실행하므로 `python -c`의 따옴표 전달 방식에 의존하지 않는다. Redirect된 WSL process의 handle을 먼저 보존해 5.1에서 정상 종료 코드를 놓치지 않도록 했다.
+
 모델 로딩 중에는 `Loading OpenVLA NF4 + AeroVLA LoRA`가 표시된다. 로딩과 camera 연결이 끝나면 비행과 실제 모델 추론이 시작된다. 별도 WSL 터미널 명령은 필요 없다. 기본 최대 30 decisions이며 바꾸려면 `-MaxSteps 12`처럼 지정한다.
 
 ## 조작

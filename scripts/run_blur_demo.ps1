@@ -5,6 +5,7 @@ $taskRoot=Split-Path -Parent $PSScriptRoot
 $taskOutput=Join-Path $taskRoot 'outputs/failure_demo'
 $taskExe=Join-Path $taskRoot 'assets/projectairsim-blocks-1.0.1/Blocks/Binaries/Win64/Blocks-Win64-Shipping.exe'
 $taskPython=Join-Path $taskRoot 'assets/projectairsim-env/Scripts/python.exe'
+$taskControlScript=Join-Path $PSScriptRoot 'blur_demo_control.py'
 if (-not (Test-Path -LiteralPath $taskExe) -or -not (Test-Path -LiteralPath $taskPython)) { throw 'Prepared Blocks and Windows client required; see docs/setup.md' }
 if (-not (Test-Path -LiteralPath (Join-Path $taskRoot 'outputs/integration/model-downloads.json'))) { throw 'Local model manifest required; see docs/setup.md. This launcher never downloads models.' }
 if (Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | Where-Object LocalPort -in 8989,8990) { throw 'Close the existing simulator/client before starting this demo.' }
@@ -19,15 +20,8 @@ $taskHost=((& wsl -d $Distro --exec ip -4 route show default) -split '\s+')[2]
 if (-not $taskHost) { throw 'Current Windows NAT host address unavailable' }
 New-Item -ItemType Directory -Force $taskOutput | Out-Null
 if ($AutoTest) { $MaxSteps=6 }
-Push-Location $taskRoot
-try {
-& $taskPython -c 'from src.failures.control import initialize_run_output;initialize_run_output("outputs/failure_demo")'
-if ($LASTEXITCODE -ne 0) { throw 'Previous run evidence could not be archived' }
-& $taskPython -c 'from src.failures.control import default_control,write_control;write_control("outputs/failure_demo/control.json",default_control())'
-if ($LASTEXITCODE -ne 0) { throw 'Control initialization failed; run this script from the repository root' }
-& $taskPython -c "from src.integration.blur_demo_support import BlurDemoSession;BlurDemoSession('.', 'outputs/failure_demo', $MaxSteps)"
-if ($LASTEXITCODE -ne 0) { throw 'Fresh viewer telemetry initialization failed' }
-} finally { Pop-Location }
+& $taskPython $taskControlScript --action init --output $taskOutput --steps $MaxSteps
+if ($LASTEXITCODE -ne 0) { throw 'Demo control initialization failed; previous evidence is preserved in runs/ when archived' }
 $taskRunToken=(Get-Content -LiteralPath (Join-Path $taskOutput 'run-info.json') -Raw | ConvertFrom-Json).id
 $taskSim=$taskMonitor=$taskViewer=$taskWorker=$null
 $taskCleanupFailure=$null
@@ -50,15 +44,14 @@ try {
     $taskRunnerArgs=@('-d',$Distro,'--exec',$taskWslPython,"$taskWslRoot/src/integration/closed_loop_runner.py",'--host',$taskHost,'--blur-demo','--steps',"$MaxSteps",'--run-token',$taskRunToken)
     if ($AutoTest) { $taskRunnerArgs+='--auto-test' }
     $taskWorker=Start-Process -FilePath 'wsl.exe' -ArgumentList (Join-NativeArguments $taskRunnerArgs) -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $taskOutput 'worker.log') -RedirectStandardError (Join-Path $taskOutput 'worker-errors.log')
+    Enable-ProcessExitTracking $taskWorker
     Write-Host 'WSL is loading the existing AeroVLA checkpoint. Progress is shown in the observer and worker.log.'
     $taskPrevious=''
     $taskQuitDeadline=$null
     while (-not $taskWorker.HasExited) {
         if ($taskViewer.HasExited) {
             if (-not $taskQuitDeadline) { $taskQuitDeadline=(Get-Date).AddSeconds(45) }
-            Push-Location $taskRoot
-            try { & $taskPython -c 'from src.failures.control import read_control,write_control;p="outputs/failure_demo/control.json";s=read_control(p);s["quit"]=True;write_control(p,s)' }
-            finally { Pop-Location }
+            & $taskPython $taskControlScript --action quit --output $taskOutput
         }
         try {
             $taskStatus=Get-Content -LiteralPath (Join-Path $taskOutput 'telemetry.json') -Raw | ConvertFrom-Json
@@ -72,7 +65,7 @@ try {
         $taskWorker.Refresh(); $taskViewer.Refresh()
     }
     if (-not $taskWorker.HasExited) { throw 'Graceful stop timed out; ownership-aware cleanup will run' }
-    if ($taskWorker.ExitCode -ne 0) { throw 'WSL demo failed; inspect outputs/failure_demo/worker-errors.log and closed-loop.json' }
+    if ($null -eq $taskWorker.ExitCode -or $taskWorker.ExitCode -ne 0) { throw "WSL demo failed (exit $($taskWorker.ExitCode)); inspect outputs/failure_demo/worker-errors.log and closed-loop.json" }
     if ($AutoTest) { $null=$taskViewer.WaitForExit(10000) }
     else {
         Write-Host 'Run complete. Inspect the last input/action in the observer; press Q/Esc to close.'
@@ -80,9 +73,7 @@ try {
     }
 } finally {
     if ($taskWorker -and -not $taskWorker.HasExited) {
-        Push-Location $taskRoot
-        try { & $taskPython -c 'from src.failures.control import read_control,write_control;p="outputs/failure_demo/control.json";s=read_control(p);s["quit"]=True;write_control(p,s)' }
-        finally { Pop-Location }
+        & $taskPython $taskControlScript --action quit --output $taskOutput
         $taskGraceMs=if ($taskQuitDeadline) { [Math]::Max(0,[int](($taskQuitDeadline-(Get-Date)).TotalMilliseconds)) } else { 45000 }
         $null=$taskWorker.WaitForExit($taskGraceMs)
     }
