@@ -46,6 +46,36 @@ class BlurDemoViewTests(unittest.TestCase):
             session.verify_input(inference, failure)
             self.assertTrue(session.telemetry['input_verified'])
 
+    def test_incomplete_display_pair_is_not_accepted_under_new_telemetry(self):
+        from scripts.blur_demo_viewer import read_input_pair
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            image = np.full((256,256,3), 20, dtype=np.uint8)
+            digest = hashlib.sha256(image.tobytes()).hexdigest()
+            cv2.imwrite(str(output/'front.png'), image)
+            (output/'down.png').write_bytes(b'incomplete image')
+            telemetry = {'input_files': {'front':'front.png','down':'down.png'},
+                         'failure': {'used_frame_sha256': {'front':digest,'down':digest}}}
+            self.assertIsNone(read_input_pair(output, telemetry))
+            cv2.imwrite(str(output/'down.png'), image)
+            pair = read_input_pair(output, telemetry)
+            np.testing.assert_array_equal(pair['front'], image)
+            np.testing.assert_array_equal(pair['down'], image)
+
+    def test_new_run_archives_old_evidence_without_mixing_logs_or_removing_notes(self):
+        from src.failures.control import initialize_run_output
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            for name in ('closed-loop-log.jsonl','control-events.jsonl','blur_front.png','comparison.png'):
+                (output/name).write_text('previous run')
+            (output/'my_notes.txt').write_text('keep in place')
+            archive = initialize_run_output(output)
+            for name in ('closed-loop-log.jsonl','control-events.jsonl','blur_front.png','comparison.png'):
+                self.assertFalse((output/name).exists())
+                self.assertEqual((archive/name).read_text(), 'previous run')
+            self.assertEqual((output/'my_notes.txt').read_text(), 'keep in place')
+            self.assertTrue((output/'run-info.json').is_file())
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -3,6 +3,8 @@ import json
 import os
 import time
 import tempfile
+import datetime
+import uuid
 from pathlib import Path
 
 
@@ -58,3 +60,33 @@ def apply_key(state, key):
         return updated
     updated['revision'] += 1
     return updated
+
+
+def initialize_run_output(path):
+    """Archive only known current-run files; leave unrelated notes and directories alone."""
+    output = Path(path).resolve()
+    output.mkdir(parents=True, exist_ok=True)
+    names = {'closed-loop.json','closed-loop-log.jsonl','closed-loop-wsl-resources.jsonl',
+             'control.json','control-events.jsonl','telemetry.json','worker-pid.txt','run-info.json',
+             'worker.log','worker-errors.log','viewer.log','viewer-errors.log',
+             'windows-resources.jsonl','windows-latest.json','windows-latest.tmp','active-stage.txt',
+             'chase_latest.png','comparison.png','launcher-cleanup.json'}
+    names.update(f'{prefix}_{camera}.png' for prefix in ('normal','blur','restored','input_a','input_b')
+                 for camera in ('front','down'))
+    names.update(f'observer_{label}.png' for label in ('normal','blur','restored'))
+    names.update(Path(name).stem+'.publish.png' for name in list(names) if name.endswith('.png'))
+    names.add('telemetry.publish.tmp')
+    old = [file for file in output.iterdir() if file.is_file() and
+           (file.name in names or file.name.startswith('control.json.') and file.name.endswith('.tmp'))]
+    archive = None
+    if old:
+        tag = datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ')+'-'+uuid.uuid4().hex[:8]
+        archive = output/'runs'/tag
+        archive.mkdir(parents=True)
+        for file in old:
+            # Single known file moves, never recursive cleanup or removal.
+            file.replace(archive/file.name)
+    (output/'run-info.json').write_text(json.dumps({'id': uuid.uuid4().hex,
+        'started_at': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        'previous_run_archive': str(archive.relative_to(output)) if archive else None}), encoding='utf-8')
+    return archive

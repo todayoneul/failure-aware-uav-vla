@@ -14,6 +14,11 @@ import threading
 import time
 import traceback
 from pathlib import Path
+if '--blur-demo' in sys.argv:
+    # Publish ownership before slow ML imports/loading so cancellation can locate this process.
+    early_output = Path(__file__).resolve().parents[2]/'outputs/failure_demo'
+    early_output.mkdir(parents=True, exist_ok=True)
+    (early_output/'worker-pid.txt').write_text(str(os.getpid()))
 import cv2
 import numpy as np
 import psutil
@@ -243,6 +248,7 @@ if __name__=='__main__':
     parser.add_argument('--blur-demo', action='store_true')
     parser.add_argument('--steps', type=int, default=30)
     parser.add_argument('--auto-test', action='store_true')
+    parser.add_argument('--run-token')
     args = parser.parse_args()
     if not 1 <= args.steps <= 60:
         parser.error('--steps must be within 1..60')

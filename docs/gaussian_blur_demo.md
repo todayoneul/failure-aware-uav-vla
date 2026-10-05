@@ -61,6 +61,8 @@ Blur 때문에 모델이 실패해야 이 기능이 성공한 것은 아니다. 
 
 `outputs/failure_demo/`에 최근 실행을 기록한다. 전체 camera frame dump는 만들지 않는다.
 
+재실행하면 이전에 프로그램이 만든 사진·로그는 `outputs/failure_demo/runs/<UTC시각-식별자>/`에 보존하고 현재 파일을 새로 시작한다. 사용자가 따로 만든 메모나 다른 디렉터리는 이동하지 않는다. `run-info.json`으로 이번 실행과 이전 archive를 구분한다.
+
 | 파일 | 확인할 것 |
 |---|---|
 | `worker.log`, `worker-errors.log` | 모델 로딩·각 decision·오류 |
@@ -85,3 +87,7 @@ NORMAL 2 → MEDIUM BLUR 2 → NORMAL 2, **6/6 완료**. 실제 GPU tensor의 �
 Blur ON 두 pair의 처리 시간은 약 **9.02 / 0.53ms**였다. 첫 AeroVLA generation은 **2.880초**, 이후 5회 평균은 약 **1.075초**였다. 이 작은 시연에서의 측정이며, 강도별 성능 비교나 navigation 평가가 아니다. 다른 pose의 행동 차이를 blur의 인과 효과로 단정하지 않는다.
 
 자동 감지·분류·복구·replanning·재학습·benchmark·다른 failure는 이번 작업에 포함하지 않는다.
+
+실행/표시/종료 경계 보완 뒤 추가 정상 1-step도 실제 추론·이동·land/disarm에 성공했다. 소유 worker 종료 확인, 현재 run의 stale blur 파일 부재를 검사했다. 24개 Python 회귀 테스트와 Windows/WSL 인자 경계 smoke 2개가 통과했다. LOW/HIGH는 모듈 테스트, 실제 live ON/OFF 기록은 MEDIUM이다.
+
+종료 요청에 정상 응답하지 않는 경우에는 제한된 대기 뒤 **동일 run-token과 script 경로로 확인한 worker만** 종료하고 자기 simulator를 닫는다. 이 강제 종료는 정상 착륙으로 기록하지 않는다. `launcher-cleanup.json`의 `terminated` / `forced`를 확인할 수 있다.

@@ -26,6 +26,20 @@ def control_key_for_click(x, y):
     return -1
 
 
+def read_input_pair(output, telemetry):
+    files = telemetry.get('input_files') or {}
+    expected = (telemetry.get('failure') or {}).get('used_frame_sha256') or {}
+    if not all(name in files and name in expected for name in ('front','down')):
+        return None
+    pair = {}
+    for name in ('front','down'):
+        image = cv2.imread(str(Path(output)/files[name]))
+        if image is None or image.shape != (256,256,3) or hashlib.sha256(image.tobytes()).hexdigest() != expected[name]:
+            return None
+        pair[name] = image
+    return pair
+
+
 def write_lines(canvas, lines, x, y, width=56, scale=.48, color=(55, 43, 31)):
     for line in lines:
         for wrapped in textwrap.wrap(str(line), width) or ['']:
@@ -134,7 +148,12 @@ def main():
                 telemetry = json.loads((output/'telemetry.json').read_text())
             except (OSError, ValueError):
                 pass
-            sources = list((telemetry.get('input_files') or {}).items())
+            pair = read_input_pair(output, telemetry)
+            if pair is None:
+                images['front'] = images['down'] = None
+            else:
+                images.update(pair)
+            sources = []
             if telemetry.get('chase_ready'):
                 sources.append(('chase','chase_latest.png'))
             for name, filename in sources:
@@ -152,7 +171,7 @@ def main():
                     pass
             rendered = draw_view(telemetry, control, images)
             cv2.imshow(WINDOW, rendered)
-            if telemetry.get('input_verified') and telemetry.get('clipped_action') is not None:
+            if pair is not None and telemetry.get('input_verified') and telemetry.get('clipped_action') is not None:
                 active = (telemetry.get('failure') or {}).get('failure_enabled', False)
                 label = 'blur' if active else 'restored' if 'blur' in saved else 'normal'
                 if label not in saved:
