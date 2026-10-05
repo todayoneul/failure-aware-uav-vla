@@ -39,3 +39,16 @@
 회귀 테스트는 **10/10**이다. Chase만 바뀌고 physics와 AI camera 설정은 보존되는지, camera optical axis, GIF의 기록 시각 보존을 추가 검사했다. 후보·최종 촬영 raw frames·세 차례 촬영의 결과 JSON은 로컬 `outputs/demo_views/`에 보존하고 선택한 media만 공개한다.
 
 상세 기록: [최종 loop](archive/final_closed_loop_validation.md), [통신](archive/communication_stability_test.md), [NF4](archive/aerovla_int4_validation.md), [Project AirSim](archive/projectairsim_smoke_test.md), [이전 기록 목록](archive/README.md).
+
+## Gaussian Blur live input injection — 2026-10-05
+
+현재 구현은 [Gaussian Blur 실행 안내](gaussian_blur_demo.md)에 있다. 기존 model-free blur/drift와 달리 **실제 Front/Down → GaussianBlur → 기존 AeroVLA preprocessing/inference**에 연결했다.
+
+- NORMAL 2 → MEDIUM BLUR 2 → NORMAL 2, **6/6 완료**.
+- 실제 CUDA BF16 tensor의 원본 기준 대비 차이: `false,false,true,true,false,false`. 표시 입력과 모델 입력의 frame SHA도 일치했다.
+- 실제 movement: 0.336 / 0.239 / 0.386 / 0.410 / 0.305 / 0.387m. Timeout/OOM 없이 land/disarm 완료.
+- Blur ON pair 평균 **4.776ms**; 첫 9.020ms, 다음 0.533ms. 첫 generation 2.880s, 이후 5회 평균 1.075s.
+- 리뷰 보완 뒤 새 launcher의 추가 1-step도 PASS, actual movement와 정상 종료/worker 소멸을 확인했다. 이전 ON/OFF 결과는 `outputs/failure_demo/runs/`에 보존하고 새 실행의 파일과 분리했다.
+- 회귀 테스트 **24/24**, Windows native/WSL argv 경계 smoke 2개 통과. 종료 helper는 무해한 소유 테스트 worker만 종료하고 다른 run-token 프로세스는 거부하는 테스트로 확인했다.
+
+물리 키를 자동으로 눌러 시험한 것은 아니다. 동일 B 상태 변경 경로의 live 검증과 키/버튼 handler 테스트를 수행했다. LOW/HIGH는 모듈 테스트에서 실행했으며, 실제 VLA live 기록은 MEDIUM이다. 모델 행동 차이의 원인을 blur로 단정하지 않으며 detection/recovery, 재학습, benchmark는 수행하지 않았다.

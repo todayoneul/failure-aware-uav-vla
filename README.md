@@ -17,6 +17,7 @@ Project AirSim의 실제 드론입니다. 관찰 카메라를 가까이 배치�
 - ✅ Project AirSim 드론·Front/Down RGB 카메라
 - ✅ AeroVLA NF4 추론과 실제 영상 → 행동 → 이동
 - ✅ single-step 및 **10/10 closed loop**
+- ✅ **Interactive Gaussian Blur injection — 실제 AeroVLA 입력에 적용**
 - ✅ 기본 blur·control drift 데모 — **모델 없는 별도 script 시험**
 
 ### 드론이 어떻게 움직이나요?
@@ -34,6 +35,18 @@ Project AirSim의 실제 드론입니다. 관찰 카메라를 가까이 배치�
 AeroVLA에 전달된 Front/Down RGB와 생성된 forward/down/yaw 행동입니다. 기존 10-step closed loop의 실제 저장 화면입니다.
 
 ### 장애 상황은 어떻게 보여주나요?
+
+실제 AI 입력을 흐리게 하는 Gaussian Blur를 켜고 끌 수 있습니다. 관찰 창에서 **B: ON/OFF, 1/2/3: 강도, Q/Esc: 종료** 또는 버튼을 사용합니다.
+
+```powershell
+.\scripts\run_blur_demo.ps1
+```
+
+![같은 시점의 원본 영상과 실제 blurred AeroVLA 입력](outputs/examples/gaussian_blur_comparison.png)
+
+왼쪽은 원본 기준, 오른쪽은 실제 모델 입력입니다. [새 관찰 창](outputs/examples/gaussian_blur_observer.png)에는 prompt·모델 원문 행동·해석된 값·안전 제한 후 명령이 함께 표시됩니다. [실행과 관찰 안내](docs/gaussian_blur_demo.md).
+
+### 기존 모델 없는 장애 시연
 
 ![기존 blur와 control drift 시연](outputs/examples/control_drift.png)
 
@@ -59,7 +72,7 @@ RTX 5070 12GB / Windows + WSL2 / Project AirSim / OpenVLA-7B + AeroVLA LoRA / NF
 docs/              setup · baseline · experiments · failure_plan
 docs/archive/      이전 기술 검증 기록
 src/integration/   모델·카메라·행동 변환과 실행 코드
-src/failures/      다음 기능을 위한 빈 자리
+src/failures/      Gaussian Blur와 작은 control protocol
 configs/           baseline 설정과 패키지 버전
 scripts/ · tests/  준비·측정 스크립트와 테스트
 outputs/examples/  드론·관찰·AI·장애 화면과 짧은 GIF
@@ -76,10 +89,11 @@ outputs/examples/  드론·관찰·AI·장애 화면과 짧은 GIF
 - [x] Project AirSim setup
 - [x] AeroVLA NF4 inference
 - [x] Live closed-loop drone control
-- [ ] Failure injection framework
-- [ ] Interactive failure controls
+- [x] Gaussian Blur input injection
+- [x] Interactive controls for Gaussian Blur
+- [ ] Additional failure types
 - [ ] Failure detection
 - [ ] Basic recovery behavior
 - [ ] Demo and evaluation
 
-다음 후보는 **Gaussian Blur → Partial Occlusion → Control Drift**입니다. 구현 전 계획과 단축키 아이디어는 [failure plan](docs/failure_plan.md)에 있습니다.
+Gaussian Blur는 구현했습니다. 다음 후보는 **Partial Occlusion**이며, Control Drift 등 나머지는 [failure plan](docs/failure_plan.md)에 계획으로 남겨두었습니다.

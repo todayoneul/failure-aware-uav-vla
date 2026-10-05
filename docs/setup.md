@@ -92,6 +92,8 @@ Runner를 재실행하면 기존 로컬 결과 파일 일부가 갱신된다. �
 
 ## 관찰 화면 Demo
 
+**실제 AeroVLA 실행과 Blur ON/OFF를 보려면:** `./scripts/run_blur_demo.ps1`. Simulator·Windows 관찰 창·WSL 모델을 함께 시작한다. [키 조작, 모델 행동을 읽는 방법, 로그 확인](gaussian_blur_demo.md)을 먼저 참고한다. 아래 `run_demo_view.ps1`는 외부 카메라 framing을 보여주는 **model-free** scripted flight다.
+
 Windows에서 준비된 Blocks와 client를 사용해 외부 시점 위주의 별도 관찰 창을 연다. 큰 Chase 화면, 작은 Front/Down 화면, 현재 command·clearance·heading·position을 보여준다.
 
 ```powershell

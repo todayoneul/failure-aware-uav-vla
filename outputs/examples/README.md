@@ -10,7 +10,11 @@
 | [hero_drone.png](hero_drone.png) | `outputs/demo_views/hero_drone.png` | Close Chase, 실제 airborne drone; raw camera 960×540 |
 | [observer_view.png](observer_view.png) | `outputs/demo_views/observer_hero.png` | 큰 외부 시점 + Front/Down + 실제 command/telemetry, model-free |
 | [drone_flight.gif](drone_flight.gif) | `outputs/demo_views/frames/`, `capture-result.json` | 실제 전진·yaw·전진; 기록된 wall-time 간격대로 GIF 인코딩 |
+| [gaussian_blur_comparison.png](gaussian_blur_comparison.png) | Gaussian Blur 6-step live 검증의 `comparison.png`, 이후 `outputs/failure_demo/runs/`에 보존 | 동일 관측의 원본 기준 vs 실제 AeroVLA input, MEDIUM |
+| [gaussian_blur_observer.png](gaussian_blur_observer.png) | 같은 검증의 `observer_blur.png` | 실제 input·prompt·raw/decoded/bounded action을 표시한 관찰 창 |
 
 `control_drift.png`는 AeroVLA가 장애를 감지하거나 복구했다는 결과가 아니다. 전체 frame dump와 raw 로그는 Git에서 제외한다.
 
 새 비행 GIF도 AeroVLA 조종 성능을 보여주는 영상이 아니다. 기존 AI 화면과 별도의 scripted visualization이다. Hero PNG와 관찰 PNG는 원본 export를 복사했다. GIF만 크기·색상 수를 줄였으며 새 frame을 생성하거나 보간하지 않았다. 테스트용 close/medium/elevated 후보와 raw frames는 로컬 `outputs/demo_views/`에 남기고 Git에 넣지 않는다.
+
+새 `gaussian_blur_*` 두 이미지는 **실제 AeroVLA input injection** 검증에서 가져왔다. 기존 `control_drift.png`와 달리 실제 NF4 model inference를 수행했다. 자동 detection/recovery의 구현이나 성공을 보여주는 자료는 아니다.

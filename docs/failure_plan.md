@@ -1,6 +1,6 @@
 # Failure 기능 개발 계획
 
-목표는 simulator를 보면서 장애를 직접 켜고 드론 반응을 관찰하는 재미있는 텀프로젝트다. 아래는 **개발 후보**이며 구현이나 모델 영향 측정 결과가 아니다. 기존 model-free blur/drift prototype는 참고할 수 있지만, AeroVLA에 연결된 공통 failure 모듈·자동 감지·복구는 아직 없다.
+목표는 simulator를 보면서 장애를 직접 켜고 드론 반응을 관찰하는 재미있는 텀프로젝트다. **Gaussian Blur는 실제 AeroVLA 입력에 연결해 구현했다.** 나머지는 개발 후보이며 자동 감지·복구는 아직 없다. 기존 model-free blur/drift prototype와 새 live input injection은 구별한다. [실행 안내](gaussian_blur_demo.md).
 
 ## Visual failures
 
@@ -8,7 +8,7 @@
 
 | Failure | What happens | How to simulate | Difficulty | Demo value |
 |---|---|---|---|---|
-| Gaussian Blur | 영상이 갑자기 흐려진다 | Gaussian kernel로 처리 | 쉬움 | 높음 |
+| Gaussian Blur — **Implemented** | 실제 VLA 입력이 흐려진다 | preprocessing 전 Gaussian blur, B toggle | 구현 완료 | 높음 |
 | Brightness Change | 너무 어둡거나 밝아진다 | 밝기 gain을 바꾸고 uint8 범위로 제한 | 쉬움 | 보통 |
 | Image Noise | 영상에 잡음이 생긴다 | 강도를 제한한 noise 추가 | 쉬움 | 보통 |
 | Partial Occlusion | 화면 일부가 가려진다 | 지정 영역을 검은 사각형으로 덮기 | 쉬움 | 높음 |
@@ -48,15 +48,15 @@
 
 | 후보 | 구현 | 화면 재미 | Project AirSim 적용 | 예상 VLA 영향 | 추천 |
 |---|---|---|---|---|---|
-| Gaussian Blur | 쉬움 | 좋음 | camera frame에 적용, 기존 prototype 참고 | 물체/방향 인식이 흐려질 수 있음 | **첫 구현** |
+| Gaussian Blur | 구현 완료 | 좋음 | 실제 Front/Down → preprocessing 전 적용 | 6-step ON/OFF input 연결 검증; 성능 영향은 미평가 | **Implemented** |
 | Partial Occlusion | 쉬움 | 좋음 | camera frame에 적용 | 가려진 영역에 따라 판단이 달라질 수 있음 | 두 번째 |
 | Control Drift | 쉬움~보통 | 매우 좋음 | 기존 motion API와 안전 제한 활용 | 출력은 같아도 실제 이동이 빗나갈 수 있음 | 세 번째 |
 
-**첫 작업은 Gaussian Blur 주입기**다. 기존 카메라 경로에 작은 모듈로 붙이고 비행 명령은 유지할 수 있어 baseline 보존이 쉽다. 원본/변경 영상과 ON/OFF 상태를 즉시 보여줄 수 있다. 다음 작업에서 `src/failures/`에 재사용 가능한 주입기와 토글 연결을 만들고, 한 효과부터 확인한다.
+Gaussian Blur 주입기와 토글은 `src/failures/`에 구현했다. 기본 OFF/MEDIUM, LOW/MEDIUM/HIGH, Front/Down 모두 적용, 원본 보존, 실제 model tensor hash 검증을 제공한다. **다음 구현 후보는 Partial Occlusion 하나**다. 이번 작업에서는 occlusion이나 control drift 모듈을 추가하지 않았다.
 
 ## Interactive demo 아이디어
 
-향후 통합 창의 단축키 후보다. 현재 model-free 창에는 B/W 일부 기능만 있고, 아래 전체 인터페이스는 아직 없다.
+새 live 창에는 B와 1/2/3, Q/Esc 및 클릭 버튼이 있다. 아래 O/W/R은 아직 아이디어다. 기존 model-free 창의 W는 별도 script 기능이며 새 VLA pipeline의 drift 구현은 아니다.
 
 ```text
 B → Blur ON/OFF
@@ -83,4 +83,4 @@ Camera → Failure Injection → AeroVLA → Drone
                               Failure Detection → Recovery
 ```
 
-자동 감지·진단·복구는 주입 데모 다음 단계다. 이번 작업에서는 새 failure 기능, Detector, Recovery, 재학습, benchmark 또는 복잡한 metric을 구현하지 않는다.
+자동 감지·진단·복구는 이후 단계다. 이번에는 Gaussian Blur 하나만 구현했으며 Detector, Recovery, replanning, 재학습, benchmark 또는 다른 failure는 추가하지 않았다.
