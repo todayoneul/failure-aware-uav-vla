@@ -1,10 +1,14 @@
 # Failure-aware UAV VLA 실행 가능성 조사
 
+> **최신 상태 (2026-10-05 최종 검증):** Windows Project AirSim + direct WSL2 AeroVLA NF4 경로에서 single-step과 10/10 반복 실행에 성공했다. 전체 GPU peak 9.756GiB, Windows RAM peak 30.066GiB, 실제 반복 주기 0.221Hz로 **FEASIBLE WITH LIMITATIONS**다. [최종 결과](final_closed_loop_validation.md). 아래 본문은 초기 TravelUAV 조사와 당시 판단을 보존한 기록이며, checkpoint 보류·모델 미검증 등의 표현은 당시 상태다. TravelUAV 자체 GPU baseline은 여전히 미재현이다.
+
+> 2026-10-05 후속 검증: [platform comparison](platform_comparison.md). Windows **Project AirSim v1.0.1** RTX rendering / dual camera / 임시 demo는 실행됨. takeoff 반환값 제한으로 overall ⚠️, Native TravelUAV는 boot 환경 부재로 NOT TESTED. 기존 TravelUAV WSL GPU 실패 판정은 유지하며 checkpoint 다운로드는 NO다.
+
 조사일: 2026-10-04 (Asia/Seoul). 대상: RTX 5070 12GB Windows PC, TravelUAV + AeroVLA.
 
 ## 1. 결론과 검증 범위
 
-**갱신 판정: ⚠️ 기술 경로 일부를 실측했으나 baseline은 미재현이다.** WSL의 torch 2.7.1/cu128 + BF16 + bnb 0.48.2 NF4 + 작은 HF 모델 로딩은 통과했다. TravelUAV BrushifyUrban은 WSL에서 CPU Vulkan renderer를 사용했다. Windows AirSim Blocks는 RTX 5070 렌더링과 WSL RPC 중계가 성공했다. 이에 권장 후보를 **B. Windows simulator + WSL inference**로 갱신하되 동일 TravelUAV Windows scene 확보를 조건으로 둔다. Gate 2는 부분 검증이고 Gate 3 prototype은 미실행이다. checkpoint 다운로드 권고는 **NO**. 상세 로그·필수 표: [compatibility_smoke_test.md](compatibility_smoke_test.md).
+**갱신 판정: ⚠️ 기술 경로 일부를 실측했으나 baseline은 미재현이다.** WSL CUDA/BF16/NF4/HF tiny load는 통과했다. 한정 재시도에서 WSLg D3D12 OpenGL은 RTX 5070을 사용했으나 TravelUAV UE 4.27.2는 -opengl을 Vulkan으로 돌려 llvmpipe CPU renderer를 선택했다. Windows Blocks RTX/RPC 성공과 별개로 동일 BrushifyUrban의 공식 공개 Windows build는 없다. 최종 권장은 **C. Native Ubuntu**, 현재 Windows 개발 차선은 **D. 다른 AirSim 환경 개발 후 native Linux TravelUAV 평가**다. Gate 2 부분 검증, Gate 3 미실행, checkpoint 다운로드 권고 **NO**. [실측 표](compatibility_smoke_test.md), [최신 rendering decision](traveluav_rendering_decision.md).
 
 | 근거 표시 | 의미 |
 |---|---|
@@ -48,7 +52,7 @@ AeroVLA는 이전 이름 AerialVLA에서 변경되었으며 HF adapter 저장소
 | WSL kernel / CUDA 장치 인터페이스 | `6.6.87.2-microsoft-standard-WSL2`, `/dev/dxg` 존재, WSL `nvidia-smi` 경로 존재 |
 | WSL RAM / swap | `free -h` 약 15 GiB / 4 GiB |
 | WSL system Python | `3.12.3`; 제안 환경의 Python 3.10과 구별 |
-| 그래픽 진단 | vulkan-tools 설치 후 `vulkaninfo`: llvmpipe, physical device Type CPU. UE도 같은 renderer 선택 |
+| 그래픽 진단 | 기본 GL/Vulkan llvmpipe. NVIDIA/d3d12 env의 OpenGL은 RTX 5070 hardware 성공, UE -opengl은 지원 종료 warning 후 Vulkan CPU 선택 |
 | 실제 GPU 연산 | Python 3.10.14 / torch 2.7.1+cu128 / CC 12.0 / BF16·NF4·HF tiny load PASS |
 | Windows simulator 실측 | Blocks UE 4.27.2 / D3D11 RTX 5070 / 중계 camera RPC 179.195ms |
 
@@ -131,7 +135,7 @@ CUDA/PyTorch/VRAM 최소값을 AeroVLA가 공식 5070 기준으로 제시한 근
 | AirSim dependency | Python API와 RPC 필요. 환경 바이너리에 plugin 포함; 초기 목표에 AirSim/UE 소스 빌드 불필요 |
 | 엔진 버전 | 실제 BrushifyUrban과 Windows Blocks 로그에서 UE 4.27.2 확인. 다른 배포 map 및 AirSim C++ plugin revision은 `MISSING`; Python SDK version과 동일시하지 않음 |
 | 공개 실행 경로 | Linux `.sh`/`LinuxNoEditor`, `netstat`, `grep`, `pkill`, POSIX signal 기반 |
-| Windows native | Blocks RTX 5070 rendering/RPC는 성공. TravelUAV의 동등 Windows scene/build·launcher는 미확인 |
+| Windows native | Blocks RTX/RPC 성공. 동일 BrushifyUrban 공식 ZIP/배포에는 Windows executable/build 없음; 비공개 자원은 미확인 |
 | WSL2 | BrushifyUrban 실행/RGB/state/pose 성공, 그러나 llvmpipe CPU rendering. RTX rendering 조건 미충족 |
 | raw 구조 | map/trajectory UUID 아래 `log`, 5-view RGB/depth, `mark.json`, `object_description.json`; generator로 `merged_data.json` 생성 |
 | instruction | merged JSON의 `conversations[0].value`: target 방향·각도·object description이 포함된 prompt |
@@ -177,7 +181,7 @@ ModernCityMap은 script·spawn meta·seen split에 연결된 최소 **navigation
 |---|---|---|
 | 고정 호환 PyTorch cu128 | ✅ 로컬 실행 통과 | torch 2.7.1+cu128, CC 12.0, BF16 GPU kernel 및 tiny HF NF4 load/generate 성공 |
 | upstream torch 2.1.2 + cu118 그대로 | ❌ 채택 불가 | sm120에 맞춘 현재 후보가 아님 |
-| TravelUAV simulator | ⚠️ 부분 검증 | WSL BrushifyUrban CPU renderer/RPC 성공; Windows Blocks RTX/RPC 성공, 동일 TravelUAV Windows build 없음 |
+| TravelUAV simulator | ⚠️ 현재 Windows/WSL 경로 미충족 | OpenGL 재시도도 Vulkan CPU. 30-frame RPC 성공은 GPU PASS와 구별. 동일 공개 Windows map 없음; native Linux 후보 |
 | AeroVLA BF16 / FP16 전체 GPU 추론 | ❌ 어려움 | base weights만 약 14.047GiB로 GPU 총량보다 큼 |
 | AeroVLA INT8 | ⚠️ 여유 부족 가능 | 이상적 base 하한 7.023GiB에 adapter/vision/runtime/simulator 추가; 구현도 없음 |
 | AeroVLA INT4/NF4 | ⚠️ Gate 3 미실행 | NF4 stack 통과와 VLA 호환성은 구별. Gate 2 미충족으로 prototype/adapter/dtype/동시 peak 보류 |
@@ -217,19 +221,19 @@ ModernCityMap은 script·spawn meta·seen split에 연결된 최소 **navigation
 
 ## D. 권장 실행 환경
 
-**실측 후 권장 후보: B. Windows native simulator + WSL2 inference.** WSL CUDA/NF4는 정상이고 WSL TravelUAV Vulkan은 CPU renderer였다. Windows Blocks에서는 RTX 5070 graphics와 WSL camera/state RPC가 동작했다. 단, 동일 TravelUAV Windows scene/build 확보와 launcher 변경을 조건으로 둔다. all-in-one 실행의 실패를 프로젝트 전체 불가능으로 판단하지 않는다.
+**최종 권장: C. Native Ubuntu에서 동일 TravelUAV map의 native GPU Vulkan을 먼저 검증한다.** WSLg OpenGL hardware backend는 실제 성공했지만 UE 4.27.2의 desktop OpenGL 종료 때문에 현재 Linux package에 적용되지 않는다. 공개 Windows build가 없어 B를 즉시 실행 경로로 선택하지 않는다. 현재 PC에서 개발을 이어갈 차선은 **D. Windows AirSim 환경 개발 + native Linux TravelUAV final evaluation**이다. C는 아직 native 실측 전이며 파티션/dual boot 설치는 수행하지 않았다. WSL 제약을 프로젝트 전체 불가능으로 판단하지 않는다.
 
 | 판단 기준 | Windows native | WSL2 Ubuntu |
 |---|---|---|
-| 현재 배포 map/launcher와 일치 | Windows 대응 package/build 미확인 | Linux binary/bash/server를 사용 가능 |
+| 현재 배포 map/launcher와 일치 | 동일 BrushifyUrban 공개 Windows package 없음 | Linux binary/bash/server 실행 가능 |
 | Linux 프로세스·netstat·signal 코드 | launcher 변경 필요 | 원본 코드와 가깝게 사용 |
 | PyTorch/bnb sm120 지원 | 현대 wheel 존재, 로컬 Windows ML 미검증 | 별도 env BF16/NF4/HF load PASS |
-| UE GPU 렌더링 | Blocks D3D11 RTX 5070 확인; Travel scene 미확보 | Travel BrushifyUrban llvmpipe CPU, RTX 조건 미충족 |
-| 갱신 결정 | simulator 측 조건부 권장 | inference 측 권장; simulator all-in-one 보류 |
+| UE GPU 렌더링 | Blocks D3D11 RTX 5070 확인; 동일 Travel package 없음 | GL 진단 NVIDIA 정상이나 Travel은 OpenGL 거부/Vulkan llvmpipe CPU |
+| 갱신 결정 | D 개발 대안으로 가능, Travel benchmark 대체 불가 | CUDA inference stack 정상; Travel all-in-one 경로 수정은 종료 |
 
 Microsoft의 WSLg/OpenGL 가속 설명과 CUDA 지원만으로 이 compiled UE map의 Vulkan 요구사항까지 충족했다고 판단할 수 없다. `vulkaninfo`/엔진 RHI 로그, software renderer 여부, 실제 RGB·depth·pose RPC와 UAV 이동을 먼저 확인한다. [Microsoft graphics][M-gui], [WSLg][M-wslg]
 
-직접 NAT `WSL → 192.168.160.1:41461`은 timeout였고 Windows listen은 정상 확인했다. Windows에서 WSL로 먼저 연결하는 임시 TCP 중계에서는 camera/state/pose가 성공했다. 방화벽/영구 networking 설정은 변경하지 않았다. 이것은 split 구조의 실제 경로를 입증하지만 안정적 운영 topology와 같은 Travel scene은 남은 조건이다. 같은 GPU의 VRAM 경쟁도 계속된다. native Linux GPU 환경은 별도 대안으로 남긴다. [Microsoft networking][M-net]
+직접 NAT은 timeout, Windows 발신 임시 TCP 중계에서는 Blocks camera/state/pose 성공이었다. 방화벽/영구 networking 변경은 없다. 이 split 기능은 D의 개발 경로 근거로 남기지만 동일 Travel benchmark 재현으로 세지 않는다. 최신 공식 배포와 ZIP의 Windows 부재, UE OpenGL 거부, 30-frame CPU 통계는 [rendering decision](traveluav_rendering_decision.md)에 기록했다. 같은 GPU를 공유하는 model/simulator peak도 여전히 미측정이다. [Microsoft networking][M-net]
 
 ## 3. 다음 단계 결정
 

@@ -1,8 +1,12 @@
 # RTX 5070 compatibility smoke test
 
+> **최신 상태 (2026-10-05 최종 검증):** 실제 OpenVLA-7B + AeroVLA LoRA NF4 로딩·생성과 Windows Project AirSim live camera → action → 이동 10/10이 성공했다. [최종 결과](final_closed_loop_validation.md), [실제 모델 NF4 검증](aerovla_int4_validation.md). 아래 필수 판정표와 본문은 최초 TravelUAV Gate 1/2/3 시점의 기록이다. TravelUAV Gate 2의 GPU 렌더링 실패는 유지하며, Project AirSim에서의 후속 성공과 구별한다.
+
+> 2026-10-05: [Project AirSim smoke test](projectairsim_smoke_test.md), [Native TravelUAV 계획/미실행](native_traveluav_smoke_test.md) 추가. Windows Project AirSim GPU 성공은 기존 **TravelUAV Gate 2** GPU 성공이나 **AeroVLA Gate 3** 통과로 간주하지 않는다. Gate 1 NF4 결과는 그대로이며 actual AeroVLA INT4는 미검증이다.
+
 실행일: 2026-10-04 (Asia/Seoul). Git branch: `researchuav-vla-feasibility`.
 
-**Gate 1 통과, Gate 2 부분 검증, Gate 3 미실행.** CUDA/NF4와 Windows simulator → WSL Python RPC 경로는 실제 동작했다. 그러나 TravelUAV 배포 map의 RTX 5070 렌더링은 확인하지 못했다. WSL에서는 해당 map이 CPU renderer를 사용했고, Windows 테스트는 공식 AirSim Blocks를 사용했다. 전체 AeroVLA/TravelUAV 실행 가능성이 입증되었다고 보고하지 않으며 checkpoint 다운로드 권고는 **NO**다.
+**Gate 1 통과, Gate 2 부분 검증, Gate 3 미실행.** CUDA/NF4와 Windows Blocks → WSL Python RPC는 실제 동작했다. 이후 요청한 WSLg 재시도에서 NVIDIA D3D12/OpenGL backend는 성공했으나 UE 4.27.2가 -opengl을 Vulkan으로 되돌려 TravelUAV는 계속 llvmpipe CPU renderer였다. 30-frame CPU RPC를 측정했고 동일 BrushifyUrban의 공개 Windows build가 없음을 확인했다. 최종 권장은 **C. Native Ubuntu**, Windows 개발 차선은 **D**로 갱신한다. [최신 rendering decision](traveluav_rendering_decision.md). 전체 AeroVLA/TravelUAV GPU 실행은 미입증이고 checkpoint 다운로드 권고는 **NO**다.
 
 전체 dataset, OpenVLA/AeroVLA checkpoint, navigation episode, failure injection/detection/recovery, fine-tuning, evaluation은 수행하지 않았다. upstream 소스는 수정하지 않았다. [고정 revision 대조](../outputs/compatibility/upstream-integrity.json)에서 wrapper 내용이 일치했으며 기존 Windows audit copy의 CRLF와 GitHub LF만 다르다. AirSim client 수정은 격리한 Gate 2 환경에만 적용하고 원본/수정 hash와 patch를 보존했다.
 
@@ -12,10 +16,11 @@
 |---|---|---|---|
 | CUDA/PyTorch | PASS, WSL GPU kernel 실행 | torch `2.7.1+cu128`, CUDA `12.8`, `cuda.is_available=True`, RTX 5070, CC `12.0` | ✅ |
 | BF16 | PASS, matmul 결과 유한 | 256×256, FP32 기준 relative L2 `0.00165626`, BF16 지원 True | ✅ |
+| WSLg OpenGL/D3D12 | env 변수로 NVIDIA hardware 선택 성공 | D3D12 (NVIDIA GeForce RTX 5070), Accelerated yes, OpenGL 4.6 | ✅ backend / ⚠️ UE가 OpenGL 미사용 |
 | bitsandbytes NF4 | PASS, kernel 및 HF loader/generate | bnb `0.48.2`, uint8 packed NF4/BF16 compute, 작은 Llama의 14개 Linear4bit 변환 | ✅ |
-| Unreal rendering | TravelUAV WSL은 CPU; Windows Blocks는 RTX 5070 | 둘 다 UE `4.27.2`; WSL `llvmpipe`, Windows `D3D11 RTX 5070` | ⚠️ |
+| Unreal rendering | -opengl 재시도도 Vulkan CPU fallback; Windows Blocks는 RTX 5070 | UE `4.27.2`: OpenGL desktop 지원 종료 warning, Vulkan `llvmpipe`; Blocks는 D3D11 RTX | ⚠️ Travel gate 미충족 |
 | AirSim RPC | 두 환경 ping/state/pose 성공; Windows 직접 NAT 실패, 중계 성공 | WSL state `0.473ms`, pose `0.354ms`; Windows 중계 state `0.780ms`, pose `0.567ms` | ✅ 연결 / ⚠️ topology 조건 |
-| Camera RPC | 두 환경 각각 단일 요청 성공 | RGB 256×256×3 / 196,608 bytes; Travel WSL 최초 `8051.535ms`, 재측정 `3051.437ms`; Windows 중계 `179.195ms` | ✅ 응답 / ⚠️ Travel GPU 미검증 |
+| Camera RPC | 기존 단일 요청 및 최신 CPU fallback 30/30 성공 | 최신 windowed CPU mean `391.426ms`, median `286.870ms`, p95 `324.601ms`; 기존 Blocks 중계 단일 `179.195ms`는 다른 조건 | ✅ 응답 / ⚠️ Travel GPU 미검증 |
 | Simulator VRAM | Windows Blocks 단독 측정; Travel hardware 값 미측정 | Blocks PID dedicated GPU peak `216.160MiB`, shared `80.770MiB`; Travel WSL은 CPU renderer | ⚠️ 다른 map의 실측 |
 | INT4 AeroVLA loader | NOT_RUN: Gate 2의 Travel GPU 조건 미충족 | prototype·adapter load·OpenVLA forward·동시 VRAM 측정 없음 | ⚠️ |
 
@@ -118,6 +123,12 @@ simulator PID GPU counter의 sampled peak **216.160MiB (0.211GiB) dedicated**, *
 
 **A/B는 map·renderer·cache·중계 조건이 달라 NOT_COMPARABLE.** 8.05s 대 179ms를 GPU 개선 배율이나 TravelUAV 성능 차이로 보고하지 않는다. B는 hardware/RPC 구조를 입증했지만 동일 TravelUAV Windows scene/build가 필요하다. Linux pak을 Windows executable에 복사하면 동등 환경이 된다고 가정하지 않는다.
 
+### 이후 한정 재시도 — 2026-10-04 23시대
+
+`GALLIUM_DRIVER=d3d12`, `MESA_D3D12_DEFAULT_ADAPTER_NAME=NVIDIA`로 glxinfo가 RTX 5070 hardware를 확인했다. 그러나 동일 Unreal에 `-opengl -windowed`를 주면 desktop OpenGL 지원 종료 warning 후 Vulkan llvmpipe를 사용한다. 동일 설정에서 30회 camera/state RPC를 계측했고 mean 391.426 / median 286.870 / p95 324.601ms였다. 최초 요청 3318.664ms도 포함한다. system RAM RSS sampled peak 1407.805MiB, global GPU range 1622–1643MiB. hardware scene VRAM으로 귀속하지 않는다. 이전 RenderOffscreen 단일 측정과 NOT_COMPARABLE이다.
+
+공식 README/HF 최신 metadata/동일 ZIP 전체 contents/GitHub tree/releases를 조사한 결과 **동일 BrushifyUrban의 공개 Windows packaged build는 NO**다. 비공개 build 존재는 알 수 없다. WSL graphics 추가 수정은 종료하고 C 또는 D 경로만 권장한다. [전체 근거와 30개 samples](traveluav_rendering_decision.md).
+
 ## Gate 3 — NOT_RUN
 
 사용자의 **Gate 1과 Gate 2 모두 통과 후 prototype 진행** 조건에 따라, TravelUAV GPU rendering이 미검증인 상태에서 INT4 loader/patch를 만들거나 checkpoint를 받지 않았다. 다음은 기존 정적 조사에서 확인한 쟁점이며 실제 adapter/forward 검증 결과가 아니다.
@@ -149,7 +160,8 @@ wsl -d Ubuntu -- /home/gyuhan/uav-vla-smoke/gate2/bin/python /mnt/c/Users/leegy/
 ## Recommendation
 
 ```yaml
-권장 구조: B. Windows simulator + WSL2 inference (조건부)
+권장 구조: C. Native Ubuntu - 동일 TravelUAV baseline용, 아직 native 실측 전
+현재 Windows 개발 차선: D. Windows AirSim 개발 + 추후 native Linux TravelUAV 평가
 NF4: ✅
 Simulator: ⚠️ - Windows Blocks RTX rendering/RPC 성공, TravelUAV GPU rendering 미확인
 AeroVLA INT4: ⚠️ - NOT_RUN, Gate 2 통과 대기
@@ -160,10 +172,10 @@ AeroVLA INT4: ⚠️ - NOT_RUN, Gate 2 통과 대기
 다음 단계에서 OpenVLA/AeroVLA checkpoint 다운로드를 진행해도 되는가: NO
 근거:
   - RTX 5070의 WSL CUDA/BF16/NF4/HF 로딩 stack은 실제 통과했다.
-  - WSL TravelUAV는 CPU Vulkan renderer여서 A의 RTX rendering 조건 미충족.
-  - B의 hardware/RPC 구조는 입증했으나 동일 TravelUAV Windows map/build가 필요하다.
+  - WSLg NVIDIA OpenGL은 정상이나 UE 4.27.2는 -opengl을 Vulkan으로 돌려 CPU renderer를 사용한다.
+  - 동일 BrushifyUrban Windows map/build는 공식 공개 배포에 없다.
   - 직접 NAT 연결 문제는 남아 있으며 임시 중계 경로만 확인했다.
   - AeroVLA custom loader/LoRA/resize 및 model+scene 메모리는 미검증이다.
 ```
 
-다음 후보는 동일 TravelUAV Windows scene 확보/동등성 확인 또는 해당 Linux scene의 hardware renderer 확보 후 Gate 2 재검증이다. 그 조건을 만족한 뒤 별도 INT4 prototype으로 진입한다. **이번 단계는 여기서 중단한다.**
+다음 후보는 확보한 native Linux 환경에서 같은 map의 hardware renderer를 확인하는 C, 또는 개발과 최종 TravelUAV 평가 환경을 나누는 D다. 이번 단계에서 checkpoint/Gate 3/episode로 넘어가지 않는다. 파티션/dual boot 설치는 수행하지 않았다.

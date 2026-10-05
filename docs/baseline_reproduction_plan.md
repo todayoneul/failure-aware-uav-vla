@@ -1,12 +1,16 @@
 # Minimal Baseline Reproduction Plan
 
+> **최신 상태 (2026-10-05 최종 검증):** Windows Project AirSim + direct WSL2 AeroVLA NF4 개발 경로는 single-step / 10-step 연결 검증을 통과했다. [최종 결과와 제한](final_closed_loop_validation.md). 아래는 초기 TravelUAV baseline 계획과 당시 gate 상태를 보존한다. 승인된 OpenVLA base와 AeroVLA LoRA 다운로드·검증은 이후 완료했으며, TravelUAV 원본 episode/metric 재현은 미실행이다. 다음 단계는 Failure-aware 연구 설계다.
+
+> 2026-10-05 후속 전략: [Windows Project AirSim 개발 + Native TravelUAV 최종 평가 후보](platform_comparison.md). Project AirSim과 legacy AirSim의 client/API는 별개다. Native boot / GPU, NNG dual-port inference, AeroVLA NF4 loader 검증 전 checkpoint를 다운로드하지 않는다.
+
 작성일: 2026-10-04 (Asia/Seoul). 관련 조사: [feasibility_report.md](feasibility_report.md).
 
 ## 1. 첫 milestone와 현재 상태
 
 목표는 **TravelUAV ModernCityMap의 원본 navigation episode 한 개에서 instruction → AeroVLA action → UAV 이동 → 종료/결과 저장을 확인**하는 것이다. 모델 학습이나 Failure Detection/Diagnosis/Recovery는 포함하지 않는다.
 
-**2026-10-04 실제 smoke 갱신:** Python 3.10.14/torch 2.7.1+cu128/bnb 0.48.2의 CUDA·BF16·NF4·작은 HF 모델 로딩은 통과했다. TravelUAV BrushifyUrban은 WSL에서 CPU renderer와 RGB/state/pose가 성공했고 Windows Blocks의 RTX 5070 rendering + WSL 중계 RPC가 성공했다. 동일 TravelUAV GPU rendering은 미확인이므로 Gate 2 부분 검증, INT4 prototype Gate 3 미실행, checkpoint 다운로드 권고 **NO**다. [전체 실측/로그](compatibility_smoke_test.md). 아래 episode/raw/7B/checkpoint 명령은 향후 계획이며 이번 단계에서 실행하지 않았다. 사용자 요청에 따라 episode로 넘어가지 않고 중단한다.
+**2026-10-04 실제 smoke 갱신:** CUDA/BF16/NF4/HF tiny load 통과. 추가 WSLg 재시도에서 NVIDIA D3D12 OpenGL backend는 성공했으나 TravelUAV UE 4.27.2는 -opengl을 거부해 Vulkan CPU로 실행했다. 30-frame CPU camera RPC mean 391.426 / median 286.870 / p95 324.601ms. 동일 BrushifyUrban의 공개 Windows build도 없다. 따라서 권장 경로는 **C. Native Ubuntu**, Windows 개발 차선은 **D**다. Gate 2 부분 검증, Gate 3 미실행, checkpoint 다운로드 **NO**. [rendering decision](traveluav_rendering_decision.md), [전체 smoke](compatibility_smoke_test.md). 아래 episode/raw/7B 명령은 향후 계획이며 실행하지 않았다. 현재 파티션/dual boot 설치도 수행하지 않았다.
 
 이번 기술 Gate 1/2/3와 아래 episode 계획의 G0~G5는 구별한다. 기술 Gate 3은 INT4 prototype이고 아래 G3은 episode 자료 준비다.
 
@@ -26,7 +30,7 @@ G5의 **pipeline 완료**와 **navigation 성공**은 다르다. collision/timeo
 | 항목 | 선택 후보 / 현재 근거 |
 |---|---|
 | Host | Windows 11 Pro, RTX 5070, driver 591.86 (현재 읽기 전용 확인) |
-| 실행 OS | B안 조건부: Windows simulator + 기존 WSL2 Ubuntu 24.04.4 LTS inference, kernel 6.6.87.2 |
+| 실행 OS | 현재 계측은 WSL2 Ubuntu 24.04.4/kernel 6.6.87.2. 동일 Travel baseline 권장은 C Native Ubuntu(미설치/미검증), 현재 Windows 개발 대안 D |
 | Python | 실제 uv venv `/home/gyuhan/uav-vla-smoke/gate1`와 `gate2`, **3.10.14**. Conda는 설치하지 않음 |
 | PyTorch runtime | 실제 **torch 2.7.1+cu128**, torchvision 0.22.1+cu128; torchaudio 미설치 |
 | CUDA | wheel 제공 CUDA **12.8 runtime**; host driver 사용, 전체 toolkit/source-build 기본 경로 제외 |
@@ -35,7 +39,7 @@ G5의 **pipeline 완료**와 **navigation 성공**은 다르다. collision/timeo
 | 작업 파일시스템 | WSL Linux filesystem의 `~/uav-vla`; 수많은 trajectory 파일을 `/mnt/c`에서 처리하는 경로는 우선 피함 |
 | 자원 topology | GPU 0, model 1 process, simulator scene 1개, batchSize 1 |
 
-system Python 3.12.3과 테스트 환경을 분리했다. compiled UE 4.27.2 BrushifyUrban은 실행했으나 llvmpipe CPU renderer였다. Windows Blocks D3D11 RTX 렌더링과 중계 RPC는 성공했다. 동일 TravelUAV Windows scene/build 확보 또는 native Linux hardware renderer 확보가 남았다. Ubuntu/renderer/map을 바꾸면 manifest와 결과 scope도 변경한다.
+system Python과 테스트 환경을 분리했다. BrushifyUrban UE 4.27.2는 OpenGL 지원 종료 후 Vulkan CPU 렌더링했다. WSL graphics 수정은 추가로 진행하지 않는다. 공개 동일 Windows build가 없으므로 native Linux GPU 환경에서 기존 ZIP을 재사용해 renderer gate를 검증하는 것이 우선이다. Windows Blocks는 D 개발 대안으로만 기록한다. Ubuntu/renderer/map을 바꾸면 manifest와 결과 scope도 변경한다.
 
 PyTorch 2.7.1/cu128 대응 조합은 [공식 설치 표](https://pytorch.org/get-started/previous-versions/)에 있고, [bnb 0.48.2](https://huggingface.co/docs/bitsandbytes/v0.48.2/en/installation)는 sm120 및 NF4 binary 지원 근거가 있다. 최신 package를 모두 쓰는 조합 대신 upstream API 변경을 줄이는 후보를 고정한다.
 
@@ -132,7 +136,7 @@ bnb NF4 Linear4bit quantize/forward와 로컬 random Llama의 HF load/generate�
 
 ## 5. 최소 environment 다운로드·renderer/RPC — G2
 
-이번 camera/state smoke에는 **BrushifyUrban ZIP 하나(1.531GB)**만 받아 WSL에서 실행했고 Windows Blocks(0.259GB)를 별도로 비교했다. UE 4.27.2/RPC는 확인했으나 Travel hardware rendering이 미충족이다. 따라서 아래 18.65GB closed-loop 묶음과 raw/7B 다운로드는 **실행하지 않고 보류**했다. 작은 map smoke의 ClockSpeed 1/두 camera와 아래 원본 평가 설정을 혼동하지 않는다.
+이번 smoke에는 **BrushifyUrban ZIP 하나(1.531GB)**를 사용했고 Blocks(0.259GB)를 별도로 비교했다. 추가 NVIDIA OpenGL 재시도도 UE가 Vulkan CPU로 돌렸으며 30-frame RPC 성공을 GPU PASS로 세지 않는다. 동일 공개 Windows build가 없어 C Native Ubuntu의 GPU gate 또는 D 개발/평가 분리가 필요하다. 아래 18.65GB 묶음/raw/7B 다운로드는 **보류**한다. ClockSpeed 1/두 camera smoke와 원본 평가 설정을 혼동하지 않는다.
 
 **사전 용량 보고:** environment 묶음 18,645,702,495 bytes, raw map 9,847,057,165 bytes, base+adapter 약 15.55GB. 전체 알려진 최소 다운로드 약 **44.05GB / 41.03GiB**. 추출/중복/cache/환경 포함 **100–150GiB 여유 예약은 계획 가정**이다. 먼저 environment만 받고 G2를 통과한 뒤 raw/checkpoint 다운로드로 진행한다. 전체 raw+env는 약 527.53GiB로 현재 C: 여유보다 크므로 받지 않는다.
 
@@ -172,7 +176,7 @@ G2 성공 조건:
 - shader/material/asset 누락과 RPC timeout이 없음. 응답시간·simulator-only VRAM peak 기록.
 - scene 1개, model 0개 조건에서 메모리·RAM 여유 확인.
 
-서버는 원본 template에서 runtime settings를 다시 생성한다. `ClockSpeed=10`, 5-view RGB/depth 256×256 및 front/down record camera 1024×1024 등을 baseline 평가 시 보존한다. 현재 model이 두 RGB view를 써도 evaluator/recording의 추가 camera를 누락하지 않는다. 이번 gate는 별도 ClockSpeed 1/두 camera/RPC 설정을 사용했다. WSL hardware graphics 조건이 미충족이므로 checkpoint/episode를 보류하고 조건부 Windows split 구조를 다음 후보로 선택했다.
+서버는 원본 template에서 runtime settings를 다시 생성한다. `ClockSpeed=10`, 5-view RGB/depth 256×256 및 front/down record camera 1024×1024 등을 baseline 평가 시 보존한다. model이 두 RGB view를 써도 evaluator/recording의 추가 camera를 누락하지 않는다. 이번 gate는 별도 ClockSpeed 1/두 camera 설정이다. WSL hardware gate 미충족 및 동일 Windows build 부재로 checkpoint/episode는 보류하고 C/D 경로를 권장한다.
 
 ## 6. Dataset·one-episode 준비 — G3
 
@@ -305,7 +309,7 @@ python utils/metric.py \
 | 실패 | 이 단계에서의 대응 |
 |---|---|
 | cu128/bnb kernel 실패 | driver/wheel/sm120/ABI 원인 기록; 구버전 cu118로 돌아가 실험을 계속하지 않음 |
-| WSL UE hardware rendering 미충족 | model/raw 다운로드 보류. Windows Blocks split 경로 성공을 바탕으로 동일 Travel Windows build 또는 native Linux hardware 환경 확보 |
+| WSL UE hardware rendering 미충족 | 제한 재시도 완료. OpenGL hardware 성공과 UE OpenGL 거부를 기록하고 WSL 추가 수정 종료. 공개 Windows build가 없어 C 또는 D 선택 |
 | assets/RPC/merged 부족 | 필요한 file/byte/version 특정; 전체 저장소/거대 dataset을 무차별 다운로드하지 않음 |
 | NF4 adapter/API 실패 | 최소 loader 변경과 package 범위 조사; 성능 동등성을 가정하지 않음 |
 | 동시 실행 OOM | 측정 내역으로 예산 재평가; renderer 변경/offload는 다른 구성으로 기록 |
