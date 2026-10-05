@@ -1,6 +1,7 @@
-param([int]$SimulatorProcessId,[int]$DurationSeconds=1800)
+param([int]$SimulatorProcessId,[int]$DurationSeconds=1800,[string]$OutputDirectory='outputs/communication_final')
 $ErrorActionPreference='Stop'
-$taskOutput=Join-Path (Split-Path -Parent $PSScriptRoot) 'outputs/communication_final'
+$taskOutput=Join-Path (Split-Path -Parent $PSScriptRoot) $OutputDirectory
+New-Item -ItemType Directory -Force $taskOutput | Out-Null
 $taskDeadline=(Get-Date).AddSeconds($DurationSeconds)
 while ((Get-Date) -lt $taskDeadline -and (Get-Process -Id $SimulatorProcessId -ErrorAction SilentlyContinue)) {
     $taskOS=Get-CimInstance Win32_OperatingSystem

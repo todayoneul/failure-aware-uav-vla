@@ -28,6 +28,7 @@ from projectairsim_probe import prepare_config,CONFIG
 from projectairsim import ProjectAirSimClient,World,Drone
 from projectairsim.utils import unpack_image
 from validate_aerovla_int4 import memory
+from src.integration.blur_demo_support import BlurDemoSession, DemoQuit
 OUT=ROOT/'outputs/communication_final'
 INSTRUCTION='The target is 3 meters away and 0 degrees from you. Find the colored blocks ahead. Please control the drone.'
 
@@ -47,10 +48,17 @@ def debug_panel(front,down,state,label,inference=None):
     temp=OUT/'debug_publish.png';cv2.imwrite(str(temp),panel);os.replace(temp,OUT/'debug_latest.png')
 
 async def main(args):
-    gate_a=json.loads((OUT/'gate-a.json').read_text())
-    gate_b=json.loads((OUT/'gate-b.json').read_text())
-    if gate_a.get('status')!='PASS' or gate_b.get('status')!='PASS':
-        raise RuntimeError('Direct route requires successful Gate A and tested Gate B levels')
+    global OUT
+    session = None
+    if args.blur_demo:
+        OUT = ROOT/'outputs/failure_demo'
+        session = BlurDemoSession(ROOT, OUT, args.steps)
+        (OUT/'worker-pid.txt').write_text(str(os.getpid()))
+    else:
+        gate_a=json.loads((OUT/'gate-a.json').read_text())
+        gate_b=json.loads((OUT/'gate-b.json').read_text())
+        if gate_a.get('status')!='PASS' or gate_b.get('status')!='PASS':
+            raise RuntimeError('Direct route requires successful Gate A and tested Gate B levels')
     result={'status':'RUNNING','route':'Direct WSL NNG -> Windows host','address':args.host,
             'single_step':None,'closed_loop':[],'errors':[],'domain_check':None}
     stop=threading.Event();client=None;drone=None;collision_events=[];flight_start_stamp=None
@@ -78,17 +86,32 @@ async def main(args):
     sampler=threading.Thread(target=sample,daemon=True);sampler.start()
     try:
         (OUT/'active-stage.txt').write_text('Gate D model load')
+        if session:
+            session.update(phase='Loading OpenVLA NF4 + AeroVLA LoRA', instruction=INSTRUCTION)
+            session.poll_control()
         torch.cuda.reset_peak_memory_stats()
         model=AeroVLAInt4(ROOT/'outputs/integration/model-downloads.json')
         result['load_info']=model.load_info;result['after_load']=memory();save()
+        if session:
+            session.poll_control()
+            session.update(phase='Connecting to Project AirSim')
         # Start the NNG client only after model loading, with no eager proxy session.
-        prepare_config();client=ProjectAirSimClient(address=args.host)
+        if session:
+            config_path = session.prepare_config()
+        else:
+            prepare_config()
+            config_path = CONFIG
+        client=ProjectAirSimClient(address=args.host)
         start=time.perf_counter();client.connect();result['connect_ms']=(time.perf_counter()-start)*1000
-        start=time.perf_counter();world=World(client,'scene_basic_drone.jsonc',delay_after_load_sec=2,sim_config_path=str(CONFIG))
+        start=time.perf_counter();world=World(client,'scene_basic_drone.jsonc',delay_after_load_sec=2,sim_config_path=str(config_path))
         result['topic_init_ms']=(time.perf_counter()-start)*1000
         drone=Drone(client,world,'Drone1')
         client.subscribe(drone.robot_info['collision_info'],collision_callback)
+        if session:
+            client.subscribe(drone.sensors['Chase']['scene_camera'], session.chase_callback)
         rest=drone.get_ground_truth_kinematics();ground_z=rest['pose']['position']['z']
+        if session:
+            session.update(phase='Takeoff', ground_z=ground_z)
         drone.enable_api_control();drone.arm()
         takeoff_return=await (await drone.takeoff_async(timeout_sec=20))
         await (await drone.hover_async());await asyncio.sleep(.7)
@@ -105,6 +128,9 @@ async def main(args):
 
         async def step(label):
             check_collisions();wall=time.perf_counter();transport_start=time.perf_counter()
+            if session:
+                session.poll_control()
+                session.update(phase='Receiving live Front / Down', step=int(label))
             row={'step':label,'instruction':INSTRUCTION,'target':target,'camera':{}}
             row['state_before']=drone.get_ground_truth_kinematics();state=adapt_state(row['state_before']);state_is_finite(state)
             frames=[]
@@ -112,20 +138,38 @@ async def main(args):
                 start=time.perf_counter();message=drone.get_images(sensor,[0])[0]
                 latency=(time.perf_counter()-start)*1000;frame=unpack_image(message)
                 if message['encoding']!='BGR' or frame.shape!=(256,256,3):raise RuntimeError('Unexpected camera contract')
-                path=OUT/f'{name}_{label}.png';cv2.imwrite(str(path),frame)
-                row['camera'][name]={'path':str(path),'rpc_ms':latency,'timestamp':message['time_stamp'],
+                row['camera'][name]={'rpc_ms':latency,'timestamp':message['time_stamp'],
                     'sha256':hashlib.sha256(frame.tobytes()).hexdigest(),'shape':list(frame.shape)};frames.append(frame)
+                if not session:
+                    path=OUT/f'{name}_{label}.png';cv2.imwrite(str(path),frame)
+                    row['camera'][name]['path']=str(path)
             row['observation_transport_ms']=(time.perf_counter()-transport_start)*1000
-            debug_panel(*frames,state,label)
-            inference=model.infer(*frames,state,target,INSTRUCTION);row['inference']=inference
+            if session:
+                raw_frames = frames
+                frames, row['failure'] = session.inject(raw_frames, int(label), state, INSTRUCTION)
+                inference = model.infer(*frames, state, target, INSTRUCTION,
+                                        trace_inputs=True, reference_frames=raw_frames)
+                session.verify_input(inference, row['failure'])
+                session.poll_control()
+            else:
+                debug_panel(*frames,state,label)
+                inference=model.infer(*frames,state,target,INSTRUCTION)
+            row['inference']=inference
             if inference['parsed_action'] is None:log({'event':'invalid_action',**row});raise RuntimeError(inference['parse_error'])
-            debug_panel(*frames,state,label,inference);make_mosaic(*frames).save(OUT/f'mosaic_{label}.png')
+            if not session:
+                debug_panel(*frames,state,label,inference);make_mosaic(*frames).save(OUT/f'mosaic_{label}.png')
             check_collisions()
             # Re-read pose immediately before converting/issuing a command after generation.
             execution_state=adapt_state(drone.get_ground_truth_kinematics());state_is_finite(execution_state)
             row['execution_state']=execution_state
             row['clipped_action']=convert_action(inference['parsed_action'],execution_state,ground_z)
-            command_start=time.perf_counter();row['command_returns']=await execute_action(drone,row['clipped_action'])
+            if session:
+                session.update(phase='Executing bounded action', clipped_action=row['clipped_action'], state=execution_state)
+            command_start=time.perf_counter()
+            if session:
+                row['command_returns'] = await asyncio.wait_for(execute_action(drone, row['clipped_action']), timeout=20)
+            else:
+                row['command_returns']=await execute_action(drone,row['clipped_action'])
             row['command_rpc_wall_ms']=(time.perf_counter()-command_start)*1000
             await asyncio.sleep(.5);check_collisions()
             row['state_after']=drone.get_ground_truth_kinematics();after_state=adapt_state(row['state_after']);state_is_finite(after_state)
@@ -137,15 +181,24 @@ async def main(args):
             row['memory']=memory();row['windows']=host_memory();row['step_wall_ms']=(time.perf_counter()-wall)*1000
             # Command wall includes the actual1s flight/yaw; do not label it wire latency.
             log({'event':'step',**row});print(f'STEP {label}: {inference["parsed_action"]["bins"]} movement={row["movement_m"]:.4f}m inference={inference["inference_ms"]:.1f}ms',flush=True)
+            if session:
+                session.update(phase='Step complete', completed_steps=int(label), state=after_state,
+                               movement_m=row['movement_m'], inference=inference, step_wall_ms=row['step_wall_ms'],
+                               command_returns=row['command_returns'])
             return row
 
-        (OUT/'active-stage.txt').write_text('Gate D single step')
-        result['single_step']=await step('single');save()
-        if result['single_step']['clipped_action']['stop'] or result['single_step']['movement_m']<.03:
-            raise RuntimeError('Single-step action did not cause measurable movement')
+        if not session:
+            (OUT/'active-stage.txt').write_text('Gate D single step')
+            result['single_step']=await step('single');save()
+            if result['single_step']['clipped_action']['stop'] or result['single_step']['movement_m']<.03:
+                raise RuntimeError('Single-step action did not cause measurable movement')
         (OUT/'active-stage.txt').write_text('Gate E ten-step loop')
-        for index in range(1,11):result['closed_loop'].append(await step(f'{index:02d}'));save()
-        result['loop_summary']={'steps':10,
+        count = args.steps if session else 10
+        for index in range(1,count+1):
+            if session and args.auto_test and index in (3, 5):
+                session.auto_toggle(index)
+            result['closed_loop'].append(await step(f'{index:02d}'));save()
+        result['loop_summary']={'steps':count,
             'inference_ms':{'mean':float(np.mean([r['inference']['inference_ms'] for r in result['closed_loop']])),
                 'median':float(np.median([r['inference']['inference_ms'] for r in result['closed_loop']])),
                 'p95':float(np.percentile([r['inference']['inference_ms'] for r in result['closed_loop']],95))},
@@ -161,11 +214,15 @@ async def main(args):
             'scope':'one Blocks flight, same synthetic instruction/target; not independent scene/target sweep',
             'observation':'Inconclusive' if len(set(actions))==1 else 'not obviously degenerate on this sequence'}
         result['peak']=memory();result['status']='PASS';save()
+    except DemoQuit:
+        result['status'] = 'STOPPED'; save()
     except Exception:
         result['status']='FAIL';result['errors'].append(traceback.format_exc());print(result['errors'][-1],flush=True)
         result['failure_memory']=memory();log({'event':'failure','error':result['errors'][-1]});save()
     finally:
         (OUT/'active-stage.txt').write_text('Cleanup')
+        if session:
+            session.update(phase='Landing and cleanup')
         # Collision events observed after the flight start remain in the raw result.
         result['collision_events']=collision_events
         if drone:
@@ -175,9 +232,20 @@ async def main(args):
             except Exception:result['cleanup_error']=traceback.format_exc()
         if client:client.disconnect()
         stop.set();sampler.join(timeout=2);save()
+        if session:
+            session.update(status=result['status'], phase='Finished', errors=result['errors'],
+                           cleanup_error=result.get('cleanup_error'), result_file='closed-loop.json')
     print(f'FINAL {result["status"]} loop_steps={len(result["closed_loop"])}',flush=True)
-    if result['status']!='PASS':raise SystemExit(1)
+    if result['status'] not in ('PASS','STOPPED') or result.get('cleanup_error'):raise SystemExit(1)
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('--host',required=True)
-    asyncio.run(main(parser.parse_args()))
+    parser.add_argument('--blur-demo', action='store_true')
+    parser.add_argument('--steps', type=int, default=30)
+    parser.add_argument('--auto-test', action='store_true')
+    args = parser.parse_args()
+    if not 1 <= args.steps <= 60:
+        parser.error('--steps must be within 1..60')
+    if args.auto_test and (not args.blur_demo or args.steps != 6):
+        parser.error('--auto-test requires --blur-demo --steps 6')
+    asyncio.run(main(args))

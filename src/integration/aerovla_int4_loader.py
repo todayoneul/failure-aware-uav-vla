@@ -1,5 +1,6 @@
 """Revision-pinned, GPU-only NF4 OpenVLA + unmerged AeroVLA PEFT adapter."""
 import json
+import hashlib
 import time
 from pathlib import Path
 import torch
@@ -55,7 +56,7 @@ class AeroVLAInt4:
             'projector_dtype':str(next(model.projector.parameters()).dtype)}
         print('LOAD_ADAPTER_COMPLETE',flush=True)
 
-    def infer(self, front_bgr, down_bgr, state, target_position, instruction):
+    def infer(self, front_bgr, down_bgr, state, target_position, instruction, *, trace_inputs=False, reference_frames=None):
         mosaic=make_mosaic(front_bgr,down_bgr)
         prompt=make_prompt(state,target_position,instruction)
         inputs=self.tokenizer([prompt],return_tensors='pt',padding=True)
@@ -64,6 +65,20 @@ class AeroVLAInt4:
             raise RuntimeError(f'Unexpected official processor output: {pv.shape}')
         inputs={k:v.to(self.device) for k,v in inputs.items()}
         inputs['pixel_values']=pv.to(self.device,dtype=torch.bfloat16)
+        evidence = None
+        if trace_inputs:
+            actual = inputs['pixel_values'].detach().contiguous()
+            digest = lambda tensor: hashlib.sha256(tensor.contiguous().view(torch.uint16).cpu().numpy().tobytes()).hexdigest()
+            evidence = {'used_frame_sha256': {'front': hashlib.sha256(front_bgr.tobytes()).hexdigest(),
+                                               'down': hashlib.sha256(down_bgr.tobytes()).hexdigest()},
+                        'mosaic_sha256': hashlib.sha256(mosaic.tobytes()).hexdigest(),
+                        'pixel_values_sha256': digest(actual), 'dtype': str(actual.dtype),
+                        'device': str(actual.device), 'shape': list(actual.shape)}
+            if reference_frames is not None:
+                reference = self.image_processor(images=make_mosaic(*reference_frames), return_tensors='pt')['pixel_values']
+                reference = reference.to(dtype=actual.dtype)
+                evidence['reference_pixel_values_sha256'] = digest(reference)
+                evidence['tensor_differs_from_reference'] = evidence['pixel_values_sha256'] != evidence['reference_pixel_values_sha256']
         torch.cuda.synchronize()
         start=time.perf_counter()
         with torch.inference_mode():
@@ -82,5 +97,7 @@ class AeroVLAInt4:
                 'inference_ms':latency,'pixel_values_shape':list(pv.shape),
                 'mosaic_size':list(mosaic.size),'input_tokens':inputs['input_ids'].shape[-1],
                 'generated_tokens':ids.shape[-1]-inputs['input_ids'].shape[-1]}
+        if evidence is not None:
+            result['input_evidence'] = evidence
         del inputs,pv,ids
         return result
