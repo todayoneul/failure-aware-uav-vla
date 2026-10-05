@@ -1,43 +1,65 @@
-# Failure-aware UAV VLA
+# Failure-Aware UAV VLA
 
-드론이 카메라 영상과 자연어 지시를 보고 움직이는 모델을 바탕으로, **실패를 알아차리고 회복하는 방법**을 연구하는 프로젝트입니다.
+## Overview
 
-현재는 연구를 시작하기 위한 **실행 가능성 검증**을 마쳤습니다. 실패 감지·회복 기능과 학습은 아직 구현하지 않았습니다.
+**Project AirSim에서 AeroVLA가 가상 드론을 조종하고, 예상치 못한 장애를 직접 넣어 보는 오픈소스소프트웨어 과목 텀프로젝트입니다.** 영상 흐림, 가림, 조종 편향 같은 상황을 만들고, 이후 감지·복구 기능으로 확장할 계획입니다.
 
-## 지금까지 확인한 것
+## What It Does
 
-**RTX 5070 한 장에서 시뮬레이터와 AeroVLA를 함께 실행하고, 실제 카메라 영상으로 드론을 움직이는 데 성공했습니다.**
+앞·아래 카메라 영상과 자연어 지시를 AeroVLA에 전달합니다. 모델이 출력한 전진·상하 이동·회전 값을 안전 범위로 제한해 드론을 움직이고, 새 영상을 받아 반복합니다.
+
+## Current Demo
+
+- ✅ Project AirSim 드론·Front/Down RGB 카메라
+- ✅ AeroVLA NF4 추론과 실제 영상 → 행동 → 이동
+- ✅ single-step 및 **10/10 closed loop**
+- ✅ 기본 blur·control drift 데모 — **모델 없는 별도 script 시험**
+
+![실제 10번째 decision의 Front/Down 영상과 AeroVLA 출력](outputs/examples/closed_loop.png)
+
+저장된 실제 실행 화면입니다. [드론 화면](outputs/examples/drone_view.png)과 [blur·drift 데모](outputs/examples/control_drift.png)도 볼 수 있습니다.
+
+## System Architecture
 
 ```text
-Windows: Project AirSim 시뮬레이터 / RTX 5070 렌더링
-                       ↕ 직접 통신
-WSL2 Ubuntu: AeroVLA / OpenVLA-7B + LoRA / NF4 4-bit 추론
+Project AirSim → Front + Down RGB → AeroVLA NF4
+       ↑                                ↓
+     Drone ← Action Adapter ← forward / down / yaw
 ```
 
-| 검증 | 결과 |
-|---|---|
-| CUDA·BF16·NF4 | GPU 연산과 실제 모델 로딩 성공 |
-| 통신 안정성 | 재접속 20/20, 60초 대기 후 재접속 5/5 성공 |
-| 영상 → 모델 → 이동 | 1회 검증 후 10단계 반복 모두 완료 |
-| TravelUAV | WSL에서는 CPU 렌더링으로 실행됨. GPU 실행·최종 평가는 미검증 |
+시뮬레이터는 Windows에서, 모델은 WSL2 Ubuntu에서 실행하며 직접 통신합니다.
 
-10단계 시험에서 전체 GPU 메모리 최대 사용량은 **9.76GiB**, 모델 추론은 평균 **1.05초**였습니다. 이동 완료까지 기다리는 전체 반복 속도는 **초당 0.22회**였습니다. Windows RAM은 최대 **30.07GiB**를 사용해 여유가 약 **1.05GiB**였으므로, 장시간 실행에는 추가 확인이 필요합니다.
+## Environment
 
-이 결과는 **Blocks 환경에서 기능이 연결된다는 확인**입니다. TravelUAV에서의 탐색 성능이나 목표 도달률, 양자화 전후 정확도를 입증한 결과는 아닙니다.
+RTX 5070 12GB / Windows + WSL2 / Project AirSim / OpenVLA-7B + AeroVLA LoRA / NF4 + BF16 compute. 환경과 실행 순서는 [setup](docs/setup.md)에 있습니다.
 
-## 코드와 기록
+## Repository Structure
 
-- `src/integration/`: NF4 로더, 영상·상태·행동 변환, 실제 반복 실행 코드
-- `scripts/`: 환경 준비와 각 단계의 측정 스크립트
-- `tests/`: 영상 변환, 좌표·행동 해석, 비정상 상태 거부 테스트
-- `docs/`: 성공·실패 과정과 측정 결과
+```text
+docs/              setup · baseline · experiments · failure_plan
+docs/archive/      이전 기술 검증 기록
+src/integration/   모델·카메라·행동 변환과 실행 코드
+src/failures/      다음 기능을 위한 빈 자리
+configs/           baseline 설정과 패키지 버전
+scripts/ · tests/  준비·측정 스크립트와 테스트
+outputs/examples/  실제 데모 이미지 3장
+```
 
-먼저 [최종 통합 검증](docs/final_closed_loop_validation.md)을 읽으면 현재 상태를 알 수 있습니다. [통신 검증](docs/communication_stability_test.md), [NF4 모델 검증](docs/aerovla_int4_validation.md), [TravelUAV 렌더링 조사](docs/traveluav_rendering_decision.md)에 상세 근거가 있습니다.
+## Current Status
 
-검증 환경은 Python 3.10.14, PyTorch 2.7.1+cu128, transformers 4.42.4, bitsandbytes 0.48.2, PEFT 0.11.1, accelerate 0.32.1입니다. 스크립트에는 시험 PC의 경로와 로컬 설정·측정 파일 참조가 있어, 새 PC에서 실행하려면 먼저 해당 파일과 환경을 준비해야 합니다. 모델·데이터셋·시뮬레이터 바이너리·원시 실행 로그는 이 저장소에 포함하지 않습니다.
+[Current Baseline](docs/baseline.md): 추론 평균 **1.05초**, 전체 step **4.53초**, 전체 GPU peak **9.76GiB**. 10단계 동안 timeout·OOM·simulator crash는 없었습니다. RAM 여유가 약 1GiB이고 반복 속도는 약 0.22Hz여서 장시간 자율 비행은 아직 확인하지 않았습니다. [실제 테스트 요약](docs/experiments.md).
 
-## 다음 단계
+실패 자동 감지·진단·복구는 아직 구현하지 않았습니다. TravelUAV benchmark와 모델 재학습은 현재 과제 범위에 포함하지 않습니다. 모델·시뮬레이터 바이너리와 raw 로그는 Git에 넣지 않습니다.
 
-실패 유형과 평가 방법을 먼저 설계하고, 이후 실패 주입·감지·진단·회복을 구현할 계획입니다. TravelUAV 최종 평가는 GPU 렌더링을 확인한 native Linux 환경에서 별도로 검증해야 합니다.
+## Roadmap
 
-마지막 검증: **2026-10-05**. 판정: **제한 조건 안에서 실행 가능**.
+- [x] Project AirSim setup
+- [x] AeroVLA NF4 inference
+- [x] Live closed-loop drone control
+- [ ] Failure injection framework
+- [ ] Interactive failure controls
+- [ ] Failure detection
+- [ ] Basic recovery behavior
+- [ ] Demo and evaluation
+
+다음 후보는 **Gaussian Blur → Partial Occlusion → Control Drift**입니다. 구현 전 계획과 단축키 아이디어는 [failure plan](docs/failure_plan.md)에 있습니다.

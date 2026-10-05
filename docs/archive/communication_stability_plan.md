@@ -2,7 +2,7 @@
 
 Goal: Verify a stable live Project AirSim → AeroVLA → UAV movement path with the existing checkpoints.
 
-Spec: User-requested Gates A–E: direct reconnect, bounded resource pressure, conditional Windows gateway, one live VLA action, then exactly ten decisions. Final measurements are recorded in [final_closed_loop_validation.md](../../final_closed_loop_validation.md).
+Spec: User-requested Gates A–E: direct reconnect, bounded resource pressure, conditional Windows gateway, one live VLA action, then exactly ten decisions. Final measurements are recorded in [final_closed_loop_validation.md](final_closed_loop_validation.md).
 
 This is the user-authorized feasibility probe. Implement experimental integration files only; preserve upstream and previous measurements. No new model/simulator downloads, training, or Failure-aware implementation.
 

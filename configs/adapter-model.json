@@ -1,0 +1,19 @@
+{
+  "sha": "196f2f3253b69df6e90ac10b6ae041c7b3a9569e",
+  "siblings": [
+    {
+      "rfilename": "aero_vla/adapter_config.json",
+      "size": 733,
+      "lfs": null
+    },
+    {
+      "rfilename": "aero_vla/adapter_model.safetensors",
+      "size": 462655064,
+      "lfs": {
+        "sha256": "05b11cf66d2a7bba9af3fefc5afa9e9af4fe1f2a567ddeca4fca73192060b846",
+        "size": 462655064,
+        "pointerSize": 134
+      }
+    }
+  ]
+}

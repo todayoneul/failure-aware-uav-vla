@@ -38,7 +38,7 @@ Latency는 각각 **1회 호출**이며 앞선 100-frame simulator 단독 통계
 
 ## Observation adapter — 정적/저장 프레임 검증 PASS
 
-구현: [projectairsim_observation_adapter.py](../src/integration/projectairsim_observation_adapter.py).
+구현: [projectairsim_observation_adapter.py](../../src/integration/projectairsim_observation_adapter.py).
 
 1. `FrontCamera`/`DownCamera`의 BGR uint8 이미지에 정확히 BGR→RGB 적용.
 2. 각 PIL RGB 이미지를 BICUBIC 224×224로 resize.
@@ -68,7 +68,7 @@ angle = atan2(vector_body.y, vector_body.x)
 
 ## Action adapter — 정적 테스트 PASS, 실제 VLA 조종 미실행
 
-구현: [projectairsim_action_adapter.py](../src/integration/projectairsim_action_adapter.py). [원본 AeroVLA simulator client](https://github.com/XuPeng23/AeroVLA/blob/2c5ae0987a484ab92f00dd9d9ed493cb3e98e492/airsim_plugin/AirVLNSimulatorClientTool_AeroVLA.py)의 거리/상대 yaw 의미를 유지하고 [Project AirSim 공식 API](https://github.com/iamaisim/ProjectAirSim/blob/v1.0.1/client/python/projectairsim/src/projectairsim/drone.py)의 NED velocity 및 rad yaw로 변환한다.
+구현: [projectairsim_action_adapter.py](../../src/integration/projectairsim_action_adapter.py). [원본 AeroVLA simulator client](https://github.com/XuPeng23/AeroVLA/blob/2c5ae0987a484ab92f00dd9d9ed493cb3e98e492/airsim_plugin/AirVLNSimulatorClientTool_AeroVLA.py)의 거리/상대 yaw 의미를 유지하고 [Project AirSim 공식 API](https://github.com/iamaisim/ProjectAirSim/blob/v1.0.1/client/python/projectairsim/src/projectairsim/drone.py)의 NED velocity 및 rad yaw로 변환한다.
 
 | 의미 | TravelUAV/legacy AirSim | Project AirSim 실험 |
 |---|---|---|

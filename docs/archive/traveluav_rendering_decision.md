@@ -24,7 +24,7 @@ vulkaninfo --summary
 GALLIUM_DRIVER=d3d12 MESA_D3D12_DEFAULT_ADAPTER_NAME=NVIDIA glxinfo -B
 ```
 
-[기본 OpenGL 로그](../outputs/rendering_retry/glx-default.log), [NVIDIA D3D12 로그](../outputs/rendering_retry/glx-nvidia-d3d12.log), [Vulkan 로그](../outputs/rendering_retry/vulkan-summary.log), [nvidia-smi](../outputs/rendering_retry/nvidia-smi.log), [설치 로그](../outputs/rendering_retry/mesa-utils-install.log).
+기본 OpenGL 로그 (`outputs/rendering_retry/glx-default.log`, 로컬 기록·Git 제외), NVIDIA D3D12 로그 (`outputs/rendering_retry/glx-nvidia-d3d12.log`, 로컬 기록·Git 제외), Vulkan 로그 (`outputs/rendering_retry/vulkan-summary.log`, 로컬 기록·Git 제외), nvidia-smi (`outputs/rendering_retry/nvidia-smi.log`, 로컬 기록·Git 제외), 설치 로그 (`outputs/rendering_retry/mesa-utils-install.log`, 로컬 기록·Git 제외).
 
 Microsoft의 [WSLg GPU 선택 문서](https://github.com/microsoft/wslg/wiki/GPU-selection-in-WSLg)는 이 adapter 선택을 Mesa D3D12 경로로 설명한다. 이번 OpenGL 성공은 Vulkan까지 hardware로 바뀌었다는 뜻이 아니다.
 
@@ -34,9 +34,9 @@ UE 버전은 이전 map 로그 및 이번 로그의 **4.27.2**다. [Epic 4.27 �
 
 ```bash
 GALLIUM_DRIVER=d3d12 MESA_D3D12_DEFAULT_ADAPTER_NAME=NVIDIA \
-  /home/gyuhan/uav-vla-smoke/assets/travel-urban/BrushifyUrban/BrushifyUrban.sh \
+  $UAV_VLA_HOME/assets/travel-urban/BrushifyUrban/BrushifyUrban.sh \
   -opengl -ResX=640 -ResY=480 -windowed -NoSound -NoVSync \
-  -settings=/mnt/c/Users/leegy/Desktop/drone/scripts/gate2-settings.json
+  -settings=$REPO_ROOT/scripts/gate2-settings.json
 ```
 
 원본 map/pak/settings에는 변경을 가하지 않았다. 최초 bounded launch에서 fallback을 확인하고, **같은 구성**을 30-frame 계측 목적으로 한 번 더 실행했다. 추가 해결 시도가 아니다. 이번에는 windowed 실행이며 이전 RenderOffscreen 한 프레임 측정과 직접 비교하지 않는다.
@@ -52,7 +52,7 @@ LogVulkanRHI: Display: - DeviceID 0x0 Type CPU
 
 따라서 driver 선택 변수는 정상 적용되었어도, **해당 Unreal binary가 OpenGL RHI를 사용하지 않는다**. `-opengl4` 검토는 이 명시적 desktop 지원 종료에서 끝냈으며 추가 launch하지 않았다. Vulkan/D3D12 driver를 새로 빌드하거나 Engine/pak을 고치는 작업도 하지 않았다.
 
-[전체 UE 로그](../outputs/rendering_retry/travel-opengl-unreal.log), [stdout](../outputs/rendering_retry/travel-opengl-stdout.log), [binary strings](../outputs/rendering_retry/unreal-rhi-wide-strings.log), [최초 시도 JSON](../outputs/rendering_retry/first-attempt/travel-opengl-launch.json), [계측 코드](../scripts/traveluav_opengl_probe.py).
+전체 UE 로그 (`outputs/rendering_retry/travel-opengl-unreal.log`, 로컬 기록·Git 제외), stdout (`outputs/rendering_retry/travel-opengl-stdout.log`, 로컬 기록·Git 제외), binary strings (`outputs/rendering_retry/unreal-rhi-wide-strings.log`, 로컬 기록·Git 제외), 최초 시도 JSON (`outputs/rendering_retry/first-attempt/travel-opengl-launch.json`, 로컬 기록·Git 제외), [계측 코드](../../scripts/traveluav_opengl_probe.py).
 
 ## 3. 30-frame RPC와 메모리
 
@@ -74,7 +74,7 @@ scene에 모델을 띄우지 않았고 takeoff/arm/move/episode 명령도 호출
 
 nvidia-smi는 desktop/WSLg presentation/다른 Windows process를 포함한다. scene renderer가 CPU인데 GPU 사용률 몇 %나 global usage 증가만으로 RTX 렌더링을 주장하지 않는다. Windows WDDM의 GPU Engine/Process Memory counters도 저장했다. **Task Manager UI 자체는 직접 열람하지 않았고**, 같은 WDDM 계측 경로의 raw counters로 보완했다. 이 VM/presentation 점유를 simulator 전용 VRAM으로 분리할 근거는 없어 global 1643MiB를 simulator VRAM이라고 적지 않았다.
 
-[30개 latency + resource samples](../outputs/rendering_retry/travel-opengl-launch.json), [실행 로그](../outputs/rendering_retry/travel-opengl-profile.log), [Windows WDDM counters](../outputs/rendering_retry/windows-wddm-during-profile.json).
+30개 latency + resource samples (`outputs/rendering_retry/travel-opengl-launch.json`, 로컬 기록·Git 제외), 실행 로그 (`outputs/rendering_retry/travel-opengl-profile.log`, 로컬 기록·Git 제외), Windows WDDM counters (`outputs/rendering_retry/windows-wddm-during-profile.json`, 로컬 기록·Git 제외).
 
 ## 4. 동일 map Windows build 조사
 
@@ -85,7 +85,7 @@ nvidia-smi는 desktop/WSLg presentation/다른 Windows process를 포함한다. 
 - 공식 GitHub main `5cc26e9a4a55b9c788e918f7c3bb2dc5076a85e6` 전체 tree도 Windows executable/package/build 경로를 제공하지 않는다. [GitHub releases](https://github.com/prince687028/TravelUAV/releases)는 없고 현재 API도 `[]`다.
 - [유지관리자 issue #6 답변](https://github.com/prince687028/TravelUAV/issues/6#issuecomment-2677291805)은 작업을 Linux에서 수행했다고 밝힌다. 이 답변만으로 Windows 불가능을 단정한 것이 아니라 실제 배포 목록/동일 ZIP과 함께 판정했다.
 
-[동일 ZIP 전체 목록](../outputs/rendering_retry/same-map-package-audit.json), [최신 HF metadata](../outputs/rendering_retry/travel-env-metadata.json), [GitHub tree](../outputs/rendering_retry/travel-github-tree.json), [releases API](../outputs/rendering_retry/travel-github-releases.json), [issue 답변 API](../outputs/rendering_retry/travel-issue6-comments.json).
+동일 ZIP 전체 목록 (`outputs/rendering_retry/same-map-package-audit.json`, 로컬 기록·Git 제외), 최신 HF metadata (`outputs/rendering_retry/travel-env-metadata.json`, 로컬 기록·Git 제외), GitHub tree (`outputs/rendering_retry/travel-github-tree.json`, 로컬 기록·Git 제외), releases API (`outputs/rendering_retry/travel-github-releases.json`, 로컬 기록·Git 제외), issue 답변 API (`outputs/rendering_retry/travel-issue6-comments.json`, 로컬 기록·Git 제외).
 
 다른 map 전체 ZIP을 다운로드하거나 Windows Blocks를 같은 TravelUAV map으로 취급하지 않았다. Linux cooked pak이 Windows cooked build를 대체한다는 가정도 하지 않는다.
 

@@ -70,8 +70,8 @@ Windows used/available/commit/limit, pagefile allocated/current/peak, simulator 
 실제 실행 명령:
 
 ```bash
-/home/gyuhan/uav-vla-smoke/projectairsim-client/bin/python \
-  /mnt/c/Users/leegy/Desktop/drone/scripts/communication_reconnect_probe.py \
+$UAV_VLA_HOME/projectairsim-client/bin/python \
+  $REPO_ROOT/scripts/communication_reconnect_probe.py \
   --host 192.168.160.1
 ```
 

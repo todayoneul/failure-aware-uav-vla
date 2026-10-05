@@ -73,13 +73,13 @@ Crash/OOM: **통합 runner는 timeout으로 FAIL/exit1; OOM은 NO**. Simulator c
 
 ```text
 Traceback (most recent call last):
-  File "/mnt/c/Users/leegy/Desktop/drone/scripts/run_aerovla_projectairsim.py", line 78, in main
+  File "$REPO_ROOT/scripts/run_aerovla_projectairsim.py", line 78, in main
     world=World(client,'scene_basic_drone.jsonc',delay_after_load_sec=2,sim_config_path=str(CONFIG))
-  File "/home/gyuhan/uav-vla-smoke/integration/lib/python3.10/site-packages/projectairsim/world.py", line 72, in __init__
+  File "$UAV_VLA_HOME/integration/lib/python3.10/site-packages/projectairsim/world.py", line 72, in __init__
     self.load_scene(config_dict, delay_after_load_sec=delay_after_load_sec)
-  File "/home/gyuhan/uav-vla-smoke/integration/lib/python3.10/site-packages/projectairsim/world.py", line 1073, in load_scene
+  File "$UAV_VLA_HOME/integration/lib/python3.10/site-packages/projectairsim/world.py", line 1073, in load_scene
     self.client.get_topic_info()  # get new scene's list of registered topic info
-  File "/home/gyuhan/uav-vla-smoke/integration/lib/python3.10/site-packages/projectairsim/client.py", line 123, in get_topic_info
+  File "$UAV_VLA_HOME/integration/lib/python3.10/site-packages/projectairsim/client.py", line 123, in get_topic_info
     raise RuntimeError(
 RuntimeError: Timeout waiting to get topic info from sim server.
 ```

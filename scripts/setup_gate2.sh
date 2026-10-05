@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Reproduce the isolated RPC client stack; no simulator/model downloads here.
 set -euo pipefail
-TASK_ROOT=/home/gyuhan/uav-vla-smoke
-EVIDENCE=/mnt/c/Users/leegy/Desktop/drone/outputs/compatibility
+TASK_ROOT=${UAV_VLA_HOME:-"$HOME/uav-vla-smoke"}
+REPO_ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+EVIDENCE="$REPO_ROOT/outputs/compatibility"
 export UV_PYTHON_INSTALL_DIR="$TASK_ROOT/python"
 export UV_CACHE_DIR="$TASK_ROOT/cache"
 UV="$TASK_ROOT/tools/uv-x86_64-unknown-linux-gnu/uv"
@@ -17,6 +18,6 @@ printf '%s  %s\n' c0d7df3fe91271ea052384ca7150c7f6730eeed63672168d08a0f279463221
   "$TASK_ROOT/tools/msgpack-rpc-python-fix-msgpack-dep.zip"
 "$UV" pip install --python "$TASK_ROOT/gate2/bin/python" \
   airsim==1.8.1 opencv-contrib-python==4.11.0.86 --no-build-isolation
-"$TASK_ROOT/gate2/bin/python" /mnt/c/Users/leegy/Desktop/drone/scripts/prepare_gate2_client.py
+"$TASK_ROOT/gate2/bin/python" "$REPO_ROOT/scripts/prepare_gate2_client.py"
 "$UV" pip check --python "$TASK_ROOT/gate2/bin/python"
 "$UV" pip freeze --python "$TASK_ROOT/gate2/bin/python" > "$EVIDENCE/gate2-freeze.txt"

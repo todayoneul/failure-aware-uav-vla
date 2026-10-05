@@ -4,7 +4,7 @@ $taskOutput = Join-Path $taskRoot 'outputs\platform_final'
 $archivePath = Join-Path $taskRoot 'assets\archives\ProjectAirSim-Blocks-Windows-1.0.1.zip'
 $environmentPath = Join-Path $taskRoot 'assets\projectairsim-blocks-1.0.1'
 New-Item -ItemType Directory -Force -Path (Split-Path $archivePath),$taskOutput | Out-Null
-$release = Get-Content -LiteralPath (Join-Path $taskOutput 'release.json') -Raw | ConvertFrom-Json
+$release = Get-Content -LiteralPath (Join-Path $taskRoot 'configs/projectairsim-release.json') -Raw | ConvertFrom-Json
 $asset = $release.assets | Where-Object name -eq 'Blocks-Windows-1.0.1.zip'
 if ($release.tag_name -ne 'v1.0.1' -or $asset.size -gt 1GB) { throw 'Unexpected release or oversized asset' }
 if (-not (Test-Path -LiteralPath $archivePath)) {

@@ -1,10 +1,11 @@
 """One local read-only RPC probe through a Windows-initiated TCP connection."""
 import socket
 import subprocess
+import sys
 import threading
 from pathlib import Path
 
-evidence = Path('/mnt/c/Users/leegy/Desktop/drone/outputs/compatibility')
+evidence = Path(__file__).resolve().parents[1] / 'outputs/compatibility'
 remote_listener = socket.socket()
 remote_listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 remote_listener.bind(('0.0.0.0', 41500))
@@ -49,8 +50,8 @@ def connect_local():
 worker = threading.Thread(target=connect_local, daemon=True)
 worker.start()
 probe = subprocess.run([
-    '/home/gyuhan/uav-vla-smoke/gate2/bin/python',
-    '/mnt/c/Users/leegy/Desktop/drone/scripts/compatibility_gate2_rpc.py',
+    sys.executable,
+    str(Path(__file__).resolve().parent / 'compatibility_gate2_rpc.py'),
     '--host', '127.0.0.1', '--port', '41501', '--label', 'windows-blocks-bridge',
     '--output', str(evidence)], timeout=30)
 worker.join(3)

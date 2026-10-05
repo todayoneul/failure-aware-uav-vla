@@ -1,0 +1,11 @@
+{
+  "tag_name": "v1.0.1",
+  "assets": [
+    {
+      "name": "Blocks-Windows-1.0.1.zip",
+      "size": 677972773,
+      "digest": "sha256:ae86066b588783512ab0d420e29b05cb9b1deea86cc130aad6e3480eb63859d1",
+      "browser_download_url": "https://github.com/iamaisim/ProjectAirSim/releases/download/v1.0.1/Blocks-Windows-1.0.1.zip"
+    }
+  ]
+}

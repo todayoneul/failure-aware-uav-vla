@@ -1,19 +1,21 @@
 """Download only the two authorized, revision-pinned integration models."""
 import hashlib
 import json
+import os
 import time
 from pathlib import Path
 from huggingface_hub import snapshot_download
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'outputs/integration'
-CACHE = '/home/gyuhan/uav-vla-smoke/models/hf'
+CACHE = Path(os.environ.get('UAV_VLA_HOME', Path.home() / 'uav-vla-smoke')) / 'models/hf'
+OUT.mkdir(parents=True, exist_ok=True)
 result = {'started': time.time(), 'models': []}
 for name, repo, patterns in (
     ('base', 'openvla/openvla-7b', ['*.json', '*.py', '*.safetensors', 'tokenizer.model']),
     ('adapter', 'XuPeng23/AerialVLA', ['aero_vla/adapter_config.json', 'aero_vla/adapter_model.safetensors']),
 ):
-    meta = json.loads((OUT / f'{name}-metadata.json').read_text(encoding='utf-8-sig'))
+    meta = json.loads((ROOT / 'configs' / f'{name}-model.json').read_text(encoding='utf-8-sig'))
     print(f'DOWNLOAD {repo} revision={meta["sha"]}', flush=True)
     path = Path(snapshot_download(repo, revision=meta['sha'], allow_patterns=patterns,
                                   cache_dir=CACHE, max_workers=3))

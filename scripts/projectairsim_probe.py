@@ -1,7 +1,6 @@
 """Disposable, model-free Project AirSim feasibility probe. No upstream edits."""
 import argparse
 import asyncio
-import copy
 import importlib.metadata
 import json
 import math
@@ -10,7 +9,6 @@ import time
 import traceback
 from pathlib import Path
 
-import commentjson
 import cv2
 import numpy as np
 import psutil
@@ -20,25 +18,13 @@ from projectairsim.utils import unpack_image
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "outputs" / "platform_final"
 CONFIG = OUT / "sim_config"
-SOURCE = OUT / "source" / "client" / "python" / "example_user_scripts" / "sim_config"
+SOURCE = ROOT / "configs"
 
 
 def prepare_config():
-    CONFIG.mkdir(exist_ok=True)
-    scene = commentjson.loads((SOURCE / "scene_basic_drone.jsonc").read_text())
-    robot = commentjson.loads((SOURCE / "robot_quadrotor_fastphysics.jsonc").read_text())
-    down = next(x for x in robot["sensors"] if x["id"] == "DownCamera")
-    front = copy.deepcopy(down)
-    front["id"] = "FrontCamera"
-    front["origin"]["rpy-deg"] = "0 0 0"
-    robot["sensors"].append(front)
-    for sensor in robot["sensors"]:
-        if sensor["type"] == "camera":
-            sensor["capture-interval"] = 0.0333333
-            sensor["capture-settings"] = [dict(sensor["capture-settings"][0], width=256, height=256,
-                **{"image-type": 0, "capture-enabled": True, "streaming-enabled": sensor["id"] == "Chase"})]
-    (CONFIG / "robot_quadrotor_fastphysics.jsonc").write_text(json.dumps(robot, indent=2))
-    (CONFIG / "scene_basic_drone.jsonc").write_text(json.dumps(scene, indent=2))
+    CONFIG.mkdir(parents=True, exist_ok=True)
+    for name in ("scene_basic_drone.jsonc", "robot_quadrotor_fastphysics.jsonc"):
+        (CONFIG / name).write_text((SOURCE / name).read_text(encoding="utf-8"), encoding="utf-8")
 
 
 def stats(values):

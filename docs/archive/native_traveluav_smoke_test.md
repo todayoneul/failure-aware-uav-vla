@@ -4,7 +4,7 @@
 
 ## A0 — 읽기 전용 disk / boot 확인
 
-Project AirSim 테스트 이후 Get-Disk, Get-Partition, Get-Volume, Get-PhysicalDisk, bcdedit /enum, wsl -l -v를 조회했다. [Inventory](../outputs/platform_final/disk-boot-inventory.json).
+Project AirSim 테스트 이후 Get-Disk, Get-Partition, Get-Volume, Get-PhysicalDisk, bcdedit /enum, wsl -l -v를 조회했다. Inventory (`outputs/platform_final/disk-boot-inventory.json`, 로컬 기록·Git 제외).
 
 | 대상 | 관찰 |
 |---|---|
@@ -30,7 +30,7 @@ Blackwell은 NVIDIA **open kernel modules**를 사용해야 한다. [NVIDIA 공�
 ## A2–A5 — Native 실행 계획
 
 1. 준비된 Native Ubuntu에서 OS/kernel/driver를 기록하고 nvidia-smi, vulkaninfo --summary를 실행한다. **RTX 5070 hardware Vulkan**이 기준이다. CPU/llvmpipe면 FAIL.
-2. 기존 **동일 BrushifyUrban archive**만 복사한다. 1,530,641,125 bytes, SHA256 `5faf7a9b475a4adc5e106c8a9711b975497cab9482f188ceb06cd557017c8d09`. WSL 보유 위치 `/home/gyuhan/uav-vla-smoke/assets/archives/BrushifyUrban.zip`. 전체 dataset을 다시 받지 않는다.
+2. 기존 **동일 BrushifyUrban archive**만 복사한다. 1,530,641,125 bytes, SHA256 `5faf7a9b475a4adc5e106c8a9711b975497cab9482f188ceb06cd557017c8d09`. WSL 보유 위치 `$UAV_VLA_HOME/assets/archives/BrushifyUrban.zip`. 전체 dataset을 다시 받지 않는다.
 3. UE4.27.2 Linux binary를 640×480 windowed Vulkan으로 실행하고 UE RHI가 RTX 5070을 선택하는지 확인한다. 종료된 WSL OpenGL 수정을 재개하지 않는다.
 4. 기존 isolated AirSim client/settings를 복사해 ping, state/pose, front/down scene을 확인한다. Camera별 warm-up과 **새 frame 최소 100개**. RPC round-trip, decode 포함 FPS, dual-view timestamp 차이를 구분한다.
 5. Simulator만 로드한 상태에서 process RSS/CPU, GPU memory/util을 주기적으로 수집한다. Process NVIDIA accounting이 없으면 전후 global delta를 proxy라고 명시한다. Desktop 사용량과 simulator 전용 VRAM을 구분한다.

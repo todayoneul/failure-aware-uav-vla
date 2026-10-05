@@ -3,7 +3,7 @@ $ErrorActionPreference = 'Stop'
 $taskRoot = Split-Path -Parent $PSScriptRoot
 $taskExe = Join-Path $taskRoot 'assets\projectairsim-blocks-1.0.1\Blocks\Binaries\Win64\Blocks-Win64-Shipping.exe'
 $taskPython = Join-Path $taskRoot 'assets\projectairsim-env\Scripts\python.exe'
-if (-not (Test-Path -LiteralPath $taskExe) -or -not (Test-Path -LiteralPath $taskPython)) { throw 'Prepared environment required: see docs/projectairsim_smoke_test.md' }
+if (-not (Test-Path -LiteralPath $taskExe) -or -not (Test-Path -LiteralPath $taskPython)) { throw 'Prepared environment required: see docs/setup.md' }
 if (Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | Where-Object { $_.LocalPort -in 8989,8990 }) { throw 'Ports 8989/8990 are in use' }
 $taskSim = Start-Process -FilePath $taskExe -WorkingDirectory (Split-Path -Parent $taskExe) -ArgumentList @('-windowed','-ResX=960','-ResY=540','-WinX=0','-WinY=40') -WindowStyle Normal -PassThru
 try {

@@ -1,0 +1,5 @@
+# Measured model-free Windows demo client; inference runs in WSL.
+projectairsim==1.0.2
+numpy==1.26.3
+opencv-python==4.11.0.86
+psutil==6.1.1

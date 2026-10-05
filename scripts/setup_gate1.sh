@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Isolated smoke-test runtime; never modifies the system Python or shell profile.
 set -euo pipefail
-TASK_ROOT=/home/gyuhan/uav-vla-smoke
-EVIDENCE=/mnt/c/Users/leegy/Desktop/drone/outputs/compatibility
+TASK_ROOT=${UAV_VLA_HOME:-"$HOME/uav-vla-smoke"}
+REPO_ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+EVIDENCE="$REPO_ROOT/outputs/compatibility"
 mkdir -p "$TASK_ROOT/tools" "$TASK_ROOT/python" "$TASK_ROOT/cache" "$EVIDENCE"
 exec > >(tee "$EVIDENCE/gate1-install.log") 2>&1
 export UV_PYTHON_INSTALL_DIR="$TASK_ROOT/python"

@@ -5,6 +5,7 @@ import os
 import signal
 import socket
 import subprocess
+import sys
 import threading
 import time
 from pathlib import Path
@@ -16,7 +17,7 @@ args = p.parse_args()
 args.output.mkdir(parents=True, exist_ok=True)
 command = [str(args.executable), '-RenderOffscreen', '-vulkan', '-NoSound', '-NoVSync',
            '-ResX=640', '-ResY=480', '-windowed',
-           '-settings=/mnt/c/Users/leegy/Desktop/drone/scripts/gate2-settings.json',
+           f'-settings={Path(__file__).resolve().parent / "gate2-settings.json"}',
            f'-AbsLog={args.output}/wsl-travel-unreal.log', '-stdout', '-FullStdOutLogOutput']
 result = {'command': command, 'samples': [], 'rpc_port_open': False}
 stop = threading.Event()
@@ -50,8 +51,8 @@ try:
                 with socket.create_connection(('127.0.0.1', 41461), timeout=0.2):
                     result['rpc_port_open'] = True
                 rpc = subprocess.run([
-                    '/home/gyuhan/uav-vla-smoke/gate2/bin/python',
-                    '/mnt/c/Users/leegy/Desktop/drone/scripts/compatibility_gate2_rpc.py',
+                    sys.executable,
+                    str(Path(__file__).resolve().parent / 'compatibility_gate2_rpc.py'),
                     '--host', '127.0.0.1', '--label', 'wsl-travel', '--output', str(args.output)],
                     stdout=log, stderr=subprocess.STDOUT, timeout=35)
                 result['rpc_probe_exit'] = rpc.returncode

@@ -1,8 +1,37 @@
-outputs/
-assets/
+# Raw experiments stay local; publish only these selected demo examples.
+/outputs/*
+!/outputs/examples/
+/outputs/examples/*
+!/outputs/examples/README.md
+!/outputs/examples/closed_loop.png
+!/outputs/examples/control_drift.png
+!/outputs/examples/drone_view.png
+
+# Downloaded simulator, datasets and model weights.
+/assets/
+/models/
+/datasets/
+*.safetensors
+*.ckpt
+*.pth
+*.pt
+*.bin
+*.zip
+*.7z
+*.tar
+*.tar.gz
+*.z[0-9][0-9]
+
+# Local environments, caches and generated files.
 .venv/
+venv/
+.conda/
+.cache/
+cache/
 __pycache__/
-*.pyc
+*.py[cod]
+.pytest_cache/
+*.tmp
 *.log
 .env
 .env.*

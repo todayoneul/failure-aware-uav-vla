@@ -1,6 +1,10 @@
 param([switch]$UseReverseBridge)
 $ErrorActionPreference = 'Stop'
-$TaskRoot = 'C:\Users\leegy\Desktop\drone'
+$TaskRoot = Split-Path -Parent $PSScriptRoot
+$TaskWslRoot = (& wsl -d Ubuntu -- wslpath -u $TaskRoot).Trim()
+$TaskWslHome = (& wsl -d Ubuntu -- printenv HOME).Trim()
+$TaskWslPython = "$TaskWslHome/uav-vla-smoke/gate2/bin/python"
+$TaskWindowsHost = ((& wsl -d Ubuntu -- ip -4 route show default) -split '\s+')[2]
 $EvidenceRoot = Join-Path $TaskRoot 'outputs\compatibility'
 $SimExe = Join-Path $TaskRoot 'assets\windows-blocks-1.8.1\Blocks\WindowsNoEditor\Blocks\Binaries\Win64\Blocks.exe'
 $SimArguments = @('-RenderOffscreen', '-d3d11', '-NoSound', '-NoVSync', '-ResX=640', '-ResY=480', '-windowed', "-settings=$TaskRoot\scripts\gate2-settings.json", "-AbsLog=$EvidenceRoot\windows-blocks-unreal.log")
@@ -40,12 +44,12 @@ try {
         if (-not $RpcStarted -and (Get-NetTCPConnection -State Listen -LocalPort 41461 -ErrorAction SilentlyContinue)) {
             $RpcStarted = $true
             if ($UseReverseBridge) {
-                $WslBridgeProcess = Start-Process -FilePath 'wsl.exe' -ArgumentList @('-d','Ubuntu','--','/home/gyuhan/uav-vla-smoke/gate2/bin/python','/mnt/c/Users/leegy/Desktop/drone/scripts/gate2_reverse_bridge.py') -WindowStyle Hidden -PassThru -RedirectStandardOutput "$EvidenceRoot\windows-blocks-bridge-rpc.log" -RedirectStandardError "$EvidenceRoot\windows-blocks-bridge-stderr.log"
+                $WslBridgeProcess = Start-Process -FilePath 'wsl.exe' -ArgumentList @('-d','Ubuntu','--',$TaskWslPython,"$TaskWslRoot/scripts/gate2_reverse_bridge.py") -WindowStyle Hidden -PassThru -RedirectStandardOutput "$EvidenceRoot\windows-blocks-bridge-rpc.log" -RedirectStandardError "$EvidenceRoot\windows-blocks-bridge-stderr.log"
                 $ReadyDeadline = (Get-Date).AddSeconds(10)
                 while ((Get-Date) -lt $ReadyDeadline -and -not ((Get-Content -LiteralPath "$EvidenceRoot\windows-blocks-bridge-rpc.log" -Raw -ErrorAction SilentlyContinue) -match 'listeners ready')) { Start-Sleep -Milliseconds 200 }
                 $WindowsBridgeProcess = Start-Process -FilePath (Get-Process -Id $PID).Path -ArgumentList @('-NoProfile','-File',"$TaskRoot\scripts\gate2_reverse_bridge.ps1") -WindowStyle Hidden -PassThru -RedirectStandardOutput "$EvidenceRoot\windows-blocks-bridge-windows.log" -RedirectStandardError "$EvidenceRoot\windows-blocks-bridge-windows-stderr.log"
             } else {
-                & wsl -d Ubuntu -- /home/gyuhan/uav-vla-smoke/gate2/bin/python /mnt/c/Users/leegy/Desktop/drone/scripts/compatibility_gate2_rpc.py --host 192.168.160.1 --label windows-blocks --output /mnt/c/Users/leegy/Desktop/drone/outputs/compatibility 2>&1 | Tee-Object -FilePath "$EvidenceRoot\windows-blocks-rpc.log"
+                & wsl -d Ubuntu -- $TaskWslPython "$TaskWslRoot/scripts/compatibility_gate2_rpc.py" --host $TaskWindowsHost --label windows-blocks --output "$TaskWslRoot/outputs/compatibility" 2>&1 | Tee-Object -FilePath "$EvidenceRoot\windows-blocks-rpc.log"
                 $ProbeExit = $LASTEXITCODE
                 if ($ProbeExit -eq 0) { break }
             }

@@ -5,7 +5,7 @@ import importlib.util
 import json
 from pathlib import Path
 
-root = Path('/mnt/c/Users/leegy/Desktop/drone/outputs/compatibility')
+root = Path(__file__).resolve().parents[1] / 'outputs/compatibility'
 spec = importlib.util.find_spec('airsim')
 path = Path(spec.origin).parent / 'client.py'
 original = path.read_text()

@@ -1,0 +1,101 @@
+{
+  "sha": "47a0ec7fc4ec123775a391911046cf33cf9ed83f",
+  "siblings": [
+    {
+      "rfilename": "added_tokens.json",
+      "size": 21,
+      "lfs": null
+    },
+    {
+      "rfilename": "config.json",
+      "size": 60712,
+      "lfs": null
+    },
+    {
+      "rfilename": "configuration_prismatic.py",
+      "size": 5865,
+      "lfs": null
+    },
+    {
+      "rfilename": "generation_config.json",
+      "size": 136,
+      "lfs": null
+    },
+    {
+      "rfilename": "model-00001-of-00003.safetensors",
+      "size": 6948961960,
+      "lfs": {
+        "sha256": "10d8636256018712c5e5c823d12e22b5797f99bb721bd123bf6bf2379892be85",
+        "size": 6948961960,
+        "pointerSize": 135
+      }
+    },
+    {
+      "rfilename": "model-00002-of-00003.safetensors",
+      "size": 6971232040,
+      "lfs": {
+        "sha256": "2050b14f21d48904d269f48d5a980fecea87cd7b36641d9b0f015e72d1fe216a",
+        "size": 6971232040,
+        "pointerSize": 135
+      }
+    },
+    {
+      "rfilename": "model-00003-of-00003.safetensors",
+      "size": 1162406824,
+      "lfs": {
+        "sha256": "ea65305a1577f36f721965bf84c8caec0a948ce7ce84d754701637376c531fef",
+        "size": 1162406824,
+        "pointerSize": 135
+      }
+    },
+    {
+      "rfilename": "model.safetensors.index.json",
+      "size": 94764,
+      "lfs": null
+    },
+    {
+      "rfilename": "modeling_prismatic.py",
+      "size": 26062,
+      "lfs": null
+    },
+    {
+      "rfilename": "preprocessor_config.json",
+      "size": 1650,
+      "lfs": null
+    },
+    {
+      "rfilename": "processing_prismatic.py",
+      "size": 12718,
+      "lfs": null
+    },
+    {
+      "rfilename": "processor_config.json",
+      "size": 130,
+      "lfs": null
+    },
+    {
+      "rfilename": "special_tokens_map.json",
+      "size": 552,
+      "lfs": null
+    },
+    {
+      "rfilename": "tokenizer.json",
+      "size": 1842976,
+      "lfs": null
+    },
+    {
+      "rfilename": "tokenizer.model",
+      "size": 499723,
+      "lfs": {
+        "sha256": "9e556afd44213b6bd1be2b850ebbbd98f5481437a8021afaf58ee7fb1818d347",
+        "size": 499723,
+        "pointerSize": 131
+      }
+    },
+    {
+      "rfilename": "tokenizer_config.json",
+      "size": 1192,
+      "lfs": null
+    }
+  ]
+}

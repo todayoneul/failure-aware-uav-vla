@@ -8,9 +8,9 @@ import threading
 import time
 from pathlib import Path
 
-workspace = Path('/mnt/c/Users/leegy/Desktop/drone')
+workspace = Path(__file__).resolve().parents[1]
 output = workspace / 'outputs/rendering_retry'
-executable = Path('/home/gyuhan/uav-vla-smoke/assets/travel-urban/BrushifyUrban/BrushifyUrban.sh')
+executable = Path(os.environ.get('UAV_VLA_HOME', Path.home() / 'uav-vla-smoke')) / 'assets/travel-urban/BrushifyUrban/BrushifyUrban.sh'
 env = os.environ.copy()
 env.update(GALLIUM_DRIVER='d3d12', MESA_D3D12_DEFAULT_ADAPTER_NAME='NVIDIA')
 command = [str(executable), '-opengl', '-ResX=640', '-ResY=480', '-windowed',

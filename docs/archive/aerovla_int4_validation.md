@@ -14,9 +14,9 @@
 | [AeroVLA LoRA: aero_vla](https://huggingface.co/XuPeng23/AerialVLA/tree/196f2f3253b69df6e90ac10b6ae041c7b3a9569e/aero_vla) | `196f2f3253b69df6e90ac10b6ae041c7b3a9569e` | 462,655,797 bytes / 2 files |
 | 합계 | 고정 revision, snapshot symlink로 중복 복사 방지 | **15,547,803,122 bytes / 14.480 GiB** |
 
-Base의 세 safetensors shard와 config/tokenizer/processor/custom Python code, LoRA의 `adapter_config.json`/`adapter_model.safetensors`만 선택했다. 모델 저장 위치는 WSL `/home/gyuhan/uav-vla-smoke/models/hf`. 다운로드 사전 예산은 실행 환경 포함 30GB였으며 C: 여유는 다운로드 전 400,527,294,464 bytes, 정리 시 384,480,014,336 bytes였다. 이 차이는 전체 드라이브 측정으로 다른 쓰기도 포함할 수 있다. venv의 apparent size 7.1G는 uv cache hardlink를 포함하므로 독립 추가 디스크 사용량으로 합산하지 않는다.
+Base의 세 safetensors shard와 config/tokenizer/processor/custom Python code, LoRA의 `adapter_config.json`/`adapter_model.safetensors`만 선택했다. 모델 저장 위치는 WSL `$UAV_VLA_HOME/models/hf`. 다운로드 사전 예산은 실행 환경 포함 30GB였으며 C: 여유는 다운로드 전 400,527,294,464 bytes, 정리 시 384,480,014,336 bytes였다. 이 차이는 전체 드라이브 측정으로 다른 쓰기도 포함할 수 있다. venv의 apparent size 7.1G는 uv cache hardlink를 포함하므로 독립 추가 디스크 사용량으로 합산하지 않는다.
 
-Python 3.10.14 별도 venv: `/home/gyuhan/uav-vla-smoke/integration`. 기존 Gate 1 환경은 수정하지 않았다.
+Python 3.10.14 별도 venv: `$UAV_VLA_HOME/integration`. 기존 Gate 1 환경은 수정하지 않았다.
 
 | Library | Version |
 |---|---|
@@ -30,7 +30,7 @@ Python 3.10.14 별도 venv: `/home/gyuhan/uav-vla-smoke/integration`. 기존 Gat
 
 ## 별도 로더의 실제 동작
 
-구현: [aerovla_int4_loader.py](../src/integration/aerovla_int4_loader.py). [공개 AeroVLA wrapper](https://github.com/XuPeng23/AeroVLA/blob/2c5ae0987a484ab92f00dd9d9ed493cb3e98e492/src/model_wrapper/aerovla_wrapper_ui.py)는 읽기만 했으며 복사본과 원본의 SHA-256을 보존했다.
+구현: [aerovla_int4_loader.py](../../src/integration/aerovla_int4_loader.py). [공개 AeroVLA wrapper](https://github.com/XuPeng23/AeroVLA/blob/2c5ae0987a484ab92f00dd9d9ed493cb3e98e492/src/model_wrapper/aerovla_wrapper_ui.py)는 읽기만 했으며 복사본과 원본의 SHA-256을 보존했다.
 
 ```python
 BitsAndBytesConfig(
@@ -95,8 +95,8 @@ Windows simulator가 실행된 상태에서 두 번째 NF4+LoRA 로딩도 성공
 
 ```bash
 # 반드시 simulator를 끈 상태에서 단독 검증
-/home/gyuhan/uav-vla-smoke/integration/bin/python \
-  /mnt/c/Users/leegy/Desktop/drone/scripts/validate_aerovla_int4.py
+$UAV_VLA_HOME/integration/bin/python \
+  $REPO_ROOT/scripts/validate_aerovla_int4.py
 ```
 
 현재 실패 상태에서는 이 명령을 자동으로 재실행하지 않는다. 다운로드된 base/LoRA와 실험 환경은 다음 통신 수정 검증을 위해 보존했다.

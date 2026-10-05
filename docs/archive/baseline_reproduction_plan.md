@@ -31,7 +31,7 @@ G5의 **pipeline 완료**와 **navigation 성공**은 다르다. collision/timeo
 |---|---|
 | Host | Windows 11 Pro, RTX 5070, driver 591.86 (현재 읽기 전용 확인) |
 | 실행 OS | 현재 계측은 WSL2 Ubuntu 24.04.4/kernel 6.6.87.2. 동일 Travel baseline 권장은 C Native Ubuntu(미설치/미검증), 현재 Windows 개발 대안 D |
-| Python | 실제 uv venv `/home/gyuhan/uav-vla-smoke/gate1`와 `gate2`, **3.10.14**. Conda는 설치하지 않음 |
+| Python | 실제 uv venv `$UAV_VLA_HOME/gate1`와 `gate2`, **3.10.14**. Conda는 설치하지 않음 |
 | PyTorch runtime | 실제 **torch 2.7.1+cu128**, torchvision 0.22.1+cu128; torchaudio 미설치 |
 | CUDA | wheel 제공 CUDA **12.8 runtime**; host driver 사용, 전체 toolkit/source-build 기본 경로 제외 |
 | model precision | **NF4 4-bit base + BF16 compute**; nonquantized vision/projector/adapter dtype는 검사 후 고정 |
@@ -45,12 +45,12 @@ PyTorch 2.7.1/cu128 대응 조합은 [공식 설치 표](https://pytorch.org/get
 
 ## 3. Repository와 경로 전략
 
-이번 smoke에서 `C:\Users\leegy\Desktop\drone`에 Git을 초기화하고 `researchuav-vla-feasibility` branch를 생성했다. upstream checkout은 외부 TEMP 경로에서 원본 그대로 보존했다. 아래 future baseline에는 **외부 별도 clone + immutable SHA + patch 기록**을 선택한다. 동작이 안정된 뒤 필요하면 submodule로 전환할 수 있다. assets/output/venv는 Git ignore 대상으로 두었다.
+이번 smoke에서 `<repository>`에 Git을 초기화하고 `researchuav-vla-feasibility` branch를 생성했다. upstream checkout은 외부 TEMP 경로에서 원본 그대로 보존했다. 아래 future baseline에는 **외부 별도 clone + immutable SHA + patch 기록**을 선택한다. 동작이 안정된 뒤 필요하면 submodule로 전환할 수 있다. assets/output/venv는 Git ignore 대상으로 두었다.
 
 제안 경로는 아래와 같다. 이것은 이번에 생성한 구조가 아니다.
 
 ```text
-Windows: C:\Users\leegy\Desktop\drone\docs\  ← 이번 두 문서
+Windows: <repository>\docs\  ← 이번 두 문서
 WSL: ~/uav-vla/
   external/AeroVLA/       ← 실험 branch, upstream SHA 보존
   external/TravelUAV/     ← 전처리 source, SHA 고정
@@ -90,7 +90,7 @@ detached TravelUAV source는 읽기/전처리 실행만 하며 generator를 수�
 ## 4. 설치 순서와 package 고정 후보 — G0/G1
 
 1. WSL host driver, RAM, disk 확인. 현재 WSL RAM은 약 15GiB로 CPU checkpoint loading transient가 문제일 수 있다. Windows의 31.11GiB를 전부 WSL이 쓰는 것으로 가정하지 않는다. `.wslconfig` 변경이 필요하면 별도로 기록한다.
-2. 실제 smoke는 uv 0.12.23 managed Python과 별도 venv를 사용했다. [실행한 설치 script](../scripts/setup_gate1.sh)/freeze를 우선 재사용한다. 아래 Conda 명령은 이전 계획의 대안이며 현재 설치 방식으로 보고하지 않는다.
+2. 실제 smoke는 uv 0.12.23 managed Python과 별도 venv를 사용했다. [실행한 설치 script](../../scripts/setup_gate1.sh)/freeze를 우선 재사용한다. 아래 Conda 명령은 이전 계획의 대안이며 현재 설치 방식으로 보고하지 않는다.
 3. Python 3.10 환경 → CUDA wheel → model utility → patched RPC → AirSim 순서.
 4. OS library/graphics tool은 실제 필요한 항목만 설치하고 `dpkg-query` 결과를 기록한다. 현재 libvulkan/UE runtime 의존성과 `net-tools`, `7z`, Tk library의 확정 OS package lock은 `MISSING`이다.
 
@@ -122,7 +122,7 @@ RPC zip은 [AeroVLA 공식 troubleshooting](https://github.com/XuPeng23/AeroVLA/
 c0d7df3fe91271ea052384ca7150c7f6730eeed63672168d08a0f27946322197
 ```
 
-공식 수정 RPC zip과 `VehicleClient` encoding kwargs 제거를 실제 Gate 2 env에 적용했다. [원본/수정 hash](../outputs/compatibility/airsim-client-patch-manifest.json)와 [정확한 patch](../outputs/compatibility/airsim-client-encoding.patch)를 기록했고 두 환경 RGB/state RPC를 성공했다. upstream은 수정하지 않았다. Tornado 4.5.3을 이유 없이 최신 major로 바꾸지 않았다.
+공식 수정 RPC zip과 `VehicleClient` encoding kwargs 제거를 실제 Gate 2 env에 적용했다. 원본/수정 hash (`outputs/compatibility/airsim-client-patch-manifest.json`, 로컬 기록·Git 제외)와 정확한 patch (`outputs/compatibility/airsim-client-encoding.patch`, 로컬 기록·Git 제외)를 기록했고 두 환경 RGB/state RPC를 성공했다. upstream은 수정하지 않았다. Tornado 4.5.3을 이유 없이 최신 major로 바꾸지 않았다.
 
 다음은 향후 전체 baseline import 확인 예시다. 현재 Gate 1의 실행 결과는 smoke 문서/freeze에 있으며 timm/airsim/tk를 포함한 이 combined import 명령은 실행하지 않았다.
 

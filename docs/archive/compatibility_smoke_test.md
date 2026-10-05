@@ -8,7 +8,7 @@
 
 **Gate 1 통과, Gate 2 부분 검증, Gate 3 미실행.** CUDA/NF4와 Windows Blocks → WSL Python RPC는 실제 동작했다. 이후 요청한 WSLg 재시도에서 NVIDIA D3D12/OpenGL backend는 성공했으나 UE 4.27.2가 -opengl을 Vulkan으로 되돌려 TravelUAV는 계속 llvmpipe CPU renderer였다. 30-frame CPU RPC를 측정했고 동일 BrushifyUrban의 공개 Windows build가 없음을 확인했다. 최종 권장은 **C. Native Ubuntu**, Windows 개발 차선은 **D**로 갱신한다. [최신 rendering decision](traveluav_rendering_decision.md). 전체 AeroVLA/TravelUAV GPU 실행은 미입증이고 checkpoint 다운로드 권고는 **NO**다.
 
-전체 dataset, OpenVLA/AeroVLA checkpoint, navigation episode, failure injection/detection/recovery, fine-tuning, evaluation은 수행하지 않았다. upstream 소스는 수정하지 않았다. [고정 revision 대조](../outputs/compatibility/upstream-integrity.json)에서 wrapper 내용이 일치했으며 기존 Windows audit copy의 CRLF와 GitHub LF만 다르다. AirSim client 수정은 격리한 Gate 2 환경에만 적용하고 원본/수정 hash와 patch를 보존했다.
+전체 dataset, OpenVLA/AeroVLA checkpoint, navigation episode, failure injection/detection/recovery, fine-tuning, evaluation은 수행하지 않았다. upstream 소스는 수정하지 않았다. 고정 revision 대조 (`outputs/compatibility/upstream-integrity.json`, 로컬 기록·Git 제외)에서 wrapper 내용이 일치했으며 기존 Windows audit copy의 CRLF와 GitHub LF만 다르다. AirSim client 수정은 격리한 Gate 2 환경에만 적용하고 원본/수정 hash와 patch를 보존했다.
 
 ## 필수 판정표
 
@@ -28,7 +28,7 @@
 
 ## Gate 1 — modern CUDA / NF4
 
-WSL Ubuntu 24.04.4, kernel `6.6.87.2-microsoft-standard-WSL2`. uv `0.12.23`으로 Python 3.10.14와 별도 venv를 만들었다. system Python 3.12.3과 shell profile을 변경하지 않았다. 환경: `/home/gyuhan/uav-vla-smoke/gate1`.
+WSL Ubuntu 24.04.4, kernel `6.6.87.2-microsoft-standard-WSL2`. uv `0.12.23`으로 Python 3.10.14와 별도 venv를 만들었다. system Python 3.12.3과 shell profile을 변경하지 않았다. 환경: `$UAV_VLA_HOME/gate1`.
 
 ```yaml
 Python: 3.10.14
@@ -68,7 +68,7 @@ BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4",
 
 첫 실행은 bnb import → Triton 3.3.1의 C helper compilation에서 `RuntimeError: Failed to find C compiler. Please specify via CC environment variable.`로 실패했다. `gcc`/`cc` 부재를 확인하고 **패키지 버전을 유지**한 채 WSL root로 `gcc libc6-dev`를 설치한 뒤 재실행해 통과했다. gcc `13.3.0`, libc6-dev `2.39-0ubuntu8.9`. apt가 필요한 libc 관련 패키지 3개도 갱신했지만 전체 OS upgrade는 하지 않았다. 기본 사용자 sudo는 password를 요구해 WSL `-u root` 경로를 사용했다. 임의 버전 반복 설치는 하지 않았다.
 
-오류 전문: [최초 stdout/stderr](../outputs/compatibility/gate1-run.log), [실패 JSON](../outputs/compatibility/gate1-initial-failure.json). 성공 증거: [복구 후 로그](../outputs/compatibility/gate1-run-after-gcc.log), [측정 JSON](../outputs/compatibility/gate1-result.json), [전체 freeze](../outputs/compatibility/gate1-freeze.txt). [설치 script](../scripts/setup_gate1.sh), [측정 코드](../scripts/compatibility_gate1.py).
+오류 전문: 최초 stdout/stderr (`outputs/compatibility/gate1-run.log`, 로컬 기록·Git 제외), 실패 JSON (`outputs/compatibility/gate1-initial-failure.json`, 로컬 기록·Git 제외). 성공 증거: 복구 후 로그 (`outputs/compatibility/gate1-run-after-gcc.log`, 로컬 기록·Git 제외), 측정 JSON (`outputs/compatibility/gate1-result.json`, 로컬 기록·Git 제외), 전체 freeze (`outputs/compatibility/gate1-freeze.txt`, 로컬 기록·Git 제외). [설치 script](../../scripts/setup_gate1.sh), [측정 코드](../../scripts/compatibility_gate1.py).
 
 ## Gate 2 — 단일 TravelUAV map과 Windows fallback
 
@@ -81,13 +81,13 @@ BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4",
 | TravelUAV BrushifyUrban | 1,530,641,125 bytes (1.426GiB) / 1,656,328,410 bytes, 27 entries | `5faf7a9b475a4adc5e106c8a9711b975497cab9482f188ceb06cd557017c8d09`, HF digest와 일치 |
 | [AirSim Windows Blocks 1.8.1](https://github.com/microsoft/AirSim/releases/tag/v1.8.1-windows) | 259,463,081 bytes (247.443MiB), 별도 fallback map | `47c526a5f0acff42c211d2479b9de9f10286a8162678ef19adc09040a23ca1db`, 로컬 계산; 공급자 digest 미제공 |
 
-BrushifyUrban은 Linux ELF와 `.sh`만 포함하고 Windows executable은 없다. WSL 경로는 `/home/gyuhan/uav-vla-smoke/assets/travel-urban`. Blocks는 `assets/windows-blocks-1.8.1`. raw dataset/closed-loop 전체 maps/trajectory/spawn metadata는 받지 않았다. default spawn은 유효한 navigation 시작 위치로 확인하지 않았다. 물리 엔진으로 pose가 변했지만 takeoff/arm/move 명령은 호출하지 않았다.
+BrushifyUrban은 Linux ELF와 `.sh`만 포함하고 Windows executable은 없다. WSL 경로는 `$UAV_VLA_HOME/assets/travel-urban`. Blocks는 `assets/windows-blocks-1.8.1`. raw dataset/closed-loop 전체 maps/trajectory/spawn metadata는 받지 않았다. default spawn은 유효한 navigation 시작 위치로 확인하지 않았다. 물리 엔진으로 pose가 변했지만 takeoff/arm/move 명령은 호출하지 않았다.
 
-모델을 종료한 뒤 simulator만 실행하여 ping/version/listVehicles, **simGetImages 1회**, state 1회, pose 1회를 요청하고 종료했다. [settings](../scripts/gate2-settings.json): Drone_1/SimpleFlight, FrontCamera/DownCamera, Scene 256×256, ClockSpeed **1**, NoDisplay, RPC 41461. launcher RenderOffscreen/NoSound/NoVSync, 640×480. 원본 ClockSpeed 10/5-view/recording과 다른 **smoke 전용 설정**이다.
+모델을 종료한 뒤 simulator만 실행하여 ping/version/listVehicles, **simGetImages 1회**, state 1회, pose 1회를 요청하고 종료했다. [settings](../../scripts/gate2-settings.json): Drone_1/SimpleFlight, FrontCamera/DownCamera, Scene 256×256, ClockSpeed **1**, NoDisplay, RPC 41461. launcher RenderOffscreen/NoSound/NoVSync, 640×480. 원본 ClockSpeed 10/5-view/recording과 다른 **smoke 전용 설정**이다.
 
-Gate 2 env `/home/gyuhan/uav-vla-smoke/gate2`: Python 3.10.14, AirSim 1.8.1, numpy 1.26.3, tornado 4.5.3, msgpack 1.1.2, AeroVLA 수정 msgpack-rpc-python 0.4, OpenCV contrib 4.11.0.86. `uv pip check` 통과. [freeze](../outputs/compatibility/gate2-freeze.txt), [설치 순서를 기록한 script](../scripts/setup_gate2.sh). 기존 env를 덮어쓰는 설치 재실행은 피한다.
+Gate 2 env `$UAV_VLA_HOME/gate2`: Python 3.10.14, AirSim 1.8.1, numpy 1.26.3, tornado 4.5.3, msgpack 1.1.2, AeroVLA 수정 msgpack-rpc-python 0.4, OpenCV contrib 4.11.0.86. `uv pip check` 통과. freeze (`outputs/compatibility/gate2-freeze.txt`, 로컬 기록·Git 제외), [설치 순서를 기록한 script](../../scripts/setup_gate2.sh). 기존 env를 덮어쓰는 설치 재실행은 피한다.
 
-[AeroVLA 공식 troubleshooting](https://github.com/XuPeng23/AeroVLA/blob/2c5ae0987a484ab92f00dd9d9ed493cb3e98e492/docs/assets/troubleshooting.md)에 따라 수정 RPC zip을 설치하고 AirSim client encoding kwargs를 제거했다. zip SHA256 `c0d7df3fe91271ea052384ca7150c7f6730eeed63672168d08a0f27946322197`. [patch](../outputs/compatibility/airsim-client-encoding.patch), [원본/수정 hash](../outputs/compatibility/airsim-client-patch-manifest.json). upstream checkout에는 적용하지 않았다.
+[AeroVLA 공식 troubleshooting](https://github.com/XuPeng23/AeroVLA/blob/2c5ae0987a484ab92f00dd9d9ed493cb3e98e492/docs/assets/troubleshooting.md)에 따라 수정 RPC zip을 설치하고 AirSim client encoding kwargs를 제거했다. zip SHA256 `c0d7df3fe91271ea052384ca7150c7f6730eeed63672168d08a0f27946322197`. patch (`outputs/compatibility/airsim-client-encoding.patch`, 로컬 기록·Git 제외), 원본/수정 hash (`outputs/compatibility/airsim-client-patch-manifest.json`, 로컬 기록·Git 제외). upstream checkout에는 적용하지 않았다.
 
 ### A. WSL simulator + WSL Python
 
@@ -97,7 +97,7 @@ Gate 2 env `/home/gyuhan/uav-vla-smoke/gate2`: Python 3.10.14, AirSim 1.8.1, num
 
 재측정 process-group sampled RSS peak **1359.879MiB (1.328GiB)**. global GPU usage 1645MiB가 일정했으나 CPU renderer의 점유로 귀속하지 않는다. **TravelUAV GPU-rendering VRAM은 MISSING**.
 
-[최초 RPC](../outputs/compatibility/wsl-first-run/wsl-travel-rpc.json), [재측정 RPC](../outputs/compatibility/wsl-travel-rpc.json), [resource samples](../outputs/compatibility/wsl-travel-launch.json), [UE 전체 로그](../outputs/compatibility/wsl-travel-unreal.log), [Vulkan 진단](../outputs/compatibility/wsl-vulkan-summary.log), [프레임](../outputs/compatibility/wsl-travel-camera.png).
+최초 RPC (`outputs/compatibility/wsl-first-run/wsl-travel-rpc.json`, 로컬 기록·Git 제외), 재측정 RPC (`outputs/compatibility/wsl-travel-rpc.json`, 로컬 기록·Git 제외), resource samples (`outputs/compatibility/wsl-travel-launch.json`, 로컬 기록·Git 제외), UE 전체 로그 (`outputs/compatibility/wsl-travel-unreal.log`, 로컬 기록·Git 제외), Vulkan 진단 (`outputs/compatibility/wsl-vulkan-summary.log`, 로컬 기록·Git 제외), 프레임 (`outputs/compatibility/wsl-travel-camera.png`, 로컬 기록·Git 제외).
 
 ### B. Windows simulator + WSL Python
 
@@ -113,13 +113,13 @@ WSL AirSim client → 127.0.0.1:41501 → WSL bridge
   → Windows bridge → Windows 127.0.0.1:41461 → AirSim Blocks
 ```
 
-RPC message를 변경하지 않고 양방향 byte stream을 중계했다. camera 파일 공유를 RPC 대신 사용하지 않았다. [Python bridge](../scripts/gate2_reverse_bridge.py), [Windows bridge](../scripts/gate2_reverse_bridge.ps1). 테스트 후 simulator/helper/listen sockets를 종료했다. persistent service/firewall 변경 없음.
+RPC message를 변경하지 않고 양방향 byte stream을 중계했다. camera 파일 공유를 RPC 대신 사용하지 않았다. [Python bridge](../../scripts/gate2_reverse_bridge.py), [Windows bridge](../../scripts/gate2_reverse_bridge.ps1). 테스트 후 simulator/helper/listen sockets를 종료했다. persistent service/firewall 변경 없음.
 
 camera **179.195ms**, ping `2.114ms`, state `0.780ms`, pose `0.567ms`. latency는 network/render/readback을 포함한 최초 요청이며 GPU render time/지속 FPS가 아니다.
 
 simulator PID GPU counter의 sampled peak **216.160MiB (0.211GiB) dedicated**, **80.770MiB shared**. 시스템 RAM working-set peak **367.750MiB**, private bytes **604.637MiB**. global nvidia-smi baseline `1639MiB`, peak `1860MiB`. GPU counter와 nvidia-smi 범위가 달라 더하지 않는다. 작은 Blocks의 값이며 TravelUAV 도시 scene으로 외삽하지 않는다.
 
-[RPC JSON](../outputs/compatibility/windows-blocks-bridge-rpc.json), [resource samples](../outputs/compatibility/windows-blocks-bridge-launch.json), [UE 로그](../outputs/compatibility/windows-blocks-unreal.log), [직접 NAT 실패 전문](../outputs/compatibility/windows-blocks-rpc.json), [프레임](../outputs/compatibility/windows-blocks-bridge-camera.png).
+RPC JSON (`outputs/compatibility/windows-blocks-bridge-rpc.json`, 로컬 기록·Git 제외), resource samples (`outputs/compatibility/windows-blocks-bridge-launch.json`, 로컬 기록·Git 제외), UE 로그 (`outputs/compatibility/windows-blocks-unreal.log`, 로컬 기록·Git 제외), 직접 NAT 실패 전문 (`outputs/compatibility/windows-blocks-rpc.json`, 로컬 기록·Git 제외), 프레임 (`outputs/compatibility/windows-blocks-bridge-camera.png`, 로컬 기록·Git 제외).
 
 **A/B는 map·renderer·cache·중계 조건이 달라 NOT_COMPARABLE.** 8.05s 대 179ms를 GPU 개선 배율이나 TravelUAV 성능 차이로 보고하지 않는다. B는 hardware/RPC 구조를 입증했지만 동일 TravelUAV Windows scene/build가 필요하다. Linux pak을 Windows executable에 복사하면 동등 환경이 된다고 가정하지 않는다.
 
@@ -148,10 +148,10 @@ simulator PID GPU counter의 sampled peak **216.160MiB (0.211GiB) dedicated**, *
 ```powershell
 # 최초 설치 시 C compiler 필요; setup은 별도 Python env를 생성한다
 wsl -d Ubuntu -u root -- apt-get install -y --no-install-recommends gcc libc6-dev
-wsl -d Ubuntu -- bash /mnt/c/Users/leegy/Desktop/drone/scripts/setup_gate1.sh
-wsl -d Ubuntu -- /home/gyuhan/uav-vla-smoke/gate1/bin/python /mnt/c/Users/leegy/Desktop/drone/scripts/compatibility_gate1.py --output /mnt/c/Users/leegy/Desktop/drone/outputs/compatibility --model-dir /home/gyuhan/uav-vla-smoke/tiny-hf-llama
+wsl -d Ubuntu -- bash $REPO_ROOT/scripts/setup_gate1.sh
+wsl -d Ubuntu -- $UAV_VLA_HOME/gate1/bin/python $REPO_ROOT/scripts/compatibility_gate1.py --output $REPO_ROOT/outputs/compatibility --model-dir $UAV_VLA_HOME/tiny-hf-llama
 # 이미 설치된 Gate 2 env와 압축 해제 자원을 사용
-wsl -d Ubuntu -- /home/gyuhan/uav-vla-smoke/gate2/bin/python /mnt/c/Users/leegy/Desktop/drone/scripts/compatibility_gate2_linux.py --executable /home/gyuhan/uav-vla-smoke/assets/travel-urban/BrushifyUrban/BrushifyUrban.sh --output /mnt/c/Users/leegy/Desktop/drone/outputs/compatibility
+wsl -d Ubuntu -- $UAV_VLA_HOME/gate2/bin/python $REPO_ROOT/scripts/compatibility_gate2_linux.py --executable $UAV_VLA_HOME/assets/travel-urban/BrushifyUrban/BrushifyUrban.sh --output $REPO_ROOT/outputs/compatibility
 & .\scripts\compatibility_gate2_windows.ps1 -UseReverseBridge
 ```
 
