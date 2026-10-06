@@ -8,14 +8,18 @@
 
 | 조작 | 기능 |
 |---|---|
-| 맵 클릭 | 평평한 표면의 좌표 목표. 파란 원뿔·주황 공·색 벽을 클릭하면 그 landmark가 목표가 된다 |
+| 맵 클릭 | 평평한 표면의 좌표 목표. 파란 원뿔·주황 공을 클릭하면 그 landmark가 목표가 된다. 블록 위를 클릭하면 그 블록의 종류와 색이 설명 문장이 되고(`The target is the top of a gray block.`), 목표 45m 안에 들어오면 그 면보다 6m 위로 올라간다 |
 | N | 이름 있는 landmark를 차례로 선택 (blue cone → orange ball → colored wall) |
 | G | 미션 시작. 모델이 LAND를 낼 때까지 비행하고, LAND가 나오면 착륙한 뒤 정지 지점으로 판정 |
-| M | 방향 힌트 ON/OFF. OFF면 prompt에 방향 문장이 빠지고 landmark 설명과 영상만 전달 |
+| M | prompt 모드를 차례로 바꾼다. **방향 힌트 + 설명**(기본) → **설명만**(방향 문장 없음) → **지시문만**(`Land on top of the large blue cone. Fly around, find it with your camera, then fly straight to it and land.`) |
 | R | 끝난 미션 초기화; 드론 위치는 그대로 |
 | F / C / WASD / +,- / V | 전체 맵 / 드론 중심 / pan / zoom / 시점 |
 | B / 1·2·3 | Gaussian Blur ON/OFF / 강도 |
 | Q / Esc / 창 닫기 | 중단 → 착륙 처리 → 종료 |
+
+비행은 step 방식이다: 이동 → 정지 → 촬영 → 추론을 반복한다. 멈추지 않고 이어서 나는 연속 비행은 이 브랜치에 없고 `feat/continuous-flight` 브랜치에 있다. [측정과 비교](model_evaluation.md#연속-비행).
+
+모델 출력의 숫자 자리에 다른 토큰이 끼면 유효한 토큰 중 확률이 가장 높은 것으로 바꾸고 `Grammar: token …`으로 표시한다. 이전에는 이런 출력에서 미션이 `invalid_action`으로 끝났다. 블록 위 목표에 착륙하면 결과 줄에 고른 면 위인지, 몇 m 아래인지가 함께 나온다. 기본 출발점에서 블록 위에 착륙한 실행은 아직 없다(가까운 시작점에서는 6회 중 5회). 지시문만 준 모드에서 모델은 지시한 물체를 찾아가지 못한다. [근거](model_evaluation.md#깨진-출력-블록-위-목표-지시문만으로-찾아가기).
 
 성공 반경·step 한도는 [mission_limits.json](../configs/mission_limits.json), 고도 범위·행동 배율은 [flight_limits.json](../configs/flight_limits.json), landmark 설명은 [landmarks.json](../configs/landmarks.json)에서 바꾼다. 기체가 구조물에 부딪히면 simulator가 기체를 그 자리에 고정하므로 미션은 `collision`으로 끝나고, 새로 시작하려면 Q로 종료한 뒤 다시 실행한다.
 

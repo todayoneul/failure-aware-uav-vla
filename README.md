@@ -64,7 +64,7 @@ AeroVLA에 전달된 Front/Down RGB와 생성된 forward/down/yaw 행동입니�
 
 ![Blue cone landmark 미션의 실제 화면: 102m 비행 뒤 모델 LAND, 목표 3.6m에 착륙](outputs/examples/mission_landmark.png)
 
-맵의 평평한 지점이나 landmark를 클릭하고 **G**로 시작합니다. **N: landmark 차례로 선택, M: 방향 힌트 ON/OFF, R: 완료 후 초기화, F/C/WASD/+/-/V: 지도 조작, B: Blur, Q/Esc: 중단·착륙**입니다. 모델은 첫 미션에서 기존 캐시로 로딩합니다. 드론은 모델이 낸 거리만큼(최대 5m/step) 실제로 이동하고, 모델이 LAND를 내면 착륙한 뒤 그 지점이 목표 20m 안인지로 성공을 판정합니다. [현재 조작](docs/mission_demo.md#현재-조작-2026-10-06-이후).
+맵의 평평한 지점이나 landmark를 클릭하고 **G**로 시작합니다. **N: landmark 차례로 선택, M: prompt 모드(방향 힌트 + 설명 → 설명만 → 지시문만), R: 완료 후 초기화, F/C/WASD/+/-/V: 지도 조작, B: Blur, Q/Esc: 중단·착륙**입니다. 블록 위를 클릭하면 그 블록의 종류와 색이 설명 문장이 되고, 드론은 목표 45m 안에 들어왔을 때 그 면보다 6m 위로 올라갑니다. 모델은 첫 미션에서 기존 캐시로 로딩합니다. 드론은 모델이 낸 거리만큼(최대 5m/step) 실제로 이동하고, 모델이 LAND를 내면 착륙한 뒤 그 지점이 목표 20m 안인지로 성공을 판정합니다. [현재 조작](docs/mission_demo.md#현재-조작-2026-10-06-이후).
 
 오른쪽 Inspector는 모델에 실제로 들어간 prompt를 보여줍니다. 좌표·거리·지도·빨간 X는 모델 입력이 아닙니다.
 
@@ -75,6 +75,16 @@ AeroVLA에 전달된 Front/Down RGB와 생성된 forward/down/yaw 행동입니�
 하네스를 고친 뒤 고정 시작점에서 69회 비행시켜 측정했습니다. **방향 힌트가 있으면 날아갑니다.** 힌트가 목표를 가리킨 35회(초기 거리 20m 초과) 중 33회가 목표 쪽으로 접근했고, 12회는 목표 20m 안에서 모델이 스스로 LAND를 냈습니다. 위 대화형 데모 화면도 102m 떨어진 파란 원뿔까지 가서 3.6m 지점에 착륙한 실제 실행입니다.
 
 **카메라만으로 설명된 물체를 찾아가지는 못합니다.** 방향 힌트를 빼면 13회 모두 첫 step에서 LAND였고, 설명과 힌트가 다른 물체를 가리키면 힌트 쪽으로 갔습니다. 정지 위치도 실행마다 달라, 같은 조건이 8m에서 멈추기도 하고 34m에서 멈추거나 목표물에 부딪히기도 했습니다. [무엇을 고쳤는지·방법·전체 결과·한계](docs/model_evaluation.md).
+
+### 블록 위에도 착륙하나요? 말로만 시켜도 되나요?
+
+![지붕 목표와 지시문 방식의 실제 궤적](outputs/examples/model_evaluation_roof.jpg)
+
+**블록 위는 가까운 곳에서 위로 접근할 때만 됩니다.** 모델은 고도를 거의 바꾸지 않아서, 낮게 날아가면 16m 건물의 벽 앞에서 멈추거나 부딪힙니다(지붕 착륙 0/3). 42m 거리에서 지붕보다 6m 위로 올라간 뒤 출발하면 6회 모두 목표 10m 안에서 모델이 스스로 멈췄고 5회는 그 지붕에 착륙했습니다. 97m 떨어진 기본 출발점에서는 9회 모두 실패했습니다. 가는 도중에 멈추거나, 지붕 위까지 가서 멈추지 않았습니다. 데모는 블록 위 목표가 45m 안에 들어오면 그 면보다 6m 위로 올라갑니다.
+
+**"파란 원뿔 위에 착륙해라, 돌아다니며 카메라로 찾아라"처럼 말로만 시키면 찾아가지 못합니다.** 출발은 하지만 지시한 물체 20m 안에서 멈춘 경우가 0/6입니다. 이 모델은 매 step 방향 힌트를 받는 형태로만 학습됐고, 영상 한 장만 보고 판단해 지나온 곳을 기억하지 못합니다.
+
+그 과정에서 미션이 `invalid_action`으로 끝나던 원인도 찾았습니다. 이동 명령의 숫자 토큰 하나가 원본 OpenVLA의 action 토큰으로 바뀐 출력이었고, 유효한 토큰만 고르도록 디코더를 바꾼 뒤로는 그런 종료가 없습니다. [상세](docs/model_evaluation.md#깨진-출력-블록-위-목표-지시문만으로-찾아가기).
 
 ## System Architecture
 
@@ -121,6 +131,9 @@ outputs/examples/  드론·관찰·AI·장애 화면과 짧은 GIF
 - [x] Interactive target selection and mission runner
 - [x] Upstream-equivalent action execution, model-decided landing
 - [x] Model self-evaluation with landmarks and prompt ablations
+- [ ] Continuous flight: re-plan in the air instead of stopping every step (kept on the `feat/continuous-flight` branch)
+- [x] Grammar-constrained action decoding; roof targets approached from above
+- [x] Instruction-only prompt mode and its evaluation (the model does not follow it)
 - [ ] Reaching a described landmark and stopping near it
 - [ ] Additional failure types
 - [ ] Failure detection
