@@ -15,12 +15,12 @@ def alive(pid):
         return False
 
 
-def verify_owner(pid, expected_script, run_token):
+def verify_owner(pid, expected_script, run_token, marker='--blur-demo'):
     if pid <= 1:
         raise PermissionError('Refusing invalid/system PID')
     args = (Path('/proc')/str(pid)/'cmdline').read_bytes().decode().split('\0')
     valid = len(args) > 1 and Path(args[1]).resolve() == Path(expected_script).resolve()
-    valid = valid and '--blur-demo' in args and '--run-token' in args
+    valid = valid and marker in args and '--run-token' in args
     if valid:
         index = args.index('--run-token')
         valid = index+1 < len(args) and args[index+1] == run_token
@@ -31,11 +31,11 @@ def verify_owner(pid, expected_script, run_token):
     return True
 
 
-def stop_owned_worker(pid, expected_script, run_token):
+def stop_owned_worker(pid, expected_script, run_token, marker='--blur-demo'):
     if not alive(pid):
         return {'pid': pid, 'terminated': True, 'forced': False}
     try:
-        owned = verify_owner(pid, expected_script, run_token)
+        owned = verify_owner(pid, expected_script, run_token, marker)
     except FileNotFoundError:
         if alive(pid):
             raise
@@ -46,7 +46,7 @@ def stop_owned_worker(pid, expected_script, run_token):
         if not alive(pid):
             break
         try:
-            if not verify_owner(pid, expected_script, run_token):
+            if not verify_owner(pid, expected_script, run_token, marker):
                 break
         except FileNotFoundError:
             if not alive(pid):
@@ -69,10 +69,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--pid-file', type=Path, required=True)
     parser.add_argument('--run-token', required=True)
+    parser.add_argument('--mode',choices=('blur','mission'),default='blur')
     args = parser.parse_args()
     if args.pid_file.exists():
         pid = int(args.pid_file.read_text().strip())
-        script = Path(__file__).resolve().parents[1]/'src/integration/closed_loop_runner.py'
-        print(json.dumps(stop_owned_worker(pid, script, args.run_token)))
+        root=Path(__file__).resolve().parents[1]
+        script=root/('src/mission/runner.py' if args.mode=='mission' else 'src/integration/closed_loop_runner.py')
+        marker='--mission-demo' if args.mode=='mission' else '--blur-demo'
+        print(json.dumps(stop_owned_worker(pid, script, args.run_token, marker)))
     else:
         print(json.dumps({'pid': None, 'terminated': True, 'forced': False, 'note': 'Python worker not started'}))

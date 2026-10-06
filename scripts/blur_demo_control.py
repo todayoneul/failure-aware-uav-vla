@@ -15,6 +15,7 @@ def main():
     parser.add_argument('--action', choices=('init', 'quit'), required=True)
     parser.add_argument('--output', type=Path, default=Path('outputs/failure_demo'))
     parser.add_argument('--steps', type=int, default=30)
+    parser.add_argument('--mode', choices=('blur','mission'), default='blur')
     args = parser.parse_args()
     if not 1 <= args.steps <= 60:
         parser.error('--steps must be within 1..60')
@@ -23,8 +24,14 @@ def main():
     if args.action == 'init':
         from src.integration.blur_demo_support import BlurDemoSession
         initialize_run_output(output)
-        write_control(path, default_control())
-        BlurDemoSession(ROOT, output, args.steps)
+        if args.mode=='mission':
+            from src.mission.control import default_mission_control
+            write_control(path, default_mission_control())
+        else:write_control(path, default_control())
+        session=BlurDemoSession(ROOT, output, args.steps)
+        if args.mode=='mission':
+            session.update(mission={'state':'IDLE','target':None,'type':None,'errors':None},
+                           capabilities={'GO_TO':True,'GO_TO_AND_HOVER':False,'GO_TO_AND_LAND':False})
         print('Control initialized: blur OFF, severity MEDIUM', flush=True)
     else:
         state = read_control(path)

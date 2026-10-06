@@ -71,6 +71,9 @@ def initialize_run_output(path):
              'worker.log','worker-errors.log','viewer.log','viewer-errors.log',
              'windows-resources.jsonl','windows-latest.json','windows-latest.tmp','active-stage.txt',
              'chase_latest.png','comparison.png','launcher-cleanup.json'}
+    names.update({'mission-results.json','mission-steps.jsonl','overview.json','overview_0.png','overview_1.png',
+                  'overview_top.png','overview_elevated.png','scene-geometry.json','target_selected.png',
+                  'navigating.png','mission_success.png','mission_failed.png','current_view.png'})
     names.update(f'{prefix}_{camera}.png' for prefix in ('normal','blur','restored','input_a','input_b')
                  for camera in ('front','down'))
     names.update(f'observer_{label}.png' for label in ('normal','blur','restored'))
