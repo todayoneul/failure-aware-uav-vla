@@ -14,6 +14,9 @@
 !/outputs/examples/mission_runner.png
 !/outputs/examples/mission_landing_failed.png
 !/outputs/examples/full_map_grounding.png
+!/outputs/examples/model_evaluation.jpg
+!/outputs/examples/mission_landmark.png
+!/outputs/examples/model_evaluation_frames.jpg
 
 # Downloaded simulator, datasets and model weights.
 /assets/

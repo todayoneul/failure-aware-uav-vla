@@ -1,10 +1,27 @@
 # Interactive Mission Runner
 
 > 2026-10-06 후속 업데이트: [Full Map + Target Grounding Inspector](full_map_grounding.md). 기본 Overview는 scene geometry 전체를 fit하는 Top-down으로 변경했고 F/C/WASD와 방향·visibility Inspector를 추가했다. 아래는 최초 미션 실행기의 검증 기록이며 당시 UI/카메라 기본값과 구분한다.
+>
+> **현재 동작은 [Model Self-Evaluation](model_evaluation.md) 이후 바뀌었다.** 미션 종류는 하나(G)이고, 모델 행동을 원래 크기로 실행하며, **모델이 LAND를 출력하면 착륙하고 그 지점의 거리로 성공을 판정**한다. H/L 미션, 0.45m 도착 판정, 전진 0.5m·상하 0.3m·회전 15° 제한, 0.8–4m 고도 이탈 실패는 더 이상 없다. 아래 본문에서 이 항목들을 다루는 부분은 **당시 기록**이다. 현재 조작은 바로 아래 표를 따른다.
+
+## 현재 조작 (2026-10-06 이후)
+
+| 조작 | 기능 |
+|---|---|
+| 맵 클릭 | 평평한 표면의 좌표 목표. 파란 원뿔·주황 공·색 벽을 클릭하면 그 landmark가 목표가 된다 |
+| N | 이름 있는 landmark를 차례로 선택 (blue cone → orange ball → colored wall) |
+| G | 미션 시작. 모델이 LAND를 낼 때까지 비행하고, LAND가 나오면 착륙한 뒤 정지 지점으로 판정 |
+| M | 방향 힌트 ON/OFF. OFF면 prompt에 방향 문장이 빠지고 landmark 설명과 영상만 전달 |
+| R | 끝난 미션 초기화; 드론 위치는 그대로 |
+| F / C / WASD / +,- / V | 전체 맵 / 드론 중심 / pan / zoom / 시점 |
+| B / 1·2·3 | Gaussian Blur ON/OFF / 강도 |
+| Q / Esc / 창 닫기 | 중단 → 착륙 처리 → 종료 |
+
+성공 반경·step 한도는 [mission_limits.json](../configs/mission_limits.json), 고도 범위·행동 배율은 [flight_limits.json](../configs/flight_limits.json), landmark 설명은 [landmarks.json](../configs/landmarks.json)에서 바꾼다. 기체가 구조물에 부딪히면 simulator가 기체를 그 자리에 고정하므로 미션은 `collision`으로 끝나고, 새로 시작하려면 Q로 종료한 뒤 다시 실행한다.
 
 2026-10-06 검증. **맵에서 목표를 클릭하면 AeroVLA가 실제 영상으로 이동하고, 목표 오차와 성공·실패를 한 창에서 확인하는 데모**다. Windows Project AirSim Blocks + WSL2 AeroVLA NF4 구조를 유지했다. 이동·호버는 성공했고, 목표 착륙은 실패했다. 아래 기록은 각각 한 번의 기능 확인이며 성공률이나 Blur 강건성 평가가 아니다.
 
-## How I Can Check It
+## How I Can Check It (최초 검증 당시 안내)
 
 이미 준비된 이 PC에서는 저장소 폴더에서 다음 한 줄을 실행한다.
 
@@ -29,7 +46,7 @@ Simulator와 관찰 창이 자동으로 열린다. 지도는 먼저 보이고, *
 | B / 1·2·3 | 기존 Gaussian Blur ON/OFF / LOW·MEDIUM·HIGH |
 | Q / Esc / 창 닫기 | 미션 중단 요청 → 착륙 처리 → 종료 |
 
-조작은 다음 안전한 관측 경계에 적용된다. 추론·RPC를 즉시 중단하는 방식은 아니다. 클릭과 시작 요청은 순서대로 처리한다. 완료 후 다른 목표를 클릭하거나 R을 누르면 새 미션을 준비할 수 있다. H/L의 허용 여부는 이전 미션의 검증 결과와 [기능 게이트](../configs/mission_capabilities.json)에 따른다. **L은 아직 성공하지 않은 시험 기능**이다.
+조작은 다음 안전한 관측 경계에 적용된다. 추론·RPC를 즉시 중단하는 방식은 아니다. 클릭과 시작 요청은 순서대로 처리한다. 완료 후 다른 목표를 클릭하거나 R을 누르면 새 미션을 준비할 수 있다. 당시 H/L의 허용 여부는 이전 미션의 검증 결과와 기능 게이트 설정(`configs/mission_capabilities.json`, 현재는 삭제)에 따랐고, L은 성공하지 않은 시험 기능이었다.
 
 ## Map / Overview — ✅
 

@@ -10,7 +10,7 @@ Project AirSim의 실제 드론입니다. 관찰 카메라를 가까이 배치�
 
 ## What It Does
 
-앞·아래 카메라 영상과 자연어 지시를 AeroVLA에 전달합니다. 모델이 출력한 전진·상하 이동·회전 값을 안전 범위로 제한해 드론을 움직이고, 새 영상을 받아 반복합니다.
+앞·아래 카메라 영상과 자연어 지시를 AeroVLA에 전달합니다. 모델이 출력한 전진·상하 이동·회전 값대로 드론을 움직이고, 새 영상을 받아 반복합니다. 모델이 LAND를 출력하면 착륙합니다.
 
 ## Current Demo
 
@@ -18,9 +18,10 @@ Project AirSim의 실제 드론입니다. 관찰 카메라를 가까이 배치�
 - ✅ AeroVLA NF4 추론과 실제 영상 → 행동 → 이동
 - ✅ single-step 및 **10/10 closed loop**
 - ✅ **Interactive Gaussian Blur injection — 실제 AeroVLA 입력에 적용**
-- ✅ **Interactive mission target selection** — 맵 클릭으로 실제 좌표 선택
-- ✅ **Full-map / Target Grounding Inspector** — 전체 Blocks와 실제 방향 prompt·camera visibility 표시
-- ✅ **Goal-based mission runner** — 이동·호버 성공, 목표 착륙은 아직 실패
+- ✅ **Interactive mission target selection** — 맵 클릭 또는 landmark(파란 원뿔·주황 공·색 벽) 선택
+- ✅ **Full-map / Target Grounding Inspector** — 전체 Blocks와 실제 prompt·camera visibility 표시
+- ✅ **Mission runner** — 모델 행동을 원래 크기로 실행하고, 모델의 LAND로 끝내 착륙 후 판정
+- ✅ **Model self-evaluation** — 고정 시작점·landmark·prompt 조건별 측정: 방향 힌트가 있으면 35회 중 33회가 목표 쪽으로 접근하고 12회는 20m 안에서 스스로 정지, 힌트가 없으면 13회 모두 출발하지 않음
 - ✅ 기본 blur·control drift 데모 — **모델 없는 별도 script 시험**
 
 ### 드론이 어떻게 움직이나요?
@@ -61,11 +62,19 @@ AeroVLA에 전달된 Front/Down RGB와 생성된 forward/down/yaw 행동입니�
 .\scripts\run_mission_demo.ps1
 ```
 
-![목표·경로·모델 입력과 행동을 함께 보여주는 실제 미션 화면](outputs/examples/mission_runner.png)
+![Blue cone landmark 미션의 실제 화면: 102m 비행 뒤 모델 LAND, 목표 3.6m에 착륙](outputs/examples/mission_landmark.png)
 
-맵의 평평한 지점을 클릭하고 **G: 이동, H: 호버, L: 착륙 시험**을 누릅니다. **V: 시점, +/-: 확대·축소, R: 완료 후 초기화, B: Blur, Q/Esc: 중단·착륙**입니다. 모델은 첫 미션에서 기존 캐시로 로딩합니다. 실제 이동·호버가 한 번씩 성공했으며, 착륙은 XY 오차 **0.50m > 기준 0.45m**로 실패했습니다. [실행 방법·실제 결과·한계](docs/mission_demo.md).
+맵의 평평한 지점이나 landmark를 클릭하고 **G**로 시작합니다. **N: landmark 차례로 선택, M: 방향 힌트 ON/OFF, R: 완료 후 초기화, F/C/WASD/+/-/V: 지도 조작, B: Blur, Q/Esc: 중단·착륙**입니다. 모델은 첫 미션에서 기존 캐시로 로딩합니다. 드론은 모델이 낸 거리만큼(최대 5m/step) 실제로 이동하고, 모델이 LAND를 내면 착륙한 뒤 그 지점이 목표 20m 안인지로 성공을 판정합니다. [현재 조작](docs/mission_demo.md#현재-조작-2026-10-06-이후).
 
-이제 **F: 전체 맵, C: 드론 중심, WASD: pan**을 지원합니다. 오른쪽 Inspector에서 목표 좌표가 모델의 **coarse 방향 문장**으로 바뀌는 과정을 볼 수 있습니다. Exact XYZ·거리·빨간 X는 모델 입력이 아닙니다. Near/Medium/Far(약 2/9.5/68m)는 이번 시험에서 실패했으며, [실제 화면·결과·visibility 해석](docs/full_map_grounding.md)에 그대로 기록했습니다. Visual landmark navigation은 아직 구현하지 않았습니다.
+오른쪽 Inspector는 모델에 실제로 들어간 prompt를 보여줍니다. 좌표·거리·지도·빨간 X는 모델 입력이 아닙니다.
+
+### 모델은 실제로 목표를 찾아가나요?
+
+![조건별 실제 궤적](outputs/examples/model_evaluation.jpg)
+
+하네스를 고친 뒤 고정 시작점에서 69회 비행시켜 측정했습니다. **방향 힌트가 있으면 날아갑니다.** 힌트가 목표를 가리킨 35회(초기 거리 20m 초과) 중 33회가 목표 쪽으로 접근했고, 12회는 목표 20m 안에서 모델이 스스로 LAND를 냈습니다. 위 대화형 데모 화면도 102m 떨어진 파란 원뿔까지 가서 3.6m 지점에 착륙한 실제 실행입니다.
+
+**카메라만으로 설명된 물체를 찾아가지는 못합니다.** 방향 힌트를 빼면 13회 모두 첫 step에서 LAND였고, 설명과 힌트가 다른 물체를 가리키면 힌트 쪽으로 갔습니다. 정지 위치도 실행마다 달라, 같은 조건이 8m에서 멈추기도 하고 34m에서 멈추거나 목표물에 부딪히기도 했습니다. [무엇을 고쳤는지·방법·전체 결과·한계](docs/model_evaluation.md).
 
 ## System Architecture
 
@@ -84,12 +93,12 @@ RTX 5070 12GB / Windows + WSL2 / Project AirSim / OpenVLA-7B + AeroVLA LoRA / NF
 ## Repository Structure
 
 ```text
-docs/              setup · baseline · experiments · failure_plan
+docs/              setup · baseline · experiments · model_evaluation · failure_plan
 docs/archive/      이전 기술 검증 기록
 src/integration/   모델·카메라·행동 변환과 실행 코드
 src/failures/      Gaussian Blur와 작은 control protocol
-src/mission/       지도 좌표·미션 상태·성공/실패 판정
-configs/           baseline 설정과 패키지 버전
+src/mission/       지도 좌표·landmark·미션 상태·성공/실패 판정
+configs/           baseline 설정, 비행·미션 한도, landmark, 평가 protocol
 scripts/ · tests/  준비·측정 스크립트와 테스트
 outputs/examples/  드론·관찰·AI·장애 화면과 짧은 GIF
 ```
@@ -97,6 +106,8 @@ outputs/examples/  드론·관찰·AI·장애 화면과 짧은 GIF
 ## Current Status
 
 [Current Baseline](docs/baseline.md): 추론 평균 **1.05초**, 전체 step **4.53초**, 전체 GPU peak **9.76GiB**. 10단계 동안 timeout·OOM·simulator crash는 없었습니다. RAM 여유가 약 1GiB이고 반복 속도는 약 0.22Hz여서 장시간 자율 비행은 아직 확인하지 않았습니다. [실제 테스트 요약](docs/experiments.md).
+
+미션 실행기는 모델 행동을 원래 크기로 실행하며, 69회 평가에서 추론 평균 **0.99초**, 이동 명령 평균 **4.4초**, step당 이동 평균 **2.9m**였습니다. 고도 이탈 실패와 프로그램 오류는 없었습니다. [Model Self-Evaluation](docs/model_evaluation.md).
 
 실패 자동 감지·진단·복구는 아직 구현하지 않았습니다. TravelUAV benchmark와 모델 재학습은 현재 과제 범위에 포함하지 않습니다. 모델·시뮬레이터 바이너리와 raw 로그는 Git에 넣지 않습니다.
 
@@ -107,11 +118,13 @@ outputs/examples/  드론·관찰·AI·장애 화면과 짧은 GIF
 - [x] Live closed-loop drone control
 - [x] Gaussian Blur input injection
 - [x] Interactive controls for Gaussian Blur
-- [x] Interactive target selection / GO_TO / GO_TO_AND_HOVER
-- [ ] GO_TO_AND_LAND success
+- [x] Interactive target selection and mission runner
+- [x] Upstream-equivalent action execution, model-decided landing
+- [x] Model self-evaluation with landmarks and prompt ablations
+- [ ] Reaching a described landmark and stopping near it
 - [ ] Additional failure types
 - [ ] Failure detection
 - [ ] Basic recovery behavior
 - [ ] Demo and evaluation
 
-다음 권장 작업은 **미션 목표가 현재 coarse 방향 prompt에 어떻게 표현되는지 분석**하는 것입니다. 나머지 Failure 후보는 [failure plan](docs/failure_plan.md)에 계획으로 남겨두었습니다.
+다음 권장 작업은 **가장 안정적이었던 조건(hint + landmark, colored wall / blue cone)을 기준선으로 삼아 Blur 같은 failure의 영향을 정지 거리 분포로 비교**하는 것입니다. 실행 간 편차가 커서 조건당 5회 이상이 필요합니다. 나머지 Failure 후보는 [failure plan](docs/failure_plan.md)에 계획으로 남겨두었습니다.

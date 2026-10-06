@@ -1,5 +1,7 @@
 # Full Map + Target Grounding Inspector
 
+> **후속: [Model Self-Evaluation](model_evaluation.md).** 아래 Near/Medium/Far 실패는 모델보다 실행 하네스의 문제였다. Medium·Far의 `extreme_altitude`는 속도 명령이 step마다 약 6cm씩 고도를 잃어 0.8m 하한에 닿은 결과였고, Far(68m)는 60 step × 0.5m 제한으로 도달 자체가 불가능했다. 실행기·고도 범위·종료 판정을 고친 뒤 같은 좌표를 다시 실행한 결과와 landmark 평가는 위 문서에 있다. 이 문서의 조작 키(H/L)와 고도·행동 제한 설명은 **당시 기록**이다.
+
 2026-10-06 검증. **전체 Blocks 구조물 영역에서 목표를 클릭하고, 그 좌표가 방향 문장으로 바뀌어 AeroVLA에 전달되는 과정을 실시간으로 표시한다.** 이번 Near/Medium/Far 미션은 모두 실패했다. 지도·Inspector·실제 closed loop와 실패 기록을 검증한 결과이며 장거리 navigation 성공이나 visual target detection을 입증한 결과는 아니다.
 
 ![실제 Far 미션의 전체 맵과 Target Inspector](../outputs/examples/full_map_grounding.png)
@@ -139,7 +141,7 @@ Coordinate mode는 임의 점·방향 힌트 기반 navigation/failure injection
 .\scripts\run_mission_demo.ps1
 ```
 
-F 전체 맵 → 평평한 표면 클릭 → G. C는 drone 중심 확대, WASD pan, +/- zoom, V 시점 전환이다. 기존 H/L/R/B/1/2/3/Q/Esc도 유지한다. 높은 surface는 preview 가능하나 시작이 거절될 수 있다. 새 물리적 시작 상태가 필요하면 Q로 종료한 뒤 같은 launcher를 다시 실행한다.
+F 전체 맵 → 평평한 표면 클릭 → G. C는 drone 중심 확대, WASD pan, +/- zoom, V 시점 전환이다. 새 물리적 시작 상태가 필요하면 Q로 종료한 뒤 같은 launcher를 다시 실행한다. (당시에는 H/L 미션도 있었고 높은 surface는 시작이 거절될 수 있었다. 현재는 미션이 G 하나이며 N으로 landmark, M으로 방향 힌트를 고른다 — [현재 조작](mission_demo.md#현재-조작-2026-10-06-이후).)
 
 실제 자동 확인은 관찰 창과 동일한 handler가 만든 frame ID/pixel/control file 요청으로 수행했다. 물리적 마우스·키 입력을 자동화한 검증은 아니다. 창의 실제 렌더링/export, callback 좌표와 조작 함수는 검증했고, GUI 조작은 `control-events.jsonl`에 출처와 request ID를 남긴다.
 

@@ -16,8 +16,14 @@
 | [mission_landing_failed.png](mission_landing_failed.png) | `outputs/mission_demo/runs/20261006T012742Z-6cbfc3b7/mission_failed.png` | 실제 GO_TO_AND_LAND 실패: 최종 XY 0.5044m >0.45m |
 | [full_map_grounding.png](full_map_grounding.png) | `outputs/full_map/far-run/inspector.png` | 실제 68m 목표의 12번째 decision, 전체 맵·실제 hint·point visibility와 실패 결과; camera cross는 display copy에만 있음 |
 
+| [model_evaluation.jpg](model_evaluation.jpg) | `outputs/model_eval/` 7개 run의 `results.json`을 `scripts/summarize_model_evaluation.py`로 그림 | 69 trial의 실제 궤적, 조건별 8칸. 배경은 simulator top-down 촬영이며 모델 입력이 아님 |
+| [model_evaluation_frames.jpg](model_evaluation_frames.jpg) | `outputs/model_eval/run1/frames/`의 step별 모델 입력 | 실제 Front/Down 입력과 그 step의 모델 출력. 위: 102m 비행 후 cone 옆 LAND, 아래: 설명은 cone인데 힌트가 가리킨 ball 위에서 LAND |
+| [mission_landmark.png](mission_landmark.png) | `outputs/mission_demo/` 대화형 세션의 `current_view.png` | Blue cone landmark 미션: 43 step, 모델 LAND, 착륙, 목표 3.59m |
+
 `control_drift.png`는 AeroVLA가 장애를 감지하거나 복구했다는 결과가 아니다. 전체 frame dump와 raw 로그는 Git에서 제외한다.
 
 새 비행 GIF도 AeroVLA 조종 성능을 보여주는 영상이 아니다. 기존 AI 화면과 별도의 scripted visualization이다. Hero PNG와 관찰 PNG는 원본 export를 복사했다. GIF만 크기·색상 수를 줄였으며 새 frame을 생성하거나 보간하지 않았다. 테스트용 close/medium/elevated 후보와 raw frames는 로컬 `outputs/demo_views/`에 남기고 Git에 넣지 않는다.
 
 새 `gaussian_blur_*` 두 이미지는 **실제 AeroVLA input injection** 검증에서 가져왔다. 기존 `control_drift.png`와 달리 실제 NF4 model inference를 수행했다. 자동 detection/recovery의 구현이나 성공을 보여주는 자료는 아니다.
+
+`model_evaluation*` 두 장과 `mission_landmark.png`는 2026-10-06 하네스 수정 뒤의 실제 기록이다. 궤적 그림과 입력 모음은 저장된 실제 데이터로 그린 것이고 JPEG로 저장했다. 한 번의 성공 화면이 일반적인 성공률을 뜻하지 않는다. 같은 조건의 반복 결과는 [Model Self-Evaluation](../../docs/model_evaluation.md)에 있다.

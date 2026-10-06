@@ -41,13 +41,13 @@ Windows PowerShell 5.1과 PowerShell 7 모두 지원한다. 초기화·종료 �
 - **Prompt given to model:** 해당 관측과 pose로 구성해 모델에 전달한 실제 prompt다.
 - **Model output / bins:** 모델이 생성한 원문 행동 토큰이다.
 - **Decoded model action:** 토큰을 거리(m)와 yaw(deg)로 해석한 값이다.
-- **Actual bounded command:** 기존 안전 범위로 제한해 실제 drone API에 전달한 값이다.
+- **Actual bounded command:** 실제 drone API에 전달한 값이다. 이 데모는 시작 플랫폼 위에 머물도록 이동 거리를 모델 출력의 1/10(전진 최대 0.5m, 상하 최대 0.5m)로 줄인다. 회전은 모델 값 그대로이고, 0.25rad(약 14°) 이상 회전하는 step은 upstream과 같이 제자리에서 돈다.
 - **Last checked state:** 마지막으로 확인한 높이·방향·위치다. 실시간 Chase와 달리 decision 경계에서 갱신한다.
 - **Actual input: VERIFIED:** 표시된 입력 hash와 실제 `generate()`에 전달한 tensor 기록을 검증했다는 뜻이다.
 
 이 VLA는 내부 판단을 설명하는 문장을 출력하지 않는다. 따라서 ‘사고 과정’은 위의 **관측 → prompt → 생성값 → 해석 → 실제 명령 → 이동 결과**를 확인하는 형태로 제공한다. 출력만 보고 행동의 원인을 추정해 표시하지 않는다.
 
-예를 들어 저장된 blur decision은 raw `75 49 61`, 해석된 forward 3.827m / yaw 15.4°였다. 실제 명령은 forward 0.5m / yaw 15°로 제한했다. 화면에서 세 값을 나란히 볼 수 있다.
+예를 들어 저장된 blur decision은 raw `75 49 61`, 해석된 forward 3.827m / yaw 15.4°였다. 당시 실제 명령은 forward 0.5m / yaw 15°로 제한했다. 화면에서 세 값을 나란히 볼 수 있다. 현재 실행기에서는 같은 출력이 15.4° 제자리 회전이 된다. 또한 이동 명령을 고도 유지 방식으로 바꿔, 이전처럼 step마다 약 6cm씩 가라앉아 10 step 안팎에서 고도 검사에 걸리는 일이 없다([근거](model_evaluation.md)).
 
 ## 직접 확인할 순서
 

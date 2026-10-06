@@ -52,3 +52,17 @@
 - 회귀 테스트 **24/24**, Windows native/WSL argv 경계 smoke 2개 통과. 종료 helper는 무해한 소유 테스트 worker만 종료하고 다른 run-token 프로세스는 거부하는 테스트로 확인했다.
 
 물리 키를 자동으로 눌러 시험한 것은 아니다. 동일 B 상태 변경 경로의 live 검증과 키/버튼 handler 테스트를 수행했다. LOW/HIGH는 모듈 테스트에서 실행했으며, 실제 VLA live 기록은 MEDIUM이다. 모델 행동 차이의 원인을 blur로 단정하지 않으며 detection/recovery, 재학습, benchmark는 수행하지 않았다.
+
+## Harness fix and model self-evaluation — 2026-10-06
+
+이전 Near/Medium/Far 미션 실패를 로그로 다시 분석해 실행 하네스를 고치고, AeroVLA NF4를 고정 조건에서 평가했다. 상세: [Model Self-Evaluation](model_evaluation.md).
+
+- **원인:** 모델 행동(전진 0–5m, 회전 ±63°)을 0.5m·15°로 잘랐고, 속도 명령이 step마다 약 6cm씩 고도를 잃어 0.8m 하한에서 미션이 종료됐다. 모델의 LAND는 무시했다.
+- **수정:** upstream과 같은 의미·크기의 실행(위치·고도 유지 API), 고도 범위 0.8–30m를 실패가 아닌 목표 제한으로 적용, 모델 정지로 episode 종료 후 착륙·판정, 미션 종류 통합, landmark 목표와 방향 힌트 ON/OFF.
+- **실행기 실측:** 1m 이상 이동 441회의 명령 대비 오차 중앙값 0.16m, 고도 오차 중앙값 0.02m. 69 trial에서 고도 이탈·runtime·cleanup 오류 0건.
+- **모델 평가 69 trial / 654 decision / 1,873m:** 힌트가 목표를 가리킨 35회(초기 20m 초과) 중 33회 접근, 20m 안 모델 정지 12회, 충돌 7회, invalid 출력 6회. 힌트 없는 13회는 모두 첫 step LAND. 설명과 힌트가 다르면 힌트 쪽으로 이동.
+- **대화형 데모:** 2세션 3미션. 좌표 목표 7.85m 정지·착륙, blue cone 102m 비행 후 3.59m 정지·착륙, 다른 1회는 `diverging` 실패.
+- **Blur 데모:** `-AutoTest` 6/6 PASS. 이동 거리는 1/10 배율을 쓰며, 6 step 동안 고도 변화 2.4cm.
+- **Tests:** Python 73/73, Windows PowerShell 5.1 검사 4개 통과. PowerShell 7은 이 PC에 없어 미실행.
+
+같은 조건의 반복 실행이 서로 다른 결과를 냈다. 위 수치는 성공률 주장이 아니라 관찰 기록이다. Failure 비교, BF16 원본과의 비교, TravelUAV 환경 평가는 수행하지 않았다.
