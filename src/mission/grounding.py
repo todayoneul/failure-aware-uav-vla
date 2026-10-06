@@ -5,19 +5,20 @@ import numpy as np
 from .geometry import rotation_matrix,intrinsics
 
 
-def grounding_report(state,goal,surface,instruction):
+def grounding_report(state,goal,surface,instruction,direction_hint=True,landmark=None):
     # Use the exact existing model adapter; this lazy import is WSL-side only.
     from src.integration.projectairsim_observation_adapter import semantic_direction,make_prompt
     relative=np.asarray(goal)-np.asarray(state['position'])
     body=rotation_matrix(state['orientation']).T@relative
-    return {'mode':'COORDINATE GOAL MODE','world_surface':list(surface),'navigation_goal':list(goal),
+    mode=('DIRECTION HINT + ' if direction_hint else 'NO HINT + ')+('LANDMARK DESCRIPTION' if landmark else 'GENERIC DESCRIPTION')
+    return {'mode':mode,'world_surface':list(surface),'navigation_goal':list(goal),
             'relative_world':relative.tolist(),'relative_body':body.tolist(),
             'horizontal_distance':float(np.linalg.norm(relative[:2])),
             'bearing_deg':math.degrees(math.atan2(relative[1],relative[0])),
             'body_bearing_deg':math.degrees(math.atan2(body[1],body[0])),
             'semantic_direction':semantic_direction(state,goal).strip(),
-            'prompt':make_prompt(state,goal,instruction),'prompt_scope':'preview',
-            'decision_pose':state,
+            'prompt':make_prompt(state,goal,instruction,direction_hint),'prompt_scope':'preview',
+            'decision_pose':state,'direction_hint':bool(direction_hint),'landmark':landmark,
             'vla_receives':{'exact_xyz_tokens':False,'distance_token':False,'overview_image':False,'red_x_marker':False}}
 
 

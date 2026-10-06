@@ -11,12 +11,13 @@ def box(name,center,size):
 
 
 class FullMapTests(unittest.TestCase):
-    def test_restart_at_bad_altitude_is_rejected_without_a_recovery_command(self):
-        from src.mission.flight import validate_navigation_start
-        limits={'minimum_clearance_m':.8,'maximum_clearance_m':4.}
-        with self.assertRaisesRegex(ValueError,'outside flight limits'):
-            validate_navigation_start({'position':[0,0,-.757]},0,limits)
-        validate_navigation_start({'position':[0,0,-1.3]},0,limits)
+    def test_altitude_envelope_has_one_definition_and_never_raises_near_its_edge(self):
+        from src.integration.projectairsim_action_adapter import convert_action
+        action={'fwd':5,'down':0,'yaw':0,'stop':False}
+        # 0.75-0.78 m clearance used to pass the monitor but crash the converter.
+        for clearance in (.74,.76,.79,.8,30.,30.04):
+            command=convert_action(action,{'position':[0,0,-clearance],'orientation':[0,0,0,1]},0)
+            self.assertLessEqual(command['target_z'],-.8+1e-9);self.assertGreaterEqual(command['target_z'],-30-1e-9)
     def test_spatial_outlier_does_not_expand_finite_map(self):
         from src.mission.bounds import scene_bounds
         records=[box('Block'+str(i),[i*10,0,-2],[5,5,4]) for i in range(6)]
@@ -37,9 +38,9 @@ class FullMapTests(unittest.TestCase):
         from src.integration.projectairsim_action_adapter import convert_action
         action={'fwd':.5,'down':-.3,'yaw':0,'stop':False}
         state={'position':[0,0,-7.95],'orientation':[0,0,0,1]}
-        with self.assertRaises(ValueError):convert_action(action,state,0)
+        self.assertAlmostEqual(convert_action(action,state,0)['target_z'],-8.25)
         result=convert_action(action,state,0,limits={'minimum_clearance_m':.8,'maximum_clearance_m':8.})
-        self.assertEqual(result['target_z'],-8)
+        self.assertEqual(result['target_z'],-8);self.assertTrue(result['altitude_clamped'])
     def test_union_filters_giant_floor_helpers_and_nonfinite_bounds(self):
         from src.mission.bounds import scene_bounds
         records=[box('BlockA',[0,0,-3],[10,10,6]),box('BlockB',[100,50,-10],[10,10,20]),
@@ -123,6 +124,13 @@ class TargetInspectorTests(unittest.TestCase):
         self.assertAlmostEqual(report['body_bearing_deg'],45)
         self.assertEqual(report['prompt'],make_prompt(state,[5,5,-4],instruction))
         self.assertFalse(any(report['vla_receives'].values()))
+        self.assertEqual(report['mode'],'DIRECTION HINT + GENERIC DESCRIPTION')
+        visual=grounding_report(state,[5,5,-4],[5,5,-1],instruction,direction_hint=False,landmark='blue_cone')
+        self.assertEqual(visual['mode'],'NO HINT + LANDMARK DESCRIPTION')
+        self.assertNotIn('forward-right',visual['prompt'])
+        self.assertEqual(visual['prompt'],make_prompt(state,[5,5,-4],instruction,direction_hint=False))
+        # The direction is still reported for the evaluator even when it is withheld from the model.
+        self.assertEqual(visual['semantic_direction'],'forward-right')
 
     def test_marker_overlay_never_mutates_model_input(self):
         from src.mission.grounding import target_overlay

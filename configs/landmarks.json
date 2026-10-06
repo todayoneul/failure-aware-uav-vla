@@ -1,0 +1,20 @@
+[
+  {
+    "id": "blue_cone",
+    "name": "Blue cone",
+    "objects": ["Cone_5"],
+    "description": "The target is a large blue cone standing on flat gray ground."
+  },
+  {
+    "id": "orange_ball",
+    "name": "Orange ball",
+    "objects": ["OrangeBall"],
+    "description": "The target is a large orange ball resting on flat gray ground."
+  },
+  {
+    "id": "colored_wall",
+    "name": "Colored wall",
+    "objects": ["TemplateCube_Rounded_147", "TemplateCube_Rounded_150", "TemplateCube_Rounded_76", "TemplateCube_Rounded_85"],
+    "description": "The target is a wall of four colored blocks, orange, green, blue and yellow, on a gray building."
+  }
+]

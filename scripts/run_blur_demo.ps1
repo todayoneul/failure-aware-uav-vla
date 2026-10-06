@@ -1,6 +1,6 @@
 param([ValidateRange(1,60)][int]$MaxSteps=30,[switch]$AutoTest,[string]$Distro='Ubuntu',[ValidateSet('blur','mission')][string]$Mode='blur')
 $ErrorActionPreference='Stop'
-if ($Mode -eq 'mission' -and $AutoTest) { throw 'Mission tests must follow GO_TO then HOVER then LAND; AutoTest is blur-only' }
+if ($Mode -eq 'mission' -and $AutoTest) { throw 'AutoTest is blur-only; use scripts/run_model_evaluation.ps1 for mission evaluation' }
 . (Join-Path $PSScriptRoot 'native_process_args.ps1')
 $taskRoot=Split-Path -Parent $PSScriptRoot
 $taskOutputRelative=if($Mode -eq 'mission'){'outputs/mission_demo'}else{'outputs/failure_demo'}

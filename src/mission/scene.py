@@ -9,23 +9,32 @@ import numpy as np
 from projectairsim.types import BoxAlignment,Pose
 from projectairsim.utils import unpack_image
 from src.integration.blur_demo_support import publish_json,publish_image
-from .geometry import mission_robot_config,relative_camera_pose,camera_metadata,select_surface
+from .geometry import mission_robot_config,relative_camera_pose,camera_metadata,select_surface,pixel_to_world
 from .bounds import scene_bounds,fit_camera
+from .landmarks import load_landmarks,landmark_at
+
+LANDMARKS=Path(__file__).resolve().parents[2]/'configs/landmarks.json'
+
+
+def scene_records(world,names=None):
+    records=[]
+    for name in (names if names is not None else world.list_objects('.*')):
+        record={'name':name}
+        try:
+            record.update(bbox=world.get_3d_bounding_box(name,BoxAlignment.WORLD_AXIS),pose=dict(world.get_object_pose(name)))
+        except Exception as error:record['error']=str(error)
+        records.append(record)
+    return records
 
 
 class OverviewScene:
     def __init__(self,world,drone,output):
         self.world,self.drone,self.output=world,drone,Path(output)
-        records=[]
-        for name in world.list_objects('.*'):
-            record={'name':name}
-            try:
-                record.update(bbox=world.get_3d_bounding_box(name,BoxAlignment.WORLD_AXIS),pose=dict(world.get_object_pose(name)))
-            except Exception as error:record['error']=str(error)
-            records.append(record)
+        records=scene_records(world)
         self.region=scene_bounds(records)
+        self.landmarks=load_landmarks(LANDMARKS,records)
         self.frames=OrderedDict();self.counter=0
-        publish_json(self.output/'scene-geometry.json',{'bounds':self.region,'objects':records})
+        publish_json(self.output/'scene-geometry.json',{'bounds':self.region,'landmarks':self.landmarks,'objects':records})
 
     def capture(self,state,view='top',zoom=1.,pan=(0,0),focus='map'):
         region=self.region
@@ -52,6 +61,14 @@ class OverviewScene:
         publish_image(self.output/packet['image_file'],image)
         publish_json(self.output/'overview.json',packet)
         return image,packet
+
+    def landmark_at(self,frame_id,pixel):
+        """A click on a configured landmark selects the object itself, whatever its surface slope."""
+        if frame_id not in self.frames:raise ValueError('Map refreshed; select on the current frame again')
+        depth,meta=self.frames[frame_id];u,v=map(int,pixel)
+        try:point=pixel_to_world((u,v),float(depth[v,u]),meta)
+        except (ValueError,IndexError):return None
+        return landmark_at(self.landmarks,point)
 
     def select(self,frame_id,pixel):
         if frame_id not in self.frames:raise ValueError('Map refreshed; select on the current frame again')

@@ -19,8 +19,8 @@ from src.mission.geometry import world_to_pixel
 
 OUT=ROOT/'outputs/mission_demo';WINDOW='MISSION CONTROL | Map target + AeroVLA'
 MAP_RECT=(20,190,900,506)
-MISSION_BUTTONS=[(20,125,135,38,ord('g'),'G Go To'),(170,125,135,38,ord('h'),'H Hover'),
-                 (320,125,135,38,ord('l'),'L Land (trial)'),(470,125,135,38,ord('r'),'R Reset')]
+MISSION_BUTTONS=[(20,125,135,38,ord('g'),'G Start'),(170,125,135,38,ord('r'),'R Reset'),
+                 (320,125,135,38,ord('n'),'N Landmark'),(470,125,135,38,ord('m'),'M Hint on/off')]
 
 VIEW_BUTTONS=[(620,125,135,38,ord('f'),'F Full map'),(770,125,135,38,ord('c'),'C Drone')]
 BLUR_BUTTONS=[(940,125,220,38,ord('b'),'B Toggle blur')]+[(1180+i*90,125,80,38,ord(str(i+1)),label) for i,label in enumerate(('1 Low','2 Med','3 High'))]
@@ -52,6 +52,9 @@ def render_map(image,packet,telemetry):
         if pixel is not None:
             cv2.drawMarker(shown,pixel,(20,60,230),cv2.MARKER_TILTED_CROSS,14,2)
             cv2.putText(shown,'Target',(pixel[0]+10,pixel[1]-5),0,.45,(20,60,230),1,cv2.LINE_AA)
+            radius=project([target['surface_position'][0]+mission.get('success_radius_m',0),*target['surface_position'][1:]],True)
+            if radius is not None and 2<abs(radius[1]-pixel[1])+abs(radius[0]-pixel[0])<2000:
+                cv2.circle(shown,pixel,int(math.hypot(radius[0]-pixel[0],radius[1]-pixel[1])),(20,60,230),1,cv2.LINE_AA)
     state=telemetry.get('state')
     if state:
         p=state['position'];pixel=project(p)
@@ -90,13 +93,14 @@ def render_canvas(telemetry,control,images):
     if status in ('SUCCESS','FAILED','ABORTED') and mission.get('target') and telemetry.get('state'):
         target=mission['target']['surface_position'];position=telemetry['state']['position']
         label=f'Final {distance} / live {math.hypot(target[0]-position[0],target[1]-position[1]):.2f} m'
-    text(f'{mission.get("type") or "Select a surface"} | {label}',20,105,.58)
-    text('Coordinate goal mode',940,35,.73,purple,2)
-    text('World target -> body direction -> AeroVLA prompt',940,65,.48)
+    target_name=(mission.get('target') or {}).get('name') or 'Select a surface or landmark'
+    text(f'{target_name[:44]} | {label} | success radius {mission.get("success_radius_m",0):.0f} m',20,105,.58)
+    hint=control.get('direction_hint',True)
+    text('Direction hint '+('ON' if hint else 'OFF'),940,35,.73,purple,2)
+    text('Front/Down RGB + prompt -> AeroVLA; the model ends the episode',940,65,.46)
     failure=telemetry.get('failure') or {};text('Applied: '+('BLUR' if failure.get('failure_enabled') else 'NORMAL'),940,100,.6)
-    caps=telemetry.get('capabilities') or {}
     for left,top,width,height,key,label in MISSION_BUTTONS+VIEW_BUTTONS+BLUR_BUTTONS:
-        enabled=key not in (ord('g'),ord('h'),ord('l')) or caps.get({ord('g'):'GO_TO',ord('h'):'GO_TO_AND_HOVER',ord('l'):'GO_TO_AND_LAND'}[key],False)
+        enabled=key!=ord('g') or status=='TARGET_SELECTED'
         cv2.rectangle(canvas,(left,top),(left+width,top+height),blue if enabled else (205,205,205),-1)
         text(label,left+8,top+25,.45,(255,255,255))
     text('Map click | F: full map | C: drone | WASD: pan | +/-: zoom | V: view',20,182,.47)
@@ -107,7 +111,7 @@ def render_canvas(telemetry,control,images):
     report=telemetry.get('decision_grounding') or telemetry.get('grounding_preview')
     text('Target representation',960,184,.67,ink,2)
     if report:
-        text(report.get('prompt_scope','preview')+f' / step {telemetry.get("input_step",0)}',960,212,.44,purple)
+        text(report.get('prompt_scope','preview')+f' / step {telemetry.get("input_step",0)} / '+report.get('mode','').lower(),960,212,.44,purple)
         fmt=lambda p:' / '.join(f'{v:+.2f}' for v in p)
         rows=[('World surface XYZ',fmt(report['world_surface'])),('Navigation goal XYZ',fmt(report['navigation_goal'])),
               ('Goal relative world XYZ',fmt(report['relative_world'])),('Goal relative body XYZ',fmt(report['relative_body']))]
@@ -116,8 +120,9 @@ def render_canvas(telemetry,control,images):
             text(heading,960,y,.42);text(value,960,y+21,.56);y+=52
         text(f'Horizontal distance: {report["horizontal_distance"]:.2f} m',960,454,.55)
         text(f'Bearing {report["bearing_deg"]:+.1f} deg | body {report["body_bearing_deg"]:+.1f} deg',960,480,.51)
-        text('VLA direction hint',960,510,.47,purple)
-        text(report['semantic_direction'] or '(at goal)',960,539,.76,purple,2)
+        sent=report.get('direction_hint',True)
+        text('VLA direction hint' if sent else 'Direction (evaluation only, NOT sent)',960,510,.47,purple)
+        text(report['semantic_direction'] or '(at goal)',960,539,.76,purple if sent else (150,150,150),2)
         text('XYZ tokens / distance / Overview / red X: NO',960,566,.44)
         text('Actual prompt' if report.get('prompt_scope')=='actual model input' else 'Preview prompt',960,597,.48)
         prompt=report['prompt'].replace('<image>','').replace('\n',' ').strip()
@@ -125,7 +130,11 @@ def render_canvas(telemetry,control,images):
     else:
         text('Click a flat surface to inspect its target.',960,242,.53)
         text('Exact coordinates stay in the evaluator.',960,274,.48)
+    stop=mission.get('stop')
     note=telemetry.get('control_message') or mission.get('reason') or telemetry.get('phase','Waiting')
+    if stop and not telemetry.get('control_message'):
+        landed={True:'landed',False:'not landed'}.get(stop.get('landed'),'landing')
+        note=f'Model LAND at step {stop["step"]}, {stop["distance_m"]:.2f} m from target ({landed}); success radius {mission.get("success_radius_m",0):.0f} m'
     text(str(note)[:108],20,716,.47)
     visibility=images.get('visibility') or {}
     scope=images.get('camera_scope','model input')
@@ -135,7 +144,7 @@ def render_canvas(telemetry,control,images):
         if frame is not None:canvas[754:1010,left:left+256]=target_overlay(frame,item)
         else:cv2.rectangle(canvas,(left,754),(left+256,1010),(215,215,215),-1)
     inference=telemetry.get('inference') or {};action=inference.get('parsed_action') or {};command=telemetry.get('clipped_action') or {}
-    text('Last model output',610,748,.57);text('Decoded action',900,748,.57);text('Bounded command',1190,748,.57)
+    text('Last model output',610,748,.57);text('Decoded action',900,748,.57);text('Executed command',1190,748,.57)
     raw=inference.get('raw_output','Waiting...').split('Action:')[-1].strip()
     for i,line in enumerate(textwrap.wrap(raw[:150],35)):text(line,610,780+i*23,.53)
     if action:
@@ -148,7 +157,7 @@ def render_canvas(telemetry,control,images):
     text('Front / Down: '+scope,610,929,.47)
     text('Point visibility uses capture pose + depth; crosshair is a display copy.',610,956,.44)
     text('Actual input: '+('VERIFIED' if telemetry.get('input_verified') else 'not inferred yet'),610,985,.5)
-    text('G/H/L mission | R reset | B blur | 1/2/3 severity | Q/Esc abort and land',20,1030,.46)
+    text('G start | R reset | N landmark | M hint | B blur | 1/2/3 severity | Q/Esc abort and land',20,1030,.46)
     return canvas
 
 

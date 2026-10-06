@@ -1,8 +1,8 @@
 {
-  "horizontal_tolerance": 0.45,
-  "altitude_tolerance": 0.4,
-  "velocity_tolerance": 0.25,
-  "hover_seconds": 1.0,
+  "success_radius_m": 20.0,
   "max_steps": 60,
-  "max_duration": 300
+  "max_duration": 900,
+  "diverging_steps": 10,
+  "stuck_steps": 15,
+  "stuck_distance_m": 0.05
 }

@@ -30,8 +30,7 @@ def main():
         else:write_control(path, default_control())
         session=BlurDemoSession(ROOT, output, args.steps)
         if args.mode=='mission':
-            session.update(mission={'state':'IDLE','target':None,'type':None,'errors':None},
-                           capabilities={'GO_TO':True,'GO_TO_AND_HOVER':False,'GO_TO_AND_LAND':False})
+            session.update(mission={'state':'IDLE','target':None,'errors':None})
         print('Control initialized: blur OFF, severity MEDIUM', flush=True)
     else:
         state = read_control(path)
