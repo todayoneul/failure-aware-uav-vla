@@ -36,7 +36,10 @@ def semantic_direction(state, target_position):
     if -180 <= angle < -120: return 'to your left rear '
     return ''
 
-def make_prompt(state, target_position, instruction, direction_hint=True):
+def make_prompt(state, target_position, instruction, direction_hint=True, freeform=None):
+    if freeform:
+        # Evaluation only: a sentence the model was not trained on replaces the whole template.
+        return f'<image>\n{freeform.strip()}\nAction: '
     # Retain the original wrapper's instruction extraction and exact template.
     if 'degrees from you.' not in instruction or ' Please control' not in instruction:
         raise ValueError('Instruction needs upstream AeroVLA delimiters')

@@ -7,7 +7,7 @@ from scipy.spatial.transform import Rotation
 # 1 m/s only when |pred_yaw| < 0.25 rad; a larger turn changes altitude in place.
 DEFAULT_LIMITS={'minimum_clearance_m':.8,'maximum_clearance_m':30.,'displacement_scale':1.,
                 'cruise_speed_mps':1.,'vertical_speed_mps':2.,'yaw_move_threshold_rad':.25,
-                'micro_move_threshold_m':1.}
+                'micro_move_threshold_m':1.,'target_clearance_m':6.,'approach_distance_m':45.}
 # Small steps that keep the older platform demos near the start platform.
 PLATFORM_DEMO_LIMITS={'displacement_scale':.1,'maximum_clearance_m':4.}
 MODEL_VERTICAL_RANGE_M=5.
@@ -23,8 +23,10 @@ def flight_limits(overrides=None):
     if not 0<limits['minimum_clearance_m']<limits['maximum_clearance_m']:
         raise ValueError('Invalid clearance limits')
     if min(limits[key] for key in ('displacement_scale','cruise_speed_mps','vertical_speed_mps',
-                                   'yaw_move_threshold_rad','micro_move_threshold_m'))<=0:
+                                   'yaw_move_threshold_rad','micro_move_threshold_m','approach_distance_m'))<=0:
         raise ValueError('Flight scales, speeds and thresholds must be positive')
+    if limits['target_clearance_m']<0:
+        raise ValueError('target_clearance_m is zero (off) or positive')
     return limits
 
 
@@ -43,6 +45,20 @@ def parse_action(text):
     return {'fwd':fwd,'down':down,'yaw':yaw,
             'stop':fwd<.01 and abs(down)<.01 and abs(yaw)<.01,
             'bins':bins,'output':output}
+
+
+def allowed_action_tokens(generated, digits, space, land, end):
+    """Token ids that may follow `generated` in AeroVLA's output: `DD DD DD`, an optional ` LAND`, the end token.
+
+    `digits` are the ids of '0'..'9', `land` the two ids of ' LAND'. Bins stop at 98, so a 9 is never followed by a 9.
+    """
+    position=len(generated)
+    if position in (2,5): return [space]
+    if position in (0,3,6): return list(digits)
+    if position in (1,4,7): return list(digits[:9]) if generated[-1]==digits[9] else list(digits)
+    if position==8: return [end,land[0]]
+    if position==9 and generated[-1]==land[0]: return [land[1]]
+    return [end]
 
 
 def convert_action(action, state, ground_z, limits=None):

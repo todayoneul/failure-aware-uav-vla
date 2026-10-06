@@ -85,6 +85,32 @@ class AdapterTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             convert_action(action,{'position':[0,0,-4],'orientation':[0,0,0,1]},ground_z=-2.7,limits={'displacement_scale':0})
 
+    def test_action_grammar_admits_exactly_the_action_format(self):
+        from src.integration.projectairsim_action_adapter import allowed_action_tokens,parse_action
+        digits=list(range(10));space,land,end=10,[11,12],13
+        text={**{d:str(d) for d in digits},space:' ',11:' L',12:'AND',end:''}
+        def allowed(sequence):return allowed_action_tokens(sequence,digits,space,land,end)
+        self.assertEqual(allowed([]),digits);self.assertEqual(allowed([4]),digits)
+        # Bins stop at 98: after a 9 only 0-8 may follow.
+        self.assertEqual(allowed([9]),digits[:9]);self.assertEqual(allowed([9,7,space,9]),digits[:9])
+        self.assertEqual(allowed([9,7]),[space]);self.assertEqual(allowed([9,7,space,4,9]),[space])
+        self.assertEqual(allowed([9,7,space,4,9,space,4,9]),[end,land[0]])
+        self.assertEqual(allowed([9,7,space,4,9,space,4,9,land[0]]),[land[1]])
+        self.assertEqual(allowed([9,7,space,4,9,space,4,9,land[0],land[1]]),[end])
+        # Whatever is chosen inside the grammar parses: taking the first or the last allowed token each time.
+        for pick,output,stop in ((0,'00 00 00',False),(-1,'98 98 98 LAND',True)):
+            sequence=[]
+            while not sequence or sequence[-1]!=end:sequence.append(allowed(sequence)[pick])
+            action=parse_action('Action: '+''.join(text[token] for token in sequence))
+            self.assertEqual((action['output'],action['stop']),(output,stop))
+
+    def test_freeform_instruction_replaces_the_whole_template(self):
+        from src.integration.projectairsim_observation_adapter import make_prompt
+        state={'position':[0,0,-4],'orientation':[0,0,0,1]}
+        self.assertEqual(make_prompt(state,[5,5,-4],'no delimiters needed',freeform=' Land on top of the gray block. '),
+                         '<image>\nLand on top of the gray block.\nAction: ')
+        with self.assertRaises(ValueError):make_prompt(state,[5,5,-4],'no delimiters needed')
+
     def test_prompt_without_direction_hint_keeps_upstream_template(self):
         from src.integration.projectairsim_observation_adapter import make_prompt
         state={'position':[0,0,-4],'orientation':[0,0,0,1]}

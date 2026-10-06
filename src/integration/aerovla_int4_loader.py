@@ -7,11 +7,50 @@ import torch
 import bitsandbytes as bnb
 from peft import PeftModel
 from transformers import AutoImageProcessor, AutoTokenizer, AutoModelForVision2Seq, BitsAndBytesConfig
+from transformers import LogitsProcessor, LogitsProcessorList
 from .projectairsim_observation_adapter import make_mosaic, make_prompt
-from .projectairsim_action_adapter import parse_action
+from .projectairsim_action_adapter import parse_action, allowed_action_tokens
+
+
+class ActionGrammar(LogitsProcessor):
+    """Keep generation inside AeroVLA's action language.
+
+    About one NF4 decision in seventy puts a base-OpenVLA action token (vocabulary ids
+    31744-31999) where a digit belongs, e.g. `9식 49 49` for `97 49 49`. Each position is
+    masked to the grammar, so the best valid token is taken; `trace` keeps what was
+    rejected and how much probability the valid tokens held.
+    """
+    def __init__(self, tokenizer, prompt_length):
+        ids=tokenizer.convert_tokens_to_ids
+        self.tokenizer=tokenizer;self.start=prompt_length;self.trace=[]
+        self.digits=[ids(str(d)) for d in range(10)];self.space=ids('▁');self.end=tokenizer.eos_token_id
+        self.land=tokenizer('49 LAND',add_special_tokens=False)['input_ids'][-2:]
+        if tokenizer.convert_ids_to_tokens(self.land)!=['▁L','AND'] or tokenizer.unk_token_id in self.digits+[self.space]:
+            raise RuntimeError('Tokenizer does not split AeroVLA actions as expected')
+
+    def __call__(self, input_ids, scores):
+        allowed=allowed_action_tokens(input_ids[0,self.start:].tolist(),self.digits,self.space,self.land,self.end)
+        probabilities=torch.softmax(scores[0].float(),dim=-1)
+        raw=int(probabilities.argmax());chosen=max(allowed,key=lambda token:float(probabilities[token]))
+        name=self.tokenizer.convert_ids_to_tokens
+        self.trace.append({'position':len(self.trace),'valid_mass':float(probabilities[allowed].sum()),
+                           'chosen':name(chosen),'chosen_probability':float(probabilities[chosen]),
+                           'rejected':None if raw in allowed else name(raw),
+                           'rejected_id':None if raw in allowed else raw,
+                           'rejected_probability':None if raw in allowed else float(probabilities[raw])})
+        masked=torch.full_like(scores,float('-inf'));masked[:,allowed]=scores[:,allowed]
+        return masked
+
+    def report(self):
+        interventions=[item for item in self.trace if item['rejected'] is not None]
+        return {'mode':'grammar','intervened':bool(interventions),'interventions':interventions,
+                'minimum_valid_mass':min((item['valid_mass'] for item in self.trace),default=None)}
+
 
 class AeroVLAInt4:
-    def __init__(self, manifest_path):
+    def __init__(self, manifest_path, decoder='grammar'):
+        if decoder not in ('grammar','free'): raise ValueError('decoder is grammar or free')
+        self.decoder=decoder
         manifest=json.loads(Path(manifest_path).read_text())
         entries={item['repo']:item for item in manifest['models']}
         base=entries['openvla/openvla-7b']['snapshot']
@@ -57,9 +96,9 @@ class AeroVLAInt4:
         print('LOAD_ADAPTER_COMPLETE',flush=True)
 
     def infer(self, front_bgr, down_bgr, state, target_position, instruction, *, trace_inputs=False, reference_frames=None,
-              direction_hint=True):
+              direction_hint=True, freeform=None):
         mosaic=make_mosaic(front_bgr,down_bgr)
-        prompt=make_prompt(state,target_position,instruction,direction_hint)
+        prompt=make_prompt(state,target_position,instruction,direction_hint,freeform)
         inputs=self.tokenizer([prompt],return_tensors='pt',padding=True)
         pv=self.image_processor(images=mosaic,return_tensors='pt')['pixel_values']
         if list(pv.shape) != [1,6,224,224]:
@@ -80,11 +119,14 @@ class AeroVLAInt4:
                 reference = reference.to(dtype=actual.dtype)
                 evidence['reference_pixel_values_sha256'] = digest(reference)
                 evidence['tensor_differs_from_reference'] = evidence['pixel_values_sha256'] != evidence['reference_pixel_values_sha256']
+        # `free` is plain greedy decoding over the whole vocabulary, as upstream runs it.
+        grammar=ActionGrammar(self.tokenizer,inputs['input_ids'].shape[-1]) if self.decoder=='grammar' else None
+        options={'logits_processor':LogitsProcessorList([grammar])} if grammar else {}
         torch.cuda.synchronize()
         start=time.perf_counter()
         with torch.inference_mode():
             ids=self.model.generate(**inputs,max_new_tokens=20,do_sample=False,
-                                    eos_token_id=[self.tokenizer.eos_token_id])
+                                    eos_token_id=[self.tokenizer.eos_token_id],**options)
         torch.cuda.synchronize()
         latency=(time.perf_counter()-start)*1000
         text=self.tokenizer.decode(ids[0],skip_special_tokens=False)
@@ -97,7 +139,8 @@ class AeroVLAInt4:
         result={'prompt':prompt,'raw_output':text,'parsed_action':parsed,'parse_error':parse_error,
                 'inference_ms':latency,'pixel_values_shape':list(pv.shape),
                 'mosaic_size':list(mosaic.size),'input_tokens':inputs['input_ids'].shape[-1],
-                'generated_tokens':ids.shape[-1]-inputs['input_ids'].shape[-1]}
+                'generated_tokens':ids.shape[-1]-inputs['input_ids'].shape[-1],
+                'decoder':grammar.report() if grammar else {'mode':'free'}}
         if evidence is not None:
             result['input_evidence'] = evidence
         del inputs,pv,ids
