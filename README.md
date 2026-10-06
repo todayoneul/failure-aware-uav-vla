@@ -18,6 +18,8 @@ Project AirSim의 실제 드론입니다. 관찰 카메라를 가까이 배치�
 - ✅ AeroVLA NF4 추론과 실제 영상 → 행동 → 이동
 - ✅ single-step 및 **10/10 closed loop**
 - ✅ **Interactive Gaussian Blur injection — 실제 AeroVLA 입력에 적용**
+- ✅ **Interactive mission target selection** — 맵 클릭으로 실제 좌표 선택
+- ✅ **Goal-based mission runner** — 이동·호버 성공, 목표 착륙은 아직 실패
 - ✅ 기본 blur·control drift 데모 — **모델 없는 별도 script 시험**
 
 ### 드론이 어떻게 움직이나요?
@@ -52,6 +54,16 @@ AeroVLA에 전달된 Front/Down RGB와 생성된 forward/down/yaw 행동입니�
 
 모델 없는 별도 script에서 영상 흐림과 조종 편향을 주입한 데모입니다. 자동 감지·복구는 이후 구현합니다. [이전 드론 화면](outputs/examples/drone_view.png)도 그대로 보존했습니다.
 
+### 맵에서 목표를 골라 이동시키려면?
+
+```powershell
+.\scripts\run_mission_demo.ps1
+```
+
+![목표·경로·모델 입력과 행동을 함께 보여주는 실제 미션 화면](outputs/examples/mission_runner.png)
+
+맵의 평평한 지점을 클릭하고 **G: 이동, H: 호버, L: 착륙 시험**을 누릅니다. **V: 시점, +/-: 확대·축소, R: 완료 후 초기화, B: Blur, Q/Esc: 중단·착륙**입니다. 모델은 첫 미션에서 기존 캐시로 로딩합니다. 실제 이동·호버가 한 번씩 성공했으며, 착륙은 XY 오차 **0.50m > 기준 0.45m**로 실패했습니다. [실행 방법·실제 결과·한계](docs/mission_demo.md).
+
 ## System Architecture
 
 ```text
@@ -73,6 +85,7 @@ docs/              setup · baseline · experiments · failure_plan
 docs/archive/      이전 기술 검증 기록
 src/integration/   모델·카메라·행동 변환과 실행 코드
 src/failures/      Gaussian Blur와 작은 control protocol
+src/mission/       지도 좌표·미션 상태·성공/실패 판정
 configs/           baseline 설정과 패키지 버전
 scripts/ · tests/  준비·측정 스크립트와 테스트
 outputs/examples/  드론·관찰·AI·장애 화면과 짧은 GIF
@@ -91,9 +104,11 @@ outputs/examples/  드론·관찰·AI·장애 화면과 짧은 GIF
 - [x] Live closed-loop drone control
 - [x] Gaussian Blur input injection
 - [x] Interactive controls for Gaussian Blur
+- [x] Interactive target selection / GO_TO / GO_TO_AND_HOVER
+- [ ] GO_TO_AND_LAND success
 - [ ] Additional failure types
 - [ ] Failure detection
 - [ ] Basic recovery behavior
 - [ ] Demo and evaluation
 
-Gaussian Blur는 구현했습니다. 다음 후보는 **Partial Occlusion**이며, Control Drift 등 나머지는 [failure plan](docs/failure_plan.md)에 계획으로 남겨두었습니다.
+다음 권장 작업은 **미션 목표가 현재 coarse 방향 prompt에 어떻게 표현되는지 분석**하는 것입니다. 나머지 Failure 후보는 [failure plan](docs/failure_plan.md)에 계획으로 남겨두었습니다.

@@ -12,6 +12,8 @@
 | [drone_flight.gif](drone_flight.gif) | `outputs/demo_views/frames/`, `capture-result.json` | 실제 전진·yaw·전진; 기록된 wall-time 간격대로 GIF 인코딩 |
 | [gaussian_blur_comparison.png](gaussian_blur_comparison.png) | Gaussian Blur 6-step live 검증의 `comparison.png`, 이후 `outputs/failure_demo/runs/`에 보존 | 동일 관측의 원본 기준 vs 실제 AeroVLA input, MEDIUM |
 | [gaussian_blur_observer.png](gaussian_blur_observer.png) | 같은 검증의 `observer_blur.png` | 실제 input·prompt·raw/decoded/bounded action을 표시한 관찰 창 |
+| [mission_runner.png](mission_runner.png) | `outputs/mission_demo/` Test 5 GO_TO MEDIUM Blur live 관측을 최종 UI renderer로 export | 실제 맵·depth 목표·궤적·input·행동; Final은 판정 시점, live는 마지막 관측의 거리 |
+| [mission_landing_failed.png](mission_landing_failed.png) | `outputs/mission_demo/runs/20261006T012742Z-6cbfc3b7/mission_failed.png` | 실제 GO_TO_AND_LAND 실패: 최종 XY 0.5044m >0.45m |
 
 `control_drift.png`는 AeroVLA가 장애를 감지하거나 복구했다는 결과가 아니다. 전체 frame dump와 raw 로그는 Git에서 제외한다.
 

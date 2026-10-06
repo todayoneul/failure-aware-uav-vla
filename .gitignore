@@ -11,6 +11,8 @@
 !/outputs/examples/observer_view.png
 !/outputs/examples/gaussian_blur_comparison.png
 !/outputs/examples/gaussian_blur_observer.png
+!/outputs/examples/mission_runner.png
+!/outputs/examples/mission_landing_failed.png
 
 # Downloaded simulator, datasets and model weights.
 /assets/
