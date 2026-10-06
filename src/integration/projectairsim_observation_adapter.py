@@ -36,9 +36,11 @@ def semantic_direction(state, target_position):
     if -180 <= angle < -120: return 'to your left rear '
     return ''
 
-def make_prompt(state, target_position, instruction):
+def make_prompt(state, target_position, instruction, direction_hint=True):
     # Retain the original wrapper's instruction extraction and exact template.
     if 'degrees from you.' not in instruction or ' Please control' not in instruction:
         raise ValueError('Instruction needs upstream AeroVLA delimiters')
     description = instruction.split('degrees from you.')[1].split(' Please control')[0].strip()
-    return f'<image>\nFly {semantic_direction(state,target_position)}and find the target. {description}\nAction: '
+    # Without the hint the template is the one upstream emits at zero target distance.
+    direction = semantic_direction(state,target_position) if direction_hint else ''
+    return f'<image>\nFly {direction}and find the target. {description}\nAction: '

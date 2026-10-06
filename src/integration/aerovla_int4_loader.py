@@ -56,9 +56,10 @@ class AeroVLAInt4:
             'projector_dtype':str(next(model.projector.parameters()).dtype)}
         print('LOAD_ADAPTER_COMPLETE',flush=True)
 
-    def infer(self, front_bgr, down_bgr, state, target_position, instruction, *, trace_inputs=False, reference_frames=None):
+    def infer(self, front_bgr, down_bgr, state, target_position, instruction, *, trace_inputs=False, reference_frames=None,
+              direction_hint=True):
         mosaic=make_mosaic(front_bgr,down_bgr)
-        prompt=make_prompt(state,target_position,instruction)
+        prompt=make_prompt(state,target_position,instruction,direction_hint)
         inputs=self.tokenizer([prompt],return_tensors='pt',padding=True)
         pv=self.image_processor(images=mosaic,return_tensors='pt')['pixel_values']
         if list(pv.shape) != [1,6,224,224]:

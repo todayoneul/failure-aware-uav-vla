@@ -22,7 +22,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT));sys.path.insert(0,str(ROOT/'scripts'))
 from src.integration.aerovla_int4_loader import AeroVLAInt4
 from src.integration.projectairsim_observation_adapter import adapt_state, make_mosaic
-from src.integration.projectairsim_action_adapter import convert_action, execute_action
+from src.integration.projectairsim_action_adapter import convert_action, execute_action, PLATFORM_DEMO_LIMITS
 from projectairsim_probe import prepare_config, CONFIG
 from projectairsim import ProjectAirSimClient, World, Drone
 from projectairsim.utils import unpack_image
@@ -117,7 +117,7 @@ async def main():
                 raise RuntimeError(inference['parse_error'])
             debug_panel(*frames,state,label,inference)
             make_mosaic(*frames).save(OUT/f'mosaic_{label}.png')
-            command=convert_action(inference['parsed_action'],state,ground_z)
+            command=convert_action(inference['parsed_action'],state,ground_z,limits=PLATFORM_DEMO_LIMITS)
             row['converted_action']=command
             row['command_returns']=await execute_action(drone,command)
             await asyncio.sleep(.5)

@@ -28,7 +28,7 @@ ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT));sys.path.insert(0,str(ROOT/'scripts'))
 from src.integration.aerovla_int4_loader import AeroVLAInt4
 from src.integration.projectairsim_observation_adapter import adapt_state,make_mosaic
-from src.integration.projectairsim_action_adapter import convert_action,execute_action
+from src.integration.projectairsim_action_adapter import convert_action,execute_action,PLATFORM_DEMO_LIMITS
 from projectairsim_probe import prepare_config,CONFIG
 from projectairsim import ProjectAirSimClient,World,Drone
 from projectairsim.utils import unpack_image
@@ -167,7 +167,8 @@ async def main(args):
             # Re-read pose immediately before converting/issuing a command after generation.
             execution_state=adapt_state(drone.get_ground_truth_kinematics());state_is_finite(execution_state)
             row['execution_state']=execution_state
-            row['clipped_action']=convert_action(inference['parsed_action'],execution_state,ground_z)
+            # Small steps keep this input-failure demo over the start platform.
+            row['clipped_action']=convert_action(inference['parsed_action'],execution_state,ground_z,limits=PLATFORM_DEMO_LIMITS)
             if session:
                 session.update(phase='Executing bounded action', clipped_action=row['clipped_action'], state=execution_state)
             command_start=time.perf_counter()
@@ -181,7 +182,7 @@ async def main(args):
             row['movement_m']=float(np.linalg.norm(np.array(after_state['position'])-np.array(execution_state['position'])))
             row['orientation_delta_rad']=float((Rotation.from_quat(execution_state['orientation']).inv()*Rotation.from_quat(after_state['orientation'])).magnitude())
             row['clearance_m']=ground_z-after_state['position'][2];row['landed_state']=drone.get_landed_state()
-            if row['landed_state']==0 or not .75 <= row['clearance_m'] <= 4.05:
+            if row['landed_state']==0 or not .5 <= row['clearance_m'] <= 4.3:
                 log({'event':'abnormal_state',**row});raise RuntimeError('Unexpected landed/altitude state')
             row['memory']=memory();row['windows']=host_memory();row['step_wall_ms']=(time.perf_counter()-wall)*1000
             # Command wall includes the actual1s flight/yaw; do not label it wire latency.

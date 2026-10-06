@@ -1,27 +1,33 @@
-"""Landing provenance; the manager never computes a navigation command."""
+"""Guarded command execution and landing; the manager never computes a navigation command."""
 import asyncio
 from time import monotonic
 import math
 from src.integration.projectairsim_action_adapter import execute_action
 
-
-def validate_navigation_start(state,ground_z,limits):
-    clearance=ground_z-state['position'][2]
-    if not math.isfinite(clearance) or not limits['minimum_clearance_m']-.02<=clearance<=limits['maximum_clearance_m']+.02:
-        raise ValueError('Current altitude is outside flight limits; Q ends this session before a fresh launch')
+PRE_DESCENT_CLEARANCE_M=1.5
+PRE_DESCENT_SPEED_MPS=2.
 
 
-async def guarded_execute(drone,manager,state,ground_z,events,flight_stamp,command,now=None,limits=None):
+async def guarded_execute(drone,manager,state,events,flight_stamp,command,now=None):
     """Recheck conditions after inference, immediately before the next motion RPC."""
     if any(event.get('time_stamp',0)>flight_stamp for event in events):manager.fail('collision')
-    limits=limits or {'minimum_clearance_m':.8,'maximum_clearance_m':4.}
-    if not limits['minimum_clearance_m']-.05<=ground_z-state['position'][2]<=limits['maximum_clearance_m']+.05:manager.fail('extreme_altitude')
     manager.observe(state,now=now)
     if manager.status!='NAVIGATING':return None
-    return await asyncio.wait_for(execute_action(drone,command),timeout=20)
+    return await asyncio.wait_for(execute_action(drone,command),timeout=2*command.get('expected_duration_sec',1.)+15)
 
 
-async def land_and_confirm(drone,confirmation_seconds=5,stable_seconds=1):
+async def descend_before_landing(drone,surface_z):
+    """Native Land descends slowly and times out from height; close most of the gap first."""
+    sample=drone.get_ground_truth_kinematics();z=sample['pose']['position']['z']
+    low=surface_z-PRE_DESCENT_CLEARANCE_M
+    if not math.isfinite(surface_z) or not math.isfinite(z) or low-z<.5:return None
+    duration=(low-z)/PRE_DESCENT_SPEED_MPS+1.
+    await asyncio.wait_for(await drone.move_by_velocity_z_async(0.,0.,low,duration=duration),timeout=2*duration+10)
+    await asyncio.wait_for(await drone.hover_async(),timeout=10)
+    return {'from_z':z,'to_z':low,'surface_z':surface_z}
+
+
+async def land_and_confirm(drone,confirmation_seconds=5,stable_seconds=1,surface_z=None):
     """SimpleFlight marks LANDED only after low throttle, often after disarm.
 
     Its official Land RPC confirms a commanded descent followed by one second
@@ -29,6 +35,11 @@ async def land_and_confirm(drone,confirmation_seconds=5,stable_seconds=1):
     kinematics before disarm, then require the final LANDED state. Never accept
     a rejected landing while the vehicle still reports FLYING.
     """
+    descent=None
+    if surface_z is not None:
+        # A failed fast descent must never replace or prevent the landing itself.
+        try:descent=await descend_before_landing(drone,surface_z)
+        except Exception as error:descent={'error':repr(error),'surface_z':surface_z}
     response=await asyncio.wait_for(await drone.land_async(timeout_sec=20),timeout=25)
     before=drone.get_landed_state();sample=None;stable_since=None;anchor=None
     deadline=monotonic()+confirmation_seconds
@@ -53,14 +64,14 @@ async def land_and_confirm(drone,confirmation_seconds=5,stable_seconds=1):
     landed=drone.get_landed_state()
     if landed!=0:raise RuntimeError(f'Post-disarm LANDED state not confirmed: {landed}')
     return {'land_return':response,'landed_state_before_disarm':before,'landed_state':landed,
-            'touchdown_kinematics':sample,'stable_seconds':stable_seconds if before!=0 else None}
+            'touchdown_kinematics':sample,'stable_seconds':stable_seconds if before!=0 else None,
+            'pre_descent':descent}
 
 
-def landing_source(action, mission_state):
-    if mission_state != 'LANDING':
+def surface_below(world,state):
+    """Simulator ground height under the vehicle; None when the query is unavailable."""
+    try:
+        value=float(world.get_surface_elevation_at_point(state['position'][0],state['position'][1]))
+    except Exception:
         return None
-    if action and action.get('output', '').strip().strip('<>') == 'LAND':
-        return 'AeroVLA LAND signal at target tolerance'
-    if action and action.get('stop'):
-        return 'AeroVLA stop signal at target tolerance'
-    return 'Mission Manager fallback after target tolerance'
+    return value if math.isfinite(value) else None

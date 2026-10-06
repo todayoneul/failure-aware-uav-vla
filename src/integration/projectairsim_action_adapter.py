@@ -1,7 +1,32 @@
-"""Strict bin parsing and bounded NED displacement -> official flight APIs."""
+"""Strict bin parsing and upstream-equivalent NED displacement -> official flight APIs."""
 import math
 import re
 from scipy.spatial.transform import Rotation
+
+# Upstream AeroVLA move_path(): rotate to yaw+pred_yaw, then translate (fwd, down) at
+# 1 m/s only when |pred_yaw| < 0.25 rad; a larger turn changes altitude in place.
+DEFAULT_LIMITS={'minimum_clearance_m':.8,'maximum_clearance_m':30.,'displacement_scale':1.,
+                'cruise_speed_mps':1.,'vertical_speed_mps':2.,'yaw_move_threshold_rad':.25,
+                'micro_move_threshold_m':1.}
+# Small steps that keep the older platform demos near the start platform.
+PLATFORM_DEMO_LIMITS={'displacement_scale':.1,'maximum_clearance_m':4.}
+MODEL_VERTICAL_RANGE_M=5.
+EPSILON=.01
+YAW_SETTLE_RATE=1.2  # rad/s; measured: 63 deg settles within 3 deg in about 1 s.
+TRIM_TOLERANCE_M=.15
+
+
+def flight_limits(overrides=None):
+    limits={**DEFAULT_LIMITS,**(overrides or {})}
+    if not all(math.isfinite(limits[key]) for key in DEFAULT_LIMITS):
+        raise ValueError('Invalid flight limits')
+    if not 0<limits['minimum_clearance_m']<limits['maximum_clearance_m']:
+        raise ValueError('Invalid clearance limits')
+    if min(limits[key] for key in ('displacement_scale','cruise_speed_mps','vertical_speed_mps',
+                                   'yaw_move_threshold_rad','micro_move_threshold_m'))<=0:
+        raise ValueError('Flight scales, speeds and thresholds must be positive')
+    return limits
+
 
 def parse_action(text):
     output = text.split('Action:')[-1].replace('</s>','').replace('<pad>','').strip()
@@ -19,45 +44,67 @@ def parse_action(text):
             'stop':fwd<.01 and abs(down)<.01 and abs(yaw)<.01,
             'bins':bins,'output':output}
 
+
 def convert_action(action, state, ground_z, limits=None):
-    limits=limits or {'minimum_clearance_m':.8,'maximum_clearance_m':4.}
-    minimum,maximum=limits['minimum_clearance_m'],limits['maximum_clearance_m']
-    if not all(math.isfinite(v) for v in (minimum,maximum)) or not 0<minimum<maximum:
-        raise ValueError('Invalid clearance limits')
+    limits=flight_limits(limits)
     if not all(math.isfinite(action[k]) for k in ('fwd','down','yaw')):
         raise ValueError('Non-finite model action')
     if not math.isfinite(ground_z) or not all(math.isfinite(v) for v in state['position']):
         raise ValueError('Non-finite vehicle state')
-    clearance=ground_z-state['position'][2]
-    if not minimum-.02 <= clearance <= maximum+.02:
-        raise ValueError(f'Vehicle outside altitude envelope: clearance={clearance}')
-    yaw = float(Rotation.from_quat(state['orientation']).as_euler('xyz')[2])
-    delta = max(-math.radians(15), min(math.radians(15), action['yaw']))
-    heading = math.atan2(math.sin(yaw+delta), math.cos(yaw+delta))
-    fwd = max(0., min(.5, action['fwd']))
-    down = max(-.3, min(.3, action['down']))
-    z = state['position'][2]
+    x,y,z=state['position'];scale=limits['displacement_scale']
+    yaw=float(Rotation.from_quat(state['orientation']).as_euler('xyz')[2])
     # Clearance relative to the initial resting platform (not terrain-ray AGL).
-    target_z = max(ground_z-maximum, min(ground_z-minimum, z+down))
-    displacement = [fwd*math.cos(heading), fwd*math.sin(heading), target_z-z]
+    floor_z=ground_z-limits['minimum_clearance_m'];ceiling_z=ground_z-limits['maximum_clearance_m']
+    command={'stop':bool(action['stop']),'mode':'stop','yaw_delta_rad':0.,'target_yaw_rad':yaw,
+             'displacement_ned':[0.,0.,0.],'target_position':[x,y,z],'target_z':z,
+             'altitude_clamped':False,'expected_duration_sec':1.,'ground_reference_z':ground_z,
+             'clearance_limits_m':[limits['minimum_clearance_m'],limits['maximum_clearance_m']],
+             'cruise_speed_mps':limits['cruise_speed_mps'],'vertical_speed_mps':limits['vertical_speed_mps'],
+             'micro_move_threshold_m':limits['micro_move_threshold_m'],'displacement_scale':scale}
     if action['stop']:
-        displacement=[0.,0.,0.]
-        delta=0.
-        heading=yaw
-    return {'stop':action['stop'], 'yaw_delta_rad':delta,'target_yaw_rad':heading,
-            'duration_sec':1.,'displacement_ned':displacement,
-            'velocity_ned_mps':displacement.copy(), 'target_z':target_z,
-            'ground_reference_z':ground_z, 'clearance_limits_m':[minimum,maximum]}
+        return command
+    delta=max(-math.pi,min(math.pi,action['yaw']))
+    heading=math.atan2(math.sin(yaw+delta),math.cos(yaw+delta))
+    turning=abs(delta)>=limits['yaw_move_threshold_rad']
+    fwd=0. if turning else max(0.,action['fwd'])*scale
+    wanted_z=z+action['down']*scale
+    # The envelope clamps the target; it never ends a mission. A vehicle outside it is
+    # brought back by at most the model's own vertical range per step.
+    bound=MODEL_VERTICAL_RANGE_M*scale
+    down=max(-bound,min(bound,min(floor_z,max(ceiling_z,wanted_z))-z))
+    target_z=z+down
+    displacement=[fwd*math.cos(heading),fwd*math.sin(heading),down]
+    translate=fwd>EPSILON
+    travel=math.hypot(fwd,down)
+    duration=max(1.,travel/limits['cruise_speed_mps'])+abs(down)/limits['vertical_speed_mps'] if translate else \
+        max(1.+abs(delta)/YAW_SETTLE_RATE,abs(down)/limits['vertical_speed_mps']+1.)
+    command.update(mode='translate' if translate else 'turn',yaw_delta_rad=delta,target_yaw_rad=heading,
+                   displacement_ned=displacement,target_position=[x+displacement[0],y+displacement[1],target_z],
+                   target_z=target_z,altitude_clamped=abs(target_z-wanted_z)>1e-6,expected_duration_sec=duration)
+    return command
+
 
 async def execute_action(drone, command):
+    """Position/altitude-hold primitives; plain velocity commands lose about 6 cm of height per step."""
     if command['stop']:
         return {'hover': await (await drone.hover_async())}
+    x,y,z=command['target_position'];dx,dy,dz=command['displacement_ned']
+    hold={'yaw_is_rate':False,'yaw':command['target_yaw_rad']}
     returns={}
-    if abs(command['yaw_delta_rad'])>.001:
-        returns['yaw']=await (await drone.rotate_to_yaw_async(
-            command['target_yaw_rad'], timeout_sec=5, margin=math.radians(3), yaw_rate=.3))
-    vx,vy,vz=command['velocity_ned_mps']
-    returns['move']=await (await drone.move_by_velocity_async(vx,vy,vz,
-        duration=command['duration_sec'], yaw_is_rate=False, yaw=command['target_yaw_rad']))
+    if command['mode']=='turn':
+        duration=max(1.+abs(command['yaw_delta_rad'])/YAW_SETTLE_RATE,abs(dz)/command['vertical_speed_mps']+1.)
+        returns['turn']=await (await drone.move_by_velocity_z_async(0.,0.,z,duration=duration,**hold))
+    elif math.sqrt(dx*dx+dy*dy+dz*dz)<command['micro_move_threshold_m']:
+        # The position controller ignores sub-metre goals; upstream also uses a 1 s velocity move here.
+        returns['move']=await (await drone.move_by_velocity_z_async(dx,dy,z,duration=1.,**hold))
+    else:
+        travel=math.sqrt(dx*dx+dy*dy+dz*dz)
+        returns['move']=await (await drone.move_to_position_async(
+            x,y,z,command['cruise_speed_mps'],timeout_sec=travel/command['cruise_speed_mps']*2+5,**hold))
+        returns['settle']=await (await drone.hover_async())
+        residual=z-drone.get_ground_truth_kinematics()['pose']['position']['z']
+        if abs(residual)>TRIM_TOLERANCE_M:
+            returns['trim']=await (await drone.move_by_velocity_z_async(
+                0.,0.,z,duration=abs(residual)/command['vertical_speed_mps']+1.,**hold))
     returns['hover']=await (await drone.hover_async())
     return returns
