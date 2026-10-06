@@ -12,7 +12,7 @@ sys.path.insert(0,str(ROOT))
 from src.mission.geometry import world_to_pixel
 
 COLORS={'blue_cone':(200,150,20),'orange_ball':(20,120,240),'colored_wall':(60,170,60),
-        'near':(170,60,170),'medium':(170,60,170),'far':(170,60,170)}
+        'near':(170,60,170),'medium':(170,60,170),'far':(170,60,170),'roof':(60,60,60)}
 PANELS=[('harness','Earlier Near / Medium / Far coordinates (hint + generic text)'),
         ('prompt:hint+generic','Hint + generic text'),('prompt:hint+landmark|repeat','Hint + landmark text'),
         ('prompt:landmark-only','Landmark text only (no hint)'),
@@ -99,6 +99,10 @@ def cell_table(trials,radius):
 def run_text(trial,radius):
     if trial['stop']:
         text=f'stop {trial["stop"]["distance_m"]:.1f} m'
+        if trial['group']=='roof' and 'on_target_surface' in trial['stop']:
+            # A roof target is only reached when the vehicle also comes down on that surface.
+            gap=trial['stop']['below_target_surface_m']
+            text+=', on the surface' if trial['stop']['on_target_surface'] else f', landed {abs(gap):.0f} m {"below" if gap>0 else "above"}'
         return f'**{text}**' if within(trial,radius) else text
     return (trial['reason'] or trial['state']).split(' ')[0]+f' (min {trial["minimum_distance_m"]:.1f} m)'
 
@@ -120,6 +124,19 @@ def runs_table(trials,radius,where=False):
              f'{first["initial_distance_m"]:.0f} m | '+' · '.join(run_text(t,radius) for t in items)+' |')
         if where:row+=' '+' · '.join(f'{t["nearest_landmark"]["id"]} {t["nearest_landmark"]["distance_m"]:.0f} m' for t in items)+' |'
         lines.append(row)
+    return '\n'.join(lines)
+
+
+def decoder_table(trials):
+    """How often the action grammar had to replace a token, per decoder setting."""
+    lines=['| Decoder | Trials | Decisions | Grammar replaced a token | Ended as invalid_action |','|---|---:|---:|---:|---:|']
+    for name in ('free','grammar'):
+        items=[t for t in trials if t.get('decoder','free')==name]
+        if not items:continue
+        steps=[step for t in items for step in t.get('steps') or []]
+        lines.append(f'| {name} | {len(items)} | {len(steps)} | '
+                     f'{sum(bool((step.get("decoder") or {}).get("intervened")) for step in steps) if name=="grammar" else "-"} | '
+                     f'{sum((t["reason"] or "")=="invalid_action" for t in items)} |')
     return '\n'.join(lines)
 
 
@@ -181,6 +198,9 @@ def main():
         '### Earlier coordinates',runs_table(group('harness'),radii[0]),
         '### Hint against text',runs_table(group('conflict','fixed_hint'),radii[0],where=True),
         '### Range, altitude and heading',runs_table(group('far','altitude','aligned'),radii[0]),
+        '### Roof target',runs_table(group('roof'),radii[0]),
+        '### Instruction only',runs_table(group('instruction'),radii[0],where=True),
+        '### Decoder',decoder_table(trials),
         '### Per trial',trial_table(trials,radii),'### By prompt condition (landmark targets, both starts)',
         group_table([t for t in trials if t['group']!='harness' and not t.get('hint_target')],radii,lambda t:t['prompt_condition'],'Prompt'),
         '### By group',group_table(trials,radii,lambda t:t['group'],'Group'),'### Raw actions',action_table(trials)])

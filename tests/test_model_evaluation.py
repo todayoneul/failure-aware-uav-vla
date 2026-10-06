@@ -26,7 +26,10 @@ class EvaluationProtocolTests(unittest.TestCase):
             self.assertIn(trial['prompt'],PROMPTS)
             self.assertTrue(1<=trial['max_steps']<=60)
             # A description can only be evaluated for a target that has one.
-            if PROMPTS[trial['prompt']][1]:self.assertIn('landmark',self.protocol['targets'][trial['target']])
+            target=self.protocol['targets'][trial['target']]
+            if PROMPTS[trial['prompt']][1]:self.assertTrue('landmark' in target or 'description' in target)
+            if PROMPTS[trial['prompt']][0]=='instruction':self.assertTrue('landmark' in target or 'noun' in target)
+            self.assertIn(trial.get('approach'),(None,'above'))
         self.assertEqual(self.protocol['success_radii_m'],sorted(self.protocol['success_radii_m'],reverse=True))
 
     def test_target_description_follows_the_prompt_condition(self):
@@ -42,6 +45,28 @@ class EvaluationProtocolTests(unittest.TestCase):
         coordinate=resolve_target('far',self.protocol,scene,False)
         self.assertEqual(list(coordinate.position),self.protocol['targets']['far']['position'])
         self.assertIsNone(coordinate.landmark)
+        # A coordinate target may carry its own words; they follow the prompt condition like a landmark's.
+        roof=resolve_target('roof',self.protocol,scene,True)
+        self.assertIn('top of a gray block',instruction_for(roof));self.assertEqual(roof.noun,'the gray block')
+        self.assertIn(GENERIC_DESCRIPTION,instruction_for(resolve_target('roof',self.protocol,scene,False)))
+
+    def test_instruction_condition_sends_a_sentence_without_direction_or_template(self):
+        from scripts.evaluate_model import PROMPTS,resolve_target
+        from src.mission.landmarks import prompt_arguments
+        from src.integration.projectairsim_observation_adapter import make_prompt
+        scene=[{'id':'blue_cone','name':'Blue cone','description':'The target is a large blue cone.','noun':'the large blue cone',
+                'position':[91.4,-35.4,-11.],'objects':['Cone_5']}]
+        mode,described=PROMPTS['instruction']
+        target=resolve_target('blue_cone',self.protocol,scene,described)
+        hint,freeform=prompt_arguments(target,mode)
+        self.assertFalse(hint)
+        state={'position':[55,0,-3],'orientation':[0,0,0,1]}
+        prompt=make_prompt(state,list(target.position),'unused',hint,freeform)
+        self.assertEqual(prompt,'<image>\nLand on top of the large blue cone. Fly around, find it with your camera, '
+                                'then fly straight to it and land.\nAction: ')
+        for word in ('forward','left','right','ahead','find the target'):self.assertNotIn(word,prompt.replace('straight to it',''))
+        self.assertEqual(prompt_arguments(target,'hint'),(True,None));self.assertEqual(prompt_arguments(target,'description'),(False,None))
+        with self.assertRaises(ValueError):prompt_arguments(target,'coordinates')
 
 
 class EvaluationSummaryTests(unittest.TestCase):
@@ -63,6 +88,21 @@ class EvaluationSummaryTests(unittest.TestCase):
                          ['hint+landmark','3','1/3','1/3','0/3','0/3','3/3','1/3','12.0 m'])
         self.assertIn('| a | facing -> blue_cone | hint+landmark | 50.0 m | 8 | LAND @ step 8 | 12.0 m | 9.0 m | O | X | X |',
                       trial_table([landed],[20.,10.,5.]))
+
+    def test_roof_runs_say_where_the_vehicle_came_down_and_decoder_changes_are_counted(self):
+        from scripts.summarize_model_evaluation import run_text,decoder_table
+        def roof(stop,**surface):
+            return {**self.trial('r',stop,stop,group='roof'),'stop':{'step':8,'distance_m':stop,**surface}}
+        self.assertEqual(run_text(roof(2.2,on_target_surface=True,below_target_surface_m=-.2),20.),'**stop 2.2 m, on the surface**')
+        self.assertEqual(run_text(roof(25.1,on_target_surface=False,below_target_surface_m=14.8),20.),'stop 25.1 m, landed 15 m below')
+        self.assertEqual(run_text(roof(7.1,on_target_surface=False,below_target_surface_m=-10.2),20.),'**stop 7.1 m, landed 10 m above**')
+        # A landmark is an object to reach, not a surface to land on.
+        self.assertEqual(run_text({**self.trial('c',6.4,4.4),'stop':{'step':8,'distance_m':6.4,'on_target_surface':False,
+                                                                    'below_target_surface_m':9.8}},20.),'**stop 6.4 m**')
+        free={**self.trial('a',None,9.,'invalid_action'),'steps':[{'raw_output':'9x 49 49'}]}
+        fixed={**self.trial('b',12.,9.),'decoder':'grammar','steps':[{'decoder':{'intervened':True}},{'decoder':{'intervened':False}},{}]}
+        rows=decoder_table([free,fixed]).splitlines()
+        self.assertEqual(rows[2],'| free | 1 | 1 | - | 1 |');self.assertEqual(rows[3],'| grammar | 1 | 3 | 1 | 0 |')
 
 
 if __name__=='__main__':unittest.main()

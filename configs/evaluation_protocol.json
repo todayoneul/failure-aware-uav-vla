@@ -13,7 +13,9 @@
     "far": {"position": [-0.054, -59.971, -1.077], "note": "2026-10-06 Far click"},
     "blue_cone": {"landmark": "blue_cone"},
     "orange_ball": {"landmark": "orange_ball"},
-    "colored_wall": {"landmark": "colored_wall"}
+    "colored_wall": {"landmark": "colored_wall"},
+    "roof": {"position": [95.5, 10.6, -16.0], "description": "The target is the top of a gray block.", "noun": "the gray block",
+             "note": "2026-10-06 roof click: flat top of the central building, 16 m above the ground"}
   },
   "trials": [
     {"id": "H-near", "group": "harness", "start": "spawn", "target": "near", "prompt": "hint+generic", "max_steps": 30},
@@ -52,6 +54,16 @@
 
     {"id": "X-cone-ahead-hint", "group": "fixed_hint", "start": "facing", "target": "blue_cone", "prompt": "hint+landmark", "hint_mode": "ahead", "max_steps": 30},
     {"id": "X-wall-ahead-hint", "group": "fixed_hint", "start": "facing", "target": "colored_wall", "prompt": "hint+landmark", "hint_mode": "ahead", "max_steps": 30},
-    {"id": "X-ball-ahead-hint", "group": "fixed_hint", "start": "facing", "target": "orange_ball", "prompt": "hint+landmark", "hint_mode": "ahead", "max_steps": 30}
+    {"id": "X-ball-ahead-hint", "group": "fixed_hint", "start": "facing", "target": "orange_ball", "prompt": "hint+landmark", "hint_mode": "ahead", "max_steps": 30},
+
+    {"id": "B-roof-low", "group": "roof", "start": "facing", "target": "roof", "prompt": "hint+landmark", "max_steps": 30},
+    {"id": "B-roof-above", "group": "roof", "start": "facing", "target": "roof", "prompt": "hint+landmark", "max_steps": 30, "approach": "above"},
+    {"id": "B-wall-above", "group": "roof", "start": "facing", "target": "colored_wall", "prompt": "hint+landmark", "max_steps": 30, "approach": "above"},
+    {"id": "B-roof-above-far", "group": "roof", "start": "spawn", "target": "roof", "prompt": "hint+landmark", "max_steps": 45, "approach": "above"},
+    {"id": "B-roof-above-far-generic", "group": "roof", "start": "spawn", "target": "roof", "prompt": "hint+generic", "max_steps": 45, "approach": "above"},
+
+    {"id": "I-cone-instruction", "group": "instruction", "start": "facing", "target": "blue_cone", "prompt": "instruction", "max_steps": 30},
+    {"id": "I-wall-instruction", "group": "instruction", "start": "facing", "target": "colored_wall", "prompt": "instruction", "max_steps": 30},
+    {"id": "I-ball-instruction", "group": "instruction", "start": "facing", "target": "orange_ball", "prompt": "instruction", "max_steps": 30}
   ]
 }

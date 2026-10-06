@@ -25,12 +25,14 @@ from src.integration.projectairsim_observation_adapter import adapt_state,make_m
 from src.integration.projectairsim_action_adapter import convert_action,flight_limits
 from src.mission.manager import MissionManager,MissionTarget,TERMINAL
 from src.mission.scene import prepare_mission_config,scene_records,LANDMARKS
-from src.mission.flight import land_and_confirm,guarded_execute,surface_below
+from src.mission.flight import land_and_confirm,guarded_execute,surface_below,approach_altitude,climb_to
 from src.mission.grounding import grounding_report,target_visibility,matched_camera_images
 from src.mission.geometry import relative_camera_pose,camera_metadata
-from src.mission.landmarks import load_landmarks,instruction_for
+from src.mission.landmarks import load_landmarks,instruction_for,prompt_arguments
 
-PROMPTS={'hint+generic':(True,False),'hint+landmark':(True,True),'landmark-only':(False,True)}
+# condition -> (prompt mode, whether the target's description is given)
+PROMPTS={'hint+generic':('hint',False),'hint+landmark':('hint',True),'landmark-only':('description',True),
+         'instruction':('instruction',True)}
 MAP_VIEW={'position':[45.,0.,-150.],'rpy':[0,-90,0]}
 
 
@@ -42,12 +44,13 @@ def resolve_target(name,protocol,landmarks,described):
     if 'landmark' in spec:
         landmark=next(item for item in landmarks if item['id']==spec['landmark'])
         return MissionTarget(landmark['name'],tuple(landmark['position']),'scene bounding box '+'+'.join(landmark['objects']),
-                             landmark['description'] if described else None,landmark['id'])
-    return MissionTarget(name,tuple(spec['position']),spec.get('note','protocol coordinate'))
+                             landmark['description'] if described else None,landmark['id'],landmark.get('noun'))
+    return MissionTarget(name,tuple(spec['position']),spec.get('note','protocol coordinate'),
+                         spec.get('description') if described else None,None,spec.get('noun'))
 
 
 async def run_trial(trial,protocol,client,model,output,limits,envelope,landmarks_cache):
-    start=protocol['starts'][trial['start']];hint,described=PROMPTS[trial['prompt']]
+    start=protocol['starts'][trial['start']];mode,described=PROMPTS[trial['prompt']]
     config=prepare_mission_config(ROOT,output)
     scene=json.loads((config/'scene_basic_drone.jsonc').read_text())
     scene['actors'][0]['origin']={'xyz':' '.join(str(v) for v in start['xyz']),'rpy-deg':f'0 0 {start["yaw_deg"]}'}
@@ -61,9 +64,10 @@ async def run_trial(trial,protocol,client,model,output,limits,envelope,landmarks
     target=resolve_target(trial['target'],protocol,landmarks_cache,described)
     hint_target=resolve_target(trial.get('hint_target',trial['target']),protocol,landmarks_cache,described)
     rest=adapt_state(drone.get_ground_truth_kinematics());ground_z=rest['position'][2]
+    hint,freeform=prompt_arguments(target,mode)
     result={'id':trial['id'],'base_id':trial.get('base_id',trial['id']),'group':trial['group'],'start':trial['start'],'target':trial['target'],
             'hint_target':trial.get('hint_target'),'hint_mode':trial.get('hint_mode'),
-            'prompt_condition':trial['prompt'],'direction_hint':hint,
+            'prompt_condition':trial['prompt'],'direction_hint':hint,'decoder':model.decoder,'approach':trial.get('approach'),
             'target_position':list(target.position),'instruction':instruction_for(target),'rest_position':rest['position'],
             'max_steps':trial['max_steps'],'started_epoch':time.time(),'steps':[],'error':None}
     manager=MissionManager(**{**limits,'max_steps':trial['max_steps']})
@@ -84,11 +88,9 @@ async def run_trial(trial,protocol,client,model,output,limits,envelope,landmarks
         await asyncio.wait_for(await drone.hover_async(),timeout=10);await asyncio.sleep(.5)
         sample=drone.get_ground_truth_kinematics();current=adapt_state(sample)
         if ground_z-current['position'][2]<.5 or drone.get_landed_state()==0:raise RuntimeError('Actual takeoff criterion failed')
-        if trial.get('start_clearance_m'):
-            climb_z=ground_z-trial['start_clearance_m']
-            await asyncio.wait_for(await drone.move_by_velocity_z_async(0.,0.,climb_z,duration=abs(climb_z-current['position'][2])/2+1.,
-                                   yaw_is_rate=False,yaw=yaw_of(current)),timeout=30)
-            await asyncio.wait_for(await drone.hover_async(),timeout=10);await asyncio.sleep(.5)
+        climb_z=ground_z-trial['start_clearance_m'] if trial.get('start_clearance_m') else None
+        if climb_z is not None:
+            await climb_to(drone,climb_z,envelope['vertical_speed_mps']);await asyncio.sleep(.5)
             sample=drone.get_ground_truth_kinematics();current=adapt_state(sample)
         flight_stamp=sample['time_stamp'];result['start_state']=current
         result['start_clearance_m']=ground_z-current['position'][2]
@@ -98,6 +100,14 @@ async def run_trial(trial,protocol,client,model,output,limits,envelope,landmarks
             current=state()
             if collided():manager.fail('collision');break
             if manager.observe(current)!='NAVIGATING':break
+            # `approach: above` rises over the target surface once it is near, as the demo does for a selected roof.
+            climb_z=approach_altitude(current['position'][2],target.position[2],ground_z,envelope,
+                                      manager.metrics(current)['horizontal_m']) if trial.get('approach')=='above' else None
+            if climb_z is not None:
+                await asyncio.wait_for(await drone.hover_async(),timeout=10)
+                result.setdefault('climbs',[]).append({'step':manager.steps+1,**await climb_to(drone,climb_z,envelope['vertical_speed_mps']),
+                                                      'distance_m':manager.metrics(current)['horizontal_m']})
+                current=state();manager.hover_z=current['position'][2];trajectory.append(current['position'])
             raw=[];visibility={}
             for sensor,name in (('FrontCamera','front'),('DownCamera','down')):
                 image,depth,meta=matched_camera_images(drone.get_images(sensor,[0,1]))
@@ -108,8 +118,8 @@ async def run_trial(trial,protocol,client,model,output,limits,envelope,landmarks
                 # Uninformative hint: always "straight ahead", whatever the target's real bearing.
                 heading=yaw_of(current)
                 hint_goal=[current['position'][0]+1000*math.cos(heading),current['position'][1]+1000*math.sin(heading),manager.hover_z]
-            grounding=grounding_report(current,hint_goal,hint_target.position,instruction,hint,target.landmark if described else None)
-            inference=model.infer(*raw,current,hint_goal,instruction,direction_hint=hint)
+            grounding=grounding_report(current,hint_goal,hint_target.position,instruction,hint,target.landmark if described else None,freeform)
+            inference=model.infer(*raw,current,hint_goal,instruction,direction_hint=hint,freeform=freeform)
             # Bearing of the scored target in the body frame, independent of which hint was sent.
             bearing=math.atan2(target.position[1]-current['position'][1],target.position[0]-current['position'][0])-yaw_of(current)
             if inference['prompt']!=grounding['prompt']:raise RuntimeError('Logged prompt differs from model prompt')
@@ -118,7 +128,8 @@ async def run_trial(trial,protocol,client,model,output,limits,envelope,landmarks
                   'semantic_direction':grounding['semantic_direction'],'body_bearing_deg':grounding['body_bearing_deg'],
                   'target_bearing_deg':math.degrees(math.atan2(math.sin(bearing),math.cos(bearing))),
                   'prompt':inference['prompt'],'raw_output':inference['raw_output'].split('Action:')[-1].strip(),
-                  'parsed_action':action,'inference_ms':inference['inference_ms'],'visibility':visibility}
+                  'parsed_action':action,'inference_ms':inference['inference_ms'],'visibility':visibility,
+                  'decoder':inference.get('decoder')}
             make_mosaic(*raw).save(frames/f'{step["step"]:02d}.jpg',quality=85)
             if action is None:
                 step['parse_error']=inference['parse_error'];result['steps'].append(step);manager.fail('invalid_action');break
@@ -127,8 +138,7 @@ async def run_trial(trial,protocol,client,model,output,limits,envelope,landmarks
             returns=await guarded_execute(drone,manager,execution,collisions,flight_stamp,command)
             if returns is None:result['steps'].append(step);break
             await asyncio.sleep(.3);after=state()
-            manager.record_step(execution,after,action['stop']);trajectory.append(after['position'])
-            if collided():manager.fail('collision')
+            manager.record_step(execution,after,action['stop'],collided());trajectory.append(after['position'])
             step.update(command={k:command[k] for k in ('mode','yaw_delta_rad','displacement_ned','target_position','altitude_clamped')},
                         command_returns=returns,command_s=time.time()-started,after_position=after['position'],
                         moved_xy_m=math.dist(execution['position'][:2],after['position'][:2]),
@@ -145,7 +155,7 @@ async def run_trial(trial,protocol,client,model,output,limits,envelope,landmarks
                 result['landing'].pop('touchdown_kinematics',None)
             except (RuntimeError,asyncio.TimeoutError) as error:result['landing_error']=repr(error)
             landed=drone.get_landed_state()==0;airborne=not landed
-            manager.finish_stop(landed=landed);current=state()
+            current=state();manager.finish_stop(landed=landed,touchdown_z=current['position'][2])
         result['trajectory']=trajectory
     except Exception:
         result['error']=traceback.format_exc();manager.fail('runtime_error');print(result['error'],flush=True)
@@ -185,7 +195,7 @@ async def main(args):
     done=json.loads(results_path.read_text())['trials'] if results_path.exists() and args.resume else []
     finished={item['id'] for item in done}
     from src.integration.aerovla_int4_loader import AeroVLAInt4
-    model=AeroVLAInt4(ROOT/'outputs/integration/model-downloads.json')
+    model=AeroVLAInt4(ROOT/'outputs/integration/model-downloads.json',decoder=args.decoder)
     client=ProjectAirSimClient(address=args.host);client.connect();client.socket_services.recv_timeout=60000
     landmarks=[];status=0
     try:
@@ -193,7 +203,7 @@ async def main(args):
             if trial['id'] in finished:continue
             result=await run_trial(trial,protocol,client,model,output,limits,envelope,landmarks)
             done.append(result)
-            results_path.write_text(json.dumps({'protocol':args.protocol,'mission_limits':limits,'flight_limits':envelope,
+            results_path.write_text(json.dumps({'protocol':args.protocol,'mission_limits':limits,'flight_limits':envelope,'decoder':args.decoder,
                                                 'landmarks':landmarks,'load_info':model.load_info,'trials':done},indent=1))
             stop=result['stop']
             print(f'TRIAL {result["id"]} {result["state"]} reason={result["reason"]} steps={result["executed_steps"]} '
@@ -212,4 +222,6 @@ if __name__=='__main__':
     parser.add_argument('--output',default=str(ROOT/'outputs/model_eval/run'))
     parser.add_argument('--only',nargs='*',help='trial ids or group names');parser.add_argument('--resume',action='store_true')
     parser.add_argument('--suffix',default='',help='appended to trial ids for a repeat pass, e.g. "#2"')
+    parser.add_argument('--decoder',choices=('grammar','free'),default='grammar',
+                        help='grammar keeps output inside the action format; free is plain greedy decoding')
     asyncio.run(main(parser.parse_args()))

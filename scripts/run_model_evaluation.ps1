@@ -1,4 +1,4 @@
-param([string[]]$Only=@(),[string]$Output='outputs/model_eval/run',[switch]$Resume,[string]$Suffix='',[string]$Distro='Ubuntu',[switch]$ShowSimulator)
+param([string[]]$Only=@(),[string]$Output='outputs/model_eval/run',[switch]$Resume,[string]$Suffix='',[ValidateSet('','grammar','free')][string]$Decoder='',[string]$Protocol='',[string]$Distro='Ubuntu',[switch]$ShowSimulator)
 $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot 'native_process_args.ps1')
 $taskRoot=Split-Path -Parent $PSScriptRoot
@@ -28,6 +28,8 @@ try {
     $taskArgs=@('-d',$Distro,'--exec',$taskWslPython,"$taskWslRoot/scripts/evaluate_model.py",'--host',$taskHost,'--output',"$taskWslRoot/$Output")
     if ($Resume) { $taskArgs+='--resume' }
     if ($Suffix) { $taskArgs+='--suffix'; $taskArgs+=$Suffix }
+    if ($Decoder) { $taskArgs+='--decoder'; $taskArgs+=$Decoder }
+    if ($Protocol) { $taskArgs+='--protocol'; $taskArgs+="$taskWslRoot/$($Protocol.Replace('\','/'))" }
     if ($Only.Count) { $taskArgs+='--only'; $taskArgs+=$Only }
     Write-Host "Model evaluation running; progress: $Output/worker.log"
     $taskWorker=Start-Process -FilePath 'wsl.exe' -ArgumentList (Join-NativeArguments $taskArgs) -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $taskOutput 'worker.log') -RedirectStandardError (Join-Path $taskOutput 'worker-errors.log')
