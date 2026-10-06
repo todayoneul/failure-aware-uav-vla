@@ -14,6 +14,7 @@
 | [gaussian_blur_observer.png](gaussian_blur_observer.png) | 같은 검증의 `observer_blur.png` | 실제 input·prompt·raw/decoded/bounded action을 표시한 관찰 창 |
 | [mission_runner.png](mission_runner.png) | `outputs/mission_demo/` Test 5 GO_TO MEDIUM Blur live 관측을 최종 UI renderer로 export | 실제 맵·depth 목표·궤적·input·행동; Final은 판정 시점, live는 마지막 관측의 거리 |
 | [mission_landing_failed.png](mission_landing_failed.png) | `outputs/mission_demo/runs/20261006T012742Z-6cbfc3b7/mission_failed.png` | 실제 GO_TO_AND_LAND 실패: 최종 XY 0.5044m >0.45m |
+| [full_map_grounding.png](full_map_grounding.png) | `outputs/full_map/far-run/inspector.png` | 실제 68m 목표의 12번째 decision, 전체 맵·실제 hint·point visibility와 실패 결과; camera cross는 display copy에만 있음 |
 
 `control_drift.png`는 AeroVLA가 장애를 감지하거나 복구했다는 결과가 아니다. 전체 frame dump와 raw 로그는 Git에서 제외한다.
 

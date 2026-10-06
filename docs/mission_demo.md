@@ -1,5 +1,7 @@
 # Interactive Mission Runner
 
+> 2026-10-06 후속 업데이트: [Full Map + Target Grounding Inspector](full_map_grounding.md). 기본 Overview는 scene geometry 전체를 fit하는 Top-down으로 변경했고 F/C/WASD와 방향·visibility Inspector를 추가했다. 아래는 최초 미션 실행기의 검증 기록이며 당시 UI/카메라 기본값과 구분한다.
+
 2026-10-06 검증. **맵에서 목표를 클릭하면 AeroVLA가 실제 영상으로 이동하고, 목표 오차와 성공·실패를 한 창에서 확인하는 데모**다. Windows Project AirSim Blocks + WSL2 AeroVLA NF4 구조를 유지했다. 이동·호버는 성공했고, 목표 착륙은 실패했다. 아래 기록은 각각 한 번의 기능 확인이며 성공률이나 Blur 강건성 평가가 아니다.
 
 ## How I Can Check It

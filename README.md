@@ -19,6 +19,7 @@ Project AirSim의 실제 드론입니다. 관찰 카메라를 가까이 배치�
 - ✅ single-step 및 **10/10 closed loop**
 - ✅ **Interactive Gaussian Blur injection — 실제 AeroVLA 입력에 적용**
 - ✅ **Interactive mission target selection** — 맵 클릭으로 실제 좌표 선택
+- ✅ **Full-map / Target Grounding Inspector** — 전체 Blocks와 실제 방향 prompt·camera visibility 표시
 - ✅ **Goal-based mission runner** — 이동·호버 성공, 목표 착륙은 아직 실패
 - ✅ 기본 blur·control drift 데모 — **모델 없는 별도 script 시험**
 
@@ -63,6 +64,8 @@ AeroVLA에 전달된 Front/Down RGB와 생성된 forward/down/yaw 행동입니�
 ![목표·경로·모델 입력과 행동을 함께 보여주는 실제 미션 화면](outputs/examples/mission_runner.png)
 
 맵의 평평한 지점을 클릭하고 **G: 이동, H: 호버, L: 착륙 시험**을 누릅니다. **V: 시점, +/-: 확대·축소, R: 완료 후 초기화, B: Blur, Q/Esc: 중단·착륙**입니다. 모델은 첫 미션에서 기존 캐시로 로딩합니다. 실제 이동·호버가 한 번씩 성공했으며, 착륙은 XY 오차 **0.50m > 기준 0.45m**로 실패했습니다. [실행 방법·실제 결과·한계](docs/mission_demo.md).
+
+이제 **F: 전체 맵, C: 드론 중심, WASD: pan**을 지원합니다. 오른쪽 Inspector에서 목표 좌표가 모델의 **coarse 방향 문장**으로 바뀌는 과정을 볼 수 있습니다. Exact XYZ·거리·빨간 X는 모델 입력이 아닙니다. Near/Medium/Far(약 2/9.5/68m)는 이번 시험에서 실패했으며, [실제 화면·결과·visibility 해석](docs/full_map_grounding.md)에 그대로 기록했습니다. Visual landmark navigation은 아직 구현하지 않았습니다.
 
 ## System Architecture
 
