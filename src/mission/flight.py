@@ -16,6 +16,29 @@ async def guarded_execute(drone,manager,state,events,flight_stamp,command,now=No
     return await asyncio.wait_for(execute_action(drone,command),timeout=2*command.get('expected_duration_sec',1.)+15)
 
 
+def approach_altitude(current_z,surface_z,ground_z,limits,distance_m):
+    """NED height to climb to, or None when no climb is due.
+
+    The policy keeps its height in almost every decision and the direction hint is horizontal, so a
+    surface at or above the flight level (a roof) is only reachable from above it. The climb waits until
+    the vehicle is within `approach_distance_m` of the selected point: 22 m above its launch platform the
+    policy stopped at once (5 of 6 runs), while a climb made 42 m from the target was followed by a
+    flight onto the roof (3 of 3)."""
+    if not limits['target_clearance_m'] or current_z<=surface_z-limits['minimum_clearance_m']:return None
+    if distance_m>limits['approach_distance_m']:return None
+    wanted=max(surface_z-limits['target_clearance_m'],ground_z-limits['maximum_clearance_m'])
+    return wanted if wanted<current_z else None
+
+
+async def climb_to(drone,z,speed):
+    """Vertical move in place; the heading is kept."""
+    start=drone.get_ground_truth_kinematics()['pose']['position']['z']
+    duration=abs(z-start)/speed+1.
+    await asyncio.wait_for(await drone.move_by_velocity_z_async(0.,0.,z,duration=duration),timeout=2*duration+10)
+    await asyncio.wait_for(await drone.hover_async(),timeout=10)
+    return {'from_z':start,'to_z':z}
+
+
 async def descend_before_landing(drone,surface_z):
     """Native Land descends slowly and times out from height; close most of the gap first."""
     sample=drone.get_ground_truth_kinematics();z=sample['pose']['position']['z']

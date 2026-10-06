@@ -20,7 +20,9 @@ from src.mission.geometry import world_to_pixel
 OUT=ROOT/'outputs/mission_demo';WINDOW='MISSION CONTROL | Map target + AeroVLA'
 MAP_RECT=(20,190,900,506)
 MISSION_BUTTONS=[(20,125,135,38,ord('g'),'G Start'),(170,125,135,38,ord('r'),'R Reset'),
-                 (320,125,135,38,ord('n'),'N Landmark'),(470,125,135,38,ord('m'),'M Hint on/off')]
+                 (320,125,135,38,ord('n'),'N Landmark'),(470,125,135,38,ord('m'),'M Prompt mode')]
+PROMPT_LABELS={'hint':'Prompt: direction hint + description','description':'Prompt: description only (no hint)',
+               'instruction':'Prompt: instruction only (no hint)'}
 
 VIEW_BUTTONS=[(620,125,135,38,ord('f'),'F Full map'),(770,125,135,38,ord('c'),'C Drone')]
 BLUR_BUTTONS=[(940,125,220,38,ord('b'),'B Toggle blur')]+[(1180+i*90,125,80,38,ord(str(i+1)),label) for i,label in enumerate(('1 Low','2 Med','3 High'))]
@@ -95,8 +97,8 @@ def render_canvas(telemetry,control,images):
         label=f'Final {distance} / live {math.hypot(target[0]-position[0],target[1]-position[1]):.2f} m'
     target_name=(mission.get('target') or {}).get('name') or 'Select a surface or landmark'
     text(f'{target_name[:44]} | {label} | success radius {mission.get("success_radius_m",0):.0f} m',20,105,.58)
-    hint=control.get('direction_hint',True)
-    text('Direction hint '+('ON' if hint else 'OFF'),940,35,.73,purple,2)
+    mode=control.get('prompt_mode','hint' if control.get('direction_hint',True) else 'description')
+    text(PROMPT_LABELS.get(mode,mode),940,35,.62,purple,2)
     text('Front/Down RGB + prompt -> AeroVLA; the model ends the episode',940,65,.46)
     failure=telemetry.get('failure') or {};text('Applied: '+('BLUR' if failure.get('failure_enabled') else 'NORMAL'),940,100,.6)
     for left,top,width,height,key,label in MISSION_BUTTONS+VIEW_BUTTONS+BLUR_BUTTONS:
@@ -134,6 +136,10 @@ def render_canvas(telemetry,control,images):
     note=telemetry.get('control_message') or mission.get('reason') or telemetry.get('phase','Waiting')
     if stop and not telemetry.get('control_message'):
         landed={True:'landed',False:'not landed'}.get(stop.get('landed'),'landing')
+        if stop.get('landed') and 'on_target_surface' in stop and not (mission.get('target') or {}).get('landmark'):
+            # Only a selected surface has a height to land on; a landmark is an object to reach.
+            landed='landed on the selected surface' if stop['on_target_surface'] else \
+                f'landed {abs(stop["below_target_surface_m"]):.1f} m {"below" if stop["below_target_surface_m"]>0 else "above"} the selected surface'
         note=f'Model LAND at step {stop["step"]}, {stop["distance_m"]:.2f} m from target ({landed}); success radius {mission.get("success_radius_m",0):.0f} m'
     text(str(note)[:108],20,716,.47)
     visibility=images.get('visibility') or {}
@@ -147,6 +153,11 @@ def render_canvas(telemetry,control,images):
     text('Last model output',610,748,.57);text('Decoded action',900,748,.57);text('Executed command',1190,748,.57)
     raw=inference.get('raw_output','Waiting...').split('Action:')[-1].strip()
     for i,line in enumerate(textwrap.wrap(raw[:150],35)):text(line,610,780+i*23,.53)
+    changed=(inference.get('decoder') or {}).get('interventions') or []
+    if changed:
+        # The font is ASCII only, so a rejected token is shown by its vocabulary id.
+        first=changed[0]
+        text(f'Grammar: token {first["rejected_id"]} -> {first["chosen"]} (p {first["chosen_probability"]:.2f})',610,858,.42,purple)
     if action:
         for i,line in enumerate([f'Forward {action["fwd"]:.3f} m',f'Down {action["down"]:.3f} m',f'Yaw {math.degrees(action["yaw"]):.1f} deg']):text(line,900,780+i*26,.55)
     if command:
@@ -157,7 +168,7 @@ def render_canvas(telemetry,control,images):
     text('Front / Down: '+scope,610,929,.47)
     text('Point visibility uses capture pose + depth; crosshair is a display copy.',610,956,.44)
     text('Actual input: '+('VERIFIED' if telemetry.get('input_verified') else 'not inferred yet'),610,985,.5)
-    text('G start | R reset | N landmark | M hint | B blur | 1/2/3 severity | Q/Esc abort and land',20,1030,.46)
+    text('G start | R reset | N landmark | M prompt mode | B blur | 1/2/3 severity | Q/Esc abort and land',20,1030,.46)
     return canvas
 
 

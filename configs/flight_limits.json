@@ -5,5 +5,7 @@
   "cruise_speed_mps": 1.0,
   "vertical_speed_mps": 2.0,
   "yaw_move_threshold_rad": 0.25,
-  "micro_move_threshold_m": 1.0
+  "micro_move_threshold_m": 1.0,
+  "target_clearance_m": 6.0,
+  "approach_distance_m": 45.0
 }

@@ -6,7 +6,7 @@ from src.failures.control import default_control, apply_key
 def default_mission_control():
     return {**default_control(),'mission_request_id':0,'mission_request':None,'mission_requests':[],
             'overview_view':'top','overview_zoom':1.,'overview_pan':[0,0],'overview_focus':'map',
-            'direction_hint':True}
+            'direction_hint':True,'prompt_mode':'hint'}
 
 
 def enqueue(state,request):
@@ -44,7 +44,11 @@ def mission_key(state,key):
         # One mission type: the model flies and ends the episode itself. N cycles named landmarks.
         return enqueue(state,{'action':{'g':'start','r':'reset','n':'landmark'}[chr(key).lower()]})
     if key in (ord('m'),ord('M')):
-        result=copy.deepcopy(state);result['direction_hint']=not state.get('direction_hint',True)
+        # hint -> description only -> free-form instruction -> hint
+        modes=('hint','description','instruction')
+        current=state.get('prompt_mode','hint' if state.get('direction_hint',True) else 'description')
+        result=copy.deepcopy(state);result['prompt_mode']=modes[(modes.index(current)+1)%len(modes)]
+        result['direction_hint']=result['prompt_mode']=='hint'
         return result
     if key in (ord('v'),ord('V')):
         result=copy.deepcopy(state);result['overview_view']='elevated' if state.get('overview_view')=='top' else 'top'

@@ -8,6 +8,8 @@ import math
 import time
 
 TERMINAL={'SUCCESS','FAILED','ABORTED'}
+# A landed vehicle's origin sits a few decimetres above the surface it rests on.
+SURFACE_TOLERANCE_M=1.
 
 
 @dataclass(frozen=True)
@@ -17,6 +19,7 @@ class MissionTarget:
     source: str
     description: str = None
     landmark: str = None
+    noun: str = None
 
     def __post_init__(self):
         if not self.name or len(self.position)!=3 or not all(math.isfinite(v) for v in self.position):
@@ -70,14 +73,17 @@ class MissionManager:
         if self.steps>=self.max_steps: return self.fail('max_steps')
         return self.status
 
-    def record_step(self,before,after,stop):
-        """Score one executed decision. `stop` is the policy's own LAND / zero action."""
+    def record_step(self,before,after,stop,collided=False):
+        """Score one executed decision. `stop` is the policy's own LAND / zero action.
+
+        A collision during the step outranks every other ending, including the step budget."""
         if self.status!='NAVIGATING': return self.status
         self.steps+=1
         distance=self.metrics(after)['horizontal_m'];self.distances.append(distance)
         moved=math.hypot(after['position'][0]-before['position'][0],after['position'][1]-before['position'][1])
         self.stuck=self.stuck+1 if moved<self.stuck_distance_m else 0
-        if stop:
+        if collided: self.fail('collision')
+        elif stop:
             self.stop={'step':self.steps,'distance_m':distance,'within_radius':distance<=self.success_radius_m}
             self.status='LANDING'
         elif self.stuck>self.stuck_steps: self.fail('stuck')
@@ -90,10 +96,17 @@ class MissionManager:
         recent=self.distances[-(self.diverging_steps+1):]
         return len(recent)==self.diverging_steps+1 and all(b-a>self.stuck_distance_m for a,b in zip(recent,recent[1:]))
 
-    def finish_stop(self,landed=None):
-        """Judge the policy's stop; the vehicle's response to LAND is recorded, not required."""
+    def finish_stop(self,landed=None,touchdown_z=None):
+        """Judge the policy's stop; the vehicle's response to LAND is recorded, not required.
+
+        `touchdown_z` only reports whether the vehicle came down on the selected surface (a roof,
+        say) or somewhere lower; the success rule stays the horizontal stop distance."""
         if self.status!='LANDING': return self.status
         self.stop['landed']=landed
+        if landed and touchdown_z is not None and math.isfinite(touchdown_z):
+            # NED: positive means the vehicle rests below the selected surface.
+            self.stop['below_target_surface_m']=touchdown_z-self.target.position[2]
+            self.stop['on_target_surface']=abs(self.stop['below_target_surface_m'])<=SURFACE_TOLERANCE_M
         if self.stop['within_radius']:
             self.status='SUCCESS';self.reason=f'model stop {self.stop["distance_m"]:.2f} m from target'
         else:self.fail(f'stopped_outside_radius ({self.stop["distance_m"]:.2f} m)')
@@ -110,7 +123,8 @@ class MissionManager:
     def snapshot(self,state=None):
         return {'state':self.status,'reason':self.reason,'steps':self.steps,
                 'target':{'name':self.target.name,'surface_position':list(self.target.position),'source':self.target.source,
-                          'description':self.target.description,'landmark':self.target.landmark} if self.target else None,
+                          'description':self.target.description,'landmark':self.target.landmark,
+                          'noun':self.target.noun} if self.target else None,
                 'goal_position':self.goal_position,'errors':self.metrics(state) if state and self.target else None,
                 'success_radius_m':self.success_radius_m,'stop':self.stop,
                 'initial_distance_m':self.distances[0] if self.distances else None,

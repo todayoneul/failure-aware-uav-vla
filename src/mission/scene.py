@@ -11,7 +11,7 @@ from projectairsim.utils import unpack_image
 from src.integration.blur_demo_support import publish_json,publish_image
 from .geometry import mission_robot_config,relative_camera_pose,camera_metadata,select_surface,pixel_to_world
 from .bounds import scene_bounds,fit_camera
-from .landmarks import load_landmarks,landmark_at
+from .landmarks import load_landmarks,landmark_at,describe_surface
 
 LANDMARKS=Path(__file__).resolve().parents[2]/'configs/landmarks.json'
 
@@ -30,7 +30,7 @@ def scene_records(world,names=None):
 class OverviewScene:
     def __init__(self,world,drone,output):
         self.world,self.drone,self.output=world,drone,Path(output)
-        records=scene_records(world)
+        records=scene_records(world);self.records=records
         self.region=scene_bounds(records)
         self.landmarks=load_landmarks(LANDMARKS,records)
         self.frames=OrderedDict();self.counter=0
@@ -56,7 +56,7 @@ class OverviewScene:
         meta=camera_metadata(rgb)
         packet={'frame_id':self.counter,'camera':meta,'view':view,'image_file':f'overview_{self.counter%2}.png',
                 'image_sha256':hashlib.sha256(image.tobytes()).hexdigest(),'bounds':self.region,'rig':rig}
-        self.frames[self.counter]=(values.copy(),meta)
+        self.frames[self.counter]=(values.copy(),meta,image.copy())
         while len(self.frames)>4:self.frames.popitem(last=False)
         publish_image(self.output/packet['image_file'],image)
         publish_json(self.output/'overview.json',packet)
@@ -65,14 +65,20 @@ class OverviewScene:
     def landmark_at(self,frame_id,pixel):
         """A click on a configured landmark selects the object itself, whatever its surface slope."""
         if frame_id not in self.frames:raise ValueError('Map refreshed; select on the current frame again')
-        depth,meta=self.frames[frame_id];u,v=map(int,pixel)
+        depth,meta=self.frames[frame_id][:2];u,v=map(int,pixel)
         try:point=pixel_to_world((u,v),float(depth[v,u]),meta)
         except (ValueError,IndexError):return None
         return landmark_at(self.landmarks,point)
 
+    def describe(self,frame_id,pixel,point):
+        """Kind and colour of the object whose top was clicked; None on the ground."""
+        if frame_id not in self.frames:return None
+        u,v=map(int,pixel);image=self.frames[frame_id][2]
+        return describe_surface(self.records,point,image[v,u] if 0<=v<image.shape[0] and 0<=u<image.shape[1] else None)
+
     def select(self,frame_id,pixel):
         if frame_id not in self.frames:raise ValueError('Map refreshed; select on the current frame again')
-        depth,meta=self.frames[frame_id]
+        depth,meta=self.frames[frame_id][:2]
         point=select_surface(pixel,depth,meta)
         if hasattr(self,'region') and any(not self.region['minimum'][i]-5<=point[i]<=self.region['maximum'][i]+5 for i in (0,1)):
             raise ValueError('Point is outside the bounded Blocks geometry area (+5m margin)')

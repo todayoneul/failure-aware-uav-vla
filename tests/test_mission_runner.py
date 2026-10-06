@@ -48,9 +48,14 @@ class FakeDrone:
 
     def get_images(self,*_):return {0:{'encoding':'BGR','time_stamp':10}}
 
+    async def move_by_velocity_z_async(self,vx,vy,z,**kwargs):
+        async def command():self.events.append(('climb',z));return True
+        return asyncio.create_task(command())
+
 
 class MissionRunnerFailureTests(unittest.IsolatedAsyncioTestCase):
-    async def run_fake(self,drone,directory,invalid_action=False,guard_stop=False,model_stop=False):
+    async def run_fake(self,drone,directory,invalid_action=False,guard_stop=False,model_stop=False,
+                       surface=None,words=None,prompt_mode=None):
         from src.mission import runner
         root=Path(directory);(root/'configs').mkdir()
         (root/'configs/mission_limits.json').write_text(json.dumps({'max_duration':300}))
@@ -59,15 +64,21 @@ class MissionRunnerFailureTests(unittest.IsolatedAsyncioTestCase):
         session=Mock();session.telemetry={}
         session.poll_control.return_value={'mission_requests':[
             {'id':1,'request':{'action':'select','frame_id':42,'pixel':[320,180]}},
-            {'id':2,'request':{'action':'start'}}]}
+            {'id':2,'request':{'action':'start'}}],**({'prompt_mode':prompt_mode} if prompt_mode else {})}
         session.inject.return_value=([frame,frame],{})
-        overview=Mock();overview.select.return_value=([2,0,-2.5],'captured depth frame 42')
-        overview.landmark_at.return_value=None;overview.landmarks=[]
+        overview=Mock();overview.select.return_value=(surface or [2,0,-2.5],'captured depth frame 42')
+        overview.landmark_at.return_value=None;overview.landmarks=[];overview.describe.return_value=words
         overview.capture.return_value=(frame,{})
         action={'fwd':.5,'down':0,'yaw':0,'stop':False,'bins':[10,49,49],'output':'10 49 49'}
-        model=Mock();model.infer.return_value={'parsed_action':action,'parse_error':None,
-            'prompt':'<image>\nFly straight ahead and find the target. Find the selected target location.\nAction: '}
-        if invalid_action:model.infer.return_value.update(parsed_action=None,parse_error='invalid model action')
+        from src.integration.projectairsim_observation_adapter import make_prompt
+        self.prompts=[]
+        self.poses_at_inference=[]
+        def infer(front,down,state,goal,instruction,direction_hint=True,freeform=None,**_):
+            self.prompts.append(make_prompt(state,goal,instruction,direction_hint,freeform))
+            self.poses_at_inference.append('after climb' if any(isinstance(e,tuple) for e in drone.events) else 'no climb')
+            return {'parsed_action':None if invalid_action else action,'prompt':self.prompts[-1],
+                    'parse_error':'invalid model action' if invalid_action else None}
+        model=Mock();model.infer.side_effect=infer
         # The policy's own LAND; the observer then quits so the completed run can be inspected.
         if model_stop:action.update(fwd=0.,stop=True,bins=None,output='09 49 48 LAND')
         survives=model_stop or invalid_action
@@ -137,6 +148,39 @@ class MissionRunnerFailureTests(unittest.IsolatedAsyncioTestCase):
         self.assertAlmostEqual(mission['stop']['distance_m'],2)
         self.assertEqual(events[-1]['decision_status'],'EXECUTED')
         self.assertIn('land',drone.events);self.assertLess(drone.events.index('land'),drone.events.index('disarm'))
+
+    async def test_selected_roof_starts_from_above_with_its_words_in_the_instruction(self):
+        drone=FakeDrone()
+        words={'object':'TemplateCube_Rounded_96','noun':'the gray block','description':'The target is the top of a gray block.'}
+        with tempfile.TemporaryDirectory() as directory:
+            result=await self.run_fake(drone,directory,model_stop=True,surface=[2,0,-16.],words=words,prompt_mode='instruction')
+        mission=result['missions'][0]
+        # 2 m from the roof point, so the climb to 6 m above the 16 m roof comes before the first decision.
+        self.assertIn(('climb',-22.),drone.events);self.assertLess(drone.events.index(('climb',-22.)),drone.events.index('land'))
+        self.assertEqual(self.poses_at_inference[0],'after climb')
+        self.assertEqual(mission['target']['name'],'Gray block top (2.00, 0.00)');self.assertEqual(mission['target']['noun'],'the gray block')
+        self.assertEqual(mission['prompt_mode'],'instruction');self.assertFalse(mission['direction_hint'])
+        self.assertEqual(self.prompts,['<image>\nLand on top of the gray block. Fly around, find it with your camera, '
+                                       'then fly straight to it and land.\nAction: '])
+        # The fake vehicle comes to rest at the launch platform, far below the roof it was sent to.
+        self.assertFalse(mission['stop']['on_target_surface']);self.assertAlmostEqual(mission['stop']['below_target_surface_m'],13.5)
+
+    async def test_distant_roof_is_flown_to_at_the_takeoff_height_first(self):
+        drone=FakeDrone()
+        words={'object':'TemplateCube_Rounded_96','noun':'the gray block','description':'The target is the top of a gray block.'}
+        with tempfile.TemporaryDirectory() as directory:
+            await self.run_fake(drone,directory,model_stop=True,surface=[96,0,-16.],words=words)
+        # 96 m away: no climb above the launch point; the model flies (here: stops) at the takeoff height.
+        self.assertNotIn(('climb',-22.),drone.events)
+        self.assertEqual(self.poses_at_inference,['no climb'])
+
+    async def test_ground_click_keeps_the_takeoff_height_and_the_generic_prompt(self):
+        drone=FakeDrone()
+        with tempfile.TemporaryDirectory() as directory:
+            result=await self.run_fake(drone,directory,model_stop=True)
+        self.assertFalse(any(isinstance(event,tuple) and event[0]=='climb' and event[1]<-4 for event in drone.events))
+        self.assertEqual(result['missions'][0]['target']['name'],'Visible surface (2.00, 0.00)')
+        self.assertEqual(self.prompts,['<image>\nFly straight ahead and find the target. Find the selected target location.\nAction: '])
 
     async def test_partial_takeoff_failure_lands_before_disarming(self):
         drone=FakeDrone(hover_failure=True)

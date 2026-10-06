@@ -131,6 +131,11 @@ class TargetInspectorTests(unittest.TestCase):
         self.assertEqual(visual['prompt'],make_prompt(state,[5,5,-4],instruction,direction_hint=False))
         # The direction is still reported for the evaluator even when it is withheld from the model.
         self.assertEqual(visual['semantic_direction'],'forward-right')
+        described='The target is 0 degrees from you. The target is the top of a gray block. Please control the drone.'
+        self.assertEqual(grounding_report(state,[5,5,-4],[5,5,-16],described)['mode'],'DIRECTION HINT + OBJECT DESCRIPTION')
+        spoken=grounding_report(state,[5,5,-4],[5,5,-16],described,freeform='Land on top of the gray block.')
+        self.assertEqual(spoken['mode'],'INSTRUCTION ONLY');self.assertFalse(spoken['direction_hint'])
+        self.assertEqual(spoken['prompt'],'<image>\nLand on top of the gray block.\nAction: ')
 
     def test_marker_overlay_never_mutates_model_input(self):
         from src.mission.grounding import target_overlay

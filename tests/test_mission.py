@@ -61,6 +61,28 @@ class MissionGeometryTests(unittest.TestCase):
         np.testing.assert_allclose(point,[3.1,4,-2.5],atol=1e-6)
         self.assertIn('frame 42',source)
 
+    def test_clicked_object_is_described_by_its_kind_and_map_colour(self):
+        from src.mission.scene import OverviewScene
+        from src.mission.landmarks import describe_surface,color_name
+        def box(name,center,size):return {'name':name,'bbox':{'center':dict(zip('xyz',center)),'size':dict(zip('xyz',size))}}
+        records=[box('Ground',[0,0,.5],[2000,2000,1]),box('TemplateCube_Rounded_84',[85,2.5,-3.5],[10,10,5]),
+                 box('TemplateCube_Rounded_96',[95,2.5,-13.5],[10,10,5]),box('Cylinder4',[19.9,-96,-2.5],[1,1,3]),
+                 {'name':'Broken','error':'no box'}]
+        gray,orange,shadow=(118,118,112),(30,120,235),(40,25,20)
+        self.assertEqual([color_name(c) for c in (gray,orange,shadow,(200,80,30),(60,200,60),(250,250,250))],
+                         ['gray','orange',None,'blue','green','white'])
+        roof=describe_surface(records,[96,3,-16.],gray)
+        self.assertEqual(roof,{'object':'TemplateCube_Rounded_96','noun':'the gray block','description':'The target is the top of a gray block.'})
+        self.assertEqual(describe_surface(records,[84,1,-6.],orange)['description'],'The target is the top of an orange block.')
+        self.assertEqual(describe_surface(records,[19.9,-96,-4.],shadow)['noun'],'the cylinder')
+        # Plain ground and the side of a block (not its top) have no words.
+        self.assertIsNone(describe_surface(records,[40,40,0.],gray));self.assertIsNone(describe_surface(records,[96,3,-12.],gray))
+        scene=object.__new__(OverviewScene);scene.records=records
+        image=np.zeros((360,640,3),dtype=np.uint8);image[180,320]=gray
+        scene.frames={42:(np.zeros((360,640),dtype=np.float32),{},image)}
+        self.assertEqual(scene.describe(42,(320,180),[96,3,-16.])['noun'],'the gray block')
+        self.assertIsNone(scene.describe(41,(320,180),[96,3,-16.]))
+
 
 class MissionManagerTests(unittest.TestCase):
     def state(self, x=0, y=0, z=-4, speed=0):
@@ -166,10 +188,15 @@ class MissionControlTests(unittest.TestCase):
     def test_landmark_and_hint_keys(self):
         from src.mission.control import default_mission_control,mission_key,pending_requests
         control=default_mission_control()
-        self.assertTrue(control['direction_hint'])
+        self.assertTrue(control['direction_hint']);self.assertEqual(control['prompt_mode'],'hint')
         without=mission_key(control,ord('m'))
         self.assertFalse(without['direction_hint']);self.assertEqual(without['mission_request_id'],0)
-        self.assertTrue(mission_key(without,ord('M'))['direction_hint'])
+        # M cycles hint -> description only -> free-form instruction -> hint.
+        spoken=mission_key(without,ord('M'))
+        self.assertEqual([without['prompt_mode'],spoken['prompt_mode']],['description','instruction'])
+        self.assertFalse(spoken['direction_hint'])
+        again=mission_key(spoken,ord('m'))
+        self.assertEqual(again['prompt_mode'],'hint');self.assertTrue(again['direction_hint'])
         chosen=mission_key(without,ord('n'))
         self.assertEqual([r['action'] for _,r in pending_requests(chosen,0)],['landmark'])
         # The former hover/land mission keys are no longer mission requests.
@@ -187,6 +214,12 @@ class MissionControlTests(unittest.TestCase):
         np.testing.assert_allclose(landmarks[0]['position'],[91.4,-35.4,-11])
         self.assertEqual(landmark_at(landmarks,[95,-33,-3])['id'],'blue_cone')
         self.assertIsNone(landmark_at(landmarks,[60,0,-1]))
+        # Seen from above the colored wall is part of a roof, so a click there is a surface, not the wall.
+        wall={'id':'colored_wall','minimum':[80,-12.5,-16],'maximum':[90,7.5,-6],'click':False}
+        self.assertIsNone(landmark_at([wall],[85,0,-16]));self.assertEqual(landmark_at([{**wall,'click':True}],[85,0,-16])['id'],'colored_wall')
+        self.assertFalse(next(item for item in json.loads((ROOT/'configs/landmarks.json').read_text(encoding='utf-8'))
+                              if item['id']=='colored_wall')['click'])
+        self.assertEqual(landmarks[0]['noun'],'the large blue cone')
         cone=MissionTarget('Blue cone',tuple(landmarks[0]['position']),'box',landmarks[0]['description'],'blue_cone')
         self.assertIn('large blue cone',instruction_for(cone))
         self.assertIn(GENERIC_DESCRIPTION,instruction_for(MissionTarget('surface',(1,2,-2.5),'depth')))
@@ -264,6 +297,65 @@ class MissionFlightTests(unittest.IsolatedAsyncioTestCase):
                 result=await guarded_execute(Mock(),manager,state,events,10,{},now=now)
                 execute.assert_not_called();self.assertIsNone(result)
                 self.assertEqual(manager.reason,reason)
+
+    async def test_selected_roof_is_approached_from_above_and_ground_targets_are_not(self):
+        from src.mission.flight import approach_altitude,climb_to
+        from src.integration.projectairsim_action_adapter import flight_limits
+        limits=flight_limits()
+        # Roof 16 m up, vehicle at 4 m and 40 m away: rise to 6 m above the roof.
+        self.assertAlmostEqual(approach_altitude(-4.,-16.,-2.5,limits,40.),-22.)
+        # Still far away: keep flying low, the climb comes within 45 m.
+        self.assertIsNone(approach_altitude(-4.,-16.,-2.5,limits,96.))
+        self.assertAlmostEqual(approach_altitude(-4.,-16.,-2.5,limits,45.),-22.)
+        # Ground or platform already below the vehicle: no climb.
+        self.assertIsNone(approach_altitude(-1.3,0.,0.,limits,5.));self.assertIsNone(approach_altitude(-4.,-2.5,-2.5,limits,5.))
+        # Already above the roof; the flight ceiling caps the climb; zero switches the rule off.
+        self.assertIsNone(approach_altitude(-22.,-16.,-2.5,limits,10.))
+        self.assertAlmostEqual(approach_altitude(-4.,-30.,-2.5,limits,10.),-32.5)
+        self.assertIsNone(approach_altitude(-4.,-16.,-2.5,flight_limits({'target_clearance_m':0.}),10.))
+        with self.assertRaises(ValueError):flight_limits({'target_clearance_m':-1.})
+        with self.assertRaises(ValueError):flight_limits({'approach_distance_m':0.})
+        drone=Mock();calls=[]
+        async def accepted():return True
+        async def climb(*arguments,**keywords):
+            calls.append((arguments,keywords));return accepted()
+        drone.move_by_velocity_z_async=climb;drone.hover_async=AsyncMock(side_effect=lambda:accepted())
+        drone.get_ground_truth_kinematics.return_value={'pose':{'position':dict(x=0,y=0,z=-4.)}}
+        result=await climb_to(drone,-22.,2.)
+        self.assertEqual(calls[0][0],(0.,0.,-22.));self.assertAlmostEqual(calls[0][1]['duration'],10.)
+        self.assertEqual(result,{'from_z':-4.,'to_z':-22.})
+
+    def test_collision_on_the_last_budgeted_step_is_a_collision_not_a_step_limit(self):
+        from src.mission.manager import MissionManager,MissionTarget
+        def last_step(collided):
+            manager=MissionManager(max_steps=2)
+            manager.select(MissionTarget('Blue cone',(50,0,-11.),'box'))
+            pose=lambda x:{'position':[x,0,-2.],'orientation':[0,0,0,1]}
+            manager.start(pose(0),now=0);manager.record_step(pose(0),pose(5),False)
+            manager.record_step(pose(5),pose(10),False,collided);return manager
+        self.assertEqual(last_step(False).reason,'max_steps')
+        hit=last_step(True)
+        self.assertEqual((hit.status,hit.reason,hit.steps),('FAILED','collision',2))
+        # A stop decided in the same step does not turn a collision into a landing.
+        manager=MissionManager();manager.select(MissionTarget('Blue cone',(50,0,-11.),'box'))
+        manager.start({'position':[0,0,-2.],'orientation':[0,0,0,1]},now=0)
+        manager.record_step({'position':[0,0,-2.]},{'position':[5,0,-2.]},True,True)
+        self.assertEqual(manager.reason,'collision');self.assertIsNone(manager.stop)
+
+    def test_stop_record_says_whether_the_vehicle_rests_on_the_selected_surface(self):
+        from src.mission.manager import MissionManager,MissionTarget
+        def landed_at(z):
+            manager=MissionManager()
+            manager.select(MissionTarget('Gray block top',(10,0,-16.),'depth'))
+            start={'position':[0,0,-22.],'orientation':[0,0,0,1]};manager.start(start,now=0)
+            manager.record_step(start,{'position':[8,0,-22.],'orientation':[0,0,0,1]},True)
+            manager.finish_stop(landed=True,touchdown_z=z);return manager
+        roof=landed_at(-16.25);street=landed_at(-.2)
+        self.assertTrue(roof.stop['on_target_surface']);self.assertFalse(street.stop['on_target_surface'])
+        self.assertAlmostEqual(street.stop['below_target_surface_m'],15.8)
+        # The success rule is unchanged: both stopped 2 m away horizontally.
+        self.assertEqual([roof.status,street.status],['SUCCESS','SUCCESS'])
+        self.assertEqual(roof.snapshot()['target']['noun'],None)
 
     async def test_high_landing_descends_first_and_low_landing_does_not(self):
         from src.mission.flight import land_and_confirm

@@ -23,10 +23,10 @@ from src.integration.projectairsim_observation_adapter import adapt_state
 from src.integration.projectairsim_action_adapter import convert_action,flight_limits
 from src.mission.manager import MissionManager,MissionTarget,TERMINAL
 from src.mission.scene import OverviewScene,prepare_mission_config
-from src.mission.flight import land_and_confirm,guarded_execute,surface_below
+from src.mission.flight import land_and_confirm,guarded_execute,surface_below,approach_altitude,climb_to
 from src.mission.control import pending_requests
 from src.mission.grounding import grounding_report,target_visibility,matched_camera_images
-from src.mission.landmarks import instruction_for
+from src.mission.landmarks import instruction_for,prompt_arguments
 
 
 async def main(args):
@@ -39,7 +39,7 @@ async def main(args):
     history=[];trajectory=[];rows=[];decisions=[]
     client=None;drone=None;world=None;model=None;airborne=False;mission_id=0;last_request=0
     flight_stamp=None;collision_events=[];program_status='RUNNING'
-    last_state=None;last_state_epoch=None;landing_error=None;landmark_index=-1;hint=True
+    last_state=None;last_state_epoch=None;landing_error=None;landmark_index=-1;prompt_mode='hint'
 
     def state():
         nonlocal last_state,last_state_epoch
@@ -50,14 +50,14 @@ async def main(args):
         return result
 
     def report(current):
-        target=manager.target
-        return grounding_report(current,manager.goal_position,target.position,instruction_for(target),hint,target.landmark)
+        target=manager.target;hint,freeform=prompt_arguments(target,prompt_mode)
+        return grounding_report(current,manager.goal_position,target.position,instruction_for(target),hint,target.landmark,freeform)
 
     def update(current,phase=None):
         snapshot=manager.snapshot(current)
         preview=report(current) if manager.target else None
-        session.update(mission=snapshot,state=current,trajectory=trajectory,direction_hint=hint,
-                       mission_id=mission_id,grounding_preview=preview,**({'phase':phase} if phase else {}))
+        session.update(mission=snapshot,state=current,trajectory=trajectory,direction_hint=prompt_mode=='hint',
+                       prompt_mode=prompt_mode,mission_id=mission_id,grounding_preview=preview,**({'phase':phase} if phase else {}))
 
     def cameras(target):
         raw=[];visibility={};metadata={}
@@ -78,7 +78,8 @@ async def main(args):
     def save_mission(current,observation_fresh=True):
         snapshot=manager.snapshot(current)
         entry={**snapshot,'mission_id':mission_id,'final_distance_m':snapshot['errors']['horizontal_m'],
-               'vla_steps':len(decisions),'executed_steps':len(rows),'direction_hint':hint,
+               'vla_steps':len(decisions),'executed_steps':len(rows),'direction_hint':prompt_mode=='hint',
+               'prompt_mode':prompt_mode,'decoder_interventions':sum(bool((item.get('inference') or {}).get('decoder',{}).get('intervened')) for item in decisions),
                'steps':rows.copy(),'trajectory':trajectory.copy(),'landing_error':landing_error,
                'decisions':decisions.copy(),
                'final_observation_status':'fresh' if observation_fresh else 'last_validated_before_exit',
@@ -108,7 +109,7 @@ async def main(args):
         last_map=last_preview=0;preview_counter=0
         while True:
             control=session.poll_control();current=state()
-            if manager.status!='NAVIGATING' and manager.status!='LANDING':hint=control.get('direction_hint',True)
+            if manager.status!='NAVIGATING' and manager.status!='LANDING':prompt_mode=control.get('prompt_mode','hint')
             if time.monotonic()-last_map>.4:
                 overview.capture(current,control.get('overview_view','top'),control.get('overview_zoom',1.),
                                  control.get('overview_pan',[0,0]),control.get('overview_focus','map'));last_map=time.monotonic()
@@ -122,11 +123,16 @@ async def main(args):
                         else:landmark=overview.landmark_at(request['frame_id'],request['pixel'])
                         if landmark:
                             target=MissionTarget(landmark['name'],tuple(landmark['position']),
-                                                 'scene bounding box '+'+'.join(landmark['objects']),landmark['description'],landmark['id'])
+                                                 'scene bounding box '+'+'.join(landmark['objects']),landmark['description'],
+                                                 landmark['id'],landmark.get('noun'))
                             landmark_index=overview.landmarks.index(landmark)
                         else:
                             point,source=overview.select(request['frame_id'],request['pixel'])
-                            target=MissionTarget(f'Visible surface ({point[0]:.2f}, {point[1]:.2f})',tuple(point),source)
+                            # The clicked object's kind and colour become the description; plain ground has none.
+                            words=overview.describe(request['frame_id'],request['pixel'],point) or {}
+                            label=words['noun'][4:].capitalize()+' top' if words else 'Visible surface'
+                            target=MissionTarget(f'{label} ({point[0]:.2f}, {point[1]:.2f})',tuple(point),source,
+                                                 words.get('description'),None,words.get('noun'))
                         manager.select(target)
                         session.update(decision_grounding=None,target_visibility=None,visibility_step=0)
                         last_preview=0
@@ -157,7 +163,7 @@ async def main(args):
                             if rest_z-current['position'][2]<.5 or drone.get_landed_state()==0:
                                 raise RuntimeError('Actual takeoff criterion failed')
                             flight_stamp=sample['time_stamp']
-                        hint=control.get('direction_hint',True)
+                        prompt_mode=control.get('prompt_mode','hint')
                         manager.start(current);mission_id+=1;rows=[];decisions=[];trajectory=[current['position']]
                         landing_error=None
                         session.update(inference=None,clipped_action=None,input_verified=None,input_files={},input_step=0,completed_steps=0,
@@ -171,8 +177,16 @@ async def main(args):
                 manager.observe(current)
                 if manager.status=='NAVIGATING':
                     control=session.poll_control();step=manager.steps+1
+                    # A selected surface is where to land: once it is near, rise above it. A landmark is an object to find.
+                    climb=approach_altitude(current['position'][2],manager.target.position[2],ground_z,envelope,
+                                            manager.metrics(current)['horizontal_m']) if manager.target.landmark is None else None
+                    if climb is not None:
+                        session.update(phase=f'Climbing {current["position"][2]-climb:.0f} m to clear the selected surface')
+                        await hover();await climb_to(drone,climb,envelope['vertical_speed_mps'])
+                        current=state();manager.hover_z=current['position'][2]
+                        trajectory.append(current['position']);update(current,'AeroVLA navigation')
                     raw,visibility,camera=cameras(manager.target.position)
-                    instruction=instruction_for(manager.target)
+                    instruction=instruction_for(manager.target);hint,freeform=prompt_arguments(manager.target,prompt_mode)
                     grounding=report(current)
                     used,failure=session.inject(raw,step,current,instruction)
                     session.update(decision_grounding=grounding,target_visibility=visibility,visibility_step=step)
@@ -181,7 +195,7 @@ async def main(args):
                               'distance':manager.metrics(current),'inference':None}
                     decisions.append(decision);record_decision(decision,'REQUESTED')
                     inference=model.infer(*used,current,manager.goal_position,instruction,trace_inputs=True,
-                                          reference_frames=raw,direction_hint=hint)
+                                          reference_frames=raw,direction_hint=hint,freeform=freeform)
                     decision['inference']=inference;record_decision(decision,'INFERRED')
                     if inference['prompt']!=grounding['prompt']:raise RuntimeError('Inspector prompt differs from model prompt')
                     grounding['prompt_scope']='actual model input'
@@ -206,8 +220,7 @@ async def main(args):
                         manager.fail('command_rejected')
                         raise RuntimeError(f'Flight command rejected: {returns}')
                     await asyncio.sleep(.3);after=state()
-                    manager.record_step(execution,after,action['stop']);trajectory.append(after['position'])
-                    if collided():manager.fail('collision')
+                    manager.record_step(execution,after,action['stop'],collided());trajectory.append(after['position'])
                     row={'mission_id':mission_id,'step':manager.steps,'epoch':time.time(),'position':after['position'],
                          'target':manager.goal_position,'distance':manager.metrics(after),'instruction':instruction,
                          'inference':inference,'parsed_action':action,'executed_action':command,'command_returns':returns,
@@ -231,7 +244,7 @@ async def main(args):
                     session.update(landing_confirmation=confirmation)
                 except (RuntimeError,asyncio.TimeoutError) as error:landing_error=repr(error)
                 current=state();landed=drone.get_landed_state()==0;airborne=not landed
-                manager.finish_stop(landed=landed)
+                manager.finish_stop(landed=landed,touchdown_z=current['position'][2])
                 update(current,'Landing evaluation')
             if manager.status in TERMINAL and manager.started is not None and (not history or history[-1]['mission_id']!=mission_id):
                 current=state();save_mission(current)

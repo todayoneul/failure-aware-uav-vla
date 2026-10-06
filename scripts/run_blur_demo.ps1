@@ -28,7 +28,7 @@ $taskRunToken=(Get-Content -LiteralPath (Join-Path $taskOutput 'run-info.json') 
 $taskSim=$taskMonitor=$taskViewer=$taskWorker=$null
 $taskCleanupFailure=$null
 try {
-    if ($Mode -eq 'mission') { Write-Host 'MISSION CONTROL | map click | G/H/L mission | R reset | B blur | Q/Esc abort and land' }
+    if ($Mode -eq 'mission') { Write-Host "MISSION CONTROL | map click or N landmark | G start | M prompt mode | R reset | B blur | Q/Esc abort and land" }
     else { Write-Host 'Gaussian Blur Demo | B: toggle | 1/2/3: severity | Q/Esc: exit' }
     Write-Host 'Click the observer window, or use its buttons. Keys apply at the next observation.'
     $taskSim=Start-Process -FilePath $taskExe -WorkingDirectory (Split-Path $taskExe) -ArgumentList @('-windowed','-ResX=1280','-ResY=720','-WinX=0','-WinY=0') -WindowStyle Normal -PassThru
