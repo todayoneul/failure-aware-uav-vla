@@ -4,19 +4,26 @@ import json
 import math
 import sys
 import time
+
+def log_control(source,event):
+    with (OUT/"control-events.jsonl").open("a",encoding="utf-8") as file:
+        file.write(json.dumps({"source":source,"epoch":time.time(),**event})+"\n")
 from pathlib import Path
 import cv2
 import numpy as np
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
-from scripts.blur_demo_viewer import draw_view,read_input_pair,control_key_for_click
+from scripts.blur_demo_viewer import read_input_pair
 from src.failures.control import read_control,write_control
 from src.mission.control import mission_key,request_selection
 from src.mission.geometry import world_to_pixel
 
 OUT=ROOT/'outputs/mission_demo';WINDOW='MISSION CONTROL | Map target + AeroVLA'
-MAP_RECT=(20,214,720,405)
-MISSION_BUTTONS=[(20,140,135,40,ord('g'),'G Go To'),(170,140,135,40,ord('h'),'H Hover'),
-                 (320,140,135,40,ord('l'),'L Land (trial)'),(470,140,135,40,ord('r'),'R Reset')]
+MAP_RECT=(20,190,900,506)
+MISSION_BUTTONS=[(20,125,135,38,ord('g'),'G Go To'),(170,125,135,38,ord('h'),'H Hover'),
+                 (320,125,135,38,ord('l'),'L Land (trial)'),(470,125,135,38,ord('r'),'R Reset')]
+
+VIEW_BUTTONS=[(620,125,135,38,ord('f'),'F Full map'),(770,125,135,38,ord('c'),'C Drone')]
+BLUR_BUTTONS=[(940,125,220,38,ord('b'),'B Toggle blur')]+[(1180+i*90,125,80,38,ord(str(i+1)),label) for i,label in enumerate(('1 Low','2 Med','3 High'))]
 
 
 def map_pixel(x,y,meta):
@@ -27,66 +34,131 @@ def map_pixel(x,y,meta):
 
 def render_map(image,packet,telemetry):
     shown=image.copy();meta=packet['camera'];mission=telemetry.get('mission') or {}
-    def project(point):
-        return tuple(int(round(v)) for v in world_to_pixel(point,meta))
+    def project(point,outside=False):
+        try:pixel=world_to_pixel(point,meta)
+        except ValueError:return None
+        if not all(math.isfinite(v) for v in pixel):return None
+        if not outside and not (0<=pixel[0]<meta['width'] and 0<=pixel[1]<meta['height']):return None
+        return tuple(int(round(max(-1000000,min(1000000,v)))) for v in pixel)
     path=telemetry.get('trajectory') or []
-    if len(path)>1:
-        pts=np.array([project(point) for point in path],dtype=np.int32)
-        cv2.polylines(shown,[pts],False,(220,120,20),2,cv2.LINE_AA)
+    for previous,current in zip(path,path[1:]):
+        a,b=project(previous,True),project(current,True)
+        if a is None or b is None:continue
+        visible,start,end=cv2.clipLine((0,0,meta['width'],meta['height']),a,b)
+        if visible:cv2.line(shown,start,end,(220,120,20),2,cv2.LINE_AA)
     target=mission.get('target')
     if target:
         pixel=project(target['surface_position'])
-        cv2.drawMarker(shown,pixel,(20,60,230),cv2.MARKER_TILTED_CROSS,14,2)
-        cv2.putText(shown,'Target',(pixel[0]+10,pixel[1]-5),0,.45,(20,60,230),1,cv2.LINE_AA)
+        if pixel is not None:
+            cv2.drawMarker(shown,pixel,(20,60,230),cv2.MARKER_TILTED_CROSS,14,2)
+            cv2.putText(shown,'Target',(pixel[0]+10,pixel[1]-5),0,.45,(20,60,230),1,cv2.LINE_AA)
     state=telemetry.get('state')
     if state:
         p=state['position'];pixel=project(p)
-        q=state['orientation'];yaw=math.atan2(2*(q[3]*q[2]+q[0]*q[1]),1-2*(q[1]**2+q[2]**2))
-        end=project([p[0]+.7*math.cos(yaw),p[1]+.7*math.sin(yaw),p[2]])
-        cv2.circle(shown,pixel,5,(20,160,30),-1);cv2.arrowedLine(shown,pixel,end,(20,160,30),2,tipLength=.5)
-        cv2.putText(shown,'Drone',(pixel[0]+8,pixel[1]+15),0,.4,(20,140,30),1,cv2.LINE_AA)
+        if pixel is not None:
+            q=state['orientation'];yaw=math.atan2(2*(q[3]*q[2]+q[0]*q[1]),1-2*(q[1]**2+q[2]**2))
+            end=project([p[0]+.7*math.cos(yaw),p[1]+.7*math.sin(yaw),p[2]])
+            cv2.circle(shown,pixel,5,(20,160,30),-1)
+            if end is not None:cv2.arrowedLine(shown,pixel,end,(20,160,30),2,tipLength=.5)
+            cv2.putText(shown,'Drone',(pixel[0]+8,pixel[1]+15),0,.4,(20,140,30),1,cv2.LINE_AA)
     return shown
 
 
+def read_preview_pair(telemetry):
+    images={}
+    for name in ('front','down'):
+        filename=telemetry.get('preview_files',{}).get(name)
+        if not filename:return None
+        frame=cv2.imread(str(OUT/filename))
+        if frame is None or hashlib.sha256(frame.tobytes()).hexdigest()!=telemetry.get('preview_hashes',{}).get(name):return None
+        images[name]=frame
+    return images
+
+
 def render_canvas(telemetry,control,images):
-    canvas=draw_view(telemetry,control,images)
-    canvas[:190,:760]=(248,245,241)
+    from src.mission.grounding import target_overlay
+    import textwrap
+    canvas=np.full((1040,1480,3),(247,243,238),dtype=np.uint8)
+    ink=(65,47,30);blue=(170,98,35);purple=(150,75,115)
     mission=telemetry.get('mission') or {};status=mission.get('state','IDLE')
-    cv2.putText(canvas,'MISSION CONTROL / AeroVLA',(20,35),0,.8,(55,43,31),2,cv2.LINE_AA)
-    cv2.putText(canvas,status,(20,75),0,.85,(30,130,30) if status=='SUCCESS' else (190,100,30),2,cv2.LINE_AA)
+    def text(value,x,y,scale=.5,color=ink,thickness=1):
+        cv2.putText(canvas,str(value),(x,y),cv2.FONT_HERSHEY_SIMPLEX,scale,color,thickness,cv2.LINE_AA)
+    text('Full map / Mission control',20,35,.9,ink,2)
+    text(status,20,75,.8,(40,140,35) if status=='SUCCESS' else (45,75,200) if status=='FAILED' else blue,2)
     errors=mission.get('errors');distance=f'{errors["horizontal_m"]:.2f} m' if errors else '--'
-    distance_label='Distance '+distance
+    label='Distance '+distance
     if status in ('SUCCESS','FAILED','ABORTED') and mission.get('target') and telemetry.get('state'):
         target=mission['target']['surface_position'];position=telemetry['state']['position']
-        live=math.hypot(target[0]-position[0],target[1]-position[1])
-        distance_label=f'Final {distance} | live {live:.2f} m'
-    cv2.putText(canvas,f'{mission.get("type") or "Select target"} | {distance_label}',(20,110),0,.53,(55,43,31),1,cv2.LINE_AA)
-    target=mission.get("target")
-    if target:
-        xyz=target["surface_position"]
-        cv2.putText(canvas,f"Target NED: x={xyz[0]:.2f} y={xyz[1]:.2f} z={xyz[2]:.2f} m",(20,130),0,.43,(55,43,31),1,cv2.LINE_AA)
+        label=f'Final {distance} / live {math.hypot(target[0]-position[0],target[1]-position[1]):.2f} m'
+    text(f'{mission.get("type") or "Select a surface"} | {label}',20,105,.58)
+    text('Coordinate goal mode',940,35,.73,purple,2)
+    text('World target -> body direction -> AeroVLA prompt',940,65,.48)
+    failure=telemetry.get('failure') or {};text('Applied: '+('BLUR' if failure.get('failure_enabled') else 'NORMAL'),940,100,.6)
     caps=telemetry.get('capabilities') or {}
-    for left,top,width,height,key,label in MISSION_BUTTONS:
-        enabled=key==ord('r') or caps.get({ord('g'):'GO_TO',ord('h'):'GO_TO_AND_HOVER',ord('l'):'GO_TO_AND_LAND'}[key],False)
-        cv2.rectangle(canvas,(left,top),(left+width,top+height),(185,115,40) if enabled else (210,210,210),-1)
-        cv2.putText(canvas,label,(left+8,top+25),0,.48,(255,255,255) if enabled else (80,80,80),1,cv2.LINE_AA)
-    canvas[186:211,:760]=(248,245,241)
-    cv2.putText(canvas,'Overview / surface click | V: view | +/-: zoom',(20,204),0,.49,(55,43,31),1,cv2.LINE_AA)
-    failure=telemetry.get('failure') or {}
-    text='Failure: '+('BLUR' if failure.get('failure_enabled',False) else 'NORMAL')
-    cv2.putText(canvas,text,(780,142),0,.52,(20,110,210) if failure.get('failure_enabled',False) else (30,130,30),1,cv2.LINE_AA)
-    note=telemetry.get('control_message') or mission.get('reason') or telemetry.get('phase','Waiting for map')
-    canvas[620:640,:760]=(248,245,241)
-    cv2.putText(canvas,str(note)[:84],(20,634),0,.42,(55,43,31),1,cv2.LINE_AA)
+    for left,top,width,height,key,label in MISSION_BUTTONS+VIEW_BUTTONS+BLUR_BUTTONS:
+        enabled=key not in (ord('g'),ord('h'),ord('l')) or caps.get({ord('g'):'GO_TO',ord('h'):'GO_TO_AND_HOVER',ord('l'):'GO_TO_AND_LAND'}[key],False)
+        cv2.rectangle(canvas,(left,top),(left+width,top+height),blue if enabled else (205,205,205),-1)
+        text(label,left+8,top+25,.45,(255,255,255))
+    text('Map click | F: full map | C: drone | WASD: pan | +/-: zoom | V: view',20,182,.47)
+    if images.get('chase') is not None:
+        left,top,width,height=MAP_RECT;canvas[top:top+height,left:left+width]=cv2.resize(images['chase'],(width,height))
+    else:text('Reading scene geometry...',30,240,.7)
+    cv2.line(canvas,(938,165),(938,696),(205,195,185),1)
+    report=telemetry.get('decision_grounding') or telemetry.get('grounding_preview')
+    text('Target representation',960,184,.67,ink,2)
+    if report:
+        text(report.get('prompt_scope','preview')+f' / step {telemetry.get("input_step",0)}',960,212,.44,purple)
+        fmt=lambda p:' / '.join(f'{v:+.2f}' for v in p)
+        rows=[('World surface XYZ',fmt(report['world_surface'])),('Navigation goal XYZ',fmt(report['navigation_goal'])),
+              ('Goal relative world XYZ',fmt(report['relative_world'])),('Goal relative body XYZ',fmt(report['relative_body']))]
+        y=242
+        for heading,value in rows:
+            text(heading,960,y,.42);text(value,960,y+21,.56);y+=52
+        text(f'Horizontal distance: {report["horizontal_distance"]:.2f} m',960,454,.55)
+        text(f'Bearing {report["bearing_deg"]:+.1f} deg | body {report["body_bearing_deg"]:+.1f} deg',960,480,.51)
+        text('VLA direction hint',960,510,.47,purple)
+        text(report['semantic_direction'] or '(at goal)',960,539,.76,purple,2)
+        text('XYZ tokens / distance / Overview / red X: NO',960,566,.44)
+        text('Actual prompt' if report.get('prompt_scope')=='actual model input' else 'Preview prompt',960,597,.48)
+        prompt=report['prompt'].replace('<image>','').replace('\n',' ').strip()
+        for i,line in enumerate(textwrap.wrap(prompt,68)):text(line,960,620+i*22,.44)
+    else:
+        text('Click a flat surface to inspect its target.',960,242,.53)
+        text('Exact coordinates stay in the evaluator.',960,274,.48)
+    note=telemetry.get('control_message') or mission.get('reason') or telemetry.get('phase','Waiting')
+    text(str(note)[:108],20,716,.47)
+    visibility=images.get('visibility') or {}
+    scope=images.get('camera_scope','model input')
+    for name,left in (('front',20),('down',310)):
+        item=visibility.get(name) or {};text(f'{name.title()} / {item.get("status","--")}',left,743,.5)
+        frame=images.get(name)
+        if frame is not None:canvas[754:1010,left:left+256]=target_overlay(frame,item)
+        else:cv2.rectangle(canvas,(left,754),(left+256,1010),(215,215,215),-1)
+    inference=telemetry.get('inference') or {};action=inference.get('parsed_action') or {};command=telemetry.get('clipped_action') or {}
+    text('Last model output',610,748,.57);text('Decoded action',900,748,.57);text('Bounded command',1190,748,.57)
+    raw=inference.get('raw_output','Waiting...').split('Action:')[-1].strip()
+    for i,line in enumerate(textwrap.wrap(raw[:150],35)):text(line,610,780+i*23,.53)
+    if action:
+        for i,line in enumerate([f'Forward {action["fwd"]:.3f} m',f'Down {action["down"]:.3f} m',f'Yaw {math.degrees(action["yaw"]):.1f} deg']):text(line,900,780+i*26,.55)
+    if command:
+        d=command['displacement_ned']
+        for i,line in enumerate([f'Forward {math.hypot(*d[:2]):.3f} m',f'Down {d[2]:.3f} m',f'Yaw {math.degrees(command["yaw_delta_rad"]):.1f} deg']):text(line,1190,780+i*26,.55)
+    state=telemetry.get('state') or {}
+    if state:text('Last pose XYZ: '+' / '.join(f'{v:+.2f}' for v in state['position']),610,894,.5)
+    text('Front / Down: '+scope,610,929,.47)
+    text('Point visibility uses capture pose + depth; crosshair is a display copy.',610,956,.44)
+    text('Actual input: '+('VERIFIED' if telemetry.get('input_verified') else 'not inferred yet'),610,985,.5)
+    text('G/H/L mission | R reset | B blur | 1/2/3 severity | Q/Esc abort and land',20,1030,.46)
     return canvas
 
 
 def main():
     control=read_control(OUT/'control.json');telemetry={};packet=None;map_image=None;images={};saved=set();last_export=0
-    cv2.namedWindow(WINDOW,cv2.WINDOW_NORMAL);cv2.resizeWindow(WINDOW,1064,912);cv2.moveWindow(WINDOW,20,20)
+    cv2.namedWindow(WINDOW,cv2.WINDOW_NORMAL);cv2.resizeWindow(WINDOW,1332,936);cv2.moveWindow(WINDOW,20,20)
     def send(key):
         nonlocal control
         control=mission_key(read_control(OUT/'control.json'),key);write_control(OUT/'control.json',control)
+        log_control('mission viewer key/button',{'key':key,'request_id':control.get('mission_request_id')})
     def mouse(event,x,y,*_):
         nonlocal control
         if event!=cv2.EVENT_LBUTTONDOWN:return
@@ -94,11 +166,10 @@ def main():
             pixel=map_pixel(x,y,packet['camera'])
             if pixel is not None:
                 control=request_selection(read_control(OUT/'control.json'),packet['frame_id'],pixel)
-                write_control(OUT/'control.json',control);return
-        for left,top,width,height,key,_ in MISSION_BUTTONS:
+                write_control(OUT/'control.json',control)
+                log_control('mission viewer map click',{'frame_id':packet['frame_id'],'pixel':pixel,'request_id':control.get('mission_request_id')});return
+        for left,top,width,height,key,_ in MISSION_BUTTONS+VIEW_BUTTONS+BLUR_BUTTONS:
             if left<=x<left+width and top<=y<top+height:send(key);return
-        key=control_key_for_click(x,y)
-        if key!=-1:send(key)
     cv2.setMouseCallback(WINDOW,mouse)
     try:
         while not control['quit']:
@@ -109,8 +180,11 @@ def main():
                 if image is not None and hashlib.sha256(image.tobytes()).hexdigest()==latest['image_sha256']:
                     map_image,packet=image,latest
             except (OSError,ValueError):pass
-            pair=read_input_pair(OUT,telemetry)
+            preview=(telemetry.get('mission') or {}).get('state') in ('IDLE','TARGET_SELECTED')
+            pair=read_preview_pair(telemetry) if preview else read_input_pair(OUT,telemetry)
             images.update(pair or {'front':None,'down':None})
+            images['camera_scope']='preview (not model input)' if preview else f'model input step {telemetry.get("input_step",0)}'
+            images['visibility']=(telemetry.get('preview_visibility') if preview else telemetry.get('target_visibility') if telemetry.get('visibility_step')==telemetry.get('input_step') else None) or {}
             if map_image is not None:images['chase']=render_map(map_image,packet,telemetry)
             canvas=render_canvas(telemetry,control,images)
             cv2.imshow(WINDOW,canvas)

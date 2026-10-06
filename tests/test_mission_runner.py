@@ -50,7 +50,7 @@ class FakeDrone:
 
 
 class MissionRunnerFailureTests(unittest.IsolatedAsyncioTestCase):
-    async def run_fake(self,drone,directory):
+    async def run_fake(self,drone,directory,invalid_action=False,guard_stop=False):
         from src.mission import runner
         root=Path(directory);(root/'configs').mkdir()
         (root/'configs/mission_limits.json').write_text(json.dumps({'max_duration':300}))
@@ -65,8 +65,16 @@ class MissionRunnerFailureTests(unittest.IsolatedAsyncioTestCase):
         overview=Mock();overview.select.return_value=([2,0,-2.5],'captured depth frame 42')
         overview.capture.return_value=(frame,{})
         action={'fwd':.5,'down':0,'yaw':0,'stop':False,'bins':[10,49,49],'output':'10 49 49'}
-        model=Mock();model.infer.return_value={'parsed_action':action,'parse_error':None}
+        model=Mock();model.infer.return_value={'parsed_action':action,'parse_error':None,
+            'prompt':'<image>\nFly straight ahead and find the target. Find the selected target location.\nAction: '}
+        if invalid_action:model.infer.return_value.update(parsed_action=None,parse_error='invalid model action')
         async def execute(*_):drone.commanded=True;return {'move':True,'hover':True}
+        async def guarded(*args,**kwargs):
+            if guard_stop:
+                args[1].fail('collision');drone.commanded=True;drone.connection_loss=True;drone.post_command_reads=1
+                return None
+            from src.mission.flight import guarded_execute
+            return await guarded_execute(*args,**kwargs)
         with patch.object(runner,'ROOT',root),patch.object(runner,'OUT',output), \
              patch.object(runner,'BlurDemoSession',return_value=session), \
              patch.object(runner,'ProjectAirSimClient'),patch.object(runner,'World'), \
@@ -75,12 +83,32 @@ class MissionRunnerFailureTests(unittest.IsolatedAsyncioTestCase):
              patch.object(runner,'prepare_mission_config',return_value=root), \
              patch.object(runner,'publish_image'),patch.object(runner.cv2,'imread',return_value=frame), \
              patch.object(runner,'unpack_image',return_value=frame), \
+             patch.object(runner,'guarded_execute',side_effect=guarded), \
+             patch.object(runner,'matched_camera_images',return_value=(frame,np.ones((256,256))*2,
+                {'width':256,'height':256,'fov_deg':90,'position':[0,0,-4],'orientation':[0,0,0,1],'time_stamp':10})), \
              patch.dict(sys.modules,{'src.integration.aerovla_int4_loader':SimpleNamespace(AeroVLAInt4=lambda *_:model)}), \
              patch('src.mission.flight.execute_action',side_effect=execute), \
              patch('src.mission.flight.asyncio.sleep',new=AsyncMock()),patch('builtins.print'):
             with self.assertRaises(SystemExit):
                 await runner.main(argparse.Namespace(steps=4,host='fake'))
         return json.loads((output/'mission-results.json').read_text())
+
+    async def test_invalid_model_decision_keeps_grounding_and_visibility_evidence(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result=await self.run_fake(FakeDrone(),directory,invalid_action=True)
+            events=[json.loads(line) for line in (Path(directory)/'outputs/mission-decisions.jsonl').read_text().splitlines()]
+        mission=result['missions'][0]
+        self.assertEqual(mission['vla_steps'],1);self.assertEqual(mission['executed_steps'],0)
+        self.assertIn('grounding',events[-1]);self.assertIn('target_visibility',events[-1])
+        self.assertEqual(events[-1]['decision_status'],'INVALID_ACTION')
+
+    async def test_guard_stopped_decision_is_logged_without_a_navigation_step(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result=await self.run_fake(FakeDrone(),directory,guard_stop=True)
+            events=[json.loads(line) for line in (Path(directory)/'outputs/mission-decisions.jsonl').read_text().splitlines()]
+        mission=result['missions'][0]
+        self.assertEqual(mission['vla_steps'],1);self.assertEqual(mission['executed_steps'],0)
+        self.assertEqual(events[-1]['decision_status'],'SKIPPED_FAILED')
 
     async def test_partial_takeoff_failure_lands_before_disarming(self):
         drone=FakeDrone(hover_failure=True)

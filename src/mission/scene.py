@@ -10,27 +10,32 @@ from projectairsim.types import BoxAlignment,Pose
 from projectairsim.utils import unpack_image
 from src.integration.blur_demo_support import publish_json,publish_image
 from .geometry import mission_robot_config,relative_camera_pose,camera_metadata,select_surface
+from .bounds import scene_bounds,fit_camera
 
 
 class OverviewScene:
     def __init__(self,world,drone,output):
         self.world,self.drone,self.output=world,drone,Path(output)
-        self.bounds=world.get_3d_bounding_box('TemplateCube_Rounded_1',BoxAlignment.WORLD_AXIS)
-        self.pose=dict(world.get_object_pose('TemplateCube_Rounded_1'))
-        c,s=self.bounds['center'],self.bounds['size']
-        self.anchor=[c['x'],c['y'],c['z']-s['z']/2]
+        records=[]
+        for name in world.list_objects('.*'):
+            record={'name':name}
+            try:
+                record.update(bbox=world.get_3d_bounding_box(name,BoxAlignment.WORLD_AXIS),pose=dict(world.get_object_pose(name)))
+            except Exception as error:record['error']=str(error)
+            records.append(record)
+        self.region=scene_bounds(records)
         self.frames=OrderedDict();self.counter=0
-        publish_json(self.output/'scene-geometry.json',{'object':'TemplateCube_Rounded_1','pose':self.pose,'bounds':self.bounds})
+        publish_json(self.output/'scene-geometry.json',{'bounds':self.region,'objects':records})
 
-    def capture(self,state,view='top',height=50):
-        height=max(18,min(65,float(height)))
-        if view=='top':
-            position=[self.anchor[0],self.anchor[1],self.anchor[2]-height];rpy=[0,-90,0]
-        else:
-            position=[self.anchor[0]-height*.7,self.anchor[1]+height*.7,self.anchor[2]-height]
-            delta=np.subtract(self.anchor,position)
-            rpy=[0,-np.degrees(np.arctan2(delta[2],np.linalg.norm(delta[:2]))),np.degrees(np.arctan2(delta[1],delta[0]))]
-        if not self.drone.set_camera_pose('Overview',Pose(relative_camera_pose(position,rpy,state))):
+    def capture(self,state,view='top',zoom=1.,pan=(0,0),focus='map'):
+        region=self.region
+        if focus=='drone':
+            center=(np.asarray(region['minimum'])+region['maximum'])/2
+            shift=np.array([state['position'][0]-center[0],state['position'][1]-center[1],0])
+            region={**region,'minimum':(np.asarray(region['minimum'])+shift).tolist(),
+                    'maximum':(np.asarray(region['maximum'])+shift).tolist()}
+        rig=fit_camera(region,view,max(.5,min(12,float(zoom))),pan)
+        if not self.drone.set_camera_pose('Overview',Pose(relative_camera_pose(rig['position'],rig['rpy'],state))):
             raise RuntimeError('Overview pose update failed')
         messages=self.drone.get_images('Overview',[0,1])
         rgb,depth=messages[0],messages[1]
@@ -41,7 +46,7 @@ class OverviewScene:
         self.counter+=1
         meta=camera_metadata(rgb)
         packet={'frame_id':self.counter,'camera':meta,'view':view,'image_file':f'overview_{self.counter%2}.png',
-                'image_sha256':hashlib.sha256(image.tobytes()).hexdigest()}
+                'image_sha256':hashlib.sha256(image.tobytes()).hexdigest(),'bounds':self.region,'rig':rig}
         self.frames[self.counter]=(values.copy(),meta)
         while len(self.frames)>4:self.frames.popitem(last=False)
         publish_image(self.output/packet['image_file'],image)
@@ -52,6 +57,8 @@ class OverviewScene:
         if frame_id not in self.frames:raise ValueError('Map refreshed; select on the current frame again')
         depth,meta=self.frames[frame_id]
         point=select_surface(pixel,depth,meta)
+        if hasattr(self,'region') and any(not self.region['minimum'][i]-5<=point[i]<=self.region['maximum'][i]+5 for i in (0,1)):
+            raise ValueError('Point is outside the bounded Blocks geometry area (+5m margin)')
         return point, f'Overview depth-planar frame {frame_id}, pixel {tuple(pixel)}'
 
 

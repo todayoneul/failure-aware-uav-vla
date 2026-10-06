@@ -19,13 +19,17 @@ def parse_action(text):
             'stop':fwd<.01 and abs(down)<.01 and abs(yaw)<.01,
             'bins':bins,'output':output}
 
-def convert_action(action, state, ground_z):
+def convert_action(action, state, ground_z, limits=None):
+    limits=limits or {'minimum_clearance_m':.8,'maximum_clearance_m':4.}
+    minimum,maximum=limits['minimum_clearance_m'],limits['maximum_clearance_m']
+    if not all(math.isfinite(v) for v in (minimum,maximum)) or not 0<minimum<maximum:
+        raise ValueError('Invalid clearance limits')
     if not all(math.isfinite(action[k]) for k in ('fwd','down','yaw')):
         raise ValueError('Non-finite model action')
     if not math.isfinite(ground_z) or not all(math.isfinite(v) for v in state['position']):
         raise ValueError('Non-finite vehicle state')
     clearance=ground_z-state['position'][2]
-    if not .78 <= clearance <= 4.02:
+    if not minimum-.02 <= clearance <= maximum+.02:
         raise ValueError(f'Vehicle outside altitude envelope: clearance={clearance}')
     yaw = float(Rotation.from_quat(state['orientation']).as_euler('xyz')[2])
     delta = max(-math.radians(15), min(math.radians(15), action['yaw']))
@@ -34,7 +38,7 @@ def convert_action(action, state, ground_z):
     down = max(-.3, min(.3, action['down']))
     z = state['position'][2]
     # Clearance relative to the initial resting platform (not terrain-ray AGL).
-    target_z = max(ground_z-4., min(ground_z-.8, z+down))
+    target_z = max(ground_z-maximum, min(ground_z-minimum, z+down))
     displacement = [fwd*math.cos(heading), fwd*math.sin(heading), target_z-z]
     if action['stop']:
         displacement=[0.,0.,0.]
@@ -43,7 +47,7 @@ def convert_action(action, state, ground_z):
     return {'stop':action['stop'], 'yaw_delta_rad':delta,'target_yaw_rad':heading,
             'duration_sec':1.,'displacement_ned':displacement,
             'velocity_ned_mps':displacement.copy(), 'target_z':target_z,
-            'ground_reference_z':ground_z, 'clearance_limits_m':[.8,4.]}
+            'ground_reference_z':ground_z, 'clearance_limits_m':[minimum,maximum]}
 
 async def execute_action(drone, command):
     if command['stop']:

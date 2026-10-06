@@ -5,10 +5,17 @@ import math
 from src.integration.projectairsim_action_adapter import execute_action
 
 
-async def guarded_execute(drone,manager,state,ground_z,events,flight_stamp,command,now=None):
+def validate_navigation_start(state,ground_z,limits):
+    clearance=ground_z-state['position'][2]
+    if not math.isfinite(clearance) or not limits['minimum_clearance_m']-.02<=clearance<=limits['maximum_clearance_m']+.02:
+        raise ValueError('Current altitude is outside flight limits; Q ends this session before a fresh launch')
+
+
+async def guarded_execute(drone,manager,state,ground_z,events,flight_stamp,command,now=None,limits=None):
     """Recheck conditions after inference, immediately before the next motion RPC."""
     if any(event.get('time_stamp',0)>flight_stamp for event in events):manager.fail('collision')
-    if not .75<=ground_z-state['position'][2]<=4.05:manager.fail('extreme_altitude')
+    limits=limits or {'minimum_clearance_m':.8,'maximum_clearance_m':4.}
+    if not limits['minimum_clearance_m']-.05<=ground_z-state['position'][2]<=limits['maximum_clearance_m']+.05:manager.fail('extreme_altitude')
     manager.observe(state,now=now)
     if manager.status!='NAVIGATING':return None
     return await asyncio.wait_for(execute_action(drone,command),timeout=20)

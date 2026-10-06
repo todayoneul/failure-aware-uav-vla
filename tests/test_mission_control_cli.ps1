@@ -7,7 +7,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Mission initialization failed' }
     $taskControl=Get-Content -LiteralPath (Join-Path $taskTemp 'control.json') -Raw | ConvertFrom-Json
     $taskStatus=Get-Content -LiteralPath (Join-Path $taskTemp 'telemetry.json') -Raw | ConvertFrom-Json
-    if ($taskControl.enabled -ne $false -or $taskControl.mission_requests.Count -ne 0 -or $taskControl.overview_view -ne 'elevated') { throw 'Wrong mission control defaults' }
+    if ($taskControl.enabled -ne $false -or $taskControl.mission_requests.Count -ne 0 -or $taskControl.overview_view -ne 'top' -or $taskControl.overview_zoom -ne 1) { throw 'Wrong mission control defaults' }
     if ($taskStatus.mission.state -ne 'IDLE' -or $taskStatus.max_steps -ne 4) { throw 'Wrong mission telemetry defaults' }
     foreach ($taskName in @('run_mission_demo.ps1','run_blur_demo.ps1')) {
         $taskTokens=$taskErrors=$null

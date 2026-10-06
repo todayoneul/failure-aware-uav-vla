@@ -31,8 +31,12 @@ class MissionGeometryTests(unittest.TestCase):
         saved = copy.deepcopy(base)
         changed = mission_robot_config(base)
         self.assertEqual(base,saved)
-        self.assertEqual([s for s in changed['sensors'] if s['id'] in ('FrontCamera','DownCamera')],
-                         [s for s in base['sensors'] if s['id'] in ('FrontCamera','DownCamera')])
+        for original in (s for s in base['sensors'] if s['id'] in ('FrontCamera','DownCamera')):
+            debug=next(s for s in changed['sensors'] if s['id']==original['id'])
+            self.assertEqual(debug['capture-settings'][0],original['capture-settings'][0])
+            self.assertEqual({k:v for k,v in debug.items() if k!='capture-settings'},
+                             {k:v for k,v in original.items() if k!='capture-settings'})
+            self.assertEqual(debug['capture-settings'][1]['image-type'],1)
         for key in base:
             if key!='sensors': self.assertEqual(base[key],changed[key])
         self.assertEqual(sum(s['id']=='Overview' for s in changed['sensors']),1)
@@ -130,15 +134,16 @@ class MissionManagerTests(unittest.TestCase):
 
 class MissionControlTests(unittest.TestCase):
     def test_map_mouse_coordinates_use_original_rgb_resolution(self):
-        from scripts.mission_viewer import map_pixel,render_canvas
+        from scripts.mission_viewer import map_pixel,render_canvas,MAP_RECT
         meta={'width':640,'height':360}
-        self.assertEqual(map_pixel(380,416,meta),[320,179])
-        self.assertIsNone(map_pixel(19,416,meta))
+        left,top,width,height=MAP_RECT
+        self.assertEqual(map_pixel(left+width//2,top+height//2,meta),[320,180])
+        self.assertIsNone(map_pixel(left-1,top+height//2,meta))
         telemetry={'mission':{'state':'TARGET_SELECTED','type':None,'errors':None,
                              'target':{'surface_position':[1,2,-2.5]}},'phase':'Select target'}
         from src.mission.control import default_mission_control
         canvas=render_canvas(telemetry,default_mission_control(),{})
-        self.assertEqual(canvas.shape,(960,1120,3))
+        self.assertEqual(canvas.shape,(1040,1480,3))
 
     def test_click_then_start_before_poll_preserves_both_requests(self):
         from src.mission.control import default_mission_control,request_selection,mission_key,pending_requests

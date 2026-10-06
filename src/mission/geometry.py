@@ -23,7 +23,7 @@ def intrinsics(meta):
 
 def pixel_to_world(pixel, depth, meta):
     u,v=pixel
-    if not 0<=u<meta['width'] or not 0<=v<meta['height'] or not math.isfinite(depth) or not 0<depth<100:
+    if not 0<=u<meta['width'] or not 0<=v<meta['height'] or not math.isfinite(depth) or not 0<depth<65000:
         raise ValueError('Pixel/depth is outside the valid scene capture')
     focal,cx,cy=intrinsics(meta)
     # Camera x is optical forward; y is image right and z image down.
@@ -65,6 +65,10 @@ def mission_robot_config(base):
     from scripts.demo_view_config import build_demo_robot
     robot=build_demo_robot(base)
     for s in robot['sensors']:
+        if s['id'] in ('FrontCamera','DownCamera'):
+            # Append debug-only planar depth; original RGB/settings/pose are untouched.
+            s['capture-settings'].append(dict(s['capture-settings'][0],
+                **{'image-type':1,'pixels-as-float':True,'streaming-enabled':False}))
         if s['id']=='Chase':
             s['capture-settings'][0].update(width=640,height=360)
     overview=copy.deepcopy(next(s for s in base['sensors'] if s['id']=='DownCamera'))

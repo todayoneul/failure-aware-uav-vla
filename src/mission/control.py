@@ -5,7 +5,7 @@ from src.failures.control import default_control, apply_key
 
 def default_mission_control():
     return {**default_control(),'mission_request_id':0,'mission_request':None,'mission_requests':[],
-            'overview_view':'elevated','overview_height':50}
+            'overview_view':'top','overview_zoom':1.,'overview_pan':[0,0],'overview_focus':'map'}
 
 
 def enqueue(state,request):
@@ -27,7 +27,17 @@ def request_selection(state, frame_id, pixel):
 def mission_key(state,key):
     if key in (ord('+'),ord('='),ord('-')):
         result=copy.deepcopy(state)
-        result['overview_height']=max(18,min(65,state.get('overview_height',50)+(-5 if key!=ord('-') else 5)))
+        result['overview_zoom']=max(.5,min(12,state.get('overview_zoom',1.)*(1.25 if key!=ord('-') else .8)))
+        return result
+    if key in (ord('f'),ord('F'),ord('c'),ord('C')):
+        result=copy.deepcopy(state)
+        result.update(overview_pan=[0,0],overview_view='top',overview_zoom=1. if chr(key).lower()=='f' else 8.,
+                      overview_focus='map' if chr(key).lower()=='f' else 'drone')
+        return result
+    if key>=0 and chr(key).lower() in 'wasd':
+        result=copy.deepcopy(state);pan=list(state.get('overview_pan',[0,0]))
+        axis,change={'w':(0,1),'s':(0,-1),'a':(1,-1),'d':(1,1)}[chr(key).lower()]
+        pan[axis]+=change;result['overview_pan']=pan
         return result
     if key in (ord('g'),ord('G'),ord('h'),ord('H'),ord('l'),ord('L'),ord('r'),ord('R')):
         action='reset' if chr(key).lower()=='r' else 'start'
