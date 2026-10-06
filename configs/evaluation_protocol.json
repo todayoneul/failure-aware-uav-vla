@@ -1,0 +1,57 @@
+{
+  "description": "AeroVLA NF4 on Project AirSim Blocks. The policy flies at full action scale and ends each episode itself.",
+  "success_radii_m": [20.0, 10.0, 5.0],
+  "starts": {
+    "spawn": {"xyz": [-1.0, 8.0, -4.0], "yaw_deg": -45.0, "note": "repository default, on the start platform"},
+    "facing": {"xyz": [55.0, 0.0, -3.0], "yaw_deg": 0.0, "note": "open ground; cone forward-left, colored wall ahead, ball forward-right"},
+    "facing_cone": {"xyz": [55.0, 0.0, -3.0], "yaw_deg": -44.2, "note": "same place, heading straight at the blue cone"},
+    "facing_ball": {"xyz": [55.0, 0.0, -3.0], "yaw_deg": 41.6, "note": "same place, heading straight at the orange ball"}
+  },
+  "targets": {
+    "near": {"position": [0.443, 6.557, -2.517], "note": "2026-10-06 Near click"},
+    "medium": {"position": [5.260, 0.857, -2.577], "note": "2026-10-06 Medium click"},
+    "far": {"position": [-0.054, -59.971, -1.077], "note": "2026-10-06 Far click"},
+    "blue_cone": {"landmark": "blue_cone"},
+    "orange_ball": {"landmark": "orange_ball"},
+    "colored_wall": {"landmark": "colored_wall"}
+  },
+  "trials": [
+    {"id": "H-near", "group": "harness", "start": "spawn", "target": "near", "prompt": "hint+generic", "max_steps": 30},
+    {"id": "H-medium", "group": "harness", "start": "spawn", "target": "medium", "prompt": "hint+generic", "max_steps": 30},
+    {"id": "H-far", "group": "harness", "start": "spawn", "target": "far", "prompt": "hint+generic", "max_steps": 40},
+
+    {"id": "A-cone-generic", "group": "prompt", "start": "facing", "target": "blue_cone", "prompt": "hint+generic", "max_steps": 30},
+    {"id": "A-wall-generic", "group": "prompt", "start": "facing", "target": "colored_wall", "prompt": "hint+generic", "max_steps": 30},
+    {"id": "A-ball-generic", "group": "prompt", "start": "facing", "target": "orange_ball", "prompt": "hint+generic", "max_steps": 30},
+    {"id": "A-cone-landmark", "group": "prompt", "start": "facing", "target": "blue_cone", "prompt": "hint+landmark", "max_steps": 30},
+    {"id": "A-wall-landmark", "group": "prompt", "start": "facing", "target": "colored_wall", "prompt": "hint+landmark", "max_steps": 30},
+    {"id": "A-ball-landmark", "group": "prompt", "start": "facing", "target": "orange_ball", "prompt": "hint+landmark", "max_steps": 30},
+    {"id": "A-cone-visual", "group": "prompt", "start": "facing", "target": "blue_cone", "prompt": "landmark-only", "max_steps": 30},
+    {"id": "A-wall-visual", "group": "prompt", "start": "facing", "target": "colored_wall", "prompt": "landmark-only", "max_steps": 30},
+    {"id": "A-ball-visual", "group": "prompt", "start": "facing", "target": "orange_ball", "prompt": "landmark-only", "max_steps": 30},
+
+    {"id": "C-say-ball-hint-cone", "group": "conflict", "start": "facing", "target": "orange_ball", "hint_target": "blue_cone", "prompt": "hint+landmark", "max_steps": 30},
+    {"id": "C-say-cone-hint-ball", "group": "conflict", "start": "facing", "target": "blue_cone", "hint_target": "orange_ball", "prompt": "hint+landmark", "max_steps": 30},
+
+    {"id": "F-cone-landmark", "group": "far", "start": "spawn", "target": "blue_cone", "prompt": "hint+landmark", "max_steps": 45},
+    {"id": "F-ball-landmark", "group": "far", "start": "spawn", "target": "orange_ball", "prompt": "hint+landmark", "max_steps": 45},
+
+    {"id": "E-cone-landmark-high", "group": "altitude", "start": "facing", "target": "blue_cone", "prompt": "hint+landmark", "max_steps": 30, "start_clearance_m": 10.0},
+    {"id": "E-ball-landmark-high", "group": "altitude", "start": "facing", "target": "orange_ball", "prompt": "hint+landmark", "max_steps": 30, "start_clearance_m": 10.0},
+    {"id": "E-cone-visual-high", "group": "altitude", "start": "facing", "target": "blue_cone", "prompt": "landmark-only", "max_steps": 30, "start_clearance_m": 10.0},
+
+    {"id": "R-cone-landmark-repeat", "group": "repeat", "start": "facing", "target": "blue_cone", "prompt": "hint+landmark", "max_steps": 30},
+    {"id": "R-ball-landmark-repeat", "group": "repeat", "start": "facing", "target": "orange_ball", "prompt": "hint+landmark", "max_steps": 30},
+
+    {"id": "S-cone-aligned-landmark", "group": "aligned", "start": "facing_cone", "target": "blue_cone", "prompt": "hint+landmark", "max_steps": 30},
+    {"id": "S-ball-aligned-landmark", "group": "aligned", "start": "facing_ball", "target": "orange_ball", "prompt": "hint+landmark", "max_steps": 30},
+    {"id": "S-cone-aligned-visual", "group": "aligned", "start": "facing_cone", "target": "blue_cone", "prompt": "landmark-only", "max_steps": 30},
+    {"id": "S-ball-aligned-visual", "group": "aligned", "start": "facing_ball", "target": "orange_ball", "prompt": "landmark-only", "max_steps": 30},
+    {"id": "S-cone-aligned-landmark-high", "group": "aligned", "start": "facing_cone", "target": "blue_cone", "prompt": "hint+landmark", "max_steps": 30, "start_clearance_m": 10.0},
+    {"id": "S-ball-aligned-landmark-high", "group": "aligned", "start": "facing_ball", "target": "orange_ball", "prompt": "hint+landmark", "max_steps": 30, "start_clearance_m": 10.0},
+
+    {"id": "X-cone-ahead-hint", "group": "fixed_hint", "start": "facing", "target": "blue_cone", "prompt": "hint+landmark", "hint_mode": "ahead", "max_steps": 30},
+    {"id": "X-wall-ahead-hint", "group": "fixed_hint", "start": "facing", "target": "colored_wall", "prompt": "hint+landmark", "hint_mode": "ahead", "max_steps": 30},
+    {"id": "X-ball-ahead-hint", "group": "fixed_hint", "start": "facing", "target": "orange_ball", "prompt": "hint+landmark", "hint_mode": "ahead", "max_steps": 30}
+  ]
+}
