@@ -1,4 +1,4 @@
-param([ValidateSet('baseline','teacher','oft')][string]$Policy='baseline',[string]$Checkpoint='',[string[]]$Cases=@('A','B','C'),[string[]]$Targets=@('blue_cone','orange_ball'),[ValidateRange(1,200)][int]$Episodes=2,[int]$SeedStart=0,[string]$Output='outputs/visual_search/run',[string]$Record='',[switch]$Resume,[switch]$Live,[string]$Distro='Ubuntu',[switch]$ShowSimulator,[string]$Plan='',[string]$Set='',[string[]]$Only=@(),[int]$Skip=0,[int]$Limit=0,[string]$Layout='',[string]$Strategy='',[ValidateSet('step','continuous')][string]$Flight='step',[string]$ModelName='',[int]$TopicsPort=8989,[int]$ServicesPort=8990)
+param([ValidateSet('baseline','teacher','oft')][string]$Policy='baseline',[string]$Checkpoint='',[string[]]$Cases=@('A','B','C'),[string[]]$Targets=@('blue_cone','orange_ball'),[ValidateRange(1,200)][int]$Episodes=2,[int]$SeedStart=0,[string]$Output='outputs/visual_search/run',[string]$Record='',[switch]$Resume,[switch]$Live,[string]$Distro='Ubuntu',[switch]$ShowSimulator,[string]$Plan='',[string]$Set='',[string[]]$Only=@(),[int]$Skip=0,[int]$Limit=0,[string]$Layout='',[string]$Strategy='',[ValidateSet('step','continuous')][string]$Flight='step',[string]$ModelName='',[int]$TopicsPort=8989,[int]$ServicesPort=8990,[switch]$PilotVerbs)
 $ErrorActionPreference='Stop'
 # `powershell -File` hands a comma list over as one string.
 $Cases=@($Cases | ForEach-Object { $_ -split ',' } | Where-Object { $_ })
@@ -11,6 +11,9 @@ $taskExe=Join-Path $taskRoot 'assets/projectairsim-blocks-1.0.1/Blocks/Binaries/
 if (-not (Test-Path -LiteralPath $taskExe)) { throw 'Prepared Blocks required; see docs/setup.md' }
 if (-not (Test-Path -LiteralPath (Join-Path $taskRoot 'outputs/integration/model-downloads.json'))) { throw 'Local model manifest required; see docs/setup.md. This launcher never downloads models.' }
 if ($Policy -eq 'oft' -and -not $Checkpoint) { throw 'AeroVLA-OFT needs -Checkpoint <directory>' }
+# A simulator that was just closed by a previous run needs a moment to release its ports.
+$taskPortDeadline=(Get-Date).AddSeconds(30)
+while ((Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | Where-Object LocalPort -in $TopicsPort,$ServicesPort) -and (Get-Date) -lt $taskPortDeadline) { Start-Sleep -Milliseconds 500 }
 if (Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | Where-Object LocalPort -in $TopicsPort,$ServicesPort) { throw 'Close the existing simulator/client first.' }
 $taskWslRoot=(& wsl -d $Distro --exec wslpath -u $taskRoot.Replace('\','/')).Trim()
 $taskWslHome=(& wsl -d $Distro --exec printenv HOME).Trim()
@@ -42,6 +45,7 @@ try {
         if ($Limit) { $taskArgs+='--limit'; $taskArgs+="$Limit" }
         if ($Layout) { $taskArgs+='--layout'; $taskArgs+=$Layout }
         if ($Strategy) { $taskArgs+='--strategy'; $taskArgs+=$Strategy }
+        if ($PilotVerbs) { $taskArgs+='--pilot-verbs' }
     } else {
         $taskArgs+='--cases'; $taskArgs+=$Cases
         $taskArgs+='--targets'; $taskArgs+=$Targets
@@ -60,6 +64,6 @@ try {
 } finally {
     if ($taskSim) {
         $taskRemaining=Get-Process -Id $taskSim.Id -ErrorAction SilentlyContinue
-        if ($taskRemaining -and $taskRemaining.Path -eq $taskExe) { Stop-Process -Id $taskSim.Id }
+        if ($taskRemaining -and $taskRemaining.Path -eq $taskExe) { Stop-Process -Id $taskSim.Id; $null=$taskRemaining.WaitForExit(15000) }
     }
 }

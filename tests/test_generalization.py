@@ -319,6 +319,23 @@ class TrainingGuardTests(unittest.TestCase):
         self.assertLessEqual(ActionHead(32,16,2,4,bounded=True)(states).abs().max().item(),1.)
         self.assertGreater(ActionHead(32,16,2,4)(states).abs().max().item(),1.)
 
+    def test_plan_episodes_can_be_filtered_moved_to_another_layout_and_reworded_for_the_pilot(self):
+        from scripts.visual_search import planned_episodes
+        def options(**changes):
+            base=dict(plan=str(TEST_FILE),set='G1',only=None,strategy=None,layout=None,pilot_verbs=False,skip=0,limit=0);base.update(changes)
+            return types.SimpleNamespace(**base)
+        everything=planned_episodes(options(),CONFIG);self.assertEqual(len(everything),32)
+        self.assertEqual(len(planned_episodes(options(only=['blue_cone','orange_ball']),CONFIG)),16)
+        self.assertEqual([e['id'] for e in planned_episodes(options(skip=4,limit=3),CONFIG)],[e['id'] for e in everything[4:7]])
+        moved=planned_episodes(options(layout='pilot',pilot_verbs=True,only=['blue_cone']),CONFIG)
+        self.assertTrue(all(e['layout']=='pilot' and e['planned_layout'] in ('a','b') for e in moved))
+        for episode in moved:
+            verb='Approach' if episode['kind'] in ('visible','peripheral') else 'Find'
+            self.assertEqual(episode['instruction'],f'{verb} the blue cone.')
+        # The start state itself is never changed by these options.
+        self.assertEqual([e['start_xy'] for e in moved],[e['start_xy'] for e in everything if e['target']=='blue_cone'])
+        self.assertEqual({e['strategy'] for e in planned_episodes(options(strategy='scan',limit=2),CONFIG)},{'scan'})
+
     def test_launchers_expose_plans_ports_and_levels(self):
         launcher=(ROOT/'scripts/run_visual_search.ps1').read_bytes().decode()
         for text in ('[string]$Plan','[string]$Set','$TopicsPort','-topicsport=','[string]$Layout',"[ValidateSet('step','continuous')][string]$Flight"):

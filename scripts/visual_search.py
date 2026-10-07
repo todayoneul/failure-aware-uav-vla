@@ -53,7 +53,7 @@ def pose_at(x,y,z):
 class SearchEnv:
     def __init__(self,client,config,oft,output):
         self.client,self.config,self.oft,self.output=client,config,oft,Path(output)
-        self.maps={};self.verified=set();self.lighting=None;self.meshes={}
+        self.maps={};self.verified=set();self.meshes={}
         self.limits=flight_limits(json.loads((ROOT/'configs/flight_limits.json').read_text()))
 
     def map(self,name):
@@ -78,12 +78,9 @@ class SearchEnv:
                 key=(item['shape'],tuple(item['size_m']),tuple(item['color']))
                 if key not in self.meshes:self.meshes[key]=mesh(item['shape'],item['size_m'],item['color'],item['name'])
                 self.world.spawn_object_from_file(item['name'],'gltf',self.meshes[key],True,pose_at(x,y,z),[1,1,1],False)
+        # Loading a scene puts the sun back to its default, so a map's lighting is set again for every episode.
         lighting=map_config.get('lighting')
-        if self.lighting is not None and lighting!=self.lighting[1] and map_config['id']!=self.lighting[0]:
-            raise RuntimeError('Maps with different lighting cannot share one simulator session; run them separately')
-        if lighting and self.lighting is None:
-            self.world.set_time_of_day(True,lighting['time_of_day'],False,1.,1.,True)
-        self.lighting=(map_config['id'],lighting)
+        if lighting:self.world.set_time_of_day(True,lighting['time_of_day'],False,1.,1.,True)
 
     async def reset(self,episode):
         map_config=self.map(episode.get('map','blocks'));layout=episode.get('layout','pilot')
@@ -271,13 +268,18 @@ async def run_episode(env,episode,policy,args,record):
     return summarise(episode,steps,config,reason,stopped,others),steps
 
 
-def planned_episodes(args):
+def planned_episodes(args,config):
     """Episodes of one set of a plan file: `sets[NAME]` of the held-out file, or a split of a dataset plan."""
     data=json.loads(Path(args.plan).read_text(encoding='utf-8'))
     episodes=data['sets'][args.set] if 'sets' in data and args.set in data['sets'] else data[args.set]
     if args.only:episodes=[episode for episode in episodes if episode['id'] in args.only or episode['target'] in args.only or episode['kind'] in args.only]
     if args.strategy:episodes=[dict(episode,strategy=args.strategy,id=f'{episode["id"]}-{args.strategy}') for episode in episodes]
     if args.layout:episodes=[dict(episode,layout=args.layout,planned_layout=episode['layout']) for episode in episodes]
+    if args.pilot_verbs:
+        # The pilot was trained with `Approach` when the target started in view and `Find` when it did not.
+        episodes=[dict(episode,planned_instruction=episode['instruction'],
+                       instruction=config['instructions']['approach' if episode['kind'] in ('visible','peripheral') else 'find'].format(
+                           noun=load_map(episode['map'])['objects'][episode['target']]['noun'])) for episode in episodes]
     return episodes[args.skip:args.skip+args.limit] if args.limit else episodes[args.skip:]
 
 
@@ -299,7 +301,7 @@ async def main(args):
     done=json.loads(results_path.read_text())['episodes'] if results_path.exists() and args.resume else []
     done=[item for item in done if not item.get('error')]
     finished={item['id'] for item in done};status=0
-    if args.plan:episodes=planned_episodes(args)
+    if args.plan:episodes=planned_episodes(args,config)
     else:episodes=[{'case':case,'target':target,'seed':seed,'id':f'{case}-{target}-{seed}'}
                    for seed in range(args.seed_start,args.seed_start+args.episodes) for case in args.cases for target in args.targets]
     record_root=Path(args.record) if args.record else None
@@ -351,6 +353,7 @@ if __name__=='__main__':
     parser.add_argument('--limit',type=int,default=0)
     parser.add_argument('--layout',help='fly the planned starts in another layout of the same map')
     parser.add_argument('--strategy',help='teacher search strategy to use instead of the planned one')
+    parser.add_argument('--pilot-verbs',action='store_true',help="word the instruction as the pilot's training data did")
     parser.add_argument('--output',default=str(ROOT/'outputs/visual_search/run'));parser.add_argument('--record',help='dataset root to write teacher episodes into')
     parser.add_argument('--resume',action='store_true');parser.add_argument('--live',action='store_true')
     arguments=parser.parse_args()
