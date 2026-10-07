@@ -1,0 +1,179 @@
+{
+ "episodes": 292,
+ "train_episodes": 260,
+ "val_episodes": 32,
+ "dropped_episodes": {},
+ "split_by": "seed range of the plan",
+ "samples": 11745,
+ "train_samples": 10495,
+ "val_samples": 1250,
+ "maps": {
+  "blocks": 292
+ },
+ "layouts": {
+  "a": 160,
+  "b": 132
+ },
+ "objects": {
+  "blue_cone": 73,
+  "green_cylinder": 73,
+  "orange_ball": 73,
+  "red_cube": 73
+ },
+ "instructions": {
+  "Approach the blue cone.": 36,
+  "Approach the green cylinder.": 36,
+  "Approach the orange ball.": 29,
+  "Approach the red cube.": 36,
+  "Find the blue cone.": 37,
+  "Find the green cylinder.": 37,
+  "Find the orange ball.": 44,
+  "Find the red cube.": 37
+ },
+ "by_case_episodes": {
+  "altitude": 40,
+  "peripheral": 56,
+  "reacquire": 48,
+  "search": 104,
+  "visible": 44
+ },
+ "by_target_episodes": {
+  "blue_cone": 73,
+  "green_cylinder": 73,
+  "orange_ball": 73,
+  "red_cube": 73
+ },
+ "start_distance_m": {
+  "12-20 m": 69,
+  "20-30 m": 88,
+  "30-40 m": 34,
+  "40-50 m": 42,
+  "50-60 m": 30,
+  "60-70 m": 29
+ },
+ "start_bearing_sector": {
+  "behind": 29,
+  "behind_left": 22,
+  "behind_right": 25,
+  "front": 98,
+  "front_left": 35,
+  "front_right": 30,
+  "left": 24,
+  "right": 29
+ },
+ "start_height_m": {
+  "5-6 m": 60,
+  "6-7 m": 79,
+  "7-8 m": 79,
+  "8-9 m": 74
+ },
+ "search_strategy_episodes": {
+  "right": 292
+ },
+ "search_episodes": {
+  "yaw_only": 151,
+  "yaw_and_altitude": 44
+ },
+ "forced_turns": {
+  "left": 27,
+  "right": 21
+ },
+ "seeds": {
+  "train": [
+   1000,
+   1259
+  ],
+  "val": [
+   5000,
+   5031
+  ]
+ },
+ "sample_distance_m": {
+  "0-12 m": 1232,
+  "12-20 m": 2945,
+  "20-30 m": 2733,
+  "30-40 m": 1709,
+  "40-50 m": 1734,
+  "50-60 m": 805,
+  "60-70 m": 587
+ },
+ "sample_bearing_sector": {
+  "behind": 430,
+  "behind_left": 225,
+  "behind_right": 441,
+  "front": 9194,
+  "front_left": 76,
+  "front_right": 668,
+  "left": 143,
+  "right": 568
+ },
+ "by_teacher_state": {
+  "align": 174,
+  "approach": 7978,
+  "climb": 530,
+  "search": 1895,
+  "stop": 1168
+ },
+ "target_visible": {
+  "not visible": 2397,
+  "visible": 9348
+ },
+ "labels_outside_action_bounds": 0,
+ "memory_strategy_samples": 0,
+ "leaks": {
+  "episodes": [],
+  "folders": [],
+  "seeds": 0,
+  "starts": 0
+ },
+ "chunk_size": 4,
+ "tick_s": 0.5,
+ "action_bounds": {
+  "forward_m": [
+   0.0,
+   1.0
+  ],
+  "down_m": [
+   -0.5,
+   0.5
+  ],
+  "yaw_rad": [
+   -0.21,
+   0.21
+  ]
+ },
+ "val_episode_ids": [
+  "val-5000-blue_cone-search",
+  "val-5001-orange_ball-search",
+  "val-5002-red_cube-search",
+  "val-5003-green_cylinder-search",
+  "val-5004-blue_cone-reacquire",
+  "val-5005-orange_ball-reacquire",
+  "val-5006-red_cube-reacquire",
+  "val-5007-green_cylinder-reacquire",
+  "val-5008-blue_cone-peripheral",
+  "val-5009-orange_ball-peripheral",
+  "val-5010-red_cube-peripheral",
+  "val-5011-green_cylinder-peripheral",
+  "val-5012-blue_cone-search",
+  "val-5013-orange_ball-search",
+  "val-5014-red_cube-search",
+  "val-5015-green_cylinder-search",
+  "val-5016-blue_cone-visible",
+  "val-5017-orange_ball-visible",
+  "val-5018-red_cube-visible",
+  "val-5019-green_cylinder-visible",
+  "val-5020-blue_cone-search",
+  "val-5021-orange_ball-search",
+  "val-5022-red_cube-search",
+  "val-5023-green_cylinder-search",
+  "val-5024-blue_cone-altitude",
+  "val-5025-orange_ball-altitude",
+  "val-5026-red_cube-altitude",
+  "val-5027-green_cylinder-altitude",
+  "val-5028-blue_cone-reacquire",
+  "val-5029-orange_ball-reacquire",
+  "val-5030-red_cube-reacquire",
+  "val-5031-green_cylinder-reacquire"
+ ]
+}

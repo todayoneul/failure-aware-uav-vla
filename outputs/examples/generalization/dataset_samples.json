@@ -1,0 +1,1182 @@
+[
+ {
+  "traj_rel_dir": "blocks/train-1116-blue_cone-search",
+  "img_name": "000014.png",
+  "instruction": "<image>\nApproach the blue cone.",
+  "label": {
+   "fwd": 0.0,
+   "down": 0.0,
+   "yaw": 0.21
+  },
+  "is_last_step": false,
+  "is_penultimate": false,
+  "chunk": [
+   [
+    0.0,
+    0.0,
+    0.21
+   ],
+   [
+    0.0,
+    0.0,
+    0.21
+   ],
+   [
+    0.11173726703306597,
+    0.0,
+    0.21
+   ],
+   [
+    0.5774832982629516,
+    0.0,
+    0.21
+   ]
+  ],
+  "proprio": [
+   1.6579489287509487e-07,
+   1.9728719392362103e-07,
+   -7.861815538490191e-05,
+   0.17493444681167603,
+   0.9595100849990087
+  ],
+  "meta": {
+   "episode_id": "train-1116-blue_cone-search",
+   "case": "search",
+   "target": "blue_cone",
+   "map": "blocks",
+   "layout": "b",
+   "seed": 1116,
+   "kind": "search",
+   "strategy": "right",
+   "step": 14,
+   "target_visible": false,
+   "target_in_front_fov": false,
+   "target_visible_down": false,
+   "bearing_deg": 54.57828007589405,
+   "distance_m": 21.833193094322837,
+   "height_m": 5.248033404350281,
+   "teacher_state": "search"
+  }
+ },
+ {
+  "traj_rel_dir": "blocks/train-1132-blue_cone-altitude",
+  "img_name": "000000.png",
+  "instruction": "<image>\nApproach the blue cone.",
+  "label": {
+   "fwd": 0.0,
+   "down": -0.5,
+   "yaw": 0.0
+  },
+  "is_last_step": false,
+  "is_penultimate": false,
+  "chunk": [
+   [
+    0.0,
+    -0.5,
+    0.0
+   ],
+   [
+    0.0,
+    -0.5,
+    0.0
+   ],
+   [
+    0.0,
+    -0.5,
+    0.0
+   ],
+   [
+    0.0,
+    -0.5,
+    0.0
+   ]
+  ],
+  "proprio": [
+   2.6201753890424264e-07,
+   -1.8576339617883654e-08,
+   0.0004372744297143072,
+   0.24029052654902142,
+   0.0
+  ],
+  "meta": {
+   "episode_id": "train-1132-blue_cone-altitude",
+   "case": "altitude",
+   "target": "blue_cone",
+   "map": "blocks",
+   "layout": "a",
+   "seed": 1132,
+   "kind": "altitude",
+   "strategy": "right",
+   "step": 0,
+   "target_visible": false,
+   "target_in_front_fov": false,
+   "target_visible_down": false,
+   "bearing_deg": 166.88950042028267,
+   "distance_m": 38.23189034137224,
+   "height_m": 7.208715796470642,
+   "teacher_state": "climb"
+  }
+ },
+ {
+  "traj_rel_dir": "blocks/train-1120-blue_cone-search",
+  "img_name": "000002.png",
+  "instruction": "<image>\nFind the blue cone.",
+  "label": {
+   "fwd": 0.0,
+   "down": 0.0,
+   "yaw": 0.21
+  },
+  "is_last_step": false,
+  "is_penultimate": false,
+  "chunk": [
+   [
+    0.0,
+    0.0,
+    0.21
+   ],
+   [
+    0.19170388196879673,
+    0.0,
+    0.21
+   ],
+   [
+    0.0,
+    0.0,
+    0.21
+   ],
+   [
+    0.8743946862957602,
+    0.0,
+    -0.06576678846418016
+   ]
+  ],
+  "proprio": [
+   3.9590289314757575e-07,
+   -4.506083270955178e-08,
+   -0.0010696199024096131,
+   0.271073321501414,
+   1.0399571888098245
+  ],
+  "meta": {
+   "episode_id": "train-1120-blue_cone-search",
+   "case": "search",
+   "target": "blue_cone",
+   "map": "blocks",
+   "layout": "b",
+   "seed": 1120,
+   "kind": "search",
+   "strategy": "right",
+   "step": 2,
+   "target_visible": true,
+   "target_in_front_fov": true,
+   "target_visible_down": false,
+   "bearing_deg": 37.662588149039664,
+   "distance_m": 33.668991232733866,
+   "height_m": 8.13219964504242,
+   "teacher_state": "align"
+  }
+ },
+ {
+  "traj_rel_dir": "blocks/train-1120-blue_cone-search",
+  "img_name": "000026.png",
+  "instruction": "<image>\nFind the blue cone.",
+  "label": {
+   "fwd": 0.9999983730073767,
+   "down": 0.0,
+   "yaw": 8.518913454658162e-07
+  },
+  "is_last_step": false,
+  "is_penultimate": false,
+  "chunk": [
+   [
+    0.9999983730073767,
+    0.0,
+    8.518913454658162e-07
+   ],
+   [
+    0.8561290634460601,
+    0.0,
+    2.5086443569577455e-05
+   ],
+   [
+    0.6072043204388438,
+    0.0,
+    8.810720541152507e-06
+   ],
+   [
+    0.36904141155264325,
+    0.0,
+    -4.304245061259593e-06
+   ]
+  ],
+  "proprio": [
+   0.9872221960260413,
+   -3.521632536801489e-05,
+   -0.00044882073416374624,
+   0.27117984692255653,
+   -0.00012229125941789443
+  ],
+  "meta": {
+   "episode_id": "train-1120-blue_cone-search",
+   "case": "search",
+   "target": "blue_cone",
+   "map": "blocks",
+   "layout": "b",
+   "seed": 1120,
+   "kind": "search",
+   "strategy": "right",
+   "step": 26,
+   "target_visible": true,
+   "target_in_front_fov": true,
+   "target_visible_down": false,
+   "bearing_deg": 4.8809778698912446e-05,
+   "distance_m": 16.43172069409107,
+   "height_m": 8.135395407676697,
+   "teacher_state": "approach"
+  }
+ },
+ {
+  "traj_rel_dir": "blocks/train-1128-blue_cone-visible",
+  "img_name": "000011.png",
+  "instruction": "<image>\nApproach the blue cone.",
+  "label": {
+   "fwd": 0.0,
+   "down": 0.0,
+   "yaw": 0.0
+  },
+  "is_last_step": false,
+  "is_penultimate": true,
+  "chunk": [
+   [
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0
+   ]
+  ],
+  "proprio": [
+   0.17299811066489434,
+   -0.0004614836332790251,
+   0.003548278473317623,
+   0.2702383796374003,
+   -0.0021366392997234597
+  ],
+  "meta": {
+   "episode_id": "train-1128-blue_cone-visible",
+   "case": "visible",
+   "target": "blue_cone",
+   "map": "blocks",
+   "layout": "a",
+   "seed": 1128,
+   "kind": "visible",
+   "strategy": "right",
+   "step": 11,
+   "target_visible": true,
+   "target_in_front_fov": true,
+   "target_visible_down": false,
+   "bearing_deg": -0.15322629688639453,
+   "distance_m": 11.333001255378887,
+   "height_m": 8.10715138912201,
+   "teacher_state": "stop"
+  }
+ },
+ {
+  "traj_rel_dir": "blocks/train-1121-orange_ball-search",
+  "img_name": "000011.png",
+  "instruction": "<image>\nFind the orange ball.",
+  "label": {
+   "fwd": 0.0,
+   "down": 0.0,
+   "yaw": 0.21
+  },
+  "is_last_step": false,
+  "is_penultimate": false,
+  "chunk": [
+   [
+    0.0,
+    0.0,
+    0.21
+   ],
+   [
+    0.0,
+    0.0,
+    0.21
+   ],
+   [
+    0.0,
+    0.0,
+    0.21
+   ],
+   [
+    0.0,
+    0.0,
+    0.21
+   ]
+  ],
+  "proprio": [
+   2.1225928686792017e-07,
+   -3.092346702561367e-07,
+   -7.931087020551786e-05,
+   0.19747980038324991,
+   0.9740732406558488
+  ],
+  "meta": {
+   "episode_id": "train-1121-orange_ball-search",
+   "case": "search",
+   "target": "orange_ball",
+   "map": "blocks",
+   "layout": "a",
+   "seed": 1121,
+   "kind": "search",
+   "strategy": "right",
+   "step": 11,
+   "target_visible": false,
+   "target_in_front_fov": false,
+   "target_visible_down": false,
+   "bearing_deg": 76.30136913054741,
+   "distance_m": 38.46660640280375,
+   "height_m": 5.924394011497498,
+   "teacher_state": "search"
+  }
+ },
+ {
+  "traj_rel_dir": "blocks/train-1133-orange_ball-altitude",
+  "img_name": "000008.png",
+  "instruction": "<image>\nFind the orange ball.",
+  "label": {
+   "fwd": 0.0,
+   "down": -0.5,
+   "yaw": 0.0
+  },
+  "is_last_step": false,
+  "is_penultimate": false,
+  "chunk": [
+   [
+    0.0,
+    -0.5,
+    0.0
+   ],
+   [
+    0.0,
+    -0.5,
+    0.0
+   ],
+   [
+    0.0,
+    -0.5,
+    0.0
+   ],
+   [
+    0.0,
+    -0.5,
+    0.0
+   ]
+  ],
+  "proprio": [
+   -1.2950239502238347e-07,
+   2.5194990164895455e-07,
+   -0.0004835449217353016,
+   0.26572705507278443,
+   0.957000978149475
+  ],
+  "meta": {
+   "episode_id": "train-1133-orange_ball-altitude",
+   "case": "altitude",
+   "target": "orange_ball",
+   "map": "blocks",
+   "layout": "a",
+   "seed": 1133,
+   "kind": "altitude",
+   "strategy": "right",
+   "step": 8,
+   "target_visible": false,
+   "target_in_front_fov": false,
+   "target_visible_down": false,
+   "bearing_deg": 159.11168070721374,
+   "distance_m": 40.88706167040115,
+   "height_m": 7.971811652183533,
+   "teacher_state": "climb"
+  }
+ },
+ {
+  "traj_rel_dir": "blocks/train-1125-orange_ball-peripheral",
+  "img_name": "000000.png",
+  "instruction": "<image>\nFind the orange ball.",
+  "label": {
+   "fwd": 0.0,
+   "down": 0.0,
+   "yaw": -0.21
+  },
+  "is_last_step": false,
+  "is_penultimate": false,
+  "chunk": [
+   [
+    0.0,
+    0.0,
+    -0.21
+   ],
+   [
+    0.2221715319511106,
+    0.0,
+    -0.21
+   ],
+   [
+    0.0,
+    0.0,
+    0.21
+   ],
+   [
+    0.5870745794759948,
+    0.0,
+    -0.21
+   ]
+  ],
+  "proprio": [
+   9.851173856001703e-09,
+   -1.915095259082453e-07,
+   0.00010190438479185104,
+   0.2667851368586222,
+   0.0
+  ],
+  "meta": {
+   "episode_id": "train-1125-orange_ball-peripheral",
+   "case": "peripheral",
+   "target": "orange_ball",
+   "map": "blocks",
+   "layout": "a",
+   "seed": 1125,
+   "kind": "peripheral",
+   "strategy": "right",
+   "step": 0,
+   "target_visible": true,
+   "target_in_front_fov": true,
+   "target_visible_down": false,
+   "bearing_deg": -32.72145550460774,
+   "distance_m": 50.599859539395005,
+   "height_m": 8.003554105758667,
+   "teacher_state": "align"
+  }
+ },
+ {
+  "traj_rel_dir": "blocks/train-1133-orange_ball-altitude",
+  "img_name": "000053.png",
+  "instruction": "<image>\nFind the orange ball.",
+  "label": {
+   "fwd": 0.9999739038072356,
+   "down": 0.0,
+   "yaw": -1.3663934579188908e-05
+  },
+  "is_last_step": false,
+  "is_penultimate": false,
+  "chunk": [
+   [
+    0.9999739038072356,
+    0.0,
+    -1.3663934579188908e-05
+   ],
+   [
+    0.9999886206417048,
+    0.0,
+    5.958218070450937e-06
+   ],
+   [
+    0.9999728727248157,
+    0.0,
+    1.4203808071794333e-05
+   ],
+   [
+    0.9999988107213008,
+    0.0,
+    -6.227048707230232e-07
+   ]
+  ],
+  "proprio": [
+   0.9734065734606332,
+   -0.00019970133789248834,
+   -0.0008248002850450575,
+   0.48229714632034304,
+   0.00012464104828009099
+  ],
+  "meta": {
+   "episode_id": "train-1133-orange_ball-altitude",
+   "case": "altitude",
+   "target": "orange_ball",
+   "map": "blocks",
+   "layout": "a",
+   "seed": 1133,
+   "kind": "altitude",
+   "strategy": "right",
+   "step": 53,
+   "target_visible": true,
+   "target_in_front_fov": true,
+   "target_visible_down": false,
+   "bearing_deg": -0.0007828857829303889,
+   "distance_m": 24.973423103777996,
+   "height_m": 14.46891438961029,
+   "teacher_state": "approach"
+  }
+ },
+ {
+  "traj_rel_dir": "blocks/train-1129-orange_ball-visible",
+  "img_name": "000017.png",
+  "instruction": "<image>\nFind the orange ball.",
+  "label": {
+   "fwd": 0.0,
+   "down": 0.0,
+   "yaw": 0.0
+  },
+  "is_last_step": false,
+  "is_penultimate": true,
+  "chunk": [
+   [
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0
+   ]
+  ],
+  "proprio": [
+   0.32098281754977565,
+   -6.2333907945438805e-06,
+   0.02156846784055233,
+   0.23670537869135538,
+   -1.5234161745797757e-05
+  ],
+  "meta": {
+   "episode_id": "train-1129-orange_ball-visible",
+   "case": "visible",
+   "target": "orange_ball",
+   "map": "blocks",
+   "layout": "a",
+   "seed": 1129,
+   "kind": "visible",
+   "strategy": "right",
+   "step": 17,
+   "target_visible": true,
+   "target_in_front_fov": true,
+   "target_visible_down": false,
+   "bearing_deg": -0.001328395874923122,
+   "distance_m": 10.973405464216063,
+   "height_m": 7.101161360740662,
+   "teacher_state": "stop"
+  }
+ },
+ {
+  "traj_rel_dir": "blocks/train-1118-red_cube-search",
+  "img_name": "000009.png",
+  "instruction": "<image>\nFind the red cube.",
+  "label": {
+   "fwd": 0.0,
+   "down": 0.0,
+   "yaw": 0.21
+  },
+  "is_last_step": false,
+  "is_penultimate": false,
+  "chunk": [
+   [
+    0.0,
+    0.0,
+    0.21
+   ],
+   [
+    0.0,
+    0.0,
+    0.21
+   ],
+   [
+    0.0,
+    0.0,
+    0.21
+   ],
+   [
+    0.0,
+    0.0,
+    0.21
+   ]
+  ],
+  "proprio": [
+   4.1628150141608456e-07,
+   1.5982822542733137e-07,
+   -0.0001585708960192278,
+   0.20470545689264932,
+   0.9585737788449954
+  ],
+  "meta": {
+   "episode_id": "train-1118-red_cube-search",
+   "case": "search",
+   "target": "red_cube",
+   "map": "blocks",
+   "layout": "b",
+   "seed": 1118,
+   "kind": "search",
+   "strategy": "right",
+   "step": 9,
+   "target_visible": false,
+   "target_in_front_fov": false,
+   "target_visible_down": false,
+   "bearing_deg": 137.67897254150915,
+   "distance_m": 16.407535497536347,
+   "height_m": 6.14116370677948,
+   "teacher_state": "search"
+  }
+ },
+ {
+  "traj_rel_dir": "blocks/train-1114-red_cube-peripheral",
+  "img_name": "000019.png",
+  "instruction": "<image>\nApproach the red cube.",
+  "label": {
+   "fwd": 0.0,
+   "down": -0.5,
+   "yaw": 0.0
+  },
+  "is_last_step": false,
+  "is_penultimate": false,
+  "chunk": [
+   [
+    0.0,
+    -0.5,
+    0.0
+   ],
+   [
+    0.0,
+    -0.5,
+    0.0
+   ],
+   [
+    0.0,
+    -0.5,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.21
+   ]
+  ],
+  "proprio": [
+   5.78067548089989e-07,
+   -6.730218001374126e-07,
+   -0.7363821864128113,
+   0.3706108212471008,
+   -3.5036624051286993e-15
+  ],
+  "meta": {
+   "episode_id": "train-1114-red_cube-peripheral",
+   "case": "peripheral",
+   "target": "red_cube",
+   "map": "blocks",
+   "layout": "b",
+   "seed": 1114,
+   "kind": "peripheral",
+   "strategy": "right",
+   "step": 19,
+   "target_visible": false,
+   "target_in_front_fov": false,
+   "target_visible_down": false,
+   "bearing_deg": -111.79008882641793,
+   "distance_m": 67.61077432985434,
+   "height_m": 11.118324637413025,
+   "teacher_state": "climb"
+  }
+ },
+ {
+  "traj_rel_dir": "blocks/train-1138-red_cube-reacquire",
+  "img_name": "000042.png",
+  "instruction": "<image>\nApproach the red cube.",
+  "label": {
+   "fwd": 0.0,
+   "down": 0.0,
+   "yaw": 0.21
+  },
+  "is_last_step": false,
+  "is_penultimate": false,
+  "chunk": [
+   [
+    0.0,
+    0.0,
+    0.21
+   ],
+   [
+    0.2688924935475896,
+    0.0,
+    0.21
+   ],
+   [
+    0.0,
+    0.0,
+    0.21
+   ],
+   [
+    0.7919124859115103,
+    0.0,
+    -0.10895436759402699
+   ]
+  ],
+  "proprio": [
+   0.0003442177415439172,
+   0.0002509548511244324,
+   7.831794209778309e-05,
+   0.2073499321937561,
+   0.9441542854094263
+  ],
+  "meta": {
+   "episode_id": "train-1138-red_cube-reacquire",
+   "case": "reacquire",
+   "target": "red_cube",
+   "map": "blocks",
+   "layout": "b",
+   "seed": 1138,
+   "kind": "reacquire",
+   "strategy": "right",
+   "step": 42,
+   "target_visible": true,
+   "target_in_front_fov": true,
+   "target_visible_down": false,
+   "bearing_deg": 35.6998026897356,
+   "distance_m": 46.52502408186239,
+   "height_m": 6.220497965812683,
+   "teacher_state": "align"
+  }
+ },
+ {
+  "traj_rel_dir": "blocks/train-1130-red_cube-visible",
+  "img_name": "000000.png",
+  "instruction": "<image>\nApproach the red cube.",
+  "label": {
+   "fwd": 0.9072722279320453,
+   "down": 0.0,
+   "yaw": 0.048552147918739186
+  },
+  "is_last_step": false,
+  "is_penultimate": false,
+  "chunk": [
+   [
+    0.9072722279320453,
+    0.0,
+    0.048552147918739186
+   ],
+   [
+    0.9785078396574923,
+    0.0,
+    0.011253268840299313
+   ],
+   [
+    0.9592930645081256,
+    0.0,
+    -0.021314101581904388
+   ],
+   [
+    0.9914923445865286,
+    0.0,
+    -0.004454597957705864
+   ]
+  ],
+  "proprio": [
+   2.3405435266500733e-07,
+   -8.722341350992445e-07,
+   0.0002513377112336457,
+   0.2444840908050537,
+   0.0
+  ],
+  "meta": {
+   "episode_id": "train-1130-red_cube-visible",
+   "case": "visible",
+   "target": "red_cube",
+   "map": "blocks",
+   "layout": "a",
+   "seed": 1130,
+   "kind": "visible",
+   "strategy": "right",
+   "step": 0,
+   "target_visible": true,
+   "target_in_front_fov": true,
+   "target_visible_down": false,
+   "bearing_deg": 2.781833162038639,
+   "distance_m": 18.70278436153684,
+   "height_m": 7.334522724151611,
+   "teacher_state": "approach"
+  }
+ },
+ {
+  "traj_rel_dir": "blocks/train-1130-red_cube-visible",
+  "img_name": "000013.png",
+  "instruction": "<image>\nApproach the red cube.",
+  "label": {
+   "fwd": 0.0,
+   "down": 0.0,
+   "yaw": 0.0
+  },
+  "is_last_step": false,
+  "is_penultimate": true,
+  "chunk": [
+   [
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0
+   ]
+  ],
+  "proprio": [
+   0.29915882950242634,
+   8.880004505890104e-05,
+   0.01676230877637863,
+   0.24526298840840657,
+   0.0003723872274398632
+  ],
+  "meta": {
+   "episode_id": "train-1130-red_cube-visible",
+   "case": "visible",
+   "target": "red_cube",
+   "map": "blocks",
+   "layout": "a",
+   "seed": 1130,
+   "kind": "visible",
+   "strategy": "right",
+   "step": 13,
+   "target_visible": true,
+   "target_in_front_fov": true,
+   "target_visible_down": false,
+   "bearing_deg": 0.016730873742957314,
+   "distance_m": 11.108943066107313,
+   "height_m": 7.357889652252197,
+   "teacher_state": "stop"
+  }
+ },
+ {
+  "traj_rel_dir": "blocks/train-1123-green_cylinder-search",
+  "img_name": "000011.png",
+  "instruction": "<image>\nFind the green cylinder.",
+  "label": {
+   "fwd": 0.0,
+   "down": 0.0,
+   "yaw": 0.21
+  },
+  "is_last_step": false,
+  "is_penultimate": false,
+  "chunk": [
+   [
+    0.0,
+    0.0,
+    0.21
+   ],
+   [
+    0.0,
+    0.0,
+    0.21
+   ],
+   [
+    0.0,
+    0.0,
+    0.21
+   ],
+   [
+    0.0,
+    0.0,
+    0.21
+   ]
+  ],
+  "proprio": [
+   -1.2089549440044143e-07,
+   2.6349576370506343e-07,
+   -0.0001553256151964888,
+   0.295805025100708,
+   0.9624164205054874
+  ],
+  "meta": {
+   "episode_id": "train-1123-green_cylinder-search",
+   "case": "search",
+   "target": "green_cylinder",
+   "map": "blocks",
+   "layout": "b",
+   "seed": 1123,
+   "kind": "search",
+   "strategy": "right",
+   "step": 11,
+   "target_visible": false,
+   "target_in_front_fov": false,
+   "target_visible_down": false,
+   "bearing_deg": 111.5462765814001,
+   "distance_m": 24.111435379944854,
+   "height_m": 8.87415075302124,
+   "teacher_state": "search"
+  }
+ },
+ {
+  "traj_rel_dir": "blocks/train-1135-green_cylinder-altitude",
+  "img_name": "000001.png",
+  "instruction": "<image>\nFind the green cylinder.",
+  "label": {
+   "fwd": 0.0,
+   "down": -0.5,
+   "yaw": 0.0
+  },
+  "is_last_step": false,
+  "is_penultimate": false,
+  "chunk": [
+   [
+    0.0,
+    -0.5,
+    0.0
+   ],
+   [
+    0.0,
+    -0.5,
+    0.0
+   ],
+   [
+    0.0,
+    -0.5,
+    0.0
+   ],
+   [
+    0.0,
+    -0.5,
+    0.0
+   ]
+  ],
+  "proprio": [
+   -1.0462123345336378e-07,
+   1.4242766134338488e-07,
+   -0.4266893267631531,
+   0.23067656755447388,
+   -4.2537280636979177e-16
+  ],
+  "meta": {
+   "episode_id": "train-1135-green_cylinder-altitude",
+   "case": "altitude",
+   "target": "green_cylinder",
+   "map": "blocks",
+   "layout": "b",
+   "seed": 1135,
+   "kind": "altitude",
+   "strategy": "right",
+   "step": 1,
+   "target_visible": false,
+   "target_in_front_fov": true,
+   "target_visible_down": false,
+   "bearing_deg": -23.311804753537782,
+   "distance_m": 34.29233672476168,
+   "height_m": 6.920297026634216,
+   "teacher_state": "climb"
+  }
+ },
+ {
+  "traj_rel_dir": "blocks/train-1103-green_cylinder-search",
+  "img_name": "000012.png",
+  "instruction": "<image>\nFind the green cylinder.",
+  "label": {
+   "fwd": 0.0,
+   "down": 0.0,
+   "yaw": 0.21
+  },
+  "is_last_step": false,
+  "is_penultimate": false,
+  "chunk": [
+   [
+    0.0,
+    0.0,
+    0.21
+   ],
+   [
+    0.35821446219610487,
+    0.0,
+    0.21
+   ],
+   [
+    0.8224560974782096,
+    0.0,
+    0.09296176997535321
+   ],
+   [
+    0.8811440837016309,
+    0.0,
+    -0.06223281224643996
+   ]
+  ],
+  "proprio": [
+   7.462416447284649e-07,
+   -1.6831808764947586e-08,
+   -0.00015511167293880135,
+   0.2483070174853007,
+   0.9692621616782182
+  ],
+  "meta": {
+   "episode_id": "train-1103-green_cylinder-search",
+   "case": "search",
+   "target": "green_cylinder",
+   "map": "blocks",
+   "layout": "a",
+   "seed": 1103,
+   "kind": "search",
+   "strategy": "right",
+   "step": 12,
+   "target_visible": true,
+   "target_in_front_fov": true,
+   "target_visible_down": false,
+   "bearing_deg": 32.55146645097191,
+   "distance_m": 46.48158585579305,
+   "height_m": 7.449210524559021,
+   "teacher_state": "align"
+  }
+ },
+ {
+  "traj_rel_dir": "blocks/train-1127-green_cylinder-peripheral",
+  "img_name": "000049.png",
+  "instruction": "<image>\nFind the green cylinder.",
+  "label": {
+   "fwd": 0.4466340999529903,
+   "down": 0.0,
+   "yaw": -9.321212285362535e-06
+  },
+  "is_last_step": false,
+  "is_penultimate": false,
+  "chunk": [
+   [
+    0.4466340999529903,
+    0.0,
+    -9.321212285362535e-06
+   ],
+   [
+    0.22596373038893303,
+    0.0,
+    2.302040203461253e-06
+   ],
+   [
+    0.2,
+    0.0,
+    3.721794739841578e-06
+   ],
+   [
+    0.0,
+    0.0,
+    0.0
+   ]
+  ],
+  "proprio": [
+   0.9163031986645342,
+   -1.3386526846181912e-05,
+   -0.02621522918343544,
+   0.28565061489741006,
+   2.7123478730166543e-05
+  ],
+  "meta": {
+   "episode_id": "train-1127-green_cylinder-peripheral",
+   "case": "peripheral",
+   "target": "green_cylinder",
+   "map": "blocks",
+   "layout": "b",
+   "seed": 1127,
+   "kind": "peripheral",
+   "strategy": "right",
+   "step": 49,
+   "target_visible": true,
+   "target_in_front_fov": true,
+   "target_visible_down": false,
+   "bearing_deg": -0.0005340661238967659,
+   "distance_m": 13.786536399811961,
+   "height_m": 8.569518446922302,
+   "teacher_state": "approach"
+  }
+ },
+ {
+  "traj_rel_dir": "blocks/train-1131-green_cylinder-visible",
+  "img_name": "000011.png",
+  "instruction": "<image>\nFind the green cylinder.",
+  "label": {
+   "fwd": 0.0,
+   "down": 0.0,
+   "yaw": 0.0
+  },
+  "is_last_step": false,
+  "is_penultimate": true,
+  "chunk": [
+   [
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0
+   ]
+  ],
+  "proprio": [
+   0.15645424328841157,
+   4.904476696483695e-05,
+   0.001728505827486515,
+   0.2698101162910461,
+   0.00110808144195734
+  ],
+  "meta": {
+   "episode_id": "train-1131-green_cylinder-visible",
+   "case": "visible",
+   "target": "green_cylinder",
+   "map": "blocks",
+   "layout": "a",
+   "seed": 1131,
+   "kind": "visible",
+   "strategy": "right",
+   "step": 11,
+   "target_visible": true,
+   "target_in_front_fov": true,
+   "target_visible_down": false,
+   "bearing_deg": 0.017995254640687994,
+   "distance_m": 11.502826165567324,
+   "height_m": 8.094303488731384,
+   "teacher_state": "stop"
+  }
+ }
+]

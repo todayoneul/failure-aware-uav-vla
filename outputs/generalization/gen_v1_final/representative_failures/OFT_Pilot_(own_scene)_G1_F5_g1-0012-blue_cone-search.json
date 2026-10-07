@@ -1,0 +1,3428 @@
+{
+ "model": "OFT Pilot (own scene)",
+ "level": "G1",
+ "category": "F5",
+ "name": "no stop: was near the target and did not stop there",
+ "episode": {
+  "id": "g1-0012-blue_cone-search",
+  "split": "g1",
+  "seed": 12,
+  "map": "blocks",
+  "layout": "pilot",
+  "target": "blue_cone",
+  "kind": "search",
+  "case": "search",
+  "band": "medium",
+  "sector": "behind_left",
+  "strategy": "right",
+  "start_xy": [
+   108.59,
+   -67.21
+  ],
+  "start_yaw_deg": 255.42,
+  "start_height_m": 7.05,
+  "target_bearing_deg": -137.04,
+  "start_distance_m": 36.16,
+  "start_direction_deg": 298.38,
+  "instruction_id": "find",
+  "instruction": "Find the blue cone.",
+  "requested_kind": "search",
+  "in_wedge": true,
+  "planned_layout": "b",
+  "planned_instruction": "Find the blue cone.",
+  "reason": "max_steps",
+  "stopped": false,
+  "steps": 240,
+  "initial_distance_m": 36.157599697032495,
+  "final_distance_m": 10.96840073991141,
+  "minimum_distance_m": 10.860449998701679,
+  "success": false,
+  "reached": true,
+  "initially_seen": false,
+  "first_turn_toward_target": false,
+  "first_turn": "right",
+  "centred": true,
+  "acquired_step": 26,
+  "reacquired": true,
+  "search_steps": 158,
+  "yaw_swept_deg": 1961.7236311045551,
+  "height_range_m": [
+   6.478671431541443,
+   6.981973052024841
+  ],
+  "climbed_m": 0.000244140625,
+  "stop_distance_m": null,
+  "other_objects_m": {
+   "orange_ball": 77.95173848307816
+  },
+  "stopped_at_other": [],
+  "action_jump": 0.05984892905007845,
+  "seconds": 130.90833806991577,
+  "mean_decision_s": 0.5477336320916978,
+  "policy": "oft",
+  "set": "G1"
+ },
+ "climb_after_sight_m": 0.05601787567138672,
+ "trace": [
+  {
+   "step": 0,
+   "distance_m": 36.157599697032495,
+   "bearing_deg": -137.03339233076161,
+   "height_m": 6.981728911399841,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00262451171875,
+    0.21
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 1,
+   "distance_m": 36.157599697032495,
+   "bearing_deg": -137.54422134847968,
+   "height_m": 6.981973052024841,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00244140625,
+    0.21
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 2,
+   "distance_m": 36.157599697032495,
+   "bearing_deg": -150.2549608837241,
+   "height_m": 6.976481795310974,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.0006103515625,
+    0.2042578125
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 3,
+   "distance_m": 36.157599697032495,
+   "bearing_deg": -154.89472010043062,
+   "height_m": 6.974058508872986,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    -0.00189208984375,
+    0.1763671875
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 4,
+   "distance_m": 36.157599697032495,
+   "bearing_deg": -162.71988488702283,
+   "height_m": 6.973519682884216,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00152587890625,
+    0.19195312499999997
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 5,
+   "distance_m": 36.157599697032495,
+   "bearing_deg": -168.51535915078443,
+   "height_m": 6.974548697471619,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.00390625,
+    0.006683349609375,
+    0.20097656249999998
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 6,
+   "distance_m": 36.157599697032495,
+   "bearing_deg": -175.34285008376932,
+   "height_m": 6.973778128623962,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.001953125,
+    0.0062255859375,
+    0.21
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 7,
+   "distance_m": 36.15806282823421,
+   "bearing_deg": 176.99353670995865,
+   "height_m": 6.969680190086365,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00408935546875,
+    0.21
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 8,
+   "distance_m": 36.15957967776285,
+   "bearing_deg": 169.81300094167995,
+   "height_m": 6.964396834373474,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00634765625,
+    0.21
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 9,
+   "distance_m": 36.16097429318663,
+   "bearing_deg": 162.26882621371965,
+   "height_m": 6.95971143245697,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.0050048828125,
+    0.2042578125
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 10,
+   "distance_m": 36.16183344677438,
+   "bearing_deg": 154.93650269771817,
+   "height_m": 6.954274535179138,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.0045166015625,
+    0.21
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 11,
+   "distance_m": 36.16183344677438,
+   "bearing_deg": 147.705497237111,
+   "height_m": 6.949060797691345,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00457763671875,
+    0.20835937499999999
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 12,
+   "distance_m": 36.16183344677438,
+   "bearing_deg": 140.30455043797568,
+   "height_m": 6.944441199302673,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.005615234375,
+    0.20179687500000001
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 13,
+   "distance_m": 36.16183344677438,
+   "bearing_deg": 132.84829072495526,
+   "height_m": 6.939571738243103,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00439453125,
+    0.2042578125
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 14,
+   "distance_m": 36.16183344677438,
+   "bearing_deg": 126.33090270417937,
+   "height_m": 6.934426665306091,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00128173828125,
+    0.20015625
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 15,
+   "distance_m": 36.16183344677438,
+   "bearing_deg": 118.57997563195923,
+   "height_m": 6.930076003074646,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.00390625,
+    0.0020751953125,
+    0.185390625
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 16,
+   "distance_m": 36.16183344677438,
+   "bearing_deg": 111.93895462607429,
+   "height_m": 6.927483916282654,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00335693359375,
+    0.198515625
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 17,
+   "distance_m": 36.162207026301395,
+   "bearing_deg": 105.53289195856058,
+   "height_m": 6.925046324729919,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.001953125,
+    0.00543212890625,
+    0.19769531249999997
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 18,
+   "distance_m": 36.16284903364173,
+   "bearing_deg": 98.3231570287502,
+   "height_m": 6.921965003013611,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.00390625,
+    -0.00042724609375,
+    0.20917968750000002
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 19,
+   "distance_m": 36.16349470750226,
+   "bearing_deg": 91.38839224953314,
+   "height_m": 6.917924284934998,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00244140625,
+    0.21
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 20,
+   "distance_m": 36.163680396103615,
+   "bearing_deg": 83.88542323208635,
+   "height_m": 6.9163535833358765,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00335693359375,
+    0.21
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 21,
+   "distance_m": 36.163518229920825,
+   "bearing_deg": 76.4486112702423,
+   "height_m": 6.914134383201599,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00506591796875,
+    0.21
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 22,
+   "distance_m": 36.16416767368482,
+   "bearing_deg": 69.23712667657315,
+   "height_m": 6.911129355430603,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00433349609375,
+    0.21
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 23,
+   "distance_m": 36.16481715735652,
+   "bearing_deg": 61.48521481599494,
+   "height_m": 6.906733870506287,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.0067138671875,
+    0.20917968750000002
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 24,
+   "distance_m": 36.16481715735652,
+   "bearing_deg": 54.82389772174784,
+   "height_m": 6.9024118185043335,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00360107421875,
+    0.20917968750000002
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 25,
+   "distance_m": 36.16481715735652,
+   "bearing_deg": 46.915894664351484,
+   "height_m": 6.896875739097595,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00518798828125,
+    0.2075390625
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 26,
+   "distance_m": 36.16481715735652,
+   "bearing_deg": 39.715744346177104,
+   "height_m": 6.892155051231384,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00054931640625,
+    0.21
+   ],
+   "teacher_state": "align"
+  },
+  {
+   "step": 27,
+   "distance_m": 36.16481715735652,
+   "bearing_deg": 32.60465394045485,
+   "height_m": 6.887688994407654,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00372314453125,
+    0.21
+   ],
+   "teacher_state": "align"
+  },
+  {
+   "step": 28,
+   "distance_m": 36.16481715735652,
+   "bearing_deg": 24.752636210214693,
+   "height_m": 6.8853172063827515,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.037109375,
+    -0.00372314453125,
+    0.18867187500000002
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 29,
+   "distance_m": 36.1648104460556,
+   "bearing_deg": 18.091720300298483,
+   "height_m": 6.882664084434509,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.0,
+    -0.00250244140625,
+    0.21
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 30,
+   "distance_m": 36.15800560250591,
+   "bearing_deg": 11.395380295789888,
+   "height_m": 6.883912444114685,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.033203125,
+    0.00091552734375,
+    0.2058984375
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 31,
+   "distance_m": 36.148053173304824,
+   "bearing_deg": 3.495528856824549,
+   "height_m": 6.88560426235199,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.6728515625,
+    -0.00531005859375,
+    0.08449218750000001
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 32,
+   "distance_m": 36.13397765669924,
+   "bearing_deg": -2.982800182989724,
+   "height_m": 6.886039137840271,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.919921875,
+    0.000732421875,
+    0.019790039062499987
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 33,
+   "distance_m": 35.98955876666671,
+   "bearing_deg": -2.25372376436594,
+   "height_m": 6.882094740867615,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.923828125,
+    -0.00262451171875,
+    0.003896484375000009
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 34,
+   "distance_m": 35.62597787158329,
+   "bearing_deg": -3.6145499401689634,
+   "height_m": 6.86812150478363,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.94921875,
+    -0.00384521484375,
+    0.0026403808593750133
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 35,
+   "distance_m": 35.0506594733333,
+   "bearing_deg": -3.1663799623207503,
+   "height_m": 6.862187743186951,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.931640625,
+    0.0003662109375,
+    0.011997070312499997
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 36,
+   "distance_m": 34.32196406036132,
+   "bearing_deg": -3.5073106019269047,
+   "height_m": 6.86336362361908,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.92578125,
+    -0.00048828125,
+    0.010817871093749987
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 37,
+   "distance_m": 33.47414038002503,
+   "bearing_deg": -4.399739822038369,
+   "height_m": 6.868615508079529,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.900390625,
+    -0.00030517578125,
+    0.014765625000000004
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 38,
+   "distance_m": 32.54536868851315,
+   "bearing_deg": -4.424239869773182,
+   "height_m": 6.87501847743988,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.892578125,
+    0.00042724609375,
+    0.02419921875
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 39,
+   "distance_m": 31.607574872602832,
+   "bearing_deg": -5.588062084083769,
+   "height_m": 6.881966948509216,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.759765625,
+    -0.00604248046875,
+    0.044091796875000006
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 40,
+   "distance_m": 30.64717272080686,
+   "bearing_deg": -6.594524515484326,
+   "height_m": 6.8874229192733765,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.7333984375,
+    -0.00433349609375,
+    0.04081054687499999
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 41,
+   "distance_m": 29.653518442102705,
+   "bearing_deg": -8.946999370081144,
+   "height_m": 6.9035724401474,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.6943359375,
+    0.0015869140625,
+    0.023481445312499988
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 42,
+   "distance_m": 28.69627712426722,
+   "bearing_deg": -9.981635368101795,
+   "height_m": 6.91167676448822,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.75390625,
+    0.00128173828125,
+    0.018764648437500003
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 43,
+   "distance_m": 27.786155473468728,
+   "bearing_deg": -10.877583127543037,
+   "height_m": 6.913786292076111,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.4901123046875,
+    -0.00531005859375,
+    0.06644531249999999
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 44,
+   "distance_m": 26.884450224874545,
+   "bearing_deg": -12.057388160077588,
+   "height_m": 6.909118056297302,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.3994140625,
+    -0.00885009765625,
+    0.09720703124999999
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 45,
+   "distance_m": 26.03920684628003,
+   "bearing_deg": -16.249992745764963,
+   "height_m": 6.925968527793884,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.076171875,
+    -0.00152587890625,
+    0.11156249999999998
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 46,
+   "distance_m": 25.337709724296708,
+   "bearing_deg": -19.832899764618706,
+   "height_m": 6.93660581111908,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.115234375,
+    -0.00579833984375,
+    0.08941406249999997
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 47,
+   "distance_m": 24.775216348217675,
+   "bearing_deg": -24.49624086217173,
+   "height_m": 6.948172926902771,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.037109375,
+    -0.00201416015625,
+    0.10007812499999999
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 48,
+   "distance_m": 24.353659583114,
+   "bearing_deg": -26.98774273634897,
+   "height_m": 6.945373892784119,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.05078125,
+    -0.00152587890625,
+    0.12714843750000002
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 49,
+   "distance_m": 24.042545346885266,
+   "bearing_deg": -31.599453954466668,
+   "height_m": 6.942304015159607,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.033203125,
+    0.0003662109375,
+    0.1238671875
+   ],
+   "teacher_state": "align"
+  },
+  {
+   "step": 50,
+   "distance_m": 23.80819220397027,
+   "bearing_deg": -36.67145511395799,
+   "height_m": 6.938331961631775,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.009765625,
+    0.00225830078125,
+    0.14355468749999997
+   ],
+   "teacher_state": "align"
+  },
+  {
+   "step": 51,
+   "distance_m": 23.62960782559732,
+   "bearing_deg": -40.71473434959347,
+   "height_m": 6.934836745262146,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.001708984375,
+    0.1386328125
+   ],
+   "teacher_state": "align"
+  },
+  {
+   "step": 52,
+   "distance_m": 23.504837735398848,
+   "bearing_deg": -46.624954484008946,
+   "height_m": 6.931424498558044,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    -0.0006103515625,
+    0.13617187499999997
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 53,
+   "distance_m": 23.414661698736488,
+   "bearing_deg": -51.11613349038245,
+   "height_m": 6.928637862205505,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00067138671875,
+    0.144375
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 54,
+   "distance_m": 23.348313020631434,
+   "bearing_deg": -56.00179396480052,
+   "height_m": 6.927345633506775,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00152587890625,
+    0.198515625
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 55,
+   "distance_m": 23.300215806706035,
+   "bearing_deg": -61.56771456182237,
+   "height_m": 6.926126837730408,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    -0.000244140625,
+    0.196875
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 56,
+   "distance_m": 23.265577773364743,
+   "bearing_deg": -69.70205509807707,
+   "height_m": 6.924718260765076,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00048828125,
+    0.17554687500000002
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 57,
+   "distance_m": 23.24134829671336,
+   "bearing_deg": -75.9185237338499,
+   "height_m": 6.924182295799255,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    -0.00146484375,
+    0.1763671875
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 58,
+   "distance_m": 23.223429850856096,
+   "bearing_deg": -81.84425613826757,
+   "height_m": 6.923780798912048,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    -0.00042724609375,
+    0.17390625
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 59,
+   "distance_m": 23.21059896566581,
+   "bearing_deg": -88.21339062820188,
+   "height_m": 6.924375891685486,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    -0.00482177734375,
+    0.19195312499999997
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 60,
+   "distance_m": 23.200501625136024,
+   "bearing_deg": -94.4712417235602,
+   "height_m": 6.925260901451111,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    -0.00286865234375,
+    0.20015625
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 61,
+   "distance_m": 23.19394092434344,
+   "bearing_deg": -101.26724368773286,
+   "height_m": 6.928228735923767,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    -0.00225830078125,
+    0.20507812499999997
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 62,
+   "distance_m": 23.189052988788838,
+   "bearing_deg": -108.81765560906496,
+   "height_m": 6.931125998497009,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00201416015625,
+    0.20179687500000001
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 63,
+   "distance_m": 23.185502361314906,
+   "bearing_deg": -115.92458924730502,
+   "height_m": 6.933226943016052,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00103759765625,
+    0.19359374999999998
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 64,
+   "distance_m": 23.183045254852317,
+   "bearing_deg": -122.9680123347385,
+   "height_m": 6.932988524436951,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00250244140625,
+    0.19031249999999997
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 65,
+   "distance_m": 23.181284477603164,
+   "bearing_deg": -129.5424255858933,
+   "height_m": 6.932163596153259,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00469970703125,
+    0.20097656249999998
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 66,
+   "distance_m": 23.179802370591517,
+   "bearing_deg": -136.38876896924842,
+   "height_m": 6.930151343345642,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00103759765625,
+    0.20097656249999998
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 67,
+   "distance_m": 23.178820555628857,
+   "bearing_deg": -143.51099311057374,
+   "height_m": 6.926933646202087,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.0015869140625,
+    0.198515625
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 68,
+   "distance_m": 23.178200176607028,
+   "bearing_deg": -150.72526274386965,
+   "height_m": 6.924918532371521,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.0015869140625,
+    0.196875
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 69,
+   "distance_m": 23.177680308622552,
+   "bearing_deg": -157.37369852813916,
+   "height_m": 6.923220992088318,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.017578125,
+    0.00372314453125,
+    0.1796484375
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 70,
+   "distance_m": 23.177680308622552,
+   "bearing_deg": -164.36758689380684,
+   "height_m": 6.921447157859802,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.0025634765625,
+    0.18867187500000002
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 71,
+   "distance_m": 23.18027212413949,
+   "bearing_deg": -170.38135640369197,
+   "height_m": 6.918522238731384,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00225830078125,
+    0.21
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 72,
+   "distance_m": 23.184683099512707,
+   "bearing_deg": -177.41132602483677,
+   "height_m": 6.915825247764587,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.0042724609375,
+    0.21
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 73,
+   "distance_m": 23.187450129791,
+   "bearing_deg": 174.58559432640288,
+   "height_m": 6.91327702999115,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00238037109375,
+    0.21
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 74,
+   "distance_m": 23.189484661170003,
+   "bearing_deg": 167.6601214750159,
+   "height_m": 6.909828543663025,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00384521484375,
+    0.21
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 75,
+   "distance_m": 23.19091613430442,
+   "bearing_deg": 160.02560787543788,
+   "height_m": 6.9069026708602905,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.005706787109375,
+    0.21
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 76,
+   "distance_m": 23.192049541530423,
+   "bearing_deg": 152.70590867394074,
+   "height_m": 6.903239607810974,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00445556640625,
+    0.20917968750000002
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 77,
+   "distance_m": 23.192666508180825,
+   "bearing_deg": 145.44914527880516,
+   "height_m": 6.898534178733826,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00518798828125,
+    0.2058984375
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 78,
+   "distance_m": 23.193300808969738,
+   "bearing_deg": 137.8348890571251,
+   "height_m": 6.893802046775818,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00555419921875,
+    0.20671874999999998
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 79,
+   "distance_m": 23.193980173441634,
+   "bearing_deg": 130.54995059831253,
+   "height_m": 6.888494849205017,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00439453125,
+    0.2026171875
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 80,
+   "distance_m": 23.193980173441634,
+   "bearing_deg": 123.88421981507321,
+   "height_m": 6.883598685264587,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00372314453125,
+    0.2042578125
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 81,
+   "distance_m": 23.193980173441634,
+   "bearing_deg": 115.67093499199395,
+   "height_m": 6.878719687461853,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00323486328125,
+    0.2042578125
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 82,
+   "distance_m": 23.193980173441634,
+   "bearing_deg": 109.80842407064196,
+   "height_m": 6.874894499778748,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00201416015625,
+    0.20097656249999998
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 83,
+   "distance_m": 23.193980173441634,
+   "bearing_deg": 101.66512065561716,
+   "height_m": 6.871495604515076,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00213623046875,
+    0.2075390625
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 84,
+   "distance_m": 23.193980173441634,
+   "bearing_deg": 94.959896335913,
+   "height_m": 6.868822455406189,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00421142578125,
+    0.20343749999999997
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 85,
+   "distance_m": 23.193980173441634,
+   "bearing_deg": 87.34798714042458,
+   "height_m": 6.8662837743759155,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.0032958984375,
+    0.2042578125
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 86,
+   "distance_m": 23.193980173441634,
+   "bearing_deg": 80.54701536257055,
+   "height_m": 6.862935423851013,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00311279296875,
+    0.2075390625
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 87,
+   "distance_m": 23.193980173441634,
+   "bearing_deg": 73.0964506479427,
+   "height_m": 6.859547019004822,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00628662109375,
+    0.20179687500000001
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 88,
+   "distance_m": 23.193980173441634,
+   "bearing_deg": 65.80162228896471,
+   "height_m": 6.856045126914978,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.006866455078125,
+    0.20835937499999999
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 89,
+   "distance_m": 23.193980173441634,
+   "bearing_deg": 59.00555201009553,
+   "height_m": 6.850757002830505,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.005828857421875,
+    0.21
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 90,
+   "distance_m": 23.193980173441634,
+   "bearing_deg": 51.31133207376246,
+   "height_m": 6.844680190086365,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00494384765625,
+    0.19933593749999998
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 91,
+   "distance_m": 23.193980173441634,
+   "bearing_deg": 44.16075633422311,
+   "height_m": 6.838823676109314,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.005767822265625,
+    0.1894921875
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 92,
+   "distance_m": 23.193980173441634,
+   "bearing_deg": 37.31047016145596,
+   "height_m": 6.833319067955017,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00225830078125,
+    0.1944140625
+   ],
+   "teacher_state": "align"
+  },
+  {
+   "step": 93,
+   "distance_m": 23.193980173441634,
+   "bearing_deg": 30.741629964701946,
+   "height_m": 6.827998518943787,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.001953125,
+    -0.00018310546875,
+    0.18621093749999998
+   ],
+   "teacher_state": "align"
+  },
+  {
+   "step": 94,
+   "distance_m": 23.193980173441634,
+   "bearing_deg": 23.655093371450853,
+   "height_m": 6.824712157249451,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.0625,
+    -0.00030517578125,
+    0.17144531249999997
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 95,
+   "distance_m": 23.19357810008323,
+   "bearing_deg": 17.636530734446644,
+   "height_m": 6.82362973690033,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.078125,
+    0.002685546875,
+    0.15832031249999998
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 96,
+   "distance_m": 23.179566277222396,
+   "bearing_deg": 11.449598157000462,
+   "height_m": 6.823046088218689,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.2568359375,
+    -0.00518798828125,
+    0.146015625
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 97,
+   "distance_m": 23.146559794636506,
+   "bearing_deg": 6.823270597478481,
+   "height_m": 6.821656584739685,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.46240234375,
+    0.00115966796875,
+    0.09228515624999997
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 98,
+   "distance_m": 23.063285699885167,
+   "bearing_deg": 1.431778903962336,
+   "height_m": 6.8226341009140015,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.91015625,
+    0.0030517578125,
+    0.01548339843749999
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 99,
+   "distance_m": 22.868695594633444,
+   "bearing_deg": 0.39863963247561385,
+   "height_m": 6.818138480186462,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.876953125,
+    0.00408935546875,
+    0.020097656250000012
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 100,
+   "distance_m": 22.49203411538907,
+   "bearing_deg": 0.8111011132206378,
+   "height_m": 6.800631880760193,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.849609375,
+    0.002197265625,
+    0.022661132812500012
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 101,
+   "distance_m": 21.924828588854055,
+   "bearing_deg": -0.9624002859021622,
+   "height_m": 6.791347861289978,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.875,
+    0.0009765625,
+    0.01917480468749999
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 102,
+   "distance_m": 21.228968954609105,
+   "bearing_deg": -0.9952106600542843,
+   "height_m": 6.790784239768982,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.86328125,
+    0.00128173828125,
+    0.013740234374999993
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 103,
+   "distance_m": 20.470437177543097,
+   "bearing_deg": -1.9829834056765872,
+   "height_m": 6.791716456413269,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.84375,
+    0.0,
+    0.015073242187500002
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 104,
+   "distance_m": 19.588549839302033,
+   "bearing_deg": -2.2443317593798353,
+   "height_m": 6.795275568962097,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.810546875,
+    0.00152587890625,
+    0.016303710937499993
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 105,
+   "distance_m": 18.693253706236746,
+   "bearing_deg": -2.9763971767439528,
+   "height_m": 6.800235152244568,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.6875,
+    0.00390625,
+    0.035068359375
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 106,
+   "distance_m": 17.7947995335144,
+   "bearing_deg": -3.7349039806022537,
+   "height_m": 6.804838538169861,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.7578125,
+    0.00146484375,
+    0.018559570312499996
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 107,
+   "distance_m": 16.912832254760346,
+   "bearing_deg": -5.5372889163147,
+   "height_m": 6.812224745750427,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.2685546875,
+    0.0028076171875,
+    0.06890624999999997
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 108,
+   "distance_m": 16.071287899631574,
+   "bearing_deg": -5.725998636271531,
+   "height_m": 6.809232115745544,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.5439453125,
+    -0.00079345703125,
+    0.07998046875
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 109,
+   "distance_m": 15.322271020949664,
+   "bearing_deg": -10.224060442871385,
+   "height_m": 6.831384062767029,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.169921875,
+    6.103515625e-05,
+    0.09187500000000001
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 110,
+   "distance_m": 14.654832989868178,
+   "bearing_deg": -12.61171375313802,
+   "height_m": 6.819929480552673,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.09765625,
+    -0.00445556640625,
+    0.07218749999999999
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 111,
+   "distance_m": 14.079989394900817,
+   "bearing_deg": -16.582608177710892,
+   "height_m": 6.828403830528259,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.056640625,
+    -0.00360107421875,
+    0.06275390625000002
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 112,
+   "distance_m": 13.628196287367883,
+   "bearing_deg": -18.73629592341265,
+   "height_m": 6.829386115074158,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.068359375,
+    -0.00042724609375,
+    0.05988281250000002
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 113,
+   "distance_m": 13.300233840541647,
+   "bearing_deg": -21.01066099637517,
+   "height_m": 6.826964735984802,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.0703125,
+    -0.00213623046875,
+    0.06685546875000001
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 114,
+   "distance_m": 13.048457416960737,
+   "bearing_deg": -23.555189673209835,
+   "height_m": 6.822729468345642,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.0546875,
+    -0.00262451171875,
+    0.07218749999999999
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 115,
+   "distance_m": 12.844598102714997,
+   "bearing_deg": -26.096376768288618,
+   "height_m": 6.820482611656189,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.041015625,
+    0.00360107421875,
+    0.08080078124999998
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 116,
+   "distance_m": 12.684453221259453,
+   "bearing_deg": -28.99805274148434,
+   "height_m": 6.819807410240173,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.0390625,
+    -0.00213623046875,
+    0.09802734375000002
+   ],
+   "teacher_state": "align"
+  },
+  {
+   "step": 117,
+   "distance_m": 12.557792123073755,
+   "bearing_deg": -32.17436572426901,
+   "height_m": 6.817304968833923,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.037109375,
+    -0.00225830078125,
+    0.11484375
+   ],
+   "teacher_state": "align"
+  },
+  {
+   "step": 118,
+   "distance_m": 12.452182697991233,
+   "bearing_deg": -36.26437947122481,
+   "height_m": 6.81715714931488,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.01953125,
+    0.005859375,
+    0.1238671875
+   ],
+   "teacher_state": "align"
+  },
+  {
+   "step": 119,
+   "distance_m": 12.370114947533718,
+   "bearing_deg": -40.62014103893106,
+   "height_m": 6.817504286766052,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.029296875,
+    0.006256103515625,
+    0.12058593749999999
+   ],
+   "teacher_state": "align"
+  },
+  {
+   "step": 120,
+   "distance_m": 12.305059548994578,
+   "bearing_deg": -45.24077816334007,
+   "height_m": 6.814029097557068,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.017578125,
+    -0.00115966796875,
+    0.10130859374999998
+   ],
+   "teacher_state": "align"
+  },
+  {
+   "step": 121,
+   "distance_m": 12.253505963921127,
+   "bearing_deg": -49.34418429827785,
+   "height_m": 6.809342741966248,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0234375,
+    0.00054931640625,
+    0.11156249999999998
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 122,
+   "distance_m": 12.211885796697661,
+   "bearing_deg": -52.67177114066065,
+   "height_m": 6.80801522731781,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.017578125,
+    0.0030517578125,
+    0.10746093749999999
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 123,
+   "distance_m": 12.178370166014787,
+   "bearing_deg": -57.16276346657333,
+   "height_m": 6.806914210319519,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00128173828125,
+    0.11730468749999998
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 124,
+   "distance_m": 12.151885984890953,
+   "bearing_deg": -60.681213212110166,
+   "height_m": 6.8047789335250854,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    -0.00189208984375,
+    0.11976562500000001
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 125,
+   "distance_m": 12.131370390653851,
+   "bearing_deg": -65.32247222278129,
+   "height_m": 6.803401827812195,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00042724609375,
+    0.15093749999999997
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 126,
+   "distance_m": 12.116439215935516,
+   "bearing_deg": -69.63308243649152,
+   "height_m": 6.803748965263367,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.00390625,
+    0.00262451171875,
+    0.16816406250000002
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 127,
+   "distance_m": 12.105211474103776,
+   "bearing_deg": -76.06697854106291,
+   "height_m": 6.8033798933029175,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.015625,
+    -0.000732421875,
+    0.159140625
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 128,
+   "distance_m": 12.097667889414295,
+   "bearing_deg": -81.7093381500028,
+   "height_m": 6.801961302757263,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00042724609375,
+    0.2075390625
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 129,
+   "distance_m": 12.091969276455375,
+   "bearing_deg": -87.2043335064849,
+   "height_m": 6.801725268363953,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.003173828125,
+    0.19933593749999998
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 130,
+   "distance_m": 12.087369588641435,
+   "bearing_deg": -96.2485916754791,
+   "height_m": 6.8011215925216675,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00445556640625,
+    0.2075390625
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 131,
+   "distance_m": 12.084431233520805,
+   "bearing_deg": -101.94727053473198,
+   "height_m": 6.798924803733826,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    -6.103515625e-05,
+    0.185390625
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 132,
+   "distance_m": 12.082168368383517,
+   "bearing_deg": -109.98169531437162,
+   "height_m": 6.7957552671432495,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.006622314453125,
+    0.13042968749999997
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 133,
+   "distance_m": 12.080303444082928,
+   "bearing_deg": -115.73509487014576,
+   "height_m": 6.793936133384705,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.0037841796875,
+    0.11976562500000001
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 134,
+   "distance_m": 12.079090410731647,
+   "bearing_deg": -118.7589222292253,
+   "height_m": 6.789508700370789,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00311279296875,
+    0.12304687499999997
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 135,
+   "distance_m": 12.078605234542518,
+   "bearing_deg": -123.80998616769136,
+   "height_m": 6.785530924797058,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.0009765625,
+    0.15832031249999998
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 136,
+   "distance_m": 12.078131149856405,
+   "bearing_deg": -127.94009907191159,
+   "height_m": 6.782331347465515,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00543212890625,
+    0.18046874999999998
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 137,
+   "distance_m": 12.0776407551704,
+   "bearing_deg": -134.50162971033168,
+   "height_m": 6.780070662498474,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    -0.0015869140625,
+    0.15667968749999997
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 138,
+   "distance_m": 12.077517492748306,
+   "bearing_deg": -140.87588459936015,
+   "height_m": 6.776473879814148,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.01025390625,
+    0.1632421875
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 139,
+   "distance_m": 12.077517492748306,
+   "bearing_deg": -145.54095583985176,
+   "height_m": 6.775023341178894,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.006927490234375,
+    0.17144531249999997
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 140,
+   "distance_m": 12.077517492748306,
+   "bearing_deg": -152.01556335275603,
+   "height_m": 6.768596529960632,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.0068359375,
+    0.16734374999999999
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 141,
+   "distance_m": 12.077517492748306,
+   "bearing_deg": -157.94316146630774,
+   "height_m": 6.761832594871521,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00286865234375,
+    0.15093749999999997
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 142,
+   "distance_m": 12.077517492748306,
+   "bearing_deg": -163.5016752446987,
+   "height_m": 6.75542676448822,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.007476806640625,
+    0.14109375
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 143,
+   "distance_m": 12.077517492748306,
+   "bearing_deg": -168.80338887905623,
+   "height_m": 6.75058114528656,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00469970703125,
+    0.15093749999999997
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 144,
+   "distance_m": 12.077517492748306,
+   "bearing_deg": -173.24943254767453,
+   "height_m": 6.744555830955505,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0390625,
+    -0.0006103515625,
+    0.18867187500000002
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 145,
+   "distance_m": 12.077553096531801,
+   "bearing_deg": -179.437560516873,
+   "height_m": 6.739675879478455,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00469970703125,
+    0.20917968750000002
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 146,
+   "distance_m": 12.083724710377938,
+   "bearing_deg": 173.49199469119657,
+   "height_m": 6.737731337547302,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.005706787109375,
+    0.20507812499999997
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 147,
+   "distance_m": 12.093535126189607,
+   "bearing_deg": 165.77566969375127,
+   "height_m": 6.7340134382247925,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.0045166015625,
+    0.21
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 148,
+   "distance_m": 12.10037996086668,
+   "bearing_deg": 159.05516662636228,
+   "height_m": 6.729235053062439,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00555419921875,
+    0.18867187500000002
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 149,
+   "distance_m": 12.105589483858305,
+   "bearing_deg": 151.06889109039213,
+   "height_m": 6.724388957023621,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.0025634765625,
+    0.16242187500000002
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 150,
+   "distance_m": 12.108960407258236,
+   "bearing_deg": 145.65975152156582,
+   "height_m": 6.719615817070007,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00506591796875,
+    0.1632421875
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 151,
+   "distance_m": 12.11161520251591,
+   "bearing_deg": 139.9949907111415,
+   "height_m": 6.71590793132782,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00347900390625,
+    0.15667968749999997
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 152,
+   "distance_m": 12.113699298213975,
+   "bearing_deg": 134.0506740873517,
+   "height_m": 6.711368918418884,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00341796875,
+    0.159140625
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 153,
+   "distance_m": 12.11493820883882,
+   "bearing_deg": 128.94854893347767,
+   "height_m": 6.707553267478943,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00164794921875,
+    0.1501171875
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 154,
+   "distance_m": 12.115625313914292,
+   "bearing_deg": 122.86475295839604,
+   "height_m": 6.704027533531189,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    -0.00067138671875,
+    0.1616015625
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 155,
+   "distance_m": 12.116273262848186,
+   "bearing_deg": 118.21971976113751,
+   "height_m": 6.701835036277771,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.001953125,
+    0.000732421875,
+    0.14109375
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 156,
+   "distance_m": 12.1168998557089,
+   "bearing_deg": 112.01102580816261,
+   "height_m": 6.701262354850769,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    -0.001953125,
+    0.16078125000000001
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 157,
+   "distance_m": 12.117074305711531,
+   "bearing_deg": 107.74841057568095,
+   "height_m": 6.7007821798324585,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.001953125,
+    -0.00201416015625,
+    0.17390625
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 158,
+   "distance_m": 12.117074305711531,
+   "bearing_deg": 101.24746662159693,
+   "height_m": 6.701741576194763,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00201416015625,
+    0.18867187500000002
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 159,
+   "distance_m": 12.117386687467844,
+   "bearing_deg": 95.03765295438804,
+   "height_m": 6.702950835227966,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00299072265625,
+    0.20835937499999999
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 160,
+   "distance_m": 12.117833433027721,
+   "bearing_deg": 88.09545627487087,
+   "height_m": 6.702159285545349,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00152587890625,
+    0.21
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 161,
+   "distance_m": 12.117833433027721,
+   "bearing_deg": 80.11374956737338,
+   "height_m": 6.700108885765076,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00213623046875,
+    0.2075390625
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 162,
+   "distance_m": 12.117833433027721,
+   "bearing_deg": 73.33108737150859,
+   "height_m": 6.698356032371521,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    -0.00335693359375,
+    0.20507812499999997
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 163,
+   "distance_m": 12.117833433027721,
+   "bearing_deg": 65.76193094041456,
+   "height_m": 6.696864008903503,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    -0.00042724609375,
+    0.196875
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 164,
+   "distance_m": 12.117833433027721,
+   "bearing_deg": 58.59352335961942,
+   "height_m": 6.6980942487716675,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.006256103515625,
+    0.18621093749999998
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 165,
+   "distance_m": 12.117833433027721,
+   "bearing_deg": 52.09095650296699,
+   "height_m": 6.698228240013123,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.0054931640625,
+    0.1796484375
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 166,
+   "distance_m": 12.117833433027721,
+   "bearing_deg": 45.22521842856339,
+   "height_m": 6.694366812705994,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00433349609375,
+    0.19195312499999997
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 167,
+   "distance_m": 12.117833433027721,
+   "bearing_deg": 39.468056970375855,
+   "height_m": 6.689677119255066,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.009765625,
+    0.00079345703125,
+    0.1796484375
+   ],
+   "teacher_state": "align"
+  },
+  {
+   "step": 168,
+   "distance_m": 12.117833433027721,
+   "bearing_deg": 31.84039449521366,
+   "height_m": 6.685540080070496,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.01171875,
+    0.00311279296875,
+    0.1501171875
+   ],
+   "teacher_state": "align"
+  },
+  {
+   "step": 169,
+   "distance_m": 12.116057019864982,
+   "bearing_deg": 26.624110388749457,
+   "height_m": 6.683336615562439,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.001953125,
+    0.0023193359375,
+    0.14519531249999998
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 170,
+   "distance_m": 12.111678450955733,
+   "bearing_deg": 21.821815085152007,
+   "height_m": 6.680717349052429,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.01171875,
+    0.001220703125,
+    0.17554687500000002
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 171,
+   "distance_m": 12.10678754684614,
+   "bearing_deg": 16.313032591028275,
+   "height_m": 6.678378462791443,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.02734375,
+    0.0084228515625,
+    0.1353515625
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 172,
+   "distance_m": 12.100893222723672,
+   "bearing_deg": 9.589193740883882,
+   "height_m": 6.676099181175232,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.0546875,
+    -0.00311279296875,
+    0.0959765625
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 173,
+   "distance_m": 12.09000257379011,
+   "bearing_deg": 6.613539822247818,
+   "height_m": 6.670898795127869,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.07421875,
+    -0.00262451171875,
+    0.09269531249999999
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 174,
+   "distance_m": 12.067782334570369,
+   "bearing_deg": 3.3111762102322513,
+   "height_m": 6.670751929283142,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.13671875,
+    -0.00262451171875,
+    0.0680859375
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 175,
+   "distance_m": 12.029956406165601,
+   "bearing_deg": -0.006468052147143336,
+   "height_m": 6.672265887260437,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.056640625,
+    -0.00140380859375,
+    0.07177734374999997
+   ],
+   "teacher_state": "approach"
+  },
+  {
+   "step": 176,
+   "distance_m": 11.96885183666223,
+   "bearing_deg": -1.4812055673432383,
+   "height_m": 6.673995852470398,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.083984375,
+    -0.00335693359375,
+    0.059472656250000006
+   ],
+   "teacher_state": "stop"
+  },
+  {
+   "step": 177,
+   "distance_m": 11.891253114628745,
+   "bearing_deg": -4.866566273153555,
+   "height_m": 6.67621648311615,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.068359375,
+    -0.00250244140625,
+    0.05701171875000002
+   ],
+   "teacher_state": "stop"
+  },
+  {
+   "step": 178,
+   "distance_m": 11.816876519549218,
+   "bearing_deg": -5.986105462353114,
+   "height_m": 6.678792357444763,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.046875,
+    -0.00079345703125,
+    0.06685546875000001
+   ],
+   "teacher_state": "stop"
+  },
+  {
+   "step": 179,
+   "distance_m": 11.740239050329818,
+   "bearing_deg": -8.47832452465969,
+   "height_m": 6.68129289150238,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.064453125,
+    -0.00018310546875,
+    0.05578124999999998
+   ],
+   "teacher_state": "stop"
+  },
+  {
+   "step": 180,
+   "distance_m": 11.667303717668732,
+   "bearing_deg": -11.015637589129845,
+   "height_m": 6.682810664176941,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.0390625,
+    -0.00042724609375,
+    0.05291015624999998
+   ],
+   "teacher_state": "stop"
+  },
+  {
+   "step": 181,
+   "distance_m": 11.598530068114007,
+   "bearing_deg": -12.376961127322438,
+   "height_m": 6.683412432670593,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.029296875,
+    -0.00140380859375,
+    0.05106445312499999
+   ],
+   "teacher_state": "stop"
+  },
+  {
+   "step": 182,
+   "distance_m": 11.532982469999682,
+   "bearing_deg": -14.68062966620833,
+   "height_m": 6.684114336967468,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.0390625,
+    -0.00103759765625,
+    0.048398437499999974
+   ],
+   "teacher_state": "stop"
+  },
+  {
+   "step": 183,
+   "distance_m": 11.4773863962691,
+   "bearing_deg": -16.215436748039618,
+   "height_m": 6.685209155082703,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.044921875,
+    -0.00054931640625,
+    0.05147460937500001
+   ],
+   "teacher_state": "stop"
+  },
+  {
+   "step": 184,
+   "distance_m": 11.429469409296612,
+   "bearing_deg": -17.952364295374643,
+   "height_m": 6.686137557029724,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.0546875,
+    -0.0003662109375,
+    0.04491210937499998
+   ],
+   "teacher_state": "stop"
+  },
+  {
+   "step": 185,
+   "distance_m": 11.38289240165348,
+   "bearing_deg": -19.97244274247388,
+   "height_m": 6.686795115470886,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.03515625,
+    -6.103515625e-05,
+    0.06234375
+   ],
+   "teacher_state": "stop"
+  },
+  {
+   "step": 186,
+   "distance_m": 11.334706183672349,
+   "bearing_deg": -21.379849729809663,
+   "height_m": 6.687230467796326,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.033203125,
+    -0.00286865234375,
+    0.06193359374999999
+   ],
+   "teacher_state": "stop"
+  },
+  {
+   "step": 187,
+   "distance_m": 11.288668310638714,
+   "bearing_deg": -24.22283090884605,
+   "height_m": 6.687726378440857,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.037109375,
+    -0.00384521484375,
+    0.06685546875000001
+   ],
+   "teacher_state": "stop"
+  },
+  {
+   "step": 188,
+   "distance_m": 11.245217394982577,
+   "bearing_deg": -26.227651580515356,
+   "height_m": 6.6897677183151245,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.04296875,
+    0.00238037109375,
+    0.08203124999999997
+   ],
+   "teacher_state": "stop"
+  },
+  {
+   "step": 189,
+   "distance_m": 11.2042354892034,
+   "bearing_deg": -28.903433587462082,
+   "height_m": 6.692341685295105,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.0546875,
+    -0.00250244140625,
+    0.05783203125
+   ],
+   "teacher_state": "stop"
+  },
+  {
+   "step": 190,
+   "distance_m": 11.164364646587606,
+   "bearing_deg": -32.193842020678076,
+   "height_m": 6.692275881767273,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.04296875,
+    -0.00164794921875,
+    0.10130859374999998
+   ],
+   "teacher_state": "stop"
+  },
+  {
+   "step": 191,
+   "distance_m": 11.122706390747163,
+   "bearing_deg": -33.485905855252334,
+   "height_m": 6.69366729259491,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.041015625,
+    -0.00067138671875,
+    0.10089843750000002
+   ],
+   "teacher_state": "stop"
+  },
+  {
+   "step": 192,
+   "distance_m": 11.081684770397196,
+   "bearing_deg": -38.79824944275646,
+   "height_m": 6.695179343223572,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.0234375,
+    0.00213623046875,
+    0.11484375
+   ],
+   "teacher_state": "stop"
+  },
+  {
+   "step": 193,
+   "distance_m": 11.042064317972304,
+   "bearing_deg": -41.75465423176673,
+   "height_m": 6.695977091789246,
+   "front_seen": true,
+   "down_seen": false,
+   "action": [
+    0.017578125,
+    0.00921630859375,
+    0.129609375
+   ],
+   "teacher_state": "stop"
+  },
+  {
+   "step": 194,
+   "distance_m": 11.006286023527954,
+   "bearing_deg": -46.45729477824337,
+   "height_m": 6.69447124004364,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.029296875,
+    0.00372314453125,
+    0.10212890625000001
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 195,
+   "distance_m": 10.977274309933655,
+   "bearing_deg": -51.392329024951394,
+   "height_m": 6.688872218132019,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0078125,
+    0.00347900390625,
+    0.1238671875
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 196,
+   "distance_m": 10.952081516130743,
+   "bearing_deg": -54.04141456005416,
+   "height_m": 6.684414744377136,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.025390625,
+    0.00115966796875,
+    0.09720703124999999
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 197,
+   "distance_m": 10.930476084934032,
+   "bearing_deg": -59.717954167363374,
+   "height_m": 6.680745005607605,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00201416015625,
+    0.10458984375
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 198,
+   "distance_m": 10.91259283984781,
+   "bearing_deg": -61.90283125556196,
+   "height_m": 6.678501486778259,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.00390625,
+    -0.00079345703125,
+    0.09679687499999998
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 199,
+   "distance_m": 10.897743354751038,
+   "bearing_deg": -66.43420485944448,
+   "height_m": 6.676617503166199,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00054931640625,
+    0.14765625000000002
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 200,
+   "distance_m": 10.8871389084916,
+   "bearing_deg": -69.68903570031264,
+   "height_m": 6.6762202978134155,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00299072265625,
+    0.14519531249999998
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 201,
+   "distance_m": 10.8793712108499,
+   "bearing_deg": -76.24949558698216,
+   "height_m": 6.67549741268158,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.00390625,
+    0.003662109375,
+    0.1501171875
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 202,
+   "distance_m": 10.873890125428735,
+   "bearing_deg": -80.74782880825369,
+   "height_m": 6.673396944999695,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    -0.00189208984375,
+    0.14027343750000001
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 203,
+   "distance_m": 10.869614923205758,
+   "bearing_deg": -86.39075459063172,
+   "height_m": 6.670715689659119,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.002685546875,
+    0.15503906250000002
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 204,
+   "distance_m": 10.866741597755347,
+   "bearing_deg": -91.006787044756,
+   "height_m": 6.6704710721969604,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00457763671875,
+    0.146015625
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 205,
+   "distance_m": 10.86471954444605,
+   "bearing_deg": -96.94110127611269,
+   "height_m": 6.668619990348816,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.0057373046875,
+    0.146015625
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 206,
+   "distance_m": 10.863224926626364,
+   "bearing_deg": -101.64558433603287,
+   "height_m": 6.665087580680847,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00115966796875,
+    0.1353515625
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 207,
+   "distance_m": 10.861998324385452,
+   "bearing_deg": -106.92642284331433,
+   "height_m": 6.660566687583923,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00042724609375,
+    0.1369921875
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 208,
+   "distance_m": 10.861184725862206,
+   "bearing_deg": -111.37642742583041,
+   "height_m": 6.658169150352478,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.0008544921875,
+    0.14027343750000001
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 209,
+   "distance_m": 10.860736795774448,
+   "bearing_deg": -116.37528476695925,
+   "height_m": 6.656877875328064,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00445556640625,
+    0.12714843750000002
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 210,
+   "distance_m": 10.860449998701679,
+   "bearing_deg": -121.2271913929373,
+   "height_m": 6.65558660030365,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00152587890625,
+    0.13945312499999998
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 211,
+   "distance_m": 10.860449998701679,
+   "bearing_deg": -125.40531898383144,
+   "height_m": 6.652616858482361,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.0035400390625,
+    0.14109375
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 212,
+   "distance_m": 10.860449998701679,
+   "bearing_deg": -130.8263328938169,
+   "height_m": 6.650315642356873,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00445556640625,
+    0.1665234375
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 213,
+   "distance_m": 10.860449998701679,
+   "bearing_deg": -135.6353886568659,
+   "height_m": 6.647241473197937,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.003173828125,
+    0.17144531249999997
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 214,
+   "distance_m": 10.860449998701679,
+   "bearing_deg": -142.00414640099453,
+   "height_m": 6.643529772758484,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00775146484375,
+    0.15832031249999998
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 215,
+   "distance_m": 10.860449998701679,
+   "bearing_deg": -148.02104282380276,
+   "height_m": 6.639726996421814,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.00390625,
+    0.00634765625,
+    0.15667968749999997
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 216,
+   "distance_m": 10.860449998701679,
+   "bearing_deg": -153.092321003028,
+   "height_m": 6.633632063865662,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.005859375,
+    0.01043701171875,
+    0.1369921875
+   ],
+   "teacher_state": "climb"
+  },
+  {
+   "step": 217,
+   "distance_m": 10.86102622254182,
+   "bearing_deg": -158.8291732062621,
+   "height_m": 6.627125144004822,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.001953125,
+    0.0069580078125,
+    0.15093749999999997
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 218,
+   "distance_m": 10.862848554972834,
+   "bearing_deg": -163.02276206105765,
+   "height_m": 6.618613123893738,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.01263427734375,
+    0.132890625
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 219,
+   "distance_m": 10.865384036001297,
+   "bearing_deg": -168.88382492948534,
+   "height_m": 6.610584139823914,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.013671875,
+    0.0103759765625,
+    0.10992187499999997
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 220,
+   "distance_m": 10.867411752399523,
+   "bearing_deg": -172.9146790272133,
+   "height_m": 6.599631190299988,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.007080078125,
+    0.10746093749999999
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 221,
+   "distance_m": 10.871315401734275,
+   "bearing_deg": -176.314019435107,
+   "height_m": 6.589449763298035,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.060546875,
+    0.00494384765625,
+    0.07300781250000002
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 222,
+   "distance_m": 10.876263140044035,
+   "bearing_deg": 179.6448784117431,
+   "height_m": 6.5813668966293335,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.00390625,
+    0.006988525390625,
+    0.09474609375000001
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 223,
+   "distance_m": 10.88902955066951,
+   "bearing_deg": 178.20193173436957,
+   "height_m": 6.575194716453552,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.00390625,
+    0.0054931640625,
+    0.10664062500000002
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 224,
+   "distance_m": 10.90744390376029,
+   "bearing_deg": 173.5848706536222,
+   "height_m": 6.568534255027771,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.009765625,
+    0.0125732421875,
+    0.10828125000000002
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 225,
+   "distance_m": 10.922199963368596,
+   "bearing_deg": 170.04746024950634,
+   "height_m": 6.5618075132369995,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.0133056640625,
+    0.12878906249999997
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 226,
+   "distance_m": 10.934329697707442,
+   "bearing_deg": 166.3310427827194,
+   "height_m": 6.551694273948669,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.006256103515625,
+    0.14027343750000001
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 227,
+   "distance_m": 10.944721616003925,
+   "bearing_deg": 160.85429275357697,
+   "height_m": 6.540006995201111,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.0079345703125,
+    0.155859375
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 228,
+   "distance_m": 10.95165083481805,
+   "bearing_deg": 156.36171982636645,
+   "height_m": 6.531852126121521,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.0084228515625,
+    0.14683593749999999
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 229,
+   "distance_m": 10.956726274737864,
+   "bearing_deg": 150.18527760628854,
+   "height_m": 6.523661017417908,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.0067138671875,
+    0.155859375
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 230,
+   "distance_m": 10.960343215163668,
+   "bearing_deg": 145.618202416061,
+   "height_m": 6.515504240989685,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00543212890625,
+    0.144375
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 231,
+   "distance_m": 10.963071987603644,
+   "bearing_deg": 139.7106679309611,
+   "height_m": 6.508195757865906,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00323486328125,
+    0.14355468749999997
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 232,
+   "distance_m": 10.96494726589259,
+   "bearing_deg": 135.02893552878007,
+   "height_m": 6.502285838127136,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00189208984375,
+    0.1386328125
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 233,
+   "distance_m": 10.966207819956171,
+   "bearing_deg": 129.9400501207155,
+   "height_m": 6.498080611228943,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00360107421875,
+    0.15667968749999997
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 234,
+   "distance_m": 10.966881323220473,
+   "bearing_deg": 125.05874949629921,
+   "height_m": 6.495051264762878,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.0045166015625,
+    0.15257812499999998
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 235,
+   "distance_m": 10.967518814908932,
+   "bearing_deg": 119.18579308495106,
+   "height_m": 6.491587519645691,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00311279296875,
+    0.14683593749999999
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 236,
+   "distance_m": 10.96817431954339,
+   "bearing_deg": 114.0209719700715,
+   "height_m": 6.4874948263168335,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.0,
+    0.00250244140625,
+    0.1517578125
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 237,
+   "distance_m": 10.968358005763793,
+   "bearing_deg": 109.0827438432985,
+   "height_m": 6.4841355085372925,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.001953125,
+    0.00311279296875,
+    0.15093749999999997
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 238,
+   "distance_m": 10.968358005763793,
+   "bearing_deg": 103.38007018927634,
+   "height_m": 6.481196284294128,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.02734375,
+    -0.00250244140625,
+    0.14929687499999997
+   ],
+   "teacher_state": "search"
+  },
+  {
+   "step": 239,
+   "distance_m": 10.96840073991141,
+   "bearing_deg": 98.43011815565377,
+   "height_m": 6.478671431541443,
+   "front_seen": false,
+   "down_seen": false,
+   "action": [
+    0.005859375,
+    -0.00286865234375,
+    0.15832031249999998
+   ],
+   "teacher_state": "search"
+  }
+ ]
+}
