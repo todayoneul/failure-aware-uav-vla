@@ -1,0 +1,35 @@
+{
+  "id": "blocks",
+  "name": "Blocks",
+  "description": "Project AirSim Blocks 1.0.1 as shipped, plus objects added at run time. The cone and the ball are part of the map; the cube, the cylinder and the pyramid are meshes spawned for an episode. Four 9 m walls give each object a place from which it is hidden until the vehicle climbs. Layout `pilot` is the untouched map the pilot was trained in.",
+  "scene": "scene_basic_drone.jsonc",
+  "obstacles": "blocks.obstacles.json",
+  "ground_z": -1.0,
+  "area": {"x": [-38.0, 118.0], "y": [-118.0, 114.0]},
+  "altitude": {"start_m": [5.0, 9.0], "ceiling_m": 14.0},
+  "lighting": null,
+  "structures": [
+    {"name": "WallWestOfCone", "shape": "box", "size_m": [3.0, 40.0, 9.0], "position": [60.0, -36.0], "color": [0.62, 0.6, 0.56], "layouts": ["a", "b", "a_new", "b_new"]},
+    {"name": "WallWestOfBall", "shape": "box", "size_m": [3.0, 40.0, 9.0], "position": [60.0, 36.0], "color": [0.62, 0.6, 0.56], "layouts": ["a", "b", "a_new", "b_new"]},
+    {"name": "WallSouth", "shape": "box", "size_m": [40.0, 3.0, 9.0], "position": [34.0, -60.0], "color": [0.62, 0.6, 0.56], "layouts": ["a", "b", "a_new", "b_new"]},
+    {"name": "WallNorth", "shape": "box", "size_m": [40.0, 3.0, 9.0], "position": [34.0, 60.0], "color": [0.62, 0.6, 0.56], "layouts": ["a", "b", "a_new", "b_new"]}
+  ],
+  "objects": {
+    "blue_cone": {"noun": "the blue cone", "native": "Cone_5", "size_m": [10.0, 10.0, 10.0]},
+    "orange_ball": {"noun": "the orange ball", "native": "OrangeBall", "size_m": [10.0, 10.0, 9.7]},
+    "red_cube": {"noun": "the red cube", "object": "RedCube", "shape": "box", "size_m": [8.0, 8.0, 8.0], "color": [0.85, 0.05, 0.05]},
+    "green_cylinder": {"noun": "the green cylinder", "object": "GreenCylinder", "shape": "cylinder", "size_m": [8.0, 8.0, 9.0], "color": [0.05, 0.6, 0.1]},
+    "yellow_pyramid": {"noun": "the yellow pyramid", "object": "YellowPyramid", "shape": "pyramid", "size_m": [9.0, 9.0, 9.0], "color": [0.9, 0.8, 0.05]}
+  },
+  "train_objects": ["blue_cone", "orange_ball", "red_cube", "green_cylinder"],
+  "held_out_objects": ["yellow_pyramid"],
+  "layouts": {
+    "pilot": {"blue_cone": "native", "orange_ball": "native"},
+    "a": {"blue_cone": "native", "orange_ball": "native", "red_cube": [52.0, -84.0], "green_cylinder": [52.0, 84.0]},
+    "b": {"blue_cone": "native", "orange_ball": "native", "red_cube": [52.0, 84.0], "green_cylinder": [52.0, -84.0]},
+    "a_new": {"blue_cone": "native", "orange_ball": "native", "red_cube": [52.0, -84.0], "green_cylinder": [52.0, 84.0], "yellow_pyramid": [-24.0, 0.0]},
+    "b_new": {"blue_cone": "native", "orange_ball": "native", "red_cube": [52.0, 84.0], "green_cylinder": [52.0, -84.0], "yellow_pyramid": [-24.0, 0.0]}
+  },
+  "train_layouts": ["a", "b"],
+  "held_out_layouts": ["a_new", "b_new"]
+}

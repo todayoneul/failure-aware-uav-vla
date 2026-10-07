@@ -1,0 +1,849 @@
+{
+ "source": "Project AirSim Blocks 1.0.1: world-axis bounding boxes reported by the simulator",
+ "ground_z": -1.0,
+ "boxes": [
+  {
+   "name": "TemplateCube_Rounded_86",
+   "min": [
+    -40.1,
+    97.5
+   ],
+   "max": [
+    -30.1,
+    107.5
+   ],
+   "top_m": 5.0,
+   "parts": 1
+  },
+  {
+   "name": "TemplateCube_Rounded_185",
+   "min": [
+    -40.1,
+    107.5
+   ],
+   "max": [
+    -30.1,
+    117.5
+   ],
+   "top_m": 10.0,
+   "parts": 1
+  },
+  {
+   "name": "TemplateCube_Rounded_197",
+   "min": [
+    -40.0,
+    -122.5
+   ],
+   "max": [
+    -30.0,
+    -112.5
+   ],
+   "top_m": 10.0,
+   "parts": 2
+  },
+  {
+   "name": "TemplateCube_Rounded_91",
+   "min": [
+    -40.0,
+    -112.5
+   ],
+   "max": [
+    -30.0,
+    -102.5
+   ],
+   "top_m": 10.0,
+   "parts": 2
+  },
+  {
+   "name": "TemplateCube_Rounded_187",
+   "min": [
+    -40.0,
+    97.5
+   ],
+   "max": [
+    -30.0,
+    107.5
+   ],
+   "top_m": 10.0,
+   "parts": 1
+  },
+  {
+   "name": "TemplateCube_Rounded_186",
+   "min": [
+    -40.0,
+    107.5
+   ],
+   "max": [
+    -30.0,
+    117.5
+   ],
+   "top_m": 5.0,
+   "parts": 1
+  },
+  {
+   "name": "TemplateCube_Rounded_89",
+   "min": [
+    -30.1,
+    97.5
+   ],
+   "max": [
+    -20.1,
+    107.5
+   ],
+   "top_m": 10.0,
+   "parts": 1
+  },
+  {
+   "name": "TemplateCube_Rounded_97",
+   "min": [
+    -30.0,
+    -122.5
+   ],
+   "max": [
+    -20.0,
+    -112.5
+   ],
+   "top_m": 10.0,
+   "parts": 2
+  },
+  {
+   "name": "TemplateCube_Rounded_199",
+   "min": [
+    -30.0,
+    -112.5
+   ],
+   "max": [
+    -20.0,
+    -102.5
+   ],
+   "top_m": 10.0,
+   "parts": 2
+  },
+  {
+   "name": "TemplateCube_Rounded_90",
+   "min": [
+    -30.0,
+    97.5
+   ],
+   "max": [
+    -20.0,
+    107.5
+   ],
+   "top_m": 5.0,
+   "parts": 1
+  },
+  {
+   "name": "TemplateCube_Rounded_87",
+   "min": [
+    -30.0,
+    107.5
+   ],
+   "max": [
+    -20.0,
+    117.5
+   ],
+   "top_m": 10.0,
+   "parts": 2
+  },
+  {
+   "name": "TemplateCube_Rounded_151",
+   "min": [
+    -20.0,
+    -62.5
+   ],
+   "max": [
+    -10.0,
+    -52.5
+   ],
+   "top_m": 20.0,
+   "parts": 4
+  },
+  {
+   "name": "TemplateCube_Rounded_154",
+   "min": [
+    -20.0,
+    47.5
+   ],
+   "max": [
+    -10.0,
+    57.5
+   ],
+   "top_m": 25.0,
+   "parts": 5
+  },
+  {
+   "name": "TemplateCube_Rounded_3",
+   "min": [
+    -1.9,
+    -11.0
+   ],
+   "max": [
+    8.1,
+    -1.0
+   ],
+   "top_m": 1.5,
+   "parts": 1
+  },
+  {
+   "name": "TemplateCube_Rounded_1",
+   "min": [
+    -1.9,
+    -1.0
+   ],
+   "max": [
+    8.1,
+    9.0
+   ],
+   "top_m": 1.5,
+   "parts": 1
+  },
+  {
+   "name": "Cylinder2",
+   "min": [
+    9.6,
+    -95.5
+   ],
+   "max": [
+    10.6,
+    -94.5
+   ],
+   "top_m": 3.0,
+   "parts": 1
+  },
+  {
+   "name": "Cylinder_2",
+   "min": [
+    10.9,
+    -89.3
+   ],
+   "max": [
+    11.9,
+    -88.3
+   ],
+   "top_m": 3.0,
+   "parts": 1
+  },
+  {
+   "name": "Cylinder3",
+   "min": [
+    12.7,
+    -96.5
+   ],
+   "max": [
+    13.7,
+    -95.5
+   ],
+   "top_m": 3.0,
+   "parts": 1
+  },
+  {
+   "name": "Cylinder7",
+   "min": [
+    14.0,
+    -91.3
+   ],
+   "max": [
+    15.0,
+    -90.3
+   ],
+   "top_m": 3.0,
+   "parts": 1
+  },
+  {
+   "name": "Cylinder6",
+   "min": [
+    14.5,
+    -98.6
+   ],
+   "max": [
+    15.5,
+    -97.6
+   ],
+   "top_m": 3.0,
+   "parts": 1
+  },
+  {
+   "name": "Cylinder8",
+   "min": [
+    16.4,
+    -100.8
+   ],
+   "max": [
+    17.4,
+    -99.8
+   ],
+   "top_m": 3.0,
+   "parts": 1
+  },
+  {
+   "name": "Cylinder5",
+   "min": [
+    16.8,
+    -93.5
+   ],
+   "max": [
+    17.8,
+    -92.5
+   ],
+   "top_m": 3.0,
+   "parts": 1
+  },
+  {
+   "name": "Cylinder4",
+   "min": [
+    19.4,
+    -96.5
+   ],
+   "max": [
+    20.4,
+    -95.5
+   ],
+   "top_m": 3.0,
+   "parts": 1
+  },
+  {
+   "name": "TemplateCube_Rounded_70",
+   "min": [
+    20.0,
+    -42.5
+   ],
+   "max": [
+    30.0,
+    -32.5
+   ],
+   "top_m": 20.0,
+   "parts": 4
+  },
+  {
+   "name": "TemplateCube_Rounded_10",
+   "min": [
+    20.0,
+    -32.5
+   ],
+   "max": [
+    30.0,
+    -22.5
+   ],
+   "top_m": 10.0,
+   "parts": 2
+  },
+  {
+   "name": "TemplateCube_Rounded_102",
+   "min": [
+    20.0,
+    17.5
+   ],
+   "max": [
+    30.0,
+    27.5
+   ],
+   "top_m": 15.0,
+   "parts": 3
+  },
+  {
+   "name": "TemplateCube_Rounded_101",
+   "min": [
+    20.0,
+    27.5
+   ],
+   "max": [
+    30.0,
+    37.5
+   ],
+   "top_m": 15.0,
+   "parts": 3
+  },
+  {
+   "name": "TemplateCube_Rounded_13",
+   "min": [
+    30.0,
+    -42.5
+   ],
+   "max": [
+    40.0,
+    -32.5
+   ],
+   "top_m": 10.0,
+   "parts": 2
+  },
+  {
+   "name": "TemplateCube_Rounded_49",
+   "min": [
+    30.0,
+    -32.5
+   ],
+   "max": [
+    40.0,
+    -22.5
+   ],
+   "top_m": 10.0,
+   "parts": 2
+  },
+  {
+   "name": "TemplateCube_Rounded_100",
+   "min": [
+    30.0,
+    17.5
+   ],
+   "max": [
+    40.0,
+    27.5
+   ],
+   "top_m": 15.0,
+   "parts": 3
+  },
+  {
+   "name": "TemplateCube_Rounded_99",
+   "min": [
+    30.0,
+    27.5
+   ],
+   "max": [
+    40.0,
+    37.5
+   ],
+   "top_m": 15.0,
+   "parts": 3
+  },
+  {
+   "name": "TemplateCube_Rounded_140",
+   "min": [
+    70.0,
+    -72.5
+   ],
+   "max": [
+    80.0,
+    -62.5
+   ],
+   "top_m": 25.0,
+   "parts": 5
+  },
+  {
+   "name": "TemplateCube_Rounded_266",
+   "min": [
+    70.0,
+    -62.5
+   ],
+   "max": [
+    80.0,
+    -52.5
+   ],
+   "top_m": 25.0,
+   "parts": 5
+  },
+  {
+   "name": "TemplateCube_Rounded_267",
+   "min": [
+    70.0,
+    47.5
+   ],
+   "max": [
+    80.0,
+    57.5
+   ],
+   "top_m": 25.0,
+   "parts": 5
+  },
+  {
+   "name": "TemplateCube_Rounded_141",
+   "min": [
+    70.0,
+    57.5
+   ],
+   "max": [
+    80.0,
+    67.5
+   ],
+   "top_m": 25.0,
+   "parts": 5
+  },
+  {
+   "name": "TemplateCube_Rounded_269",
+   "min": [
+    80.0,
+    -72.5
+   ],
+   "max": [
+    90.0,
+    -62.5
+   ],
+   "top_m": 25.0,
+   "parts": 5
+  },
+  {
+   "name": "TemplateCube_Rounded_145",
+   "min": [
+    80.0,
+    -62.5
+   ],
+   "max": [
+    90.0,
+    -52.5
+   ],
+   "top_m": 25.0,
+   "parts": 5
+  },
+  {
+   "name": "TemplateCube_Rounded_148",
+   "min": [
+    80.0,
+    -22.5
+   ],
+   "max": [
+    90.0,
+    -12.5
+   ],
+   "top_m": 15.0,
+   "parts": 3
+  },
+  {
+   "name": "TemplateCube_Rounded_147",
+   "min": [
+    80.0,
+    -12.5
+   ],
+   "max": [
+    90.0,
+    -2.5
+   ],
+   "top_m": 15.0,
+   "parts": 3
+  },
+  {
+   "name": "TemplateCube_Rounded_150",
+   "min": [
+    80.0,
+    -2.5
+   ],
+   "max": [
+    90.0,
+    7.5
+   ],
+   "top_m": 15.0,
+   "parts": 3
+  },
+  {
+   "name": "TemplateCube_Rounded_149",
+   "min": [
+    80.0,
+    7.5
+   ],
+   "max": [
+    90.0,
+    17.5
+   ],
+   "top_m": 15.0,
+   "parts": 3
+  },
+  {
+   "name": "TemplateCube_Rounded_144",
+   "min": [
+    80.0,
+    47.5
+   ],
+   "max": [
+    90.0,
+    57.5
+   ],
+   "top_m": 25.0,
+   "parts": 5
+  },
+  {
+   "name": "TemplateCube_Rounded_268",
+   "min": [
+    80.0,
+    57.5
+   ],
+   "max": [
+    90.0,
+    67.5
+   ],
+   "top_m": 25.0,
+   "parts": 5
+  },
+  {
+   "name": "TemplateCube_Rounded_282",
+   "min": [
+    90.0,
+    -22.5
+   ],
+   "max": [
+    100.0,
+    -12.5
+   ],
+   "top_m": 15.0,
+   "parts": 3
+  },
+  {
+   "name": "TemplateCube_Rounded_92",
+   "min": [
+    90.0,
+    -12.5
+   ],
+   "max": [
+    100.0,
+    -2.5
+   ],
+   "top_m": 15.0,
+   "parts": 1
+  },
+  {
+   "name": "TemplateCube_Rounded_96",
+   "min": [
+    90.0,
+    -2.5
+   ],
+   "max": [
+    100.0,
+    7.5
+   ],
+   "top_m": 15.0,
+   "parts": 1
+  },
+  {
+   "name": "TemplateCube_Rounded_283",
+   "min": [
+    90.0,
+    7.5
+   ],
+   "max": [
+    100.0,
+    17.5
+   ],
+   "top_m": 15.0,
+   "parts": 3
+  },
+  {
+   "name": "TemplateCube_Rounded_210",
+   "min": [
+    100.0,
+    -122.5
+   ],
+   "max": [
+    110.0,
+    -112.5
+   ],
+   "top_m": 15.0,
+   "parts": 3
+  },
+  {
+   "name": "TemplateCube_Rounded_209",
+   "min": [
+    100.0,
+    -112.5
+   ],
+   "max": [
+    110.0,
+    -102.5
+   ],
+   "top_m": 15.0,
+   "parts": 3
+  },
+  {
+   "name": "TemplateCube_Rounded_153",
+   "min": [
+    100.0,
+    -22.5
+   ],
+   "max": [
+    110.0,
+    -12.5
+   ],
+   "top_m": 15.0,
+   "parts": 3
+  },
+  {
+   "name": "TemplateCube_Rounded_103",
+   "min": [
+    100.0,
+    -12.5
+   ],
+   "max": [
+    110.0,
+    -2.5
+   ],
+   "top_m": 15.0,
+   "parts": 1
+  },
+  {
+   "name": "TemplateCube_Rounded_138",
+   "min": [
+    100.0,
+    -2.5
+   ],
+   "max": [
+    110.0,
+    7.5
+   ],
+   "top_m": 25.0,
+   "parts": 3
+  },
+  {
+   "name": "TemplateCube_Rounded_54",
+   "min": [
+    100.0,
+    7.5
+   ],
+   "max": [
+    110.0,
+    17.5
+   ],
+   "top_m": 25.0,
+   "parts": 5
+  },
+  {
+   "name": "TemplateCube_Rounded_175",
+   "min": [
+    100.0,
+    97.5
+   ],
+   "max": [
+    110.0,
+    107.5
+   ],
+   "top_m": 10.0,
+   "parts": 2
+  },
+  {
+   "name": "TemplateCube_Rounded_173",
+   "min": [
+    100.0,
+    107.5
+   ],
+   "max": [
+    110.0,
+    117.5
+   ],
+   "top_m": 10.0,
+   "parts": 2
+  },
+  {
+   "name": "TemplateCube_Rounded_212",
+   "min": [
+    110.0,
+    -122.5
+   ],
+   "max": [
+    120.0,
+    -112.5
+   ],
+   "top_m": 15.0,
+   "parts": 3
+  },
+  {
+   "name": "TemplateCube_Rounded_211",
+   "min": [
+    110.0,
+    -112.5
+   ],
+   "max": [
+    120.0,
+    -102.5
+   ],
+   "top_m": 15.0,
+   "parts": 3
+  },
+  {
+   "name": "TemplateCube_Rounded_156",
+   "min": [
+    110.0,
+    -22.5
+   ],
+   "max": [
+    120.0,
+    -12.5
+   ],
+   "top_m": 15.0,
+   "parts": 3
+  },
+  {
+   "name": "TemplateCube_Rounded_155",
+   "min": [
+    110.0,
+    -12.5
+   ],
+   "max": [
+    120.0,
+    -2.5
+   ],
+   "top_m": 15.0,
+   "parts": 3
+  },
+  {
+   "name": "TemplateCube_Rounded_57",
+   "min": [
+    110.0,
+    -2.5
+   ],
+   "max": [
+    120.0,
+    7.5
+   ],
+   "top_m": 25.0,
+   "parts": 5
+  },
+  {
+   "name": "TemplateCube_Rounded_139",
+   "min": [
+    110.0,
+    7.5
+   ],
+   "max": [
+    120.0,
+    17.5
+   ],
+   "top_m": 25.0,
+   "parts": 5
+  },
+  {
+   "name": "TemplateCube_Rounded_81",
+   "min": [
+    110.0,
+    97.5
+   ],
+   "max": [
+    120.0,
+    107.5
+   ],
+   "top_m": 10.0,
+   "parts": 2
+  },
+  {
+   "name": "TemplateCube_Rounded_79",
+   "min": [
+    110.0,
+    107.5
+   ],
+   "max": [
+    120.0,
+    117.5
+   ],
+   "top_m": 10.0,
+   "parts": 2
+  }
+ ],
+ "objects": {
+  "Cone_5": {
+   "center": [
+    91.4,
+    -35.4
+   ],
+   "size_m": [
+    10.0,
+    10.0,
+    10.0
+   ]
+  },
+  "OrangeBall": {
+   "center": [
+    91.15,
+    32.1
+   ],
+   "size_m": [
+    10.0,
+    10.0,
+    9.7
+   ]
+  }
+ }
+}
