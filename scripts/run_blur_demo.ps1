@@ -1,6 +1,8 @@
-param([ValidateRange(1,60)][int]$MaxSteps=30,[switch]$AutoTest,[string]$Distro='Ubuntu',[ValidateSet('blur','mission')][string]$Mode='blur')
+param([ValidateRange(1,60)][int]$MaxSteps=30,[switch]$AutoTest,[string]$Distro='Ubuntu',[ValidateSet('blur','mission')][string]$Mode='blur',[ValidateSet('','step','continuous')][string]$Flight='')
 $ErrorActionPreference='Stop'
 if ($Mode -eq 'mission' -and $AutoTest) { throw 'AutoTest is blur-only; use scripts/run_model_evaluation.ps1 for mission evaluation' }
+# The mission demo flies continuously whichever launcher starts it; -Flight step restores stop-and-go.
+if ($Mode -eq 'mission' -and -not $Flight) { $Flight='continuous' }
 . (Join-Path $PSScriptRoot 'native_process_args.ps1')
 $taskRoot=Split-Path -Parent $PSScriptRoot
 $taskOutputRelative=if($Mode -eq 'mission'){'outputs/mission_demo'}else{'outputs/failure_demo'}
@@ -28,7 +30,7 @@ $taskRunToken=(Get-Content -LiteralPath (Join-Path $taskOutput 'run-info.json') 
 $taskSim=$taskMonitor=$taskViewer=$taskWorker=$null
 $taskCleanupFailure=$null
 try {
-    if ($Mode -eq 'mission') { Write-Host "MISSION CONTROL | map click or N landmark | G start | M prompt mode | R reset | B blur | Q/Esc abort and land" }
+    if ($Mode -eq 'mission') { Write-Host "MISSION CONTROL | map click or N landmark | G start | M prompt mode | R reset | B blur | Q/Esc abort and land | flight: $Flight" }
     else { Write-Host 'Gaussian Blur Demo | B: toggle | 1/2/3: severity | Q/Esc: exit' }
     Write-Host 'Click the observer window, or use its buttons. Keys apply at the next observation.'
     $taskSim=Start-Process -FilePath $taskExe -WorkingDirectory (Split-Path $taskExe) -ArgumentList @('-windowed','-ResX=1280','-ResY=720','-WinX=0','-WinY=0') -WindowStyle Normal -PassThru
@@ -49,6 +51,7 @@ try {
     $taskRunnerFlag=if($Mode -eq 'mission'){'--mission-demo'}else{'--blur-demo'}
     $taskRunnerArgs=@('-d',$Distro,'--exec',$taskWslPython,"$taskWslRoot/$taskRunnerFile",'--host',$taskHost,$taskRunnerFlag,'--steps',"$MaxSteps",'--run-token',$taskRunToken)
     if ($AutoTest) { $taskRunnerArgs+='--auto-test' }
+    if ($Mode -eq 'mission' -and $Flight) { $taskRunnerArgs+='--flight'; $taskRunnerArgs+=$Flight }
     $taskWorker=Start-Process -FilePath 'wsl.exe' -ArgumentList (Join-NativeArguments $taskRunnerArgs) -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $taskOutput 'worker.log') -RedirectStandardError (Join-Path $taskOutput 'worker-errors.log')
     Enable-ProcessExitTracking $taskWorker
     if($Mode -eq 'mission'){Write-Host 'Map loads first. Select a surface and press G; the cached model loads on the first mission.'}

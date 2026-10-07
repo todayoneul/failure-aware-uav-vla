@@ -1,4 +1,4 @@
-param([string[]]$Only=@(),[string]$Output='outputs/model_eval/run',[switch]$Resume,[string]$Suffix='',[ValidateSet('','grammar','free')][string]$Decoder='',[string]$Protocol='',[string]$Distro='Ubuntu',[switch]$ShowSimulator)
+param([string[]]$Only=@(),[string]$Output='outputs/model_eval/run',[switch]$Resume,[string]$Suffix='',[ValidateSet('','step','continuous')][string]$Flight='',[ValidateRange(0,60)][int]$MaxSteps=0,[ValidateRange(1,20)][int]$Repeats=1,[ValidateSet('','grammar','free')][string]$Decoder='',[string]$Protocol='',[string]$Distro='Ubuntu',[switch]$ShowSimulator)
 $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot 'native_process_args.ps1')
 $taskRoot=Split-Path -Parent $PSScriptRoot
@@ -28,6 +28,9 @@ try {
     $taskArgs=@('-d',$Distro,'--exec',$taskWslPython,"$taskWslRoot/scripts/evaluate_model.py",'--host',$taskHost,'--output',"$taskWslRoot/$Output")
     if ($Resume) { $taskArgs+='--resume' }
     if ($Suffix) { $taskArgs+='--suffix'; $taskArgs+=$Suffix }
+    if ($Flight) { $taskArgs+='--flight'; $taskArgs+=$Flight }
+    if ($MaxSteps) { $taskArgs+='--max-steps'; $taskArgs+="$MaxSteps" }
+    if ($Repeats -gt 1) { $taskArgs+='--repeats'; $taskArgs+="$Repeats" }
     if ($Decoder) { $taskArgs+='--decoder'; $taskArgs+=$Decoder }
     if ($Protocol) { $taskArgs+='--protocol'; $taskArgs+="$taskWslRoot/$($Protocol.Replace('\','/'))" }
     if ($Only.Count) { $taskArgs+='--only'; $taskArgs+=$Only }

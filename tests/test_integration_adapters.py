@@ -168,4 +168,88 @@ class ExecutorTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual([call[0] for call in drone.calls],['hover'])
 
 
+class ContinuousFlightTests(unittest.IsolatedAsyncioTestCase):
+    class Drone:
+        """Advances 0.5 m along +x on every state read while a position move is active."""
+        def __init__(self):
+            self.calls=[];self.x=0.;self.tasks=[]
+        def get_ground_truth_kinematics(self):
+            if self.calls and self.calls[-1][0]=='position':self.x+=.5
+            return {'pose':{'position':{'x':self.x,'y':0.,'z':-10.}}}
+        def _issue(self,name,arguments,keywords):
+            import asyncio
+            self.calls.append((name,arguments,keywords))
+            task=asyncio.get_running_loop().create_future();self.tasks.append(task)
+            return task
+        async def hover_async(self):
+            async def done():return True
+            self.calls.append(('hover',(),{}));return done()
+        async def move_by_velocity_z_async(self,*arguments,**keywords):return self._issue('velocity_z',arguments,keywords)
+        async def move_to_position_async(self,*arguments,**keywords):return self._issue('position',arguments,keywords)
+
+    def command(self,action,**limits):
+        from src.integration.projectairsim_action_adapter import convert_action
+        return convert_action(action,{'position':[0,0,-10.],'orientation':[0,0,0,1]},ground_z=-2.7,
+                              limits={'continuous':True,**limits})
+
+    async def test_leg_is_handed_off_in_flight_without_a_stop(self):
+        from src.integration.projectairsim_action_adapter import fly_until_handoff
+        from unittest.mock import AsyncMock,patch
+        drone=self.Drone();command=self.command({'fwd':5.,'down':0,'yaw':0,'stop':False})
+        with patch('src.integration.projectairsim_action_adapter.asyncio.sleep',new=AsyncMock()):
+            result=await fly_until_handoff(drone,command)
+        # Default lead is 2 s at 1 m/s: the hand-off comes 2 m before the 5 m waypoint, still moving.
+        self.assertEqual(result['handoff'],'lead');self.assertFalse(result['completed'])
+        self.assertAlmostEqual(drone.x,3.)
+        self.assertEqual([call[0] for call in drone.calls],['position'])
+
+    async def test_turn_is_waited_out_and_held_while_the_next_decision_is_made(self):
+        from src.integration.projectairsim_action_adapter import fly_until_handoff,turn_duration,HOLD_AFTER_TURN_S
+        from unittest.mock import AsyncMock,patch
+        drone=self.Drone();command=self.command({'fwd':4.,'down':0,'yaw':-1.1,'stop':False})
+        ticks=iter([0.,0.,.5,1.,1.5,2.,2.5,3.])
+        with patch('src.integration.projectairsim_action_adapter.asyncio.sleep',new=AsyncMock()):
+            result=await fly_until_handoff(drone,command,clock=lambda:next(ticks))
+        self.assertEqual(result['handoff'],'turned')
+        name,arguments,keywords=drone.calls[0]
+        self.assertEqual(name,'velocity_z');self.assertEqual(arguments[:2],(0.,0.))
+        self.assertAlmostEqual(keywords['duration'],turn_duration(command)+HOLD_AFTER_TURN_S)
+
+    async def test_short_move_stop_and_interruption(self):
+        from src.integration.projectairsim_action_adapter import fly_until_handoff
+        drone=self.Drone();result=await fly_until_handoff(drone,self.command({'fwd':.5,'down':0,'yaw':0,'stop':False}))
+        self.assertEqual(result['handoff'],'lead');self.assertEqual(drone.calls[0][0],'velocity_z')
+        drone=self.Drone();result=await fly_until_handoff(drone,self.command({'fwd':0,'down':0,'yaw':0,'stop':True}))
+        self.assertEqual(result['handoff'],'stop');self.assertEqual([call[0] for call in drone.calls],['hover'])
+        drone=self.Drone();result=await fly_until_handoff(drone,self.command({'fwd':5.,'down':0,'yaw':0,'stop':False}),
+                                                          interrupted=lambda:True)
+        self.assertEqual(result['handoff'],'interrupted');self.assertEqual(drone.x,0.)
+
+    def test_altitude_follows_the_commanded_height_not_the_tracking_error(self):
+        from src.integration.projectairsim_action_adapter import convert_action
+        level={'fwd':5.,'down':0,'yaw':0,'stop':False}
+        # The vehicle sags 0.2 m below the height it was last sent to; "no vertical change" must not adopt the sag.
+        sagging={'position':[0,0,-9.8],'orientation':[0,0,0,1]}
+        self.assertAlmostEqual(convert_action(level,sagging,ground_z=-2.7,altitude_reference=-10.)['target_z'],-10.)
+        self.assertAlmostEqual(convert_action(level,sagging,ground_z=-2.7)['target_z'],-9.8)
+        climb=convert_action({'fwd':5.,'down':-2.,'yaw':0,'stop':False},sagging,ground_z=-2.7,altitude_reference=-10.)
+        self.assertAlmostEqual(climb['target_z'],-12.)
+        self.assertFalse(convert_action(level,sagging,ground_z=-2.7)['continuous'])
+        self.assertTrue(self.command(level)['continuous'])
+        with self.assertRaises(ValueError):convert_action(level,sagging,ground_z=-2.7,limits={'continuous':1})
+
+    async def test_guard_selects_the_executor_from_the_command(self):
+        from src.mission.flight import guarded_execute
+        from src.mission.manager import MissionManager,MissionTarget
+        from unittest.mock import AsyncMock,Mock,patch
+        state={'position':[0,0,-10.],'orientation':[0,0,0,1],'velocity':[0,0,0]}
+        for continuous in (True,False):
+            manager=MissionManager();manager.select(MissionTarget('surface',(40,0,-2.5),'depth'));manager.start(state,now=0)
+            command=self.command({'fwd':5.,'down':0,'yaw':0,'stop':False},continuous=continuous)
+            with patch('src.mission.flight.execute_action',new=AsyncMock(return_value={'hover':True})) as stepwise, \
+                 patch('src.mission.flight.fly_until_handoff',new=AsyncMock(return_value={'handoff':'lead'})) as handoff:
+                await guarded_execute(Mock(),manager,state,[],10,command,now=1)
+            self.assertEqual(handoff.await_count,int(continuous));self.assertEqual(stepwise.await_count,int(not continuous))
+
+
 if __name__=='__main__': unittest.main()

@@ -2,7 +2,7 @@
 import asyncio
 from time import monotonic
 import math
-from src.integration.projectairsim_action_adapter import execute_action
+from src.integration.projectairsim_action_adapter import execute_action,fly_until_handoff
 
 PRE_DESCENT_CLEARANCE_M=1.5
 PRE_DESCENT_SPEED_MPS=2.
@@ -13,7 +13,12 @@ async def guarded_execute(drone,manager,state,events,flight_stamp,command,now=No
     if any(event.get('time_stamp',0)>flight_stamp for event in events):manager.fail('collision')
     manager.observe(state,now=now)
     if manager.status!='NAVIGATING':return None
-    return await asyncio.wait_for(execute_action(drone,command),timeout=2*command.get('expected_duration_sec',1.)+15)
+    limit=2*command.get('expected_duration_sec',1.)+15
+    if command.get('continuous'):
+        # The command keeps flying after this returns; a collision ends the wait at once.
+        collided=lambda:any(event.get('time_stamp',0)>flight_stamp for event in events)
+        return await asyncio.wait_for(fly_until_handoff(drone,command,interrupted=collided),timeout=limit+5)
+    return await asyncio.wait_for(execute_action(drone,command),timeout=limit)
 
 
 def approach_altitude(current_z,surface_z,ground_z,limits,distance_m):

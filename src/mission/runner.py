@@ -34,12 +34,14 @@ async def main(args):
     manager=MissionManager(**limits)
     flight_path=ROOT/'configs/flight_limits.json'
     envelope=flight_limits(json.loads(flight_path.read_text()) if flight_path.exists() else None)
+    if getattr(args,'flight',None):envelope['continuous']=args.flight=='continuous'
     session=BlurDemoSession(ROOT,OUT,args.steps)
     session.update(mission=manager.snapshot(),phase='Preparing mission map',trajectory=[],flight_limits=envelope)
     history=[];trajectory=[];rows=[];decisions=[]
     client=None;drone=None;world=None;model=None;airborne=False;mission_id=0;last_request=0
     flight_stamp=None;collision_events=[];program_status='RUNNING'
     last_state=None;last_state_epoch=None;landing_error=None;landmark_index=-1;prompt_mode='hint'
+    altitude_setpoint=None
 
     def state():
         nonlocal last_state,last_state_epoch
@@ -165,7 +167,7 @@ async def main(args):
                             flight_stamp=sample['time_stamp']
                         prompt_mode=control.get('prompt_mode','hint')
                         manager.start(current);mission_id+=1;rows=[];decisions=[];trajectory=[current['position']]
-                        landing_error=None
+                        landing_error=None;altitude_setpoint=None
                         session.update(inference=None,clipped_action=None,input_verified=None,input_files={},input_step=0,completed_steps=0,
                                        decision_grounding=None,target_visibility=None,visibility_step=0,landing_confirmation=None)
                         update(current,'AeroVLA navigation')
@@ -183,8 +185,10 @@ async def main(args):
                     if climb is not None:
                         session.update(phase=f'Climbing {current["position"][2]-climb:.0f} m to clear the selected surface')
                         await hover();await climb_to(drone,climb,envelope['vertical_speed_mps'])
-                        current=state();manager.hover_z=current['position'][2]
+                        current=state();manager.hover_z=current['position'][2];altitude_setpoint=None
                         trajectory.append(current['position']);update(current,'AeroVLA navigation')
+                    # In continuous flight the vehicle is moving: this pose belongs to the frames taken next.
+                    current=state()
                     raw,visibility,camera=cameras(manager.target.position)
                     instruction=instruction_for(manager.target);hint,freeform=prompt_arguments(manager.target,prompt_mode)
                     grounding=report(current)
@@ -207,7 +211,12 @@ async def main(args):
                         record_decision(decision,'INVALID_ACTION');manager.fail('invalid_action')
                         session.update(inference=inference,control_message=inference['parse_error'])
                         update(current,'Model output was not a valid action');continue
-                    execution=state();command=convert_action(action,execution,ground_z,limits=envelope)
+                    # A stepwise vehicle has been hovering; a continuous one has flown on during inference, so
+                    # the action applies to the pose it was observed from.
+                    execution=current if envelope['continuous'] else state()
+                    command=convert_action(action,execution,ground_z,limits=envelope,
+                                           altitude_reference=altitude_setpoint if envelope['continuous'] else None)
+                    if not command['stop']:altitude_setpoint=command['target_z']
                     session.update(phase='Executing AeroVLA action',clipped_action=command)
                     returns=await guarded_execute(drone,manager,execution,collision_events,flight_stamp,command)
                     if returns is None:
@@ -219,7 +228,8 @@ async def main(args):
                         record_decision(decision,'COMMAND_REJECTED')
                         manager.fail('command_rejected')
                         raise RuntimeError(f'Flight command rejected: {returns}')
-                    await asyncio.sleep(.3);after=state()
+                    if not envelope['continuous']:await asyncio.sleep(.3)
+                    after=state()
                     manager.record_step(execution,after,action['stop'],collided());trajectory.append(after['position'])
                     row={'mission_id':mission_id,'step':manager.steps,'epoch':time.time(),'position':after['position'],
                          'target':manager.goal_position,'distance':manager.metrics(after),'instruction':instruction,
@@ -300,6 +310,7 @@ async def main(args):
 if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('--host',required=True)
     parser.add_argument('--mission-demo',action='store_true');parser.add_argument('--steps',type=int,default=60)
+    parser.add_argument('--flight',choices=('step','continuous'),help='override configs/flight_limits.json')
     parser.add_argument('--run-token');args=parser.parse_args()
     if not 1<=args.steps<=60:parser.error('--steps within 1..60')
     asyncio.run(main(args))

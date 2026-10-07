@@ -39,6 +39,15 @@ MAP_VIEW={'position':[45.,0.,-150.],'rpy':[0,-90,0]}
 def yaw_of(state):return float(Rotation.from_quat(state['orientation']).as_euler('xyz')[2])
 
 
+def motion_profile(poses,start_stamp,end_stamp):
+    """How steadily the vehicle moved between the first decision and the end of navigation (simulation time)."""
+    window=[pose for pose in poses if start_stamp<=pose[0]<=end_stamp]
+    speeds=[math.hypot(b[1]-a[1],b[2]-a[2])/((b[0]-a[0])/1e9) for a,b in zip(window,window[1:]) if b[0]>a[0]]
+    if not speeds:return None
+    return {'navigation_sim_s':(window[-1][0]-window[0][0])/1e9,'mean_speed_mps':sum(speeds)/len(speeds),
+            'stationary_fraction':sum(speed<.1 for speed in speeds)/len(speeds)}
+
+
 def resolve_target(name,protocol,landmarks,described):
     spec=protocol['targets'][name]
     if 'landmark' in spec:
@@ -56,8 +65,13 @@ async def run_trial(trial,protocol,client,model,output,limits,envelope,landmarks
     scene['actors'][0]['origin']={'xyz':' '.join(str(v) for v in start['xyz']),'rpy-deg':f'0 0 {start["yaw_deg"]}'}
     (config/'scene_basic_drone.jsonc').write_text(json.dumps(scene,indent=2))
     world=World(client,'scene_basic_drone.jsonc',delay_after_load_sec=2,sim_config_path=str(config))
-    drone=Drone(client,world,'Drone1');collisions=[]
+    drone=Drone(client,world,'Drone1');collisions=[];poses=[]
     client.subscribe(drone.robot_info['collision_info'],lambda _,message:collisions.append(message))
+    def pose_callback(_,message):
+        # Ten samples per simulated second are enough to tell flying from standing still.
+        if not poses or message['time_stamp']-poses[-1][0]>=1e8:
+            poses.append((message['time_stamp'],message['position']['x'],message['position']['y']))
+    client.subscribe(drone.robot_info['actual_pose'],pose_callback)
     if not landmarks_cache:
         names=[name for entry in json.loads(LANDMARKS.read_text()) for name in entry['objects']]
         landmarks_cache.extend(load_landmarks(LANDMARKS,scene_records(world,names)))
@@ -69,10 +83,11 @@ async def run_trial(trial,protocol,client,model,output,limits,envelope,landmarks
             'hint_target':trial.get('hint_target'),'hint_mode':trial.get('hint_mode'),
             'prompt_condition':trial['prompt'],'direction_hint':hint,'decoder':model.decoder,'approach':trial.get('approach'),
             'target_position':list(target.position),'instruction':instruction_for(target),'rest_position':rest['position'],
-            'max_steps':trial['max_steps'],'started_epoch':time.time(),'steps':[],'error':None}
+            'max_steps':trial['max_steps'],'flight':'continuous' if envelope['continuous'] else 'step',
+            'started_epoch':time.time(),'steps':[],'error':None}
     manager=MissionManager(**{**limits,'max_steps':trial['max_steps']})
     frames=output/'frames'/trial['id'];frames.mkdir(parents=True,exist_ok=True)
-    airborne=False;flight_stamp=None;current=rest
+    airborne=False;flight_stamp=None;current=rest;altitude_setpoint=None
 
     def state():return adapt_state(drone.get_ground_truth_kinematics())
     def collided():return any(event.get('time_stamp',0)>flight_stamp for event in collisions)
@@ -107,7 +122,7 @@ async def run_trial(trial,protocol,client,model,output,limits,envelope,landmarks
                 await asyncio.wait_for(await drone.hover_async(),timeout=10)
                 result.setdefault('climbs',[]).append({'step':manager.steps+1,**await climb_to(drone,climb_z,envelope['vertical_speed_mps']),
                                                       'distance_m':manager.metrics(current)['horizontal_m']})
-                current=state();manager.hover_z=current['position'][2];trajectory.append(current['position'])
+                current=state();manager.hover_z=current['position'][2];altitude_setpoint=None;trajectory.append(current['position'])
             raw=[];visibility={}
             for sensor,name in (('FrontCamera','front'),('DownCamera','down')):
                 image,depth,meta=matched_camera_images(drone.get_images(sensor,[0,1]))
@@ -133,11 +148,16 @@ async def run_trial(trial,protocol,client,model,output,limits,envelope,landmarks
             make_mosaic(*raw).save(frames/f'{step["step"]:02d}.jpg',quality=85)
             if action is None:
                 step['parse_error']=inference['parse_error'];result['steps'].append(step);manager.fail('invalid_action');break
-            execution=state();command=convert_action(action,execution,ground_z,limits=envelope)
+            # Continuous flight has moved on during inference; the action applies to the observed pose.
+            execution=current if envelope['continuous'] else state()
+            command=convert_action(action,execution,ground_z,limits=envelope,
+                                   altitude_reference=altitude_setpoint if envelope['continuous'] else None)
+            if not command['stop']:altitude_setpoint=command['target_z']
             started=time.time()
             returns=await guarded_execute(drone,manager,execution,collisions,flight_stamp,command)
             if returns is None:result['steps'].append(step);break
-            await asyncio.sleep(.3);after=state()
+            if not envelope['continuous']:await asyncio.sleep(.3)
+            after=state()
             manager.record_step(execution,after,action['stop'],collided());trajectory.append(after['position'])
             step.update(command={k:command[k] for k in ('mode','yaw_delta_rad','displacement_ned','target_position','altitude_clamped')},
                         command_returns=returns,command_s=time.time()-started,after_position=after['position'],
@@ -148,6 +168,10 @@ async def run_trial(trial,protocol,client,model,output,limits,envelope,landmarks
             with (output/'steps.jsonl').open('a') as file:file.write(json.dumps({'trial':trial['id'],**step})+'\n')
             print(f'{trial["id"]} step={step["step"]} out={step["raw_output"]!r} mode={command["mode"]} '
                   f'd={step["distance_after_m"]:.1f}m clr={step["clearance_m"]:.1f} state={manager.status}',flush=True)
+        result['motion']=motion_profile(poses,flight_stamp,drone.get_ground_truth_kinematics()['time_stamp'])
+        if envelope['continuous'] and manager.status!='LANDING' and airborne:
+            # An unfinished leg must not carry on while the trial is being closed.
+            await asyncio.wait_for(await drone.hover_async(),timeout=10)
         current=state()
         if manager.status=='LANDING':
             try:
@@ -187,7 +211,11 @@ async def main(args):
     output=Path(args.output);output.mkdir(parents=True,exist_ok=True)
     limits=json.loads((ROOT/'configs/mission_limits.json').read_text())
     envelope=flight_limits(json.loads((ROOT/'configs/flight_limits.json').read_text()))
+    if args.flight:envelope['continuous']=args.flight=='continuous'
     trials=[trial for trial in protocol['trials'] if not args.only or trial['id'] in args.only or trial['group'] in args.only]
+    if args.max_steps:trials=[{**trial,'max_steps':args.max_steps} for trial in trials]
+    if args.repeats>1:
+        trials=[{**trial,'base_id':trial['id'],'id':f'{trial["id"]}#{number}'} for number in range(1,args.repeats+1) for trial in trials]
     if args.suffix:
         # Repeats of the same trial definition; runs are not exactly repeatable, so they are counted separately.
         trials=[{**trial,'base_id':trial['id'],'id':trial['id']+args.suffix} for trial in trials]
@@ -222,6 +250,9 @@ if __name__=='__main__':
     parser.add_argument('--output',default=str(ROOT/'outputs/model_eval/run'))
     parser.add_argument('--only',nargs='*',help='trial ids or group names');parser.add_argument('--resume',action='store_true')
     parser.add_argument('--suffix',default='',help='appended to trial ids for a repeat pass, e.g. "#2"')
+    parser.add_argument('--flight',choices=('step','continuous'),help='override configs/flight_limits.json')
+    parser.add_argument('--max-steps',type=int,help='override every selected trial budget')
+    parser.add_argument('--repeats',type=int,default=1,help='run the selected trials this many times in one session')
     parser.add_argument('--decoder',choices=('grammar','free'),default='grammar',
                         help='grammar keeps output inside the action format; free is plain greedy decoding')
     asyncio.run(main(parser.parse_args()))

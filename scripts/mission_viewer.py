@@ -101,6 +101,8 @@ def render_canvas(telemetry,control,images):
     text(PROMPT_LABELS.get(mode,mode),940,35,.62,purple,2)
     text('Front/Down RGB + prompt -> AeroVLA; the model ends the episode',940,65,.46)
     failure=telemetry.get('failure') or {};text('Applied: '+('BLUR' if failure.get('failure_enabled') else 'NORMAL'),940,100,.6)
+    flight=telemetry.get('flight_limits') or {}
+    text('Flight: '+('continuous' if flight.get('continuous') else 'step by step'),1180,100,.6)
     for left,top,width,height,key,label in MISSION_BUTTONS+VIEW_BUTTONS+BLUR_BUTTONS:
         enabled=key!=ord('g') or status=='TARGET_SELECTED'
         cv2.rectangle(canvas,(left,top),(left+width,top+height),blue if enabled else (205,205,205),-1)

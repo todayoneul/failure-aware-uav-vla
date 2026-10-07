@@ -64,7 +64,7 @@ AeroVLA에 전달된 Front/Down RGB와 생성된 forward/down/yaw 행동입니�
 
 ![Blue cone landmark 미션의 실제 화면: 102m 비행 뒤 모델 LAND, 목표 3.6m에 착륙](outputs/examples/mission_landmark.png)
 
-맵의 평평한 지점이나 landmark를 클릭하고 **G**로 시작합니다. **N: landmark 차례로 선택, M: prompt 모드(방향 힌트 + 설명 → 설명만 → 지시문만), R: 완료 후 초기화, F/C/WASD/+/-/V: 지도 조작, B: Blur, Q/Esc: 중단·착륙**입니다. 블록 위를 클릭하면 그 블록의 종류와 색이 설명 문장이 되고, 드론은 목표 45m 안에 들어왔을 때 그 면보다 6m 위로 올라갑니다. 모델은 첫 미션에서 기존 캐시로 로딩합니다. 드론은 모델이 낸 거리만큼(최대 5m/step) 실제로 이동하고, 모델이 LAND를 내면 착륙한 뒤 그 지점이 목표 20m 안인지로 성공을 판정합니다. [현재 조작](docs/mission_demo.md#현재-조작-2026-10-06-이후).
+맵의 평평한 지점이나 landmark를 클릭하고 **G**로 시작합니다. **N: landmark 차례로 선택, M: prompt 모드(방향 힌트 + 설명 → 설명만 → 지시문만), R: 완료 후 초기화, F/C/WASD/+/-/V: 지도 조작, B: Blur, Q/Esc: 중단·착륙**입니다. 블록 위를 클릭하면 그 블록의 종류와 색이 설명 문장이 되고, 드론은 목표 45m 안에 들어왔을 때 그 면보다 6m 위로 올라갑니다. 모델은 첫 미션에서 기존 캐시로 로딩합니다. 드론은 모델이 낸 거리만큼(최대 5m/step) 실제로 이동하고, 모델이 LAND를 내면 착륙한 뒤 그 지점이 목표 20m 안인지로 성공을 판정합니다. 데모는 기본으로 **멈추지 않고 이어서 납니다**(도착 2초 전에 다음 판단을 시작). 이전처럼 step마다 멈추게 하려면 `-Flight step`을 붙입니다. [현재 조작](docs/mission_demo.md#현재-조작-2026-10-06-이후).
 
 오른쪽 Inspector는 모델에 실제로 들어간 prompt를 보여줍니다. 좌표·거리·지도·빨간 X는 모델 입력이 아닙니다.
 
@@ -131,7 +131,7 @@ outputs/examples/  드론·관찰·AI·장애 화면과 짧은 GIF
 - [x] Interactive target selection and mission runner
 - [x] Upstream-equivalent action execution, model-decided landing
 - [x] Model self-evaluation with landmarks and prompt ablations
-- [ ] Continuous flight: re-plan in the air instead of stopping every step (kept on the `feat/continuous-flight` branch)
+- [x] Continuous flight: re-plan in the air instead of stopping every step
 - [x] Grammar-constrained action decoding; roof targets approached from above
 - [x] Instruction-only prompt mode and its evaluation (the model does not follow it)
 - [ ] Reaching a described landmark and stopping near it

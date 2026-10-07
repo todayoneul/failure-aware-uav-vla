@@ -69,6 +69,19 @@ class EvaluationProtocolTests(unittest.TestCase):
         with self.assertRaises(ValueError):prompt_arguments(target,'coordinates')
 
 
+class MotionProfileTests(unittest.TestCase):
+    def test_stationary_share_separates_stop_and_go_from_continuous_flight(self):
+        from scripts.evaluate_model import motion_profile
+        second=1_000_000_000
+        # 1 m/s for two seconds, then two seconds standing, sampled every 0.5 s.
+        poses=[(int(i*second/2),min(i*.5,2.),0.) for i in range(9)]
+        profile=motion_profile(poses,0,4*second)
+        self.assertAlmostEqual(profile['navigation_sim_s'],4.);self.assertAlmostEqual(profile['mean_speed_mps'],.5)
+        self.assertAlmostEqual(profile['stationary_fraction'],.5)
+        self.assertAlmostEqual(motion_profile(poses,0,2*second)['stationary_fraction'],0.)
+        self.assertIsNone(motion_profile(poses,10*second,11*second))
+
+
 class EvaluationSummaryTests(unittest.TestCase):
     def trial(self,identifier,stop,minimum,reason=None,prompt='hint+landmark',group='prompt'):
         return {'id':identifier,'group':group,'start':'facing','target':'blue_cone','prompt_condition':prompt,

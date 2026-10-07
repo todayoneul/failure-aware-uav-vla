@@ -54,11 +54,14 @@ class FakeDrone:
 
 
 class MissionRunnerFailureTests(unittest.IsolatedAsyncioTestCase):
-    async def run_fake(self,drone,directory,invalid_action=False,guard_stop=False,model_stop=False,
+    async def run_fake(self,drone,directory,invalid_action=False,guard_stop=False,model_stop=False,continuous=False,
                        surface=None,words=None,prompt_mode=None):
         from src.mission import runner
         root=Path(directory);(root/'configs').mkdir()
         (root/'configs/mission_limits.json').write_text(json.dumps({'max_duration':300}))
+        if continuous:(root/'configs/flight_limits.json').write_text(json.dumps({'continuous':True}))
+        self.handoff=AsyncMock(return_value={'handoff':'lead','elapsed_s':1.,'completed':False})
+        self.stepwise=AsyncMock(side_effect=lambda *_:{'move':True,'hover':True})
         output=root/'outputs';output.mkdir()
         frame=np.zeros((256,256,3),dtype=np.uint8)
         session=Mock();session.telemetry={}
@@ -81,7 +84,7 @@ class MissionRunnerFailureTests(unittest.IsolatedAsyncioTestCase):
         model=Mock();model.infer.side_effect=infer
         # The policy's own LAND; the observer then quits so the completed run can be inspected.
         if model_stop:action.update(fwd=0.,stop=True,bins=None,output='09 49 48 LAND')
-        survives=model_stop or invalid_action
+        survives=model_stop or invalid_action or continuous
         if survives:
             requests=session.poll_control.return_value;polls=[]
             def poll():
@@ -108,7 +111,8 @@ class MissionRunnerFailureTests(unittest.IsolatedAsyncioTestCase):
              patch.object(runner,'matched_camera_images',return_value=(frame,np.ones((256,256))*2,
                 {'width':256,'height':256,'fov_deg':90,'position':[0,0,-4],'orientation':[0,0,0,1],'time_stamp':10})), \
              patch.dict(sys.modules,{'src.integration.aerovla_int4_loader':SimpleNamespace(AeroVLAInt4=lambda *_:model)}), \
-             patch('src.mission.flight.execute_action',side_effect=execute), \
+             patch('src.mission.flight.execute_action',side_effect=execute) as self.stepwise, \
+             patch('src.mission.flight.fly_until_handoff',new=self.handoff), \
              patch('src.mission.flight.asyncio.sleep',new=AsyncMock()),patch('builtins.print'):
             if survives:await runner.main(argparse.Namespace(steps=4,host='fake'))
             else:
@@ -148,6 +152,20 @@ class MissionRunnerFailureTests(unittest.IsolatedAsyncioTestCase):
         self.assertAlmostEqual(mission['stop']['distance_m'],2)
         self.assertEqual(events[-1]['decision_status'],'EXECUTED')
         self.assertIn('land',drone.events);self.assertLess(drone.events.index('land'),drone.events.index('disarm'))
+
+    async def test_continuous_flight_hands_off_every_step_and_never_runs_the_stepwise_executor(self):
+        drone=FakeDrone()
+        with tempfile.TemporaryDirectory() as directory:
+            result=await self.run_fake(drone,directory,continuous=True)
+        mission=result['missions'][0]
+        # The model never stops here, so the four-step budget ends the mission while the session goes on.
+        self.assertEqual(mission['state'],'FAILED');self.assertEqual(mission['reason'],'max_steps')
+        self.assertEqual(mission['executed_steps'],4);self.assertEqual(self.handoff.await_count,4)
+        self.stepwise.assert_not_called()
+        commands=[call.args[1] for call in self.handoff.await_args_list]
+        self.assertTrue(all(command['continuous'] for command in commands))
+        self.assertEqual(mission['steps'][0]['command_returns']['handoff'],'lead')
+        self.assertEqual(result['program_status'],'STOPPED')
 
     async def test_selected_roof_starts_from_above_with_its_words_in_the_instruction(self):
         drone=FakeDrone()

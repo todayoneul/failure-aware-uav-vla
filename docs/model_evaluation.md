@@ -249,8 +249,6 @@ Near는 한 step(최대 5m)보다 가까운 목표라 출발점보다 가까워�
 
 ## 연속 비행
 
-> **이 기능은 `main`에 없다.** 코드는 `feat/continuous-flight` 브랜치에 있고, 아래는 그 브랜치에서 측정한 기록이다. `main`의 데모와 평가는 step 방식만 쓴다.
-
 위 평가는 모두 step 방식이다: 이동 → 정지 → 촬영 → 추론을 반복하므로 step마다 약 1.5초씩 제자리에 떠 있다. 같은 날 **멈추지 않고 이어서 나는 방식**을 추가했다. 모델과 prompt는 그대로이고 실행 순서만 다르다.
 
 ### 동작
@@ -296,9 +294,19 @@ Near는 한 step(최대 5m)보다 가까운 목표라 출발점보다 가까워�
 
 대화형 데모에서도 연속 비행으로 두 미션을 이어서 실행했다. 좌표 목표는 2.27m에서, 이어서 재이륙한 Blue cone 미션은 93m를 날아 15.9m에서 모델이 정지·착륙했다. 종료는 정상이었다.
 
+### 기본값
+
+| 대상 | 기본 방식 | 바꾸는 법 |
+|---|---|---|
+| 대화형 데모 `run_mission_demo.ps1` (`run_blur_demo.ps1 -Mode mission` 포함) | 연속 | `-Flight step` |
+| 평가 `run_model_evaluation.ps1` | step ([flight_limits.json](../configs/flight_limits.json)의 `continuous: false`) | `-Flight continuous` |
+| Blur 데모 | step (변경 없음) | - |
+
+평가 기준선은 지금까지의 69 trial과 비교할 수 있도록 step으로 둔다.
+
 ## 깨진 출력, 블록 위 목표, 지시문만으로 찾아가기
 
-2026-10-06 저녁의 대화형 세션에서 블록 위를 목표로 고른 미션 3개가 모두 `invalid_action`으로 끝났다. 그 로그에서 출발해 세 가지를 확인하고 고쳤다. 이 절의 실제 비행은 모두 `feat/continuous-flight` 브랜치의 연속 비행으로 실행했고 새 디코더(문법 제약)를 쓴다. `main`의 step 방식으로는 다시 실행하지 않았다.
+2026-10-06 저녁의 대화형 세션에서 블록 위를 목표로 고른 미션 3개가 모두 `invalid_action`으로 끝났다. 그 로그에서 출발해 세 가지를 확인하고 고쳤다. 이 절의 실제 비행은 모두 연속 비행이고 새 디코더(문법 제약)를 쓴다.
 
 ![블록 위 목표와 지시문 방식의 실제 궤적](../outputs/examples/model_evaluation_roof.jpg)
 
@@ -421,6 +429,7 @@ Land on top of the large blue cone. Fly around, find it with your camera, then f
 | 맵 클릭 | 클릭한 물체의 종류(simulator 물체 이름)와 색(클릭한 지도 픽셀)으로 설명을 만든다. 예: `The target is the top of a gray block.` 평지는 이전처럼 일반 문장을 쓴다 |
 | 블록 위 클릭 | 목표 45m 안에 들어오면 그 면보다 6m 위로 올라간다. 착륙 뒤 고른 면 위인지 표시한다 |
 | 모델 출력 | 문법이 토큰을 바꾸면 `Grammar: token 31895 -> 7 (p 0.22)`처럼 표시하고 미션은 계속된다 |
+| 실행 방식 | `run_blur_demo.ps1 -Mode mission`으로 시작해도 연속 비행이 기본이다. 저녁 세션은 step 방식으로 실행돼 있었다. 화면의 `Flight:`에서 확인할 수 있다 |
 
 ## 한계
 
@@ -431,7 +440,6 @@ Land on top of the large blue cone. Fly around, find it with your camera, then f
 - **성공 반경 20m는 이 맵에서 느슨하다.** landmark 폭이 10m이고 cone과 wall의 중심 간격이 약 33m다. 그래서 10m·5m 결과를 함께 적었다.
 - **landmark 설명 문장은 임의로 썼다.** 다른 문장에서 결과가 달라질 수 있다.
 - **장애물 회피가 없다.** 충돌하면 simulator가 기체를 고정하므로 그 trial은 거기서 끝난다.
-- **지붕·지시문·디코더 실험은 연속 비행으로 실행했다.** 그 실행 방식은 `feat/continuous-flight` 브랜치에만 있으므로, `main`의 step 방식에서 같은 수치가 나온다고 볼 수 없다.
 - **연속 비행 비교는 조건당 5회다.** 이동 중 촬영이 결과에 주는 영향은 더 많은 반복이 있어야 말할 수 있다.
 - **지붕 실험은 조건당 3회, 지시문 실험은 물체당 2회다.** 건물 하나, 시작점 두 곳에서 본 결과다.
 - **문법 디코더는 확률이 낮은 숫자를 고를 수 있다.** 모델이 유효 토큰에 확률을 거의 주지 않은 decision에서도 행동을 만들어 낸다. 그런 decision은 기록으로 구분할 수 있지만 실행은 그대로 한다.
@@ -444,7 +452,8 @@ Land on top of the large blue cone. Fly around, find it with your camera, then f
 ```powershell
 .\scripts\run_model_evaluation.ps1                       # 전체 protocol
 .\scripts\run_model_evaluation.ps1 -Only prompt,conflict  # 그룹 또는 trial ID
-.\scripts\run_model_evaluation.ps1 -Only roof,instruction   # 블록 위 목표, 지시문만
+.\scripts\run_model_evaluation.ps1 -Only A-wall-landmark -Flight continuous -Repeats 5 -MaxSteps 60
+.\scripts\run_model_evaluation.ps1 -Only roof,instruction -Flight continuous -Repeats 3   # 블록 위 목표, 지시문만
 .\scripts\run_model_evaluation.ps1 -Only F-cone-landmark -Decoder free                    # 제약 없는 디코딩으로 비교
 ```
 
@@ -458,7 +467,7 @@ Simulator 창은 숨긴 채 실행한다(`-ShowSimulator`로 표시). 결과는 
 
 ## Tests
 
-- **Python 87/87 통과**(WSL 환경, 연속 비행 테스트 7개는 그 브랜치에 있다). 출력 문법과 토큰 교체 기록, prompt 모드 3종, 클릭한 물체의 설명, 지붕 접근 고도, 고른 면 착륙 표시, 같은 step의 충돌 우선 판정 테스트 포함. 이전 62개 중 의미가 바뀐 테스트를 다시 썼고, 실행기 API 선택·고도 제한·upstream 회전 규칙·모델 정지 판정·정체/발산 규칙·landmark 조회·힌트 없는 prompt·높은 곳 착륙·invalid 출력·평가 protocol 일관성·요약 표를 추가했다.
+- **Python 94/94 통과**(WSL 환경). 연속 비행의 인계 시점·회전 대기·중단·고도 기준·러너 연동, 출력 문법과 토큰 교체 기록, prompt 모드 3종, 클릭한 물체의 설명, 지붕 접근 고도, 고른 면 착륙 표시, 같은 step의 충돌 우선 판정 테스트 포함. 이전 62개 중 의미가 바뀐 테스트를 다시 썼고, 실행기 API 선택·고도 제한·upstream 회전 규칙·모델 정지 판정·정체/발산 규칙·landmark 조회·힌트 없는 prompt·높은 곳 착륙·invalid 출력·평가 protocol 일관성·요약 표를 추가했다.
 - **Windows PowerShell 5.1** 검사 4개(미션 초기화·launcher parse, native/WSL argv, Blur init/quit, worker exit tracking) 통과. PowerShell 7은 이 PC에 없어 다시 돌리지 못했다.
 - **Live (문법 디코더 이후):** 평가 34 trial에서 runtime 오류 0건, 26m 블록 모서리에서 끝난 1회의 정리 착륙이 거부됐다. 대화형 데모 2세션(미션 3개)은 land 처리 뒤 launcher 종료 코드 0으로 끝났다.
 - **Live (이전):** 평가 69 trial에서 runtime·cleanup 오류 0건. 대화형 데모 2세션(미션 3개) 정상 종료. 연속 비행은 비교 20 trial과 대화형 1세션(미션 2개)을 실행했고, cone 표면 근처에서 끝난 1회의 정리 착륙이 거부된 것 외에 오류는 없었다. `run_blur_demo.ps1 -AutoTest`는 6/6 PASS였고(tensor 변화 `false,false,true,true,false,false`, land True, LANDED 0), 6 step 동안 고도 변화는 2.4cm였다.
