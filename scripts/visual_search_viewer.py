@@ -37,8 +37,12 @@ def render(live,front,down,result=None):
     canvas=np.full((760,1180,3),(247,243,238),dtype=np.uint8)
     def text(value,x,y,scale=.55,color=INK,thickness=1):cv2.putText(canvas,str(value),(x,y),cv2.FONT_HERSHEY_SIMPLEX,scale,color,thickness,cv2.LINE_AA)
     step=live['step'];episode=live['episode']
-    text('MODE',20,34,.45);text(live['mode'],20,62,.85,PURPLE,2)
-    text('MODEL',330,34,.45);text(MODELS.get(live['model'],live['model']),330,62,.85,INK,2)
+    text('MODE',20,34,.45);text(live['mode'],20,62,.8,PURPLE,2)
+    text('MODEL',270,34,.45);text(live.get('model_name') or MODELS.get(live['model'],live['model']),270,62,.7,INK,2)
+    # Where this episode sits among the generalisation tests; absent for the pilot's own cases.
+    text('MAP',610,34,.45);text(live.get('map') or 'Blocks',610,62,.7,INK,2)
+    text('TARGET',730,34,.45);text(live.get('target') or episode.get('target','--'),730,62,.6,INK,2)
+    text('GENERALIZATION LEVEL',930,34,.45);text(live.get('level') or '--',930,62,.6,PURPLE,2)
     text('INSTRUCTION',20,98,.45);text(episode['instruction'],20,126,.8,INK,2)
     text('TARGET GROUND TRUTH: evaluation and display only; never sent to the model',20,156,.5,PURPLE)
     for name,frame,left in (('FRONT',front,20),('DOWN',down,420)):

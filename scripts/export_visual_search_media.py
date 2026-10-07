@@ -2,6 +2,7 @@
 
   gif           one recorded episode drawn with the observer's own renderer, frame by frame
   trajectories  top-down paths of several runs on the simulator's map picture, one row per run
+  flown         paths of generalisation runs on the map's own boxes, one panel per run and layout
 """
 import argparse
 import json
@@ -21,13 +22,19 @@ CASES={'A':'A  target centred','B':'B  target at the edge','C':'C  target not vi
 NAMES={'baseline':'AeroVLA, sentence only','oft':'AeroVLA-OFT, sentence only','teacher':'Teacher (uses the target position)'}
 
 
-def export_gif(record,episode,output,scale,seconds,hold):
+LEVELS={'G0':'G0 - seen start','G1':'G1 - unseen start','G2':'G2 - unseen object','G3':'G3 - unseen map','G4':'G4 - unseen map and object',
+        'P':'G1 - unseen words','S':'G1 - side probe'}
+
+
+def export_gif(record,episode,output,scale,seconds,hold,model_name=None):
+    from src.visual_search.maps import load_map
     data=json.loads((Path(record)/'episodes'/f'{episode}.json').read_text());summary=data['summary'];frames=[]
-    directory=Path(record)/data['traj_rel_dir']
+    directory=Path(record)/data['traj_rel_dir'];map_config=load_map(summary.get('map','blocks'))
     for index,step in enumerate(data['steps']):
         front=cv2.imread(str(directory/'frontcamera'/step['img_name']));down=cv2.imread(str(directory/'downcamera'/step['img_name']))
-        live={'mode':'VISUAL SEARCH','model':summary['policy'],'episode':summary,'step':step,'success_radius_m':data['summary'].get('success_radius_m',15.),
-              'failure':'NORMAL','raw_sha256':step['input_sha256']}
+        live={'mode':'VISUAL SEARCH','model':summary['policy'],'model_name':model_name,'episode':summary,'step':step,
+              'map':map_config['name'],'target':map_config['objects'][summary['target']]['noun'],'level':LEVELS.get(summary.get('set')),
+              'success_radius_m':data['summary'].get('success_radius_m',15.),'failure':'NORMAL','raw_sha256':step['input_sha256']}
         last=index==len(data['steps'])-1
         result={'episode':summary['id'],'reason':summary['reason'],'stopped':summary['stopped'],'final_distance_m':summary['final_distance_m']} if last else None
         canvas=render(live,front,down,result)
@@ -83,6 +90,27 @@ def export_trajectories(runs,map_directory,output,cases):
     cv2.imwrite(str(output),np.vstack([figure,legend]),[cv2.IMWRITE_JPEG_QUALITY,88]);print(output,figure.shape)
 
 
+def export_flown(runs,output,columns):
+    """Each run (LABEL=DIRECTORY) drawn on the map its episodes were flown in, split by layout."""
+    from scripts.plan_generalization import figure
+    from src.visual_search.maps import load_map
+    panels=[]
+    for item in runs:
+        label,directory=item.split('=',1);data,steps=load_run(directory)
+        episodes=[e for e in data['episodes'] if not e.get('error')];groups={}
+        for episode in episodes:groups.setdefault((episode.get('map','blocks'),episode.get('layout','pilot')),[]).append(episode)
+        for (map_id,layout),items in sorted(groups.items()):
+            paths=[(steps.get(e['id'],[]),e['target'],e['success']) for e in items];done=sum(e['success'] for e in items)
+            panels.append(figure(load_map(map_id),layout,[],None,title=f'{label}: {done}/{len(items)}   ({map_id}, layout {layout})',paths=paths,
+                                 legend='white dot: start   filled dot: stopped by itself within 15 m of the named object   square: did not   colour: the object named'))
+    height=max(panel.shape[0] for panel in panels);width=max(panel.shape[1] for panel in panels);rows=[]
+    padded=[cv2.copyMakeBorder(panel,0,height-panel.shape[0],0,width-panel.shape[1],cv2.BORDER_CONSTANT,value=(238,236,232)) for panel in panels]
+    while len(padded)%columns:padded.append(np.full_like(padded[0],(238,236,232)))
+    for index in range(0,len(padded),columns):rows.append(np.hstack(padded[index:index+columns]))
+    sheet=np.vstack(rows);scale=min(1.,2400/sheet.shape[1])
+    cv2.imwrite(str(output),cv2.resize(sheet,None,fx=scale,fy=scale,interpolation=cv2.INTER_AREA),[cv2.IMWRITE_JPEG_QUALITY,88]);print(output,sheet.shape)
+
+
 # Landmark centres are read from the first run's results; the map picture itself carries no markers.
 target_centre={}
 
@@ -91,10 +119,14 @@ def main():
     parser=argparse.ArgumentParser();commands=parser.add_subparsers(dest='command',required=True)
     gif=commands.add_parser('gif');gif.add_argument('--record',required=True);gif.add_argument('--episode',required=True);gif.add_argument('--output',required=True)
     gif.add_argument('--scale',type=float,default=.6);gif.add_argument('--seconds',type=float,default=.25);gif.add_argument('--hold',type=float,default=2.5)
+    gif.add_argument('--model-name')
     paths=commands.add_parser('trajectories');paths.add_argument('runs',nargs='+');paths.add_argument('--map',required=True);paths.add_argument('--output',required=True)
     paths.add_argument('--cases',nargs='+',default=['A','B','C']);paths.add_argument('--targets',required=True,help='JSON file with landmark id -> [x, y]')
+    flown=commands.add_parser('flown');flown.add_argument('runs',nargs='+',help='LABEL=DIRECTORY');flown.add_argument('--output',required=True)
+    flown.add_argument('--columns',type=int,default=2)
     args=parser.parse_args()
-    if args.command=='gif':export_gif(args.record,args.episode,args.output,args.scale,args.seconds,args.hold)
+    if args.command=='gif':export_gif(args.record,args.episode,args.output,args.scale,args.seconds,args.hold,args.model_name)
+    elif args.command=='flown':export_flown(args.runs,args.output,args.columns)
     else:
         target_centre.update(json.loads(Path(args.targets).read_text()));export_trajectories(args.runs,args.map,args.output,args.cases)
 
