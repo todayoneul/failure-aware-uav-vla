@@ -238,6 +238,14 @@ baseline과 같은 시작 상태(seed 0–2, 목표 2개)다. 이 시작 위치�
 | C의 평균 누적 회전 | 50° | 275° | 145° |
 | 충돌 | 0 | 0 | 0 |
 
+![같은 시작 조건의 실제 궤적](../outputs/examples/visual_search_trajectories.jpg)
+
+위는 기존 AeroVLA, 아래는 AeroVLA-OFT다. 파랑은 cone, 주황은 ball을 지시한 실행이고 원은 15m 반경이다.
+
+![AeroVLA-OFT의 실제 비행](../outputs/examples/visual_search_oft.gif)
+
+C 시작에서의 실제 비행 44 tick이다(2배속). [놓친 뒤 다시 찾는 D 실행](../outputs/examples/visual_search_oft_reacquire.gif)도 있다. 아래는 관찰 창의 한 장면이다.
+
 ![AeroVLA-OFT visual search 데모 화면](../outputs/examples/visual_search_demo.png)
 
 대화형 데모의 실제 화면이다. C 시작(목표가 뒤쪽)에서 43 tick 뒤 목표 11.1m에서 스스로 멈췄다. 십자 표시는 화면용 복사본에만 그렸고, 모델에 들어간 영상이 카메라 원본과 같은지 hash로 확인해 표시한다.
@@ -300,6 +308,9 @@ baseline과 같은 시작 상태(seed 0–2, 목표 2개)다. 이 시작 위치�
 .\scripts\run_visual_search.ps1 -Policy baseline -Cases A,B,C -Episodes 3 -Output outputs/visual_search/baseline
 .\scripts\run_visual_search.ps1 -Policy oft -Checkpoint outputs/aerovla_oft/checkpoints/pilot -Cases A,B,C,D -Episodes 3 -Output outputs/visual_search/oft_pilot
 .\assets\projectairsim-env\Scripts\python.exe scripts\summarize_visual_search.py outputs\visual_search\baseline outputs\visual_search\oft_pilot
+
+# 그림과 GIF (기록 폴더는 -Record로 만든다)
+.\assets\projectairsim-env\Scripts\python.exe scripts\export_visual_search_media.py gif --record outputs\visual_search\gif_frames --episode C-blue_cone-0 --output demo.gif
 
 # 데이터 수집 → 학습 (학습은 WSL의 integration 환경에서)
 .\scripts\run_visual_search.ps1 -Policy teacher -Cases A,B,C,D -Episodes 6 -SeedStart 100 -Output outputs/visual_search/collect -Record datasets/projectairsim_visual_search/pilot

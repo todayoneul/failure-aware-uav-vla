@@ -1,167 +1,183 @@
 # Failure-Aware UAV VLA
 
-## Overview
+**Project AirSim의 가상 드론을 Vision-Language-Action 모델(AeroVLA)로 조종하고, 영상 흐림 같은 장애를 직접 넣어 보는 오픈소스소프트웨어 과목 텀프로젝트입니다.** 지금은 "모델이 무엇을 할 수 있고 무엇을 못 하는지"를 실제 비행으로 측정하는 단계이고, 장애 감지와 복구는 그다음입니다.
 
-**Project AirSim에서 AeroVLA가 가상 드론을 조종하고, 예상치 못한 장애를 직접 넣어 보는 오픈소스소프트웨어 과목 텀프로젝트입니다.** 영상 흐림, 가림, 조종 편향 같은 상황을 만들고, 이후 감지·복구 기능으로 확장할 계획입니다.
+![Project AirSim에서 비행 중인 드론](outputs/examples/hero_drone.png)
 
-![Project AirSim에서 비행 중인 드론의 가까운 외부 시점](outputs/examples/hero_drone.png)
+## 한눈에 보기
 
-Project AirSim의 실제 드론입니다. 관찰 카메라를 가까이 배치해 기체와 주변 장애물을 함께 볼 수 있습니다.
+| 기능 | 상태 | 실행 |
+|---|---|---|
+| Front/Down 영상 → AeroVLA → 드론 이동 (closed loop) | 동작 | `.\scripts\run_blur_demo.ps1` |
+| Gaussian Blur를 실제 모델 입력에 주입 | 동작 | 같은 창에서 B, 1/2/3 |
+| 맵에서 목표를 골라 보내기 (방향 힌트 사용) | 동작. 20m 안 정지는 조건에 따라 0–60% | `.\scripts\run_mission_demo.ps1` |
+| 문장만 주고 찾아가기 (방향 힌트 없음) | AeroVLA-OFT pilot으로 이 맵에서 동작. 다른 맵은 미확인 | `.\scripts\run_visual_search_demo.ps1` |
+| 장애 자동 감지·복구 | 아직 없음 | - |
 
-## What It Does
+모델과 simulator는 저장소에 없습니다. 준비 방법은 [setup](docs/setup.md)에 있습니다.
 
-앞·아래 카메라 영상과 자연어 지시를 AeroVLA에 전달합니다. 모델이 출력한 전진·상하 이동·회전 값대로 드론을 움직이고, 새 영상을 받아 반복합니다. 모델이 LAND를 출력하면 착륙합니다.
+## Demo
 
-## Current Demo
+### 1. 문장만 주고 찾아가기 — Visual Search
 
-- ✅ Project AirSim 드론·Front/Down RGB 카메라
-- ✅ AeroVLA NF4 추론과 실제 영상 → 행동 → 이동
-- ✅ single-step 및 **10/10 closed loop**
-- ✅ **Interactive Gaussian Blur injection — 실제 AeroVLA 입력에 적용**
-- ✅ **Interactive mission target selection** — 맵 클릭 또는 landmark(파란 원뿔·주황 공·색 벽) 선택
-- ✅ **Full-map / Target Grounding Inspector** — 전체 Blocks와 실제 prompt·camera visibility 표시
-- ✅ **Mission runner** — 모델 행동을 원래 크기로 실행하고, 모델의 LAND로 끝내 착륙 후 판정
-- ✅ **Model self-evaluation** — 고정 시작점·landmark·prompt 조건별 측정: 방향 힌트가 있으면 35회 중 33회가 목표 쪽으로 접근하고 12회는 20m 안에서 스스로 정지, 힌트가 없으면 13회 모두 출발하지 않음
-- ✅ 기본 blur·control drift 데모 — **모델 없는 별도 script 시험**
+![AeroVLA-OFT가 뒤돌아 선 상태에서 파란 원뿔을 찾아 접근하는 실제 비행](outputs/examples/visual_search_oft.gif)
 
-### 드론이 어떻게 움직이나요?
-
-![실제 scripted flight의 전진과 회전](outputs/examples/drone_flight.gif)
-
-실제 simulator에서 촬영한 약 8초의 전진·회전 시연입니다. 이 GIF는 관찰 화면을 보여주기 위한 scripted control이며, 아래의 AeroVLA 실행 기록과 구분합니다.
-
-큰 Chase 화면 옆에 Front/Down 영상과 현재 명령·고도·방향을 함께 보여주는 [관찰 창](outputs/examples/observer_view.png)도 준비했습니다. 실행: `./scripts/run_demo_view.ps1` — [사용 안내](docs/setup.md#관찰-화면-demo).
-
-### AeroVLA는 무엇을 보고 판단하나요?
-
-![실제 10번째 decision의 Front/Down 영상과 AeroVLA 출력](outputs/examples/closed_loop.png)
-
-AeroVLA에 전달된 Front/Down RGB와 생성된 forward/down/yaw 행동입니다. 기존 10-step closed loop의 실제 저장 화면입니다.
-
-### 장애 상황은 어떻게 보여주나요?
-
-실제 AI 입력을 흐리게 하는 Gaussian Blur를 켜고 끌 수 있습니다. 관찰 창에서 **B: ON/OFF, 1/2/3: 강도, Q/Esc: 종료** 또는 버튼을 사용합니다.
-
-```powershell
-.\scripts\run_blur_demo.ps1
-```
-
-![같은 시점의 원본 영상과 실제 blurred AeroVLA 입력](outputs/examples/gaussian_blur_comparison.png)
-
-왼쪽은 원본 기준, 오른쪽은 실제 모델 입력입니다. [새 관찰 창](outputs/examples/gaussian_blur_observer.png)에는 prompt·모델 원문 행동·해석된 값·안전 제한 후 명령이 함께 표시됩니다. [실행과 관찰 안내](docs/gaussian_blur_demo.md).
-
-### 기존 모델 없는 장애 시연
-
-![기존 blur와 control drift 시연](outputs/examples/control_drift.png)
-
-모델 없는 별도 script에서 영상 흐림과 조종 편향을 주입한 데모입니다. 자동 감지·복구는 이후 구현합니다. [이전 드론 화면](outputs/examples/drone_view.png)도 그대로 보존했습니다.
-
-### 맵에서 목표를 골라 이동시키려면?
-
-```powershell
-.\scripts\run_mission_demo.ps1
-```
-
-![Blue cone landmark 미션의 실제 화면: 102m 비행 뒤 모델 LAND, 목표 3.6m에 착륙](outputs/examples/mission_landmark.png)
-
-맵의 평평한 지점이나 landmark를 클릭하고 **G**로 시작합니다. **N: landmark 차례로 선택, M: prompt 모드(방향 힌트 + 설명 → 설명만 → 지시문만), R: 완료 후 초기화, F/C/WASD/+/-/V: 지도 조작, B: Blur, Q/Esc: 중단·착륙**입니다. 블록 위를 클릭하면 그 블록의 종류와 색이 설명 문장이 되고, 드론은 목표 45m 안에 들어왔을 때 그 면보다 6m 위로 올라갑니다. 모델은 첫 미션에서 기존 캐시로 로딩합니다. 드론은 모델이 낸 거리만큼(최대 5m/step) 실제로 이동하고, 모델이 LAND를 내면 착륙한 뒤 그 지점이 목표 20m 안인지로 성공을 판정합니다. 데모는 기본으로 **멈추지 않고 이어서 납니다**(도착 2초 전에 다음 판단을 시작). 이전처럼 step마다 멈추게 하려면 `-Flight step`을 붙입니다. [현재 조작](docs/mission_demo.md#현재-조작-2026-10-06-이후).
-
-오른쪽 Inspector는 모델에 실제로 들어간 prompt를 보여줍니다. 좌표·거리·지도·빨간 X는 모델 입력이 아닙니다.
-
-### 모델은 실제로 목표를 찾아가나요?
-
-![조건별 실제 궤적](outputs/examples/model_evaluation.jpg)
-
-하네스를 고친 뒤 고정 시작점에서 69회 비행시켜 측정했습니다. **방향 힌트가 있으면 날아갑니다.** 힌트가 목표를 가리킨 35회(초기 거리 20m 초과) 중 33회가 목표 쪽으로 접근했고, 12회는 목표 20m 안에서 모델이 스스로 LAND를 냈습니다. 위 대화형 데모 화면도 102m 떨어진 파란 원뿔까지 가서 3.6m 지점에 착륙한 실제 실행입니다.
-
-**카메라만으로 설명된 물체를 찾아가지는 못합니다.** 방향 힌트를 빼면 13회 모두 첫 step에서 LAND였고, 설명과 힌트가 다른 물체를 가리키면 힌트 쪽으로 갔습니다. 정지 위치도 실행마다 달라, 같은 조건이 8m에서 멈추기도 하고 34m에서 멈추거나 목표물에 부딪히기도 했습니다. [무엇을 고쳤는지·방법·전체 결과·한계](docs/model_evaluation.md).
-
-### 블록 위에도 착륙하나요? 말로만 시켜도 되나요?
-
-![지붕 목표와 지시문 방식의 실제 궤적](outputs/examples/model_evaluation_roof.jpg)
-
-**블록 위는 가까운 곳에서 위로 접근할 때만 됩니다.** 모델은 고도를 거의 바꾸지 않아서, 낮게 날아가면 16m 건물의 벽 앞에서 멈추거나 부딪힙니다(지붕 착륙 0/3). 42m 거리에서 지붕보다 6m 위로 올라간 뒤 출발하면 6회 모두 목표 10m 안에서 모델이 스스로 멈췄고 5회는 그 지붕에 착륙했습니다. 97m 떨어진 기본 출발점에서는 9회 모두 실패했습니다. 가는 도중에 멈추거나, 지붕 위까지 가서 멈추지 않았습니다. 데모는 블록 위 목표가 45m 안에 들어오면 그 면보다 6m 위로 올라갑니다.
-
-**"파란 원뿔 위에 착륙해라, 돌아다니며 카메라로 찾아라"처럼 말로만 시키면 찾아가지 못합니다.** 출발은 하지만 지시한 물체 20m 안에서 멈춘 경우가 0/6입니다. 이 모델은 매 step 방향 힌트를 받는 형태로만 학습됐고, 영상 한 장만 보고 판단해 지나온 곳을 기억하지 못합니다.
-
-그 과정에서 미션이 `invalid_action`으로 끝나던 원인도 찾았습니다. 이동 명령의 숫자 토큰 하나가 원본 OpenVLA의 action 토큰으로 바뀐 출력이었고, 유효한 토큰만 고르도록 디코더를 바꾼 뒤로는 그런 종료가 없습니다. [상세](docs/model_evaluation.md#깨진-출력-블록-위-목표-지시문만으로-찾아가기).
-
-### 방향 힌트 없이 찾아가게 할 수 있나요? (AeroVLA-OFT)
-
-![AeroVLA-OFT visual search 데모](outputs/examples/visual_search_demo.png)
+`Find the blue cone.` 한 문장과 Front/Down 영상만 받은 **AeroVLA-OFT**의 실제 비행입니다(2배속). 목표가 뒤에 있어 처음에는 보이지 않습니다. 오른쪽으로 돌며 찾고, 보이면 그쪽으로 틀어 접근하고, 11m 앞에서 스스로 멈춥니다. 목표 좌표와 방향 힌트는 모델에 들어가지 않습니다. 십자 표시는 화면용 복사본에만 있고, 모델 입력이 카메라 원본과 같은지 hash로 확인해 표시합니다.
 
 ```powershell
 .\scripts\run_visual_search_demo.ps1 -Model baseline   # 기존 AeroVLA
 .\scripts\run_visual_search_demo.ps1 -Model oft        # AeroVLA-OFT (checkpoint를 학습한 PC에서)
 ```
 
-**Visual Search Mode**에서는 모델이 Front/Down 영상과 `Find the blue cone.` 같은 문장 하나만 받습니다. 목표 좌표와 방향 힌트는 점수를 매기는 데만 씁니다.
+![같은 시작 조건에서 기존 AeroVLA와 AeroVLA-OFT의 실제 궤적](outputs/examples/visual_search_trajectories.jpg)
+
+같은 시작 조건에서의 실제 궤적입니다. 위는 기존 AeroVLA, 아래는 AeroVLA-OFT입니다.
 
 | 시작 조건 (각 6회) | 기존 AeroVLA | AeroVLA-OFT |
 |---|---:|---:|
-| 목표가 정면에 보임 | 3/6 | 6/6 |
-| 목표가 가장자리에 보임 | 0/6 | 6/6 |
-| 목표가 안 보임 | 0/6 | 5/6 |
-| 접근 중 강제로 돌려 놓침 | - | 6/6 |
+| A. 목표가 정면에 보임 | 3/6 | 6/6 |
+| B. 목표가 화면 가장자리에 보임 | 0/6 | 6/6 |
+| C. 목표가 안 보임 | 0/6 | 5/6 |
+| D. 접근 중 강제로 돌려 놓침 ([GIF](outputs/examples/visual_search_oft_reacquire.gif)) | - | 6/6 |
+| 판단 주기 | 6.3초 | 0.52초 |
 
-AeroVLA-OFT는 AeroVLA adapter를 고정한 채 OpenVLA-OFT 방식의 head(한 번의 forward로 연속값 행동 4개)와 새 LoRA를 얹고, teacher가 비행한 72 episode로 학습한 pilot입니다. RTX 5070 12GB에서 39분 걸렸습니다. 판단 주기는 6.3초에서 0.52초로 줄었습니다.
+- **AeroVLA-OFT**는 AeroVLA adapter를 고정한 채 OpenVLA-OFT 방식의 head를 얹은 것입니다. 한 번의 forward로 연속값 행동 4개를 내고 그중 1개를 실행합니다. teacher가 비행한 72 episode로 RTX 5070 12GB에서 39분 학습한 pilot입니다.
+- **같은 맵, 같은 두 물체에서만 확인했습니다.** 학습에 없던 위치에서 시작하면 2/6이고, 다른 맵은 시험하지 않았습니다.
 
-**같은 맵, 같은 두 물체에서만 확인했습니다.** 학습에 없던 위치에서 시작하면 2/6이고, 다른 맵에서는 시험하지 않았습니다. [구조·데이터·학습·결과·한계](docs/aerovla_oft.md).
+[구조·데이터·학습·결과·한계](docs/aerovla_oft.md)
+
+### 2. 맵에서 목표를 골라 보내기 — Coordinate Goal Mode
+
+![Blue cone 미션의 실제 화면: 102m 비행 뒤 모델이 LAND를 내고 목표 3.6m에 착륙](outputs/examples/mission_landmark.png)
+
+```powershell
+.\scripts\run_mission_demo.ps1
+```
+
+맵의 평평한 지점이나 landmark를 클릭하고 **G**로 시작합니다. 이 모드는 목표 좌표로 계산한 방향 문장(`Fly forward-left and find the target. …`)을 모델에 줍니다. 모델이 LAND를 내면 착륙하고, 그 지점이 목표 20m 안이면 성공입니다.
+
+| 키 | 기능 |
+|---|---|
+| 맵 클릭 / N | 목표 선택 / landmark 차례로 선택 |
+| G / R | 시작 / 끝난 미션 초기화 |
+| M | prompt 모드: 방향 힌트 + 설명 → 설명만 → 지시문만 |
+| B, 1/2/3 | Gaussian Blur ON/OFF, 강도 |
+| Q / Esc | 중단하고 착륙 |
+
+- 기본은 멈추지 않고 이어서 나는 **연속 비행**입니다. `-Flight step`을 붙이면 판단마다 멈춥니다.
+- 블록 위를 클릭하면 드론은 목표 45m 안에서 그 면보다 6m 위로 올라갑니다.
+
+[조작과 화면 설명](docs/mission_demo.md)
+
+### 3. 장애 주입 — Gaussian Blur
+
+![같은 시점의 원본 영상과 실제로 모델에 들어간 흐린 영상](outputs/examples/gaussian_blur_comparison.png)
+
+```powershell
+.\scripts\run_blur_demo.ps1
+```
+
+왼쪽은 원본, 오른쪽은 실제 모델 입력입니다. 관찰 창에서 **B**로 켜고 끄고 **1/2/3**으로 강도를 바꿉니다. [관찰 창](outputs/examples/gaussian_blur_observer.png)에는 prompt, 모델 출력, 실행 명령이 함께 나옵니다. 자동 감지와 복구는 아직 없습니다. [안내](docs/gaussian_blur_demo.md)
+
+### 4. 드론과 모델 입력
+
+| | |
+|---|---|
+| ![전진과 회전](outputs/examples/drone_flight.gif) | ![10번째 decision의 Front/Down 영상과 AeroVLA 출력](outputs/examples/closed_loop.png) |
+| 관찰 카메라로 본 드론. 화면을 보여주기 위한 scripted 비행입니다 | AeroVLA가 실제로 받은 Front/Down 영상과 그때의 출력 |
+
+모델 없이 영상 흐림과 조종 편향을 넣어 본 초기 시연은 [control_drift.png](outputs/examples/control_drift.png)에 있습니다.
+
+## 측정 결과
+
+모두 Project AirSim Blocks 맵에서의 실제 비행입니다. 같은 조건도 실행마다 결과가 갈리므로 성공률이 아니라 관찰 기록으로 읽어야 합니다.
+
+![조건별 실제 궤적 69회](outputs/examples/model_evaluation.jpg)
+
+| 질문 | 결과 | 문서 |
+|---|---|---|
+| 방향 힌트가 있으면 목표로 가는가 | 35회 중 33회 접근, 12회는 20m 안에서 스스로 정지 | [Model Self-Evaluation](docs/model_evaluation.md) |
+| 방향 힌트를 빼면 | 13회 모두 첫 step에 LAND | 같은 문서 |
+| 설명과 힌트가 다른 물체를 가리키면 | 힌트 쪽으로 감 | 같은 문서 |
+| 블록 위 목표 ([그림](outputs/examples/model_evaluation_roof.jpg)) | 42m 거리에서 위로 접근하면 6/6, 97m 출발점에서는 0/9 | [해당 절](docs/model_evaluation.md#2-블록-위-목표) |
+| 말로만 시키면 (기존 AeroVLA) | 지시한 물체 20m 안 정지 0/6 | [해당 절](docs/model_evaluation.md#3-지시문만으로-찾아가기) |
+| 미션이 `invalid_action`으로 끝나던 이유 | 숫자 토큰 하나가 원본 OpenVLA의 action 토큰으로 바뀜. 디코더를 고친 뒤 0회 | [해당 절](docs/model_evaluation.md#1-invalid-출력은-토큰-하나가-바뀐-이동-명령이었다) |
+| 연속 비행의 효과 | 정지 시간 18–21% → 5–8%. 벽 충돌은 더 잦았음(10회 중 5회 대 8회 중 1회) | [연속 비행](docs/model_evaluation.md#연속-비행) |
+| 힌트 없이 찾게 학습시킬 수 있는가 | 이 맵에서는 가능(위 Visual Search 표) | [AeroVLA-OFT](docs/aerovla_oft.md) |
 
 ## System Architecture
 
 ```text
-Project AirSim → Front + Down RGB → AeroVLA NF4
-       ↑                                ↓
-     Drone ← Action Adapter ← forward / down / yaw
+                      ┌─ Coordinate Goal Mode ──────────────────────────────┐
+Project AirSim        │ Front + Down RGB + "Fly {방향} and find the target" │
+(Windows)             │        → AeroVLA NF4 → 숫자 3개 또는 LAND            │
+   │  Front / Down    └─────────────────────────────────────────────────────┘
+   ├────────────────►
+   │                  ┌─ Visual Search Mode ────────────────────────────────┐
+   │                  │ Front + Down RGB + "Find the blue cone."            │
+   │                  │        → AeroVLA-OFT → 연속값 행동 4개, 1개 실행      │
+   │                  └─────────────────────────────────────────────────────┘
+   ◄──────────────── Action Adapter ← forward / down / yaw        (WSL2)
 ```
 
-시뮬레이터는 Windows에서, 모델은 WSL2 Ubuntu에서 실행하며 직접 통신합니다.
+simulator는 Windows에서, 모델은 WSL2 Ubuntu에서 실행하고 직접 통신합니다. 두 모드는 서로 독립이고 기존 AeroVLA baseline은 그대로 남아 있습니다.
 
 ## Environment
 
-RTX 5070 12GB / Windows + WSL2 / Project AirSim / OpenVLA-7B + AeroVLA LoRA / NF4 + BF16 compute. 환경과 실행 순서는 [setup](docs/setup.md)에 있습니다.
+RTX 5070 12GB / Windows + WSL2 / Project AirSim Blocks / OpenVLA-7B + AeroVLA LoRA / NF4 + BF16 compute.
+
+- 기존 AeroVLA: 추론 약 1.0초, 판단 한 번 약 4.5–6.3초, GPU peak 9.76GiB ([baseline](docs/baseline.md))
+- AeroVLA-OFT: 추론 약 0.4초(simulator와 함께), 학습 peak 9.8GiB
 
 ## Repository Structure
 
 ```text
-docs/              setup · baseline · experiments · model_evaluation · failure_plan
-docs/archive/      이전 기술 검증 기록
-src/integration/   모델·카메라·행동 변환과 실행 코드
-src/failures/      Gaussian Blur와 작은 control protocol
-src/mission/       지도 좌표·landmark·미션 상태·성공/실패 판정
-configs/           baseline 설정, 비행·미션 한도, landmark, 평가 protocol
-scripts/ · tests/  준비·측정 스크립트와 테스트
-outputs/examples/  드론·관찰·AI·장애 화면과 짧은 GIF
+src/integration/     모델 loader, 카메라·행동 변환, 실행기
+src/mission/         지도 좌표, landmark, 미션 상태와 판정
+src/failures/        Gaussian Blur와 control protocol
+src/visual_search/   Visual Search episode, teacher 정책
+src/aerovla_oft/     AeroVLA-OFT 모델과 행동·chunk 규칙
+scripts/             launcher(.ps1), 평가·학습·요약 스크립트
+configs/             비행·미션 한도, landmark, 평가 protocol, OFT 설정
+tests/               simulator 없이 도는 테스트 (Python 110개 + PowerShell 4개)
+docs/                아래 문서
+outputs/examples/    README에 쓰는 실제 화면과 GIF
 ```
 
-## Current Status
+## 문서
 
-[Current Baseline](docs/baseline.md): 추론 평균 **1.05초**, 전체 step **4.53초**, 전체 GPU peak **9.76GiB**. 10단계 동안 timeout·OOM·simulator crash는 없었습니다. RAM 여유가 약 1GiB이고 반복 속도는 약 0.22Hz여서 장시간 자율 비행은 아직 확인하지 않았습니다. [실제 테스트 요약](docs/experiments.md).
+| 문서 | 내용 |
+|---|---|
+| [setup](docs/setup.md) | 환경 준비와 실행 순서 |
+| [baseline](docs/baseline.md) | 초기 closed loop 측정 |
+| [gaussian_blur_demo](docs/gaussian_blur_demo.md) | Blur 주입 데모 |
+| [mission_demo](docs/mission_demo.md) · [full_map_grounding](docs/full_map_grounding.md) | 미션 데모 조작, 지도와 Inspector |
+| [model_evaluation](docs/model_evaluation.md) | 하네스 수정, 69회 평가, 연속 비행, 디코더, 블록 위 목표, 지시문 |
+| [aerovla_oft](docs/aerovla_oft.md) | Visual Search Mode와 AeroVLA-OFT |
+| [experiments](docs/experiments.md) | 날짜별 실험 요약 |
+| [failure_plan](docs/failure_plan.md) | 이후 넣을 장애 후보 |
 
-미션 실행기는 모델 행동을 원래 크기로 실행하며, 69회 평가에서 추론 평균 **0.99초**, 이동 명령 평균 **4.4초**, step당 이동 평균 **2.9m**였습니다. 고도 이탈 실패와 프로그램 오류는 없었습니다. [Model Self-Evaluation](docs/model_evaluation.md).
+## 한계
 
-실패 자동 감지·진단·복구는 아직 구현하지 않았습니다. TravelUAV benchmark와 모델 재학습은 현재 과제 범위에 포함하지 않습니다. 모델·시뮬레이터 바이너리와 raw 로그는 Git에 넣지 않습니다.
+- **맵 하나에서 본 결과입니다.** Blocks 맵, 물체 몇 개, 조건당 3–6회입니다.
+- **Coordinate Goal Mode의 방향 힌트는 목표 좌표에서 나옵니다.** 카메라만으로 얻는 정보가 아닙니다.
+- **AeroVLA-OFT는 pilot입니다.** teacher의 고정 규칙을 흉내 내고, 학습 구역 밖에서는 약합니다. LAND와 착륙은 넣지 않았습니다.
+- **장애물 회피가 없습니다.** 충돌하면 simulator가 기체를 고정해 그 비행은 끝납니다.
+- **모델 전체 fine-tuning, TravelUAV benchmark는 하지 않았습니다.** 학습은 LoRA pilot뿐입니다.
+- 모델 weight, checkpoint, dataset, simulator, raw 로그는 Git에 넣지 않습니다.
 
 ## Roadmap
 
-- [x] Project AirSim setup
-- [x] AeroVLA NF4 inference
-- [x] Live closed-loop drone control
-- [x] Gaussian Blur input injection
-- [x] Interactive controls for Gaussian Blur
+- [x] Project AirSim setup, AeroVLA NF4 inference, live closed loop
+- [x] Gaussian Blur input injection with interactive controls
 - [x] Interactive target selection and mission runner
 - [x] Upstream-equivalent action execution, model-decided landing
 - [x] Model self-evaluation with landmarks and prompt ablations
-- [x] Continuous flight: re-plan in the air instead of stopping every step
-- [x] Grammar-constrained action decoding; roof targets approached from above
-- [x] Instruction-only prompt mode and its evaluation (the model does not follow it)
-- [x] Visual Search Mode (no direction hint) and AeroVLA-OFT pilot: continuous action chunk head on top of AeroVLA
+- [x] Continuous flight, grammar-constrained decoding, roof approach
+- [x] Visual Search Mode and the AeroVLA-OFT pilot
 - [ ] Visual search beyond the training map and start region
-- [ ] Reaching a described landmark and stopping near it
+- [ ] Visual Search + Gaussian Blur
 - [ ] Additional failure types
-- [ ] Failure detection
-- [ ] Basic recovery behavior
-- [ ] Demo and evaluation
+- [ ] Failure detection and basic recovery
 
-다음 권장 작업은 **가장 안정적이었던 조건(hint + landmark, colored wall / blue cone)을 기준선으로 삼아 Blur 같은 failure의 영향을 정지 거리 분포로 비교**하는 것입니다. 실행 간 편차가 커서 조건당 5회 이상이 필요합니다. 나머지 Failure 후보는 [failure plan](docs/failure_plan.md)에 계획으로 남겨두었습니다.
+다음은 **Visual Search의 일반화 확인**입니다. 시작 구역과 거리를 넓힌 데이터로 다시 학습해, 학습 범위 밖에서의 결과(현재 2/6)가 오르는지 봅니다. 그 뒤에 Visual Search에 Blur를 넣어 봅니다.
