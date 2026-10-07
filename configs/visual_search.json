@@ -13,7 +13,10 @@
   },
   "instructions": {
     "approach": "Approach {noun}.",
-    "find": "Find {noun}."
+    "find": "Find {noun}.",
+    "locate": "Locate {noun}.",
+    "search_for": "Search for {noun}.",
+    "find_and_approach": "Find and approach {noun}."
   },
   "cases": {
     "A": {"label": "visible, centred", "yaw_offset_deg": [0, 8], "instruction": "approach"},
@@ -27,5 +30,25 @@
     "search_direction": "right",
     "sweep_before_climb_deg": 400.0,
     "climb_m": 3.0
+  },
+  "generalization": {
+    "description": "Start states and teacher for the generalisation dataset and its held-out tests (docs/aerovla_oft_generalization.md). Maps are in configs/maps/.",
+    "max_ticks": 240,
+    "bands_m": {"near": [14.0, 24.0], "medium": [24.0, 44.0], "far": [44.0, 70.0]},
+    "kinds": {"search": 7, "peripheral": 4, "visible": 3, "altitude": 3, "reacquire": 3},
+    "bearing_deg": {"visible": [0.0, 10.0], "peripheral": [25.0, 38.0], "search": [60.0, 180.0]},
+    "kick": {"after_ticks": [6, 20], "degrees": [70.0, 140.0]},
+    "fov_half_deg": 40.0,
+    "ahead_reach_m": 60.0,
+    "start_margin_m": 5.0,
+    "corridor_half_width_m": 3.5,
+    "corridor_clearance_m": 2.5,
+    "rollout_clearance_m": 2.0,
+    "altitude_min_climb_m": 1.5,
+    "exclusion_radius_m": 6.0,
+    "attempts": {"default": 400, "altitude": 4000},
+    "instructions": {"train": ["find", "approach"], "held_out": ["locate", "search_for", "find_and_approach"]},
+    "teacher": {"centre_deg": 30.0, "blocked_m": 16.0, "safety_m": 6.0, "scan_deg": 60.0, "sweep_before_climb_deg": 360.0, "climb_m": 2.0},
+    "seeds": {"test": [0, 199], "train": [1000, 4999], "val": [5000, 5999]}
   }
 }
