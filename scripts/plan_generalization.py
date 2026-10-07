@@ -4,6 +4,7 @@
           start, G2 unseen object, G3 unseen map, G4 both, prompt variations, side probe) and the
           wedge of start directions each object keeps for testing. It is never rewritten.
   train   write the training and validation plans for a dataset, kept away from every held-out start
+  targeted  the same for a recipe of extra kinds (config: generalization.<recipe>), with its own seeds
   g0      pick training starts to replay as the seen-start test
   check   confirm that no planned training or validation start is near a held-out start or in a wedge
   figure  draw the map with every planned start
@@ -19,7 +20,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
 from src.visual_search.episodes import load_config
 from src.visual_search.maps import load_map,MapGeometry,object_position
-from src.visual_search.generalization import (make_start,plan_split,rollout,sector_of,band_of,in_wedge,exclusion,
+from src.visual_search.generalization import (make_start,plan_split,plan_targeted,rollout,sector_of,band_of,in_wedge,exclusion,
                                               instruction_for_id,BANDS,KINDS)
 from src.aerovla_oft.spec import load_config as load_oft_config
 
@@ -216,6 +217,8 @@ def main():
     commands.add_parser('test')
     train=commands.add_parser('train');train.add_argument('--output',required=True);train.add_argument('--episodes',type=int,default=240)
     train.add_argument('--validation',type=int,default=28);train.add_argument('--map',default='blocks')
+    extra=commands.add_parser('targeted');extra.add_argument('--output',required=True);extra.add_argument('--recipe',default='targeted_v2')
+    extra.add_argument('--map',default='blocks')
     replay=commands.add_parser('g0');replay.add_argument('--plan',required=True);replay.add_argument('--output',required=True);replay.add_argument('--episodes',type=int,default=20)
     replay.add_argument('--recorded',help='dataset root; only episodes the teacher completed there are replayed')
     checker=commands.add_parser('check');checker.add_argument('--plan',required=True)
@@ -236,6 +239,15 @@ def main():
         if problems:raise SystemExit('\n'.join(problems))
         output=Path(args.output);output.mkdir(parents=True,exist_ok=True)
         (output/'plan.json').write_text(json.dumps({'map':args.map,'held_out_file':str(TEST_FILE.relative_to(ROOT)).replace('\\','/'),
+                                                    'summary':{split:describe(config,episodes) for split,episodes in plans.items()},**plans},indent=1))
+        for split,episodes in plans.items():print(split,json.dumps(describe(config,episodes)))
+    elif args.command=='targeted':
+        map_config=load_map(args.map);recipe=config['generalization'][args.recipe]
+        plans={split:plan_targeted(config,oft,map_config,split,recipe,held_out) for split in ('train','val')}
+        problems=check(config,held_out,plans)
+        if problems:raise SystemExit('\n'.join(problems))
+        output=Path(args.output);output.mkdir(parents=True,exist_ok=True)
+        (output/'plan.json').write_text(json.dumps({'map':args.map,'recipe':args.recipe,'held_out_file':str(TEST_FILE.relative_to(ROOT)).replace('\\','/'),
                                                     'summary':{split:describe(config,episodes) for split,episodes in plans.items()},**plans},indent=1))
         for split,episodes in plans.items():print(split,json.dumps(describe(config,episodes)))
     elif args.command=='g0':

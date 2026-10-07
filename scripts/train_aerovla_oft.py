@@ -5,6 +5,7 @@
            weights. An existing checkpoint directory is never overwritten.
   verify:  --verify <checkpoint dir> --dataset <root>   reloads the checkpoint in a fresh process and
            compares its predictions with the ones stored at save time
+  score:   --score <checkpoint dir> --dataset <root>    validation L1 of a checkpoint on any dataset
 """
 import os
 os.environ['HF_HUB_OFFLINE']='1';os.environ['TRANSFORMERS_OFFLINE']='1'
@@ -161,6 +162,16 @@ def train(args):
     print(json.dumps({k:v for k,v in summary.items() if k not in ('history','reload_reference','dataset_summary')},indent=1))
 
 
+def score(args):
+    """L1 of a checkpoint on a dataset's validation file, with the same fixed subset the trainer uses."""
+    saved=json.loads((Path(args.score)/'manifest.json').read_text());model=AeroVLAOFT(MANIFEST,saved['config'],checkpoint=args.score)
+    samples=stratified(load_samples(args.dataset,args.val_file),args.eval_samples)
+    metrics,_=evaluate(model,args.dataset,samples,saved['config'])
+    result={'checkpoint':str(args.score),'dataset':str(args.dataset),'val_file':args.val_file,'metrics':metrics}
+    print(json.dumps(result,indent=1))
+    if args.output:Path(args.output).write_text(json.dumps(result,indent=1))
+
+
 def verify(args):
     saved=json.loads((Path(args.verify)/'manifest.json').read_text())
     config=saved['config'];model=AeroVLAOFT(MANIFEST,config,checkpoint=args.verify)
@@ -190,5 +201,8 @@ if __name__=='__main__':
     parser.add_argument('--strategies',nargs='+',help='keep only samples recorded with these teacher search strategies')
     parser.add_argument('--head-output',choices=('linear','tanh'));parser.add_argument('--name',help='model name stored with the checkpoint')
     parser.add_argument('--init',help='checkpoint to continue from')
+    parser.add_argument('--score',help='checkpoint to evaluate on the validation file; --output then names a JSON file')
     arguments=parser.parse_args()
-    verify(arguments) if arguments.verify else train(arguments)
+    if arguments.score:score(arguments)
+    elif arguments.verify:verify(arguments)
+    else:train(arguments)

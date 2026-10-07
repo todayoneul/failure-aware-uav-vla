@@ -150,10 +150,11 @@ def rollout(config,oft,geometry,episode,ceiling_m):
             'acquired_tick':acquired,'final_distance_m':final}
 
 
-def _bearing(settings,kind,rng,side=None):
+def _bearing(settings,kind,rng,side=None,span=None):
     """Where the target sits relative to the vehicle's nose at the start (deg, right positive)."""
     sign=side if side in (-1,1) else rng.choice((-1,1))
-    if kind in ('visible','reacquire'):low,high=settings['bearing_deg']['visible']
+    if span:low,high=span
+    elif kind in ('visible','reacquire'):low,high=settings['bearing_deg']['visible']
     elif kind=='peripheral':low,high=settings['bearing_deg']['peripheral']
     elif kind=='search':low,high=settings['bearing_deg']['search']
     else:low,high=0.,180.
@@ -162,21 +163,24 @@ def _bearing(settings,kind,rng,side=None):
 
 
 def make_start(config,oft,map_config,layout,target,kind,band,seed,split,strategy='right',side=None,
-               direction_deg=None,excluded=None,instruction_id=None,name=None):
+               direction_deg=None,excluded=None,instruction_id=None,name=None,spec=None):
     """One start state, or None when the map offers none of this kind for this object.
 
     `direction_deg` restricts where the start lies as seen from the target (low, high); `excluded`
     is a predicate over (x, y, direction) that keeps training starts away from held-out ones.
+    `spec` describes a targeted kind: the base kind whose rules it follows and its own ranges of
+    distance, target bearing and start height.
     """
     settings=config['generalization'];geometry=MapGeometry(map_config,layout);centre=geometry.objects[target]['centre']
     rng=random.Random(f'{map_config["id"]}|{split}|{seed}|{target}|{kind}|{band}')
-    low,high=settings['bands_m'][band];ceiling=map_config['altitude']['ceiling_m']
+    spec=spec or {};label=kind;kind=spec.get('base',kind)
+    low,high=spec.get('distance_m') or settings['bands_m'][band];ceiling=map_config['altitude']['ceiling_m']
     instruction_id=instruction_id or rng.choice(settings['instructions']['train'])
     for attempt in range(settings['attempts'][kind] if kind in settings['attempts'] else settings['attempts']['default']):
         distance=rng.uniform(low,high)
         direction=rng.uniform(*direction_deg) if direction_deg else rng.uniform(0.,360.)
         x=centre[0]+distance*math.cos(math.radians(direction));y=centre[1]+distance*math.sin(math.radians(direction))
-        height=rng.uniform(*map_config['altitude']['start_m']);bearing=_bearing(settings,kind,rng,side)
+        height=rng.uniform(*(spec.get('height_m') or map_config['altitude']['start_m']));bearing=_bearing(settings,kind,rng,side,spec.get('bearing_deg'))
         if not geometry.inside_area(x,y) or geometry.nearest(x,y)[0]<settings['start_margin_m']:continue
         if excluded and excluded(x,y,direction%360.):continue
         sees=geometry.sees(x,y,height,target)
@@ -188,16 +192,17 @@ def make_start(config,oft,map_config,layout,target,kind,band,seed,split,strategy
             if box['top_m']>ceiling-settings['corridor_clearance_m']-.5 or geometry._gap(box,x,y)>settings['teacher']['blocked_m']-1.:continue
         else:
             # A search start has no part of the object inside the front view, not just its centre outside.
-            if kind=='search' and abs(bearing)-math.degrees(math.atan(geometry.objects[target]['size_m'][0]/2/distance))<46.:continue
+            if kind=='search' and not spec.get('partly_in_view') and abs(bearing)-math.degrees(math.atan(geometry.objects[target]['size_m'][0]/2/distance))<46.:continue
             # Nothing may hide the target or stand in the straight track to it.
             if not sees:continue
             if not geometry.corridor_clear((x,y),centre,height,settings['corridor_half_width_m'],settings['corridor_clearance_m'],ignore=(target,)):continue
         to_target=math.degrees(math.atan2(centre[1]-y,centre[0]-x))
-        episode={'id':name or f'{split}-{seed:04d}-{target}-{kind}','split':split,'seed':seed,'map':map_config['id'],'layout':layout,
-                 'target':target,'kind':kind,'case':kind,'band':band,'sector':sector_of(bearing),'strategy':strategy,
+        episode={'id':name or f'{split}-{seed:04d}-{target}-{label}','split':split,'seed':seed,'map':map_config['id'],'layout':layout,
+                 'target':target,'kind':label,'case':label,'band':band_of(config,distance) if spec else band,'sector':sector_of(bearing),'strategy':strategy,
                  'start_xy':[round(x,2),round(y,2)],'start_yaw_deg':round(to_target-bearing,2),'start_height_m':round(height,2),
                  'target_bearing_deg':round(bearing,2),'start_distance_m':round(distance,2),'start_direction_deg':round(direction%360.,2),
                  'instruction_id':instruction_id,'instruction':instruction_for_id(config,map_config,target,instruction_id)}
+        if spec:episode['base']=kind
         if kind=='reacquire':
             kick=settings['kick']
             episode['kick']={'after_ticks':rng.randint(*kick['after_ticks']),'degrees':round(rng.choice((-1,1))*rng.uniform(*kick['degrees']),1)}
@@ -228,6 +233,30 @@ def exclusion(held_out,map_id,layout,target,radius_m):
 def in_wedge(direction_deg,wedge):
     low,high=wedge
     return (direction_deg-low)%360.<=(high-low)%360.
+
+
+def plan_targeted(config,oft,map_config,split,recipe,held_out=None):
+    """Extra episodes of the kinds listed in a recipe: {kind: {base, ranges, count: [train, val]}}.
+
+    Seeds start at the recipe's own number so they never meet an earlier plan's; objects cycle, and
+    left and right alternate within each kind."""
+    settings=config['generalization'];targets=map_config['train_objects'];layouts=map_config['train_layouts'];episodes=[]
+    seed=recipe['seeds'][split]
+    for kind,spec in recipe['kinds'].items():
+        for index in range(spec['count'][0 if split=='train' else 1]):
+            target=targets[index%len(targets)];side=(1,-1)[(index//len(targets)+index)%2];episode=None
+            bands=BANDS[:1] if 'distance_m' in spec else tuple(dict.fromkeys((BANDS[index%len(BANDS)],)+BANDS))
+            for attempt in range(40):
+                layout=layouts[random.Random(f'layout|{map_config["id"]}|{seed}').randrange(len(layouts))]
+                excluded=exclusion(held_out,map_config['id'],layout,target,settings['exclusion_radius_m']) if held_out else None
+                for band in bands:
+                    episode=make_start(config,oft,map_config,layout,target,kind,band,seed,split,side=side,excluded=excluded,spec=spec)
+                    if episode:break
+                seed+=1
+                if episode:break
+            if episode is None:raise RuntimeError(f'No {kind} start for {target}')
+            episodes.append(episode)
+    return episodes
 
 
 def plan_split(config,oft,map_config,split,seeds,held_out=None,strategy='right'):

@@ -49,6 +49,17 @@
     "attempts": {"default": 400, "altitude": 4000},
     "instructions": {"train": ["find", "approach"], "held_out": ["locate", "search_for", "find_and_approach"]},
     "teacher": {"centre_deg": 30.0, "blocked_m": 16.0, "safety_m": 6.0, "scan_deg": 60.0, "sweep_before_climb_deg": 360.0, "climb_m": 2.0},
-    "seeds": {"test": [0, 199], "train": [1000, 4999], "val": [5000, 5999]}
+    "seeds": {"test": [0, 199], "train": [1000, 4999], "val": [5000, 5999]},
+    "targeted_v2": {
+      "description": "Episodes added for Gen-v2: what to do once the target is found. Counts are [train, val]; `base` is the kind whose planning rules apply.",
+      "seeds": {"train": 2000, "val": 5100},
+      "kinds": {
+        "climb_to_view": {"base": "altitude", "count": [36, 4]},
+        "high_approach": {"base": "visible", "height_m": [9.0, 14.0], "count": [28, 4]},
+        "stop_zone": {"base": "visible", "distance_m": [9.0, 16.0], "bearing_deg": [0.0, 25.0], "height_m": [5.0, 14.0], "count": [36, 4]},
+        "near_edge": {"base": "peripheral", "distance_m": [12.0, 24.0], "bearing_deg": [25.0, 40.0], "count": [24, 4]},
+        "near_hidden": {"base": "search", "distance_m": [12.0, 22.0], "bearing_deg": [45.0, 120.0], "partly_in_view": true, "count": [12, 2]}
+      }
+    }
   }
 }

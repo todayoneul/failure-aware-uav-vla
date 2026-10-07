@@ -5,6 +5,11 @@ is_penultimate) and adds the future chunk, the optional proprio vector and analy
 Episodes planned by scripts/plan_generalization.py carry their split (decided by seed range) and are
 split accordingly; older recordings are split at random by episode. Either way no trajectory has
 frames on both sides, and the summary says how the data is distributed. No simulator, no torch.
+
+  build_visual_search_dataset.py ROOT                       one recorded dataset, written into ROOT
+  build_visual_search_dataset.py ROOT --sources A B ...     several recorded datasets merged into ROOT; nothing is
+                                                            copied, samples point at the source folders, and the
+                                                            merge stops if an episode, seed, start or folder repeats
 """
 import argparse
 import collections
@@ -57,8 +62,29 @@ def leaks(splits,records):
             'seeds':len(seeds['train']&seeds['val']),'starts':len((starts['train']&starts['val'])-{()})}
 
 
+def load_records(root,prefix=''):
+    """Recorded episodes of one dataset; `prefix` is put in front of each trajectory folder when datasets are merged."""
+    records=[json.loads(path.read_text()) for path in sorted((Path(root)/'episodes').glob('*.json'))]
+    for record in records:
+        record['traj_rel_dir']=prefix+record['traj_rel_dir'];record['source']=Path(root).name
+    return records
+
+
+def collisions(records):
+    """Anything two recordings share that would make them the same data twice."""
+    def repeated(values):
+        counts=collections.Counter(values);return sorted(str(value) for value,count in counts.items() if count>1)
+    return {'episode_ids':repeated(record['summary']['id'] for record in records),
+            'seeds':repeated((record['summary'].get('map','blocks'),record['summary'].get('seed')) for record in records if 'split' in record['summary']),
+            'folders':repeated(record['traj_rel_dir'] for record in records),
+            'starts':repeated(tuple(record['summary']['start_xy'])+(record['summary']['target'],) for record in records if 'start_xy' in record['summary'])}
+
+
 def build(root,config,validation_fraction,seed):
-    everything=[json.loads(path.read_text()) for path in sorted((root/'episodes').glob('*.json'))]
+    return build_records(load_records(root),config,validation_fraction,seed)
+
+
+def build_records(everything,config,validation_fraction,seed):
     records=[record for record in everything if record['steps'] and not record['summary'].get('error') and record['summary']['reason']=='teacher_stop']
     dropped=count([record for record in everything if record not in records],lambda r:r['summary'].get('reason','error'))
     planned=all(record['summary'].get('split') in ('train','val') for record in records)
@@ -69,9 +95,10 @@ def build(root,config,validation_fraction,seed):
         splits['val' if record['summary']['id'] in validation_ids else 'train']+=episode_samples(record,config['chunk_size'])
     samples=splits['train']+splits['val'];bounds=config['action_bounds'];summaries=[record['summary'] for record in records]
     outside=sum(any(not low-1e-9<=value<=high+1e-9 for value,(low,high) in zip(step,bounds.values())) for sample in samples for step in sample['chunk'])
-    search=[s for s in summaries if not s.get('initially_seen',True) or s.get('kind') in ('search','altitude','reacquire')]
+    search=[s for s in summaries if not s.get('initially_seen',True) or s.get('base',s.get('kind')) in ('search','altitude','reacquire')]
     climbed=[s for s in search if s.get('climbed_m',0.)>=1.]
-    summary={'episodes':len(records),'train_episodes':len(records)-len(validation_ids),'val_episodes':len(validation_ids),
+    summary={'sources':count(records,lambda r:r.get('source','')),
+             'episodes':len(records),'train_episodes':len(records)-len(validation_ids),'val_episodes':len(validation_ids),
              'dropped_episodes':dropped,'split_by':'seed range of the plan' if planned else 'random by episode',
              'samples':len(samples),'train_samples':len(splits['train']),'val_samples':len(splits['val']),
              'maps':count(summaries,lambda s:s.get('map','blocks')),'layouts':count(summaries,lambda s:s.get('layout','pilot')),
@@ -100,8 +127,18 @@ def build(root,config,validation_fraction,seed):
 if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('root');parser.add_argument('--oft-config')
     parser.add_argument('--validation-fraction',type=float,default=.2);parser.add_argument('--seed',type=int,default=0)
+    parser.add_argument('--sources',nargs='+',help='recorded datasets to merge; they must sit next to ROOT')
     args=parser.parse_args();root=Path(args.root)
-    splits,summary=build(root,load_config(args.oft_config),args.validation_fraction,args.seed)
+    if args.sources:
+        records=[]
+        for source in args.sources:
+            if Path(source).resolve().parent!=root.resolve().parent:raise SystemExit(f'{source} must be in the same folder as {root}')
+            records+=load_records(source,f'../{Path(source).name}/')
+        clashes=collisions(records)
+        if any(clashes.values()):raise SystemExit(f'The datasets overlap: {clashes}')
+        root.mkdir(parents=True,exist_ok=True)
+        splits,summary=build_records(records,load_config(args.oft_config),args.validation_fraction,args.seed)
+    else:splits,summary=build(root,load_config(args.oft_config),args.validation_fraction,args.seed)
     if any(summary['leaks'].values()):raise SystemExit(f'Training and validation overlap: {summary["leaks"]}')
     for name,samples in splits.items():(root/f'{name}.json').write_text(json.dumps(samples))
     (root/'summary.json').write_text(json.dumps(summary,indent=1));print(json.dumps(summary,indent=1))

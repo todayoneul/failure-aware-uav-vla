@@ -16,7 +16,7 @@ ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
 from src.visual_search.episodes import load_config,policy_inputs
 from src.visual_search.maps import load_map,MapGeometry,scene_objects,structures
 from src.visual_search.shapes import mesh,KINDS as SHAPES
-from src.visual_search.generalization import (SearchTeacher,geometric_view,make_start,rollout,spec_for,kind_table,sector_of,exclusion,
+from src.visual_search.generalization import (SearchTeacher,geometric_view,make_start,rollout,spec_for,kind_table,sector_of,exclusion,plan_targeted,
                                               in_wedge,plan_split,STATELESS_STRATEGIES,MEMORY_STRATEGIES,KINDS)
 from src.aerovla_oft.spec import load_config as load_oft_config
 
@@ -322,7 +322,7 @@ class TrainingGuardTests(unittest.TestCase):
     def test_plan_episodes_can_be_filtered_moved_to_another_layout_and_reworded_for_the_pilot(self):
         from scripts.visual_search import planned_episodes
         def options(**changes):
-            base=dict(plan=str(TEST_FILE),set='G1',only=None,strategy=None,layout=None,pilot_verbs=False,skip=0,limit=0);base.update(changes)
+            base=dict(plan=str(TEST_FILE),set='G1',only=None,strategy=None,layout=None,pilot_verbs=False,named=None,skip=0,limit=0);base.update(changes)
             return types.SimpleNamespace(**base)
         everything=planned_episodes(options(),CONFIG);self.assertEqual(len(everything),32)
         self.assertEqual(len(planned_episodes(options(only=['blue_cone','orange_ball']),CONFIG)),16)
@@ -335,6 +335,12 @@ class TrainingGuardTests(unittest.TestCase):
         # The start state itself is never changed by these options.
         self.assertEqual([e['start_xy'] for e in moved],[e['start_xy'] for e in everything if e['target']=='blue_cone'])
         self.assertEqual({e['strategy'] for e in planned_episodes(options(strategy='scan',limit=2),CONFIG)},{'scan'})
+        # The control names another object of the same scene and leaves the scored object alone.
+        told=planned_episodes(options(set='G2',named='red_cube'),CONFIG)
+        self.assertTrue(all(e['target']=='yellow_pyramid' and 'the red cube' in e['instruction'] and e['id'].endswith('-told-red_cube') for e in told))
+        for episode in planned_episodes(options(set='G3',named='another'),CONFIG):
+            self.assertNotEqual(episode['named_object'],episode['target'])
+            self.assertIn(load_map('yard')['objects'][episode['named_object']]['noun'],episode['instruction'])
 
     def test_launchers_expose_plans_ports_and_levels(self):
         launcher=(ROOT/'scripts/run_visual_search.ps1').read_bytes().decode()
@@ -378,6 +384,87 @@ class ReportTests(unittest.TestCase):
               'episode':{'id':'g3-0122','instruction':'Find the red cube.'},'step':step,'success_radius_m':15.,'failure':'NORMAL','raw_sha256':dict(digest)}
         shown=render(live,front,front);plain=render({k:v for k,v in live.items() if k not in ('model_name','map','target','level')},front,front)
         self.assertEqual(shown.shape,(760,1180,3));self.assertFalse(np.array_equal(shown[:80],plain[:80]))
+
+
+class TargetedPlanTests(unittest.TestCase):
+    """Gen-v2: extra episodes about what to do once the target is found."""
+    def test_a_targeted_kind_keeps_its_base_rules_and_its_own_ranges(self):
+        config=toy_map();geometry=MapGeometry(config,'a')
+        zone=make_start(CONFIG,OFT,config,'a','red_cube','stop_zone','near',5,'train',spec={'base':'visible','distance_m':[9.,16.],'bearing_deg':[0.,25.],'height_m':[5.,14.]})
+        self.assertEqual((zone['kind'],zone['base']),('stop_zone','visible'));self.assertTrue(9<=zone['start_distance_m']<=16)
+        self.assertLessEqual(abs(zone['target_bearing_deg']),25.);self.assertTrue(geometry.sees(*zone['start_xy'],zone['start_height_m'],'red_cube'))
+        self.assertEqual(zone['plan']['climbed_m'],0.);self.assertIn('stop',zone['plan']['states'])
+        high=make_start(CONFIG,OFT,config,'a','red_cube','high_approach','medium',5,'train',spec={'base':'visible','height_m':[9.,14.]})
+        self.assertTrue(9<=high['start_height_m']<=14);self.assertTrue(24<=high['start_distance_m']<=44)
+        climb=make_start(CONFIG,OFT,config,'a','red_cube','climb_to_view','medium',5,'train',spec={'base':'altitude'})
+        self.assertGreaterEqual(climb['plan']['climbed_m'],1.5);self.assertFalse(geometry.sees(*climb['start_xy'],climb['start_height_m'],'red_cube'))
+        # Without a spec nothing about the earlier kinds changes: no extra field, same band as asked.
+        plain=make_start(CONFIG,OFT,config,'a','red_cube','visible','medium',5,'train')
+        self.assertNotIn('base',plain);self.assertEqual(plain['band'],'medium')
+
+    def test_the_recipe_is_planned_with_its_own_seeds_clear_of_the_held_out_starts(self):
+        from scripts.plan_generalization import check
+        held=json.loads(TEST_FILE.read_text(encoding='utf-8'));blocks=load_map('blocks');recipe=json.loads(json.dumps(CONFIG['generalization']['targeted_v2']))
+        self.assertEqual({spec['base'] for spec in recipe['kinds'].values()},{'altitude','visible','peripheral','search'})
+        for spec in recipe['kinds'].values():spec['count']=[4,1]
+        plans={split:plan_targeted(CONFIG,OFT,blocks,split,recipe,held) for split in ('train','val')}
+        self.assertEqual(check(CONFIG,held,plans),[])
+        self.assertEqual({e['kind'] for e in plans['train']},set(recipe['kinds']));self.assertEqual(len(plans['train']),4*len(recipe['kinds']))
+        self.assertGreaterEqual(min(e['seed'] for e in plans['train']),recipe['seeds']['train'])
+        self.assertGreaterEqual(min(e['seed'] for e in plans['val']),recipe['seeds']['val'])
+        seeds=[e['seed'] for split in plans.values() for e in split];self.assertEqual(len(seeds),len(set(seeds)))
+        for kind in recipe['kinds']:
+            sides=[e['target_bearing_deg']>0 for e in plans['train'] if e['kind']==kind];self.assertEqual(sum(sides),2,kind)
+        self.assertEqual(plans,{split:plan_targeted(CONFIG,OFT,blocks,split,recipe,held) for split in ('train','val')})
+
+    def test_merging_datasets_refuses_anything_recorded_twice(self):
+        from scripts.build_visual_search_dataset import load_records,collisions,build_records
+        records=DatasetTests()
+        with tempfile.TemporaryDirectory() as folder:
+            first=Path(folder)/'first';second=Path(folder)/'second'
+            records.write(first,[records.record('train-1000-x','train',1000),records.record('val-5000-x','val',5000)])
+            records.write(second,[records.record('train-2000-x','train',2000,climbed=5.)])
+            merged=load_records(first,'../first/')+load_records(second,'../second/')
+            self.assertFalse(any(collisions(merged).values()))
+            splits,summary=build_records(merged,OFT,.2,0)
+            self.assertEqual(summary['sources'],{'first':2,'second':1});self.assertEqual(summary['episodes'],3)
+            self.assertEqual({s['traj_rel_dir'].split('/')[1] for s in splits['train']},{'first','second'})
+            again=collisions(merged+load_records(second,'../second/'))
+            self.assertEqual(again['episode_ids'],['train-2000-x']);self.assertTrue(again['seeds'] and again['folders'] and again['starts'])
+
+
+class FreezeTests(unittest.TestCase):
+    def rows(self,seen,heights=None,position=(0.,0.)):
+        return [{'front_seen':flag,'down_seen':False,'height_m':(heights or [6.]*len(seen))[i],'position':[position[0],position[1],-6.]} for i,flag in enumerate(seen)]
+
+    def episode(self,**changes):
+        base={'success':False,'reason':'max_steps','stopped':False,'minimum_distance_m':30.,'initial_distance_m':40.,'final_distance_m':30.,
+              'initially_seen':False,'stopped_at_other':[],'target':'blue_cone','map':'blocks','layout':'pilot'}
+        base.update(changes);return base
+
+    def test_every_failure_gets_exactly_one_category(self):
+        from scripts.freeze_generalization_results import classify,CATEGORIES
+        seen=self.rows([False,True,True]);cache={}
+        self.assertIsNone(classify(self.episode(success=True),seen,15.,cache))
+        self.assertEqual(classify(self.episode(reason='collision'),seen,15.,cache),'F7')
+        self.assertEqual(classify(self.episode(),self.rows([False,False]),15.,cache),'F1')
+        self.assertEqual(classify(self.episode(stopped=True,reason='model_stop',stopped_at_other=['orange_ball']),seen,15.,cache),'F2')
+        self.assertEqual(classify(self.episode(),seen,15.,cache),'F3')
+        self.assertEqual(classify(self.episode(stopped=True,reason='model_stop',minimum_distance_m=16.,final_distance_m=16.),seen,15.,cache),'F4')
+        self.assertEqual(classify(self.episode(minimum_distance_m=12.,final_distance_m=25.),seen,15.,cache),'F5')
+        self.assertEqual(classify(self.episode(minimum_distance_m=12.),self.rows([False,True,True],[6.,6.,12.]),15.,cache),'F6')
+        self.assertEqual(classify(self.episode(stopped=True,minimum_distance_m=16.),seen,15.,cache,base_success=True),'F8')
+        self.assertEqual(classify(self.episode(reason='invalid_action'),seen,15.,cache),'F10')
+        self.assertEqual(set(CATEGORIES),{f'F{i}' for i in range(1,11)})
+
+    def test_stages_separate_finding_from_reaching_and_stopping(self):
+        from scripts.freeze_generalization_results import stages,climb_after_sight
+        found=stages(self.episode(minimum_distance_m=18.,stopped=True),self.rows([False,False,True]))
+        self.assertEqual(found,{'started_hidden':True,'acquired':True,'approached':True,'stopped':True,'success':False})
+        self.assertIsNone(stages(self.episode(initially_seen=True),self.rows([True,True]))['acquired'])
+        self.assertFalse(stages(self.episode(),self.rows([False,False]))['acquired'])
+        self.assertEqual(climb_after_sight(self.rows([False,True,True,True],[6.,9.,14.,12.])),5.)
+        self.assertEqual(climb_after_sight(self.rows([False,False],[6.,20.])),0.)
 
 
 if __name__=='__main__':unittest.main()
