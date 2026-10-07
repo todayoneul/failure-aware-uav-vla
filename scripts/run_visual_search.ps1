@@ -1,4 +1,4 @@
-param([ValidateSet('baseline','teacher','oft')][string]$Policy='baseline',[string]$Checkpoint='',[string[]]$Cases=@('A','B','C'),[string[]]$Targets=@('blue_cone','orange_ball'),[ValidateRange(1,200)][int]$Episodes=2,[int]$SeedStart=0,[string]$Output='outputs/visual_search/run',[string]$Record='',[switch]$Resume,[switch]$Live,[string]$Distro='Ubuntu',[switch]$ShowSimulator,[string]$Plan='',[string]$Set='',[string[]]$Only=@(),[int]$Skip=0,[int]$Limit=0,[string]$Layout='',[string]$Strategy='',[ValidateSet('step','continuous')][string]$Flight='step',[string]$ModelName='',[int]$TopicsPort=8989,[int]$ServicesPort=8990,[switch]$PilotVerbs)
+param([ValidateSet('baseline','teacher','oft')][string]$Policy='baseline',[string]$Checkpoint='',[string[]]$Cases=@('A','B','C'),[string[]]$Targets=@('blue_cone','orange_ball'),[ValidateRange(1,200)][int]$Episodes=2,[int]$SeedStart=0,[string]$Output='outputs/visual_search/run',[string]$Record='',[switch]$Resume,[switch]$Live,[string]$Distro='Ubuntu',[switch]$ShowSimulator,[string]$Plan='',[string]$Set='',[string[]]$Only=@(),[int]$Skip=0,[int]$Limit=0,[string]$Layout='',[string]$Strategy='',[ValidateSet('step','continuous')][string]$Flight='step',[string]$ModelName='',[int]$TopicsPort=8989,[int]$ServicesPort=8990,[switch]$PilotVerbs,[string]$Named='')
 $ErrorActionPreference='Stop'
 # `powershell -File` hands a comma list over as one string.
 $Cases=@($Cases | ForEach-Object { $_ -split ',' } | Where-Object { $_ })
@@ -46,6 +46,7 @@ try {
         if ($Layout) { $taskArgs+='--layout'; $taskArgs+=$Layout }
         if ($Strategy) { $taskArgs+='--strategy'; $taskArgs+=$Strategy }
         if ($PilotVerbs) { $taskArgs+='--pilot-verbs' }
+        if ($Named) { $taskArgs+='--named'; $taskArgs+=$Named }
     } else {
         $taskArgs+='--cases'; $taskArgs+=$Cases
         $taskArgs+='--targets'; $taskArgs+=$Targets

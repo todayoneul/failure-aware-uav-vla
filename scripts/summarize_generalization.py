@@ -8,11 +8,13 @@ and the motion of each run. --json keeps the same numbers.
 import argparse
 import collections
 import json
+import math
 import statistics
 import sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
 from scripts.summarize_visual_search import load,motion
+from src.visual_search.maps import load_map,MapGeometry
 
 LEVELS=('G0','G1','G2','G3','G4','P','S')
 NAMES={'G0':'G0 seen map, seen object, seen start','G1':'G1 seen map, seen object, unseen start','G2':'G2 seen map, unseen object',
@@ -58,6 +60,29 @@ def breakdown(episodes,radius):
             'failures':dict(collections.Counter(failure(e,radius) for e in episodes if not e['success']))}
 
 
+def distractors(episodes,steps,reach_m=70.,half_fov_deg=40.):
+    """How often another object of the scene stood in the front view, and whether the vehicle went to it.
+
+    Recomputed from the flown poses and the map's boxes: inside the view angle, with a free line of sight, and no farther than
+    the longest start distance of the training data."""
+    exposed=before=stops=0;geometries={}
+    for episode in episodes:
+        key=(episode.get('map','blocks'),episode.get('layout','pilot'))
+        if key not in geometries:geometries[key]=MapGeometry(load_map(key[0]),key[1])
+        geometry=geometries[key];rows=steps.get(episode['id'],[]);seen_other=seen_before=False
+        first=episode['acquired_step'] if episode['acquired_step'] is not None else len(rows)
+        for index,row in enumerate(rows):
+            x,y=row['position'][:2]
+            for name,item in geometry.objects.items():
+                if name==episode['target']:continue
+                dx,dy=item['centre'][0]-x,item['centre'][1]-y
+                bearing=math.degrees(math.atan2(math.sin(math.atan2(dy,dx)-row['yaw_rad']),math.cos(math.atan2(dy,dx)-row['yaw_rad'])))
+                if abs(bearing)<=half_fov_deg and math.hypot(dx,dy)<=reach_m and geometry.sees(x,y,row['height_m'],name):
+                    seen_other=True;seen_before=seen_before or index<first
+        exposed+=seen_other;before+=seen_before;stops+=bool(episode.get('stopped_at_other'))
+    return {'episodes':len(episodes),'another_object_in_view':exposed,'before_the_named_one_was_seen':before,'stopped_at_another_object':stops}
+
+
 def turns(episodes):
     """First turn of episodes that began with the target out of view, by the side it was on."""
     table={}
@@ -77,8 +102,9 @@ def main():
         policy,episodes,steps=load(directory);data=json.loads((Path(directory)/'results.json').read_text())
         radius=data['config']['success_radius_m']
         runs.append({'model':model,'level':level,'directory':directory,'policy':policy,'episodes':episodes,'steps':steps,
-                     'summary':breakdown(episodes,radius),'turns':turns(episodes),'motion':motion(policy,episodes,steps)})
-        output['runs'][label]={'directory':directory,'summary':runs[-1]['summary'],'turns':runs[-1]['turns'],'motion':runs[-1]['motion'],
+                     'summary':breakdown(episodes,radius),'turns':turns(episodes),'distractors':distractors(episodes,steps),
+                     'motion':motion(policy,episodes,steps)})
+        output['runs'][label]={'directory':directory,'summary':runs[-1]['summary'],'turns':runs[-1]['turns'],'distractors':runs[-1]['distractors'],'motion':runs[-1]['motion'],
                                'episodes':[{k:e.get(k) for k in ('id','target','kind','success','reason','initial_distance_m','final_distance_m','minimum_distance_m',
                                                                  'acquired_step','first_turn','climbed_m','stopped_at_other','in_wedge','instruction')}
                                            |{'outcome':failure(e,radius)} for e in episodes]}
@@ -100,6 +126,9 @@ def main():
         for title,key in (('by kind','by_kind'),('by object','by_target'),('by start region','by_wedge'),('by wording','by_instruction')):
             if s[key]:print(f'- {title}: '+', '.join(f'{name} {value}' for name,value in s[key].items()))
         if s['failures']:print('- failures: '+', '.join(f'{name} {value}' for name,value in s['failures'].items()))
+        d=run['distractors']
+        print(f'- another object of the scene was in the front view (within 70 m) in {d["another_object_in_view"]}/{d["episodes"]} episodes '
+              f'({d["before_the_named_one_was_seen"]} of them before the named one was first seen); stopped at another object: {d["stopped_at_another_object"]}')
         if run['turns']:
             print('- first turn when the target started out of view: '+'; '.join(
                 f'target {side}: right {row["right"]}, left {row["left"]}, none {row["none"]} (found {row["acquired"]}/{row["n"]})' for side,row in sorted(run['turns'].items())))

@@ -280,6 +280,17 @@ def planned_episodes(args,config):
         episodes=[dict(episode,planned_instruction=episode['instruction'],
                        instruction=config['instructions']['approach' if episode['kind'] in ('visible','peripheral') else 'find'].format(
                            noun=load_map(episode['map'])['objects'][episode['target']]['noun'])) for episode in episodes]
+    if args.named:
+        # Control: the same start, but the sentence names another object of the scene. The score still follows the
+        # planned object, so a `success` here is a stop beside the object that was not asked for.
+        renamed=[]
+        for episode in episodes:
+            objects=load_map(episode['map'])
+            others=[name for name in objects['layouts'][episode['layout']] if name!=episode['target']]
+            named=others[episode['seed']%len(others)] if args.named=='another' else args.named
+            renamed.append(dict(episode,id=f'{episode["id"]}-told-{named}',named_object=named,planned_instruction=episode['instruction'],
+                                instruction=config['instructions'][episode['instruction_id']].format(noun=objects['objects'][named]['noun'])))
+        episodes=renamed
     return episodes[args.skip:args.skip+args.limit] if args.limit else episodes[args.skip:]
 
 
@@ -354,6 +365,7 @@ if __name__=='__main__':
     parser.add_argument('--layout',help='fly the planned starts in another layout of the same map')
     parser.add_argument('--strategy',help='teacher search strategy to use instead of the planned one')
     parser.add_argument('--pilot-verbs',action='store_true',help="word the instruction as the pilot's training data did")
+    parser.add_argument('--named',help="control: name this object (or 'another') in the sentence instead of the planned one")
     parser.add_argument('--output',default=str(ROOT/'outputs/visual_search/run'));parser.add_argument('--record',help='dataset root to write teacher episodes into')
     parser.add_argument('--resume',action='store_true');parser.add_argument('--live',action='store_true')
     arguments=parser.parse_args()
