@@ -20,6 +20,9 @@
 | [model_evaluation_frames.jpg](model_evaluation_frames.jpg) | `outputs/model_eval/run1/frames/`의 step별 모델 입력 | 실제 Front/Down 입력과 그 step의 모델 출력. 위: 102m 비행 후 cone 옆 LAND, 아래: 설명은 cone인데 힌트가 가리킨 ball 위에서 LAND |
 | [model_evaluation_roof.jpg](model_evaluation_roof.jpg) | `outputs/model_eval/roof`, `instruction`의 `results.json`을 `outputs/model_eval/make_roof_figure.py`(로컬)로 그림 | 지붕 목표 6회의 평면도와 측면도, 지시문만 준 6회의 평면도. 배경은 simulator top-down 영상 |
 | [visual_search_demo.png](visual_search_demo.png) | `outputs/visual_search/demo/viewer.png`, `run_visual_search_demo.ps1 -Model oft -Cases C` | AeroVLA-OFT visual search의 실제 관찰 창: 뒤돌아 시작해 43 tick 뒤 목표 11.1m에서 정지. 십자는 화면용 복사본에만 있음 |
+| [visual_search_oft.gif](visual_search_oft.gif) | `run_visual_search.ps1 -Policy oft -Record …`로 기록한 `C-blue_cone-0`을 `scripts/export_visual_search_media.py gif`로 그림 | AeroVLA-OFT의 실제 비행 44 tick, 2배속. 뒤돌아 시작 → 탐색 → 접근 → 11.3m에서 정지. 각 frame은 관찰 창과 같은 renderer |
+| [visual_search_oft_reacquire.gif](visual_search_oft_reacquire.gif) | 같은 기록의 `D-orange_ball-0` | 접근 중 강제 회전으로 목표를 놓친 뒤 다시 찾아 9.3m에서 정지, 50 tick |
+| [visual_search_trajectories.jpg](visual_search_trajectories.jpg) | `outputs/visual_search/baseline`, `oft_pilot`의 `steps.jsonl`을 `export_visual_search_media.py trajectories`로 그림 | 같은 시작 조건 A/B/C에서 기존 AeroVLA(위)와 AeroVLA-OFT(아래)의 실제 궤적. 배경은 simulator top-down 영상 |
 | [visual_search_dataset/](visual_search_dataset/) | `datasets/projectairsim_visual_search/pilot`에서 sample 3개 | 학습 데이터 예시: `samples.json`(search / approach / stop), `samples.jpg`(각 Front 위·Down 아래), `summary.json`(전체 통계) |
 | [mission_landmark.png](mission_landmark.png) | `outputs/mission_demo/` 대화형 세션의 `current_view.png` | Blue cone landmark 미션: 43 step, 모델 LAND, 착륙, 목표 3.59m |
 

@@ -19,6 +19,9 @@
 !/outputs/examples/model_evaluation_frames.jpg
 !/outputs/examples/model_evaluation_roof.jpg
 !/outputs/examples/visual_search_demo.png
+!/outputs/examples/visual_search_oft.gif
+!/outputs/examples/visual_search_oft_reacquire.gif
+!/outputs/examples/visual_search_trajectories.jpg
 !/outputs/examples/visual_search_dataset/
 
 # Downloaded simulator, datasets and model weights.
