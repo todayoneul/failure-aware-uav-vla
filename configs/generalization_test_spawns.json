@@ -1,0 +1,4197 @@
+{
+ "description": "Held-out start states for AeroVLA-OFT generalisation tests. Written once, before any generalisation training data was planned; training and validation starts are kept away from every start listed here (scripts/plan_generalization.py check).",
+ "levels": {
+  "G1": "seen map, seen object, unseen start",
+  "G2": "seen map, unseen object, unseen start",
+  "G3": "unseen map, seen object, unseen start",
+  "G4": "unseen map, unseen object, unseen start",
+  "P": "G1 starts told in unseen words",
+  "S": "one unseen place per object, target to the left, right, behind-left, behind-right"
+ },
+ "exclusion_radius_m": 6.0,
+ "wedge_deg": 60.0,
+ "wedges": {
+  "blocks": {
+   "a": {
+    "blue_cone": [
+     240.0,
+     300.0
+    ],
+    "orange_ball": [
+     180.0,
+     240.0
+    ],
+    "red_cube": [
+     270.0,
+     330.0
+    ],
+    "green_cylinder": [
+     180.0,
+     240.0
+    ]
+   },
+   "b": {
+    "blue_cone": [
+     240.0,
+     300.0
+    ],
+    "orange_ball": [
+     180.0,
+     240.0
+    ],
+    "red_cube": [
+     180.0,
+     240.0
+    ],
+    "green_cylinder": [
+     270.0,
+     330.0
+    ]
+   }
+  }
+ },
+ "sets": {
+  "G1": [
+   {
+    "id": "g1-0000-blue_cone-visible",
+    "split": "g1",
+    "seed": 0,
+    "map": "blocks",
+    "layout": "a",
+    "target": "blue_cone",
+    "kind": "visible",
+    "case": "visible",
+    "band": "far",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     112.56,
+     -76.44
+    ],
+    "start_yaw_deg": 123.82,
+    "start_height_m": 5.27,
+    "target_bearing_deg": -6.54,
+    "start_distance_m": 46.17,
+    "start_direction_deg": 297.28,
+    "instruction_id": "find",
+    "instruction": "Find the blue cone.",
+    "plan": {
+     "ticks": 45,
+     "clearance_m": 9.08,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 41,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": true
+   },
+   {
+    "id": "g1-0001-orange_ball-visible",
+    "split": "g1",
+    "seed": 1,
+    "map": "blocks",
+    "layout": "b",
+    "target": "orange_ball",
+    "kind": "visible",
+    "case": "visible",
+    "band": "far",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     35.99,
+     -8.83
+    ],
+    "start_yaw_deg": 32.34,
+    "start_height_m": 8.58,
+    "target_bearing_deg": 4.24,
+    "start_distance_m": 68.69,
+    "start_direction_deg": 216.58,
+    "instruction_id": "approach",
+    "instruction": "Approach the orange ball.",
+    "plan": {
+     "ticks": 67,
+     "clearance_m": 4.76,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 63,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": true
+   },
+   {
+    "id": "g1-0002-red_cube-visible",
+    "split": "g1",
+    "seed": 2,
+    "map": "blocks",
+    "layout": "a",
+    "target": "red_cube",
+    "kind": "visible",
+    "case": "visible",
+    "band": "far",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     85.6,
+     -116.53
+    ],
+    "start_yaw_deg": 133.91,
+    "start_height_m": 7.7,
+    "target_bearing_deg": 2.02,
+    "start_distance_m": 46.76,
+    "start_direction_deg": 315.93,
+    "instruction_id": "find",
+    "instruction": "Find the red cube.",
+    "plan": {
+     "ticks": 45,
+     "clearance_m": 15.07,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 41,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": true
+   },
+   {
+    "id": "g1-0003-green_cylinder-visible",
+    "split": "g1",
+    "seed": 3,
+    "map": "blocks",
+    "layout": "b",
+    "target": "green_cylinder",
+    "kind": "visible",
+    "case": "visible",
+    "band": "far",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     86.7,
+     -116.48
+    ],
+    "start_yaw_deg": 140.03,
+    "start_height_m": 5.07,
+    "target_bearing_deg": -3.13,
+    "start_distance_m": 47.53,
+    "start_direction_deg": 316.9,
+    "instruction_id": "approach",
+    "instruction": "Approach the green cylinder.",
+    "plan": {
+     "ticks": 46,
+     "clearance_m": 13.95,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 42,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": true
+   },
+   {
+    "id": "g1-0004-blue_cone-peripheral",
+    "split": "g1",
+    "seed": 4,
+    "map": "blocks",
+    "layout": "b",
+    "target": "blue_cone",
+    "kind": "peripheral",
+    "case": "peripheral",
+    "band": "medium",
+    "sector": "front_right",
+    "strategy": "right",
+    "start_xy": [
+     67.28,
+     -35.19
+    ],
+    "start_yaw_deg": -28.54,
+    "start_height_m": 7.96,
+    "target_bearing_deg": 28.05,
+    "start_distance_m": 24.12,
+    "start_direction_deg": 179.51,
+    "instruction_id": "find",
+    "instruction": "Find the blue cone.",
+    "plan": {
+     "ticks": 24,
+     "clearance_m": 5.84,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 20,
+      "stop": 4
+     }
+    },
+    "requested_kind": "peripheral",
+    "in_wedge": false
+   },
+   {
+    "id": "g1-0005-orange_ball-peripheral",
+    "split": "g1",
+    "seed": 5,
+    "map": "blocks",
+    "layout": "a",
+    "target": "orange_ball",
+    "kind": "peripheral",
+    "case": "peripheral",
+    "band": "medium",
+    "sector": "front_right",
+    "strategy": "right",
+    "start_xy": [
+     98.1,
+     74.24
+    ],
+    "start_yaw_deg": -132.06,
+    "start_height_m": 6.47,
+    "target_bearing_deg": 32.7,
+    "start_distance_m": 42.71,
+    "start_direction_deg": 80.64,
+    "instruction_id": "approach",
+    "instruction": "Approach the orange ball.",
+    "plan": {
+     "ticks": 43,
+     "clearance_m": 3.63,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "align": 1,
+      "approach": 38,
+      "stop": 4
+     }
+    },
+    "requested_kind": "peripheral",
+    "in_wedge": false
+   },
+   {
+    "id": "g1-0006-red_cube-peripheral",
+    "split": "g1",
+    "seed": 6,
+    "map": "blocks",
+    "layout": "b",
+    "target": "red_cube",
+    "kind": "peripheral",
+    "case": "peripheral",
+    "band": "medium",
+    "sector": "front_right",
+    "strategy": "right",
+    "start_xy": [
+     76.21,
+     100.22
+    ],
+    "start_yaw_deg": -177.79,
+    "start_height_m": 6.94,
+    "target_bearing_deg": 31.62,
+    "start_distance_m": 29.14,
+    "start_direction_deg": 33.83,
+    "instruction_id": "find",
+    "instruction": "Find the red cube.",
+    "plan": {
+     "ticks": 29,
+     "clearance_m": 23.79,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "align": 1,
+      "approach": 24,
+      "stop": 4
+     }
+    },
+    "requested_kind": "peripheral",
+    "in_wedge": false
+   },
+   {
+    "id": "g1-0007-green_cylinder-peripheral",
+    "split": "g1",
+    "seed": 7,
+    "map": "blocks",
+    "layout": "a",
+    "target": "green_cylinder",
+    "kind": "peripheral",
+    "case": "peripheral",
+    "band": "medium",
+    "sector": "front_right",
+    "strategy": "right",
+    "start_xy": [
+     85.38,
+     79.13
+    ],
+    "start_yaw_deg": 143.87,
+    "start_height_m": 7.92,
+    "target_bearing_deg": 27.83,
+    "start_distance_m": 33.74,
+    "start_direction_deg": 351.7,
+    "instruction_id": "approach",
+    "instruction": "Approach the green cylinder.",
+    "plan": {
+     "ticks": 33,
+     "clearance_m": 11.66,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 29,
+      "stop": 4
+     }
+    },
+    "requested_kind": "peripheral",
+    "in_wedge": false
+   },
+   {
+    "id": "g1-0008-blue_cone-peripheral",
+    "split": "g1",
+    "seed": 8,
+    "map": "blocks",
+    "layout": "a",
+    "target": "blue_cone",
+    "kind": "peripheral",
+    "case": "peripheral",
+    "band": "near",
+    "sector": "front_left",
+    "strategy": "right",
+    "start_xy": [
+     94.57,
+     -49.68
+    ],
+    "start_yaw_deg": 133.41,
+    "start_height_m": 8.46,
+    "target_bearing_deg": -30.91,
+    "start_distance_m": 14.63,
+    "start_direction_deg": 282.5,
+    "instruction_id": "find",
+    "instruction": "Find the blue cone.",
+    "plan": {
+     "ticks": 14,
+     "clearance_m": 5.37,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "align": 1,
+      "approach": 9,
+      "stop": 4
+     }
+    },
+    "requested_kind": "peripheral",
+    "in_wedge": true
+   },
+   {
+    "id": "g1-0009-orange_ball-peripheral",
+    "split": "g1",
+    "seed": 9,
+    "map": "blocks",
+    "layout": "b",
+    "target": "orange_ball",
+    "kind": "peripheral",
+    "case": "peripheral",
+    "band": "near",
+    "sector": "front_left",
+    "strategy": "right",
+    "start_xy": [
+     72.73,
+     28.26
+    ],
+    "start_yaw_deg": 42.47,
+    "start_height_m": 5.92,
+    "target_bearing_deg": -30.7,
+    "start_distance_m": 18.82,
+    "start_direction_deg": 191.77,
+    "instruction_id": "approach",
+    "instruction": "Approach the orange ball.",
+    "plan": {
+     "ticks": 19,
+     "clearance_m": 11.23,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "align": 1,
+      "approach": 14,
+      "stop": 4
+     }
+    },
+    "requested_kind": "peripheral",
+    "in_wedge": true
+   },
+   {
+    "id": "g1-0010-red_cube-peripheral",
+    "split": "g1",
+    "seed": 10,
+    "map": "blocks",
+    "layout": "a",
+    "target": "red_cube",
+    "kind": "peripheral",
+    "case": "peripheral",
+    "band": "near",
+    "sector": "front_left",
+    "strategy": "right",
+    "start_xy": [
+     59.23,
+     -106.03
+    ],
+    "start_yaw_deg": 140.25,
+    "start_height_m": 8.29,
+    "target_bearing_deg": -32.09,
+    "start_distance_m": 23.18,
+    "start_direction_deg": 288.16,
+    "instruction_id": "find",
+    "instruction": "Find the red cube.",
+    "plan": {
+     "ticks": 23,
+     "clearance_m": 26.96,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "align": 1,
+      "approach": 18,
+      "stop": 4
+     }
+    },
+    "requested_kind": "peripheral",
+    "in_wedge": true
+   },
+   {
+    "id": "g1-0011-green_cylinder-peripheral",
+    "split": "g1",
+    "seed": 11,
+    "map": "blocks",
+    "layout": "b",
+    "target": "green_cylinder",
+    "kind": "peripheral",
+    "case": "peripheral",
+    "band": "near",
+    "sector": "front_left",
+    "strategy": "right",
+    "start_xy": [
+     62.71,
+     -95.45
+    ],
+    "start_yaw_deg": 167.41,
+    "start_height_m": 7.68,
+    "target_bearing_deg": -34.33,
+    "start_distance_m": 15.68,
+    "start_direction_deg": 313.08,
+    "instruction_id": "approach",
+    "instruction": "Approach the green cylinder.",
+    "plan": {
+     "ticks": 16,
+     "clearance_m": 22.49,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "align": 1,
+      "approach": 11,
+      "stop": 4
+     }
+    },
+    "requested_kind": "peripheral",
+    "in_wedge": true
+   },
+   {
+    "id": "g1-0012-blue_cone-search",
+    "split": "g1",
+    "seed": 12,
+    "map": "blocks",
+    "layout": "b",
+    "target": "blue_cone",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "behind_left",
+    "strategy": "right",
+    "start_xy": [
+     108.59,
+     -67.21
+    ],
+    "start_yaw_deg": 255.42,
+    "start_height_m": 7.05,
+    "target_bearing_deg": -137.04,
+    "start_distance_m": 36.16,
+    "start_direction_deg": 298.38,
+    "instruction_id": "find",
+    "instruction": "Find the blue cone.",
+    "plan": {
+     "ticks": 52,
+     "clearance_m": 9.38,
+     "climbed_m": 0.0,
+     "acquired_tick": 16,
+     "states": {
+      "search": 16,
+      "align": 1,
+      "approach": 31,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": true
+   },
+   {
+    "id": "g1-0013-orange_ball-search",
+    "split": "g1",
+    "seed": 13,
+    "map": "blocks",
+    "layout": "a",
+    "target": "orange_ball",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "left",
+    "strategy": "right",
+    "start_xy": [
+     60.06,
+     8.33
+    ],
+    "start_yaw_deg": 139.89,
+    "start_height_m": 8.35,
+    "target_bearing_deg": -102.49,
+    "start_distance_m": 39.14,
+    "start_direction_deg": 217.4,
+    "instruction_id": "approach",
+    "instruction": "Approach the orange ball.",
+    "plan": {
+     "ticks": 58,
+     "clearance_m": 4.81,
+     "climbed_m": 0.0,
+     "acquired_tick": 19,
+     "states": {
+      "search": 19,
+      "align": 1,
+      "approach": 34,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": true
+   },
+   {
+    "id": "g1-0014-red_cube-search",
+    "split": "g1",
+    "seed": 14,
+    "map": "blocks",
+    "layout": "b",
+    "target": "red_cube",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "left",
+    "strategy": "right",
+    "start_xy": [
+     9.16,
+     77.61
+    ],
+    "start_yaw_deg": 82.6,
+    "start_height_m": 7.59,
+    "target_bearing_deg": -74.11,
+    "start_distance_m": 43.32,
+    "start_direction_deg": 188.49,
+    "instruction_id": "find",
+    "instruction": "Find the red cube.",
+    "plan": {
+     "ticks": 64,
+     "clearance_m": 16.61,
+     "climbed_m": 0.0,
+     "acquired_tick": 21,
+     "states": {
+      "search": 21,
+      "align": 1,
+      "approach": 38,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": true
+   },
+   {
+    "id": "g1-0015-green_cylinder-search",
+    "split": "g1",
+    "seed": 15,
+    "map": "blocks",
+    "layout": "a",
+    "target": "green_cylinder",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "behind_left",
+    "strategy": "right",
+    "start_xy": [
+     17.24,
+     78.71
+    ],
+    "start_yaw_deg": 127.95,
+    "start_height_m": 6.49,
+    "target_bearing_deg": -119.3,
+    "start_distance_m": 35.16,
+    "start_direction_deg": 188.66,
+    "instruction_id": "approach",
+    "instruction": "Approach the green cylinder.",
+    "plan": {
+     "ticks": 53,
+     "clearance_m": 17.2,
+     "climbed_m": 0.0,
+     "acquired_tick": 17,
+     "states": {
+      "search": 17,
+      "align": 1,
+      "approach": 31,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": true
+   },
+   {
+    "id": "g1-0016-blue_cone-search",
+    "split": "g1",
+    "seed": 16,
+    "map": "blocks",
+    "layout": "a",
+    "target": "blue_cone",
+    "kind": "search",
+    "case": "search",
+    "band": "near",
+    "sector": "right",
+    "strategy": "right",
+    "start_xy": [
+     69.13,
+     -35.9
+    ],
+    "start_yaw_deg": -99.13,
+    "start_height_m": 8.93,
+    "target_bearing_deg": 100.42,
+    "start_distance_m": 22.27,
+    "start_direction_deg": 181.29,
+    "instruction_id": "find",
+    "instruction": "Find the blue cone.",
+    "plan": {
+     "ticks": 28,
+     "clearance_m": 7.63,
+     "climbed_m": 0.0,
+     "acquired_tick": 6,
+     "states": {
+      "search": 6,
+      "approach": 18,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": false
+   },
+   {
+    "id": "g1-0017-orange_ball-search",
+    "split": "g1",
+    "seed": 17,
+    "map": "blocks",
+    "layout": "b",
+    "target": "orange_ball",
+    "kind": "search",
+    "case": "search",
+    "band": "far",
+    "sector": "front_right",
+    "strategy": "right",
+    "start_xy": [
+     103.22,
+     85.42
+    ],
+    "start_yaw_deg": -164.75,
+    "start_height_m": 7.61,
+    "target_bearing_deg": 61.99,
+    "start_distance_m": 54.67,
+    "start_direction_deg": 77.25,
+    "instruction_id": "approach",
+    "instruction": "Approach the orange ball.",
+    "plan": {
+     "ticks": 57,
+     "clearance_m": 4.52,
+     "climbed_m": 0.0,
+     "acquired_tick": 2,
+     "states": {
+      "search": 2,
+      "align": 1,
+      "approach": 50,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": false
+   },
+   {
+    "id": "g1-0018-red_cube-search",
+    "split": "g1",
+    "seed": 18,
+    "map": "blocks",
+    "layout": "a",
+    "target": "red_cube",
+    "kind": "search",
+    "case": "search",
+    "band": "far",
+    "sector": "right",
+    "strategy": "right",
+    "start_xy": [
+     6.69,
+     -77.92
+    ],
+    "start_yaw_deg": -88.57,
+    "start_height_m": 8.59,
+    "target_bearing_deg": 80.92,
+    "start_distance_m": 45.72,
+    "start_direction_deg": 172.35,
+    "instruction_id": "find",
+    "instruction": "Find the red cube.",
+    "plan": {
+     "ticks": 50,
+     "clearance_m": 17.29,
+     "climbed_m": 0.0,
+     "acquired_tick": 4,
+     "states": {
+      "search": 4,
+      "align": 1,
+      "approach": 41,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": false
+   },
+   {
+    "id": "g1-0019-green_cylinder-search",
+    "split": "g1",
+    "seed": 19,
+    "map": "blocks",
+    "layout": "b",
+    "target": "green_cylinder",
+    "kind": "search",
+    "case": "search",
+    "band": "far",
+    "sector": "right",
+    "strategy": "right",
+    "start_xy": [
+     91.95,
+     -105.8
+    ],
+    "start_yaw_deg": 68.36,
+    "start_height_m": 7.13,
+    "target_bearing_deg": 83.01,
+    "start_distance_m": 45.51,
+    "start_direction_deg": 331.37,
+    "instruction_id": "approach",
+    "instruction": "Approach the green cylinder.",
+    "plan": {
+     "ticks": 50,
+     "clearance_m": 8.05,
+     "climbed_m": 0.0,
+     "acquired_tick": 4,
+     "states": {
+      "search": 4,
+      "align": 1,
+      "approach": 41,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": false
+   },
+   {
+    "id": "g1-0020-blue_cone-search",
+    "split": "g1",
+    "seed": 20,
+    "map": "blocks",
+    "layout": "b",
+    "target": "blue_cone",
+    "kind": "search",
+    "case": "search",
+    "band": "near",
+    "sector": "behind_left",
+    "strategy": "right",
+    "start_xy": [
+     107.77,
+     -44.43
+    ],
+    "start_yaw_deg": 304.91,
+    "start_height_m": 7.31,
+    "target_bearing_deg": -153.79,
+    "start_distance_m": 18.7,
+    "start_direction_deg": 331.12,
+    "instruction_id": "find",
+    "instruction": "Find the blue cone.",
+    "plan": {
+     "ticks": 33,
+     "clearance_m": 16.43,
+     "climbed_m": 0.0,
+     "acquired_tick": 14,
+     "states": {
+      "search": 14,
+      "align": 1,
+      "approach": 14,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": false
+   },
+   {
+    "id": "g1-0021-orange_ball-search",
+    "split": "g1",
+    "seed": 21,
+    "map": "blocks",
+    "layout": "a",
+    "target": "orange_ball",
+    "kind": "search",
+    "case": "search",
+    "band": "near",
+    "sector": "behind",
+    "strategy": "right",
+    "start_xy": [
+     113.28,
+     26.66
+    ],
+    "start_yaw_deg": -2.61,
+    "start_height_m": 5.67,
+    "target_bearing_deg": 168.8,
+    "start_distance_m": 22.79,
+    "start_direction_deg": 346.19,
+    "instruction_id": "approach",
+    "instruction": "Approach the orange ball.",
+    "plan": {
+     "ticks": 34,
+     "clearance_m": 9.16,
+     "climbed_m": 0.0,
+     "acquired_tick": 11,
+     "states": {
+      "search": 11,
+      "align": 1,
+      "approach": 18,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": false
+   },
+   {
+    "id": "g1-0022-red_cube-search",
+    "split": "g1",
+    "seed": 22,
+    "map": "blocks",
+    "layout": "b",
+    "target": "red_cube",
+    "kind": "search",
+    "case": "search",
+    "band": "near",
+    "sector": "behind",
+    "strategy": "right",
+    "start_xy": [
+     31.96,
+     92.68
+    ],
+    "start_yaw_deg": -184.14,
+    "start_height_m": 6.84,
+    "target_bearing_deg": 160.73,
+    "start_distance_m": 21.84,
+    "start_direction_deg": 156.59,
+    "instruction_id": "find",
+    "instruction": "Find the red cube.",
+    "plan": {
+     "ticks": 33,
+     "clearance_m": 27.17,
+     "climbed_m": 0.0,
+     "acquired_tick": 11,
+     "states": {
+      "search": 11,
+      "approach": 18,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": false
+   },
+   {
+    "id": "g1-0023-green_cylinder-search",
+    "split": "g1",
+    "seed": 23,
+    "map": "blocks",
+    "layout": "a",
+    "target": "green_cylinder",
+    "kind": "search",
+    "case": "search",
+    "band": "near",
+    "sector": "behind",
+    "strategy": "right",
+    "start_xy": [
+     52.76,
+     105.19
+    ],
+    "start_yaw_deg": 70.94,
+    "start_height_m": 5.54,
+    "target_bearing_deg": -163.0,
+    "start_distance_m": 21.2,
+    "start_direction_deg": 87.93,
+    "instruction_id": "approach",
+    "instruction": "Approach the green cylinder.",
+    "plan": {
+     "ticks": 35,
+     "clearance_m": 33.4,
+     "climbed_m": 0.0,
+     "acquired_tick": 14,
+     "states": {
+      "search": 14,
+      "align": 1,
+      "approach": 16,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": false
+   },
+   {
+    "id": "g1-0024-blue_cone-altitude",
+    "split": "g1",
+    "seed": 24,
+    "map": "blocks",
+    "layout": "a",
+    "target": "blue_cone",
+    "kind": "altitude",
+    "case": "altitude",
+    "band": "far",
+    "sector": "behind_left",
+    "strategy": "right",
+    "start_xy": [
+     46.26,
+     -15.32
+    ],
+    "start_yaw_deg": 124.62,
+    "start_height_m": 5.99,
+    "target_bearing_deg": -148.6,
+    "start_distance_m": 49.4,
+    "start_direction_deg": 156.02,
+    "instruction_id": "find",
+    "instruction": "Find the blue cone.",
+    "plan": {
+     "ticks": 78,
+     "clearance_m": 7.18,
+     "climbed_m": 7.0,
+     "acquired_tick": 29,
+     "states": {
+      "search": 15,
+      "climb": 14,
+      "align": 1,
+      "approach": 44,
+      "stop": 4
+     }
+    },
+    "requested_kind": "altitude",
+    "in_wedge": false
+   },
+   {
+    "id": "g1-0025-orange_ball-altitude",
+    "split": "g1",
+    "seed": 25,
+    "map": "blocks",
+    "layout": "b",
+    "target": "orange_ball",
+    "kind": "altitude",
+    "case": "altitude",
+    "band": "far",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     47.43,
+     50.3
+    ],
+    "start_yaw_deg": -37.73,
+    "start_height_m": 7.66,
+    "target_bearing_deg": 15.13,
+    "start_distance_m": 47.36,
+    "start_direction_deg": 157.4,
+    "instruction_id": "approach",
+    "instruction": "Approach the orange ball.",
+    "plan": {
+     "ticks": 54,
+     "clearance_m": 5.18,
+     "climbed_m": 4.0,
+     "acquired_tick": 3,
+     "states": {
+      "climb": 8,
+      "approach": 42,
+      "stop": 4
+     }
+    },
+    "requested_kind": "altitude",
+    "in_wedge": false
+   },
+   {
+    "id": "g1-0026-red_cube-altitude",
+    "split": "g1",
+    "seed": 26,
+    "map": "blocks",
+    "layout": "a",
+    "target": "red_cube",
+    "kind": "altitude",
+    "case": "altitude",
+    "band": "far",
+    "sector": "behind",
+    "strategy": "right",
+    "start_xy": [
+     20.98,
+     -48.43
+    ],
+    "start_yaw_deg": 128.62,
+    "start_height_m": 5.77,
+    "target_bearing_deg": -177.54,
+    "start_distance_m": 47.19,
+    "start_direction_deg": 131.08,
+    "instruction_id": "find",
+    "instruction": "Find the red cube.",
+    "plan": {
+     "ticks": 72,
+     "clearance_m": 5.93,
+     "climbed_m": 6.0,
+     "acquired_tick": 24,
+     "states": {
+      "search": 12,
+      "climb": 12,
+      "align": 1,
+      "approach": 43,
+      "stop": 4
+     }
+    },
+    "requested_kind": "altitude",
+    "in_wedge": false
+   },
+   {
+    "id": "g1-0027-green_cylinder-altitude",
+    "split": "g1",
+    "seed": 27,
+    "map": "blocks",
+    "layout": "b",
+    "target": "green_cylinder",
+    "kind": "altitude",
+    "case": "altitude",
+    "band": "far",
+    "sector": "front_right",
+    "strategy": "right",
+    "start_xy": [
+     7.91,
+     -52.98
+    ],
+    "start_yaw_deg": -88.04,
+    "start_height_m": 8.8,
+    "target_bearing_deg": 52.9,
+    "start_distance_m": 53.91,
+    "start_direction_deg": 144.87,
+    "instruction_id": "approach",
+    "instruction": "Approach the green cylinder.",
+    "plan": {
+     "ticks": 62,
+     "clearance_m": 4.94,
+     "climbed_m": 3.0,
+     "acquired_tick": 4,
+     "states": {
+      "search": 2,
+      "climb": 6,
+      "align": 1,
+      "approach": 49,
+      "stop": 4
+     }
+    },
+    "requested_kind": "altitude",
+    "in_wedge": false
+   },
+   {
+    "id": "g1-0028-blue_cone-reacquire",
+    "split": "g1",
+    "seed": 28,
+    "map": "blocks",
+    "layout": "b",
+    "target": "blue_cone",
+    "kind": "reacquire",
+    "case": "reacquire",
+    "band": "medium",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     101.74,
+     -57.2
+    ],
+    "start_yaw_deg": 109.15,
+    "start_height_m": 7.12,
+    "target_bearing_deg": 6.24,
+    "start_distance_m": 24.13,
+    "start_direction_deg": 295.38,
+    "instruction_id": "find",
+    "instruction": "Find the blue cone.",
+    "kick": {
+     "after_ticks": 9,
+     "degrees": -102.4
+    },
+    "plan": {
+     "ticks": 39,
+     "clearance_m": 8.61,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 19,
+      "kick": 9,
+      "search": 6,
+      "align": 1,
+      "stop": 4
+     }
+    },
+    "requested_kind": "reacquire",
+    "in_wedge": true
+   },
+   {
+    "id": "g1-0029-orange_ball-reacquire",
+    "split": "g1",
+    "seed": 29,
+    "map": "blocks",
+    "layout": "a",
+    "target": "orange_ball",
+    "kind": "reacquire",
+    "case": "reacquire",
+    "band": "medium",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     57.53,
+     8.18
+    ],
+    "start_yaw_deg": 29.64,
+    "start_height_m": 5.98,
+    "target_bearing_deg": 5.79,
+    "start_distance_m": 41.26,
+    "start_direction_deg": 215.43,
+    "instruction_id": "approach",
+    "instruction": "Approach the orange ball.",
+    "kick": {
+     "after_ticks": 8,
+     "degrees": -114.4
+    },
+    "plan": {
+     "ticks": 58,
+     "clearance_m": 4.07,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 36,
+      "kick": 10,
+      "search": 7,
+      "align": 1,
+      "stop": 4
+     }
+    },
+    "requested_kind": "reacquire",
+    "in_wedge": true
+   },
+   {
+    "id": "g1-0030-red_cube-reacquire",
+    "split": "g1",
+    "seed": 30,
+    "map": "blocks",
+    "layout": "b",
+    "target": "red_cube",
+    "kind": "reacquire",
+    "case": "reacquire",
+    "band": "medium",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     19.51,
+     81.49
+    ],
+    "start_yaw_deg": -1.41,
+    "start_height_m": 7.82,
+    "target_bearing_deg": 5.83,
+    "start_distance_m": 32.58,
+    "start_direction_deg": 184.42,
+    "instruction_id": "find",
+    "instruction": "Find the red cube.",
+    "kick": {
+     "after_ticks": 17,
+     "degrees": 84.4
+    },
+    "plan": {
+     "ticks": 61,
+     "clearance_m": 20.05,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 28,
+      "kick": 8,
+      "search": 20,
+      "align": 1,
+      "stop": 4
+     }
+    },
+    "requested_kind": "reacquire",
+    "in_wedge": true
+   },
+   {
+    "id": "g1-0031-green_cylinder-reacquire",
+    "split": "g1",
+    "seed": 31,
+    "map": "blocks",
+    "layout": "a",
+    "target": "green_cylinder",
+    "kind": "reacquire",
+    "case": "reacquire",
+    "band": "medium",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     15.48,
+     76.93
+    ],
+    "start_yaw_deg": 3.53,
+    "start_height_m": 6.6,
+    "target_bearing_deg": 7.43,
+    "start_distance_m": 37.2,
+    "start_direction_deg": 190.96,
+    "instruction_id": "approach",
+    "instruction": "Approach the green cylinder.",
+    "kick": {
+     "after_ticks": 8,
+     "degrees": 108.3
+    },
+    "plan": {
+     "ticks": 66,
+     "clearance_m": 15.57,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 33,
+      "kick": 10,
+      "search": 18,
+      "align": 1,
+      "stop": 4
+     }
+    },
+    "requested_kind": "reacquire",
+    "in_wedge": true
+   }
+  ],
+  "G2": [
+   {
+    "id": "g2-0100-yellow_pyramid-visible",
+    "split": "g2",
+    "seed": 100,
+    "map": "blocks",
+    "layout": "a_new",
+    "target": "yellow_pyramid",
+    "kind": "visible",
+    "case": "visible",
+    "band": "near",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     -30.94,
+     22.88
+    ],
+    "start_yaw_deg": -69.86,
+    "start_height_m": 8.57,
+    "target_bearing_deg": -3.26,
+    "start_distance_m": 23.91,
+    "start_direction_deg": 106.88,
+    "instruction_id": "find",
+    "instruction": "Find the yellow pyramid.",
+    "plan": {
+     "ticks": 22,
+     "clearance_m": 27.62,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 18,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": null
+   },
+   {
+    "id": "g2-0101-yellow_pyramid-visible",
+    "split": "g2",
+    "seed": 101,
+    "map": "blocks",
+    "layout": "b_new",
+    "target": "yellow_pyramid",
+    "kind": "visible",
+    "case": "visible",
+    "band": "medium",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     -6.45,
+     -32.3
+    ],
+    "start_yaw_deg": 122.32,
+    "start_height_m": 7.66,
+    "target_bearing_deg": -3.81,
+    "start_distance_m": 36.76,
+    "start_direction_deg": 298.51,
+    "instruction_id": "approach",
+    "instruction": "Approach the yellow pyramid.",
+    "plan": {
+     "ticks": 35,
+     "clearance_m": 21.2,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 31,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": null
+   },
+   {
+    "id": "g2-0102-yellow_pyramid-visible",
+    "split": "g2",
+    "seed": 102,
+    "map": "blocks",
+    "layout": "a_new",
+    "target": "yellow_pyramid",
+    "kind": "visible",
+    "case": "visible",
+    "band": "far",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     -32.27,
+     63.49
+    ],
+    "start_yaw_deg": -82.44,
+    "start_height_m": 7.18,
+    "target_bearing_deg": -0.13,
+    "start_distance_m": 64.03,
+    "start_direction_deg": 97.42,
+    "instruction_id": "find",
+    "instruction": "Find the yellow pyramid.",
+    "plan": {
+     "ticks": 62,
+     "clearance_m": 10.11,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 58,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": null
+   },
+   {
+    "id": "g2-0103-yellow_pyramid-peripheral",
+    "split": "g2",
+    "seed": 103,
+    "map": "blocks",
+    "layout": "b_new",
+    "target": "yellow_pyramid",
+    "kind": "peripheral",
+    "case": "peripheral",
+    "band": "medium",
+    "sector": "front_right",
+    "strategy": "right",
+    "start_xy": [
+     -14.06,
+     -27.14
+    ],
+    "start_yaw_deg": 82.78,
+    "start_height_m": 7.04,
+    "target_bearing_deg": 27.33,
+    "start_distance_m": 28.9,
+    "start_direction_deg": 290.11,
+    "instruction_id": "approach",
+    "instruction": "Approach the yellow pyramid.",
+    "plan": {
+     "ticks": 29,
+     "clearance_m": 25.45,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 25,
+      "stop": 4
+     }
+    },
+    "requested_kind": "peripheral",
+    "in_wedge": null
+   },
+   {
+    "id": "g2-0104-yellow_pyramid-peripheral",
+    "split": "g2",
+    "seed": 104,
+    "map": "blocks",
+    "layout": "a_new",
+    "target": "yellow_pyramid",
+    "kind": "peripheral",
+    "case": "peripheral",
+    "band": "near",
+    "sector": "front_left",
+    "strategy": "right",
+    "start_xy": [
+     -27.87,
+     15.28
+    ],
+    "start_yaw_deg": -39.73,
+    "start_height_m": 7.82,
+    "target_bearing_deg": -36.05,
+    "start_distance_m": 15.76,
+    "start_direction_deg": 104.22,
+    "instruction_id": "find",
+    "instruction": "Find the yellow pyramid.",
+    "plan": {
+     "ticks": 16,
+     "clearance_m": 33.17,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "align": 1,
+      "approach": 11,
+      "stop": 4
+     }
+    },
+    "requested_kind": "peripheral",
+    "in_wedge": null
+   },
+   {
+    "id": "g2-0105-yellow_pyramid-peripheral",
+    "split": "g2",
+    "seed": 105,
+    "map": "blocks",
+    "layout": "b_new",
+    "target": "yellow_pyramid",
+    "kind": "peripheral",
+    "case": "peripheral",
+    "band": "far",
+    "sector": "front_right",
+    "strategy": "right",
+    "start_xy": [
+     -0.77,
+     38.4
+    ],
+    "start_yaw_deg": -151.47,
+    "start_height_m": 5.94,
+    "target_bearing_deg": 30.3,
+    "start_distance_m": 44.88,
+    "start_direction_deg": 58.84,
+    "instruction_id": "approach",
+    "instruction": "Approach the yellow pyramid.",
+    "plan": {
+     "ticks": 45,
+     "clearance_m": 12.96,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "align": 1,
+      "approach": 40,
+      "stop": 4
+     }
+    },
+    "requested_kind": "peripheral",
+    "in_wedge": null
+   },
+   {
+    "id": "g2-0106-yellow_pyramid-search",
+    "split": "g2",
+    "seed": 106,
+    "map": "blocks",
+    "layout": "a_new",
+    "target": "yellow_pyramid",
+    "kind": "search",
+    "case": "search",
+    "band": "near",
+    "sector": "left",
+    "strategy": "right",
+    "start_xy": [
+     -8.83,
+     -16.64
+    ],
+    "start_yaw_deg": 233.33,
+    "start_height_m": 5.43,
+    "target_bearing_deg": -100.98,
+    "start_distance_m": 22.52,
+    "start_direction_deg": 312.34,
+    "instruction_id": "find",
+    "instruction": "Find the yellow pyramid.",
+    "plan": {
+     "ticks": 41,
+     "clearance_m": 29.42,
+     "climbed_m": 0.0,
+     "acquired_tick": 19,
+     "states": {
+      "search": 19,
+      "align": 1,
+      "approach": 17,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": null
+   },
+   {
+    "id": "g2-0107-yellow_pyramid-search",
+    "split": "g2",
+    "seed": 107,
+    "map": "blocks",
+    "layout": "b_new",
+    "target": "yellow_pyramid",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "behind_right",
+    "strategy": "right",
+    "start_xy": [
+     -26.41,
+     -34.72
+    ],
+    "start_yaw_deg": -38.25,
+    "start_height_m": 6.68,
+    "target_bearing_deg": 124.29,
+    "start_distance_m": 34.8,
+    "start_direction_deg": 266.03,
+    "instruction_id": "approach",
+    "instruction": "Approach the yellow pyramid.",
+    "plan": {
+     "ticks": 43,
+     "clearance_m": 18.9,
+     "climbed_m": 0.0,
+     "acquired_tick": 8,
+     "states": {
+      "search": 8,
+      "approach": 31,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": null
+   },
+   {
+    "id": "g2-0108-yellow_pyramid-search",
+    "split": "g2",
+    "seed": 108,
+    "map": "blocks",
+    "layout": "a_new",
+    "target": "yellow_pyramid",
+    "kind": "search",
+    "case": "search",
+    "band": "far",
+    "sector": "behind",
+    "strategy": "right",
+    "start_xy": [
+     9.16,
+     36.37
+    ],
+    "start_yaw_deg": 33.6,
+    "start_height_m": 6.54,
+    "target_bearing_deg": -165.95,
+    "start_distance_m": 49.22,
+    "start_direction_deg": 47.65,
+    "instruction_id": "find",
+    "instruction": "Find the yellow pyramid.",
+    "plan": {
+     "ticks": 63,
+     "clearance_m": 10.84,
+     "climbed_m": 0.0,
+     "acquired_tick": 13,
+     "states": {
+      "search": 13,
+      "align": 1,
+      "approach": 45,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": null
+   },
+   {
+    "id": "g2-0109-yellow_pyramid-search",
+    "split": "g2",
+    "seed": 109,
+    "map": "blocks",
+    "layout": "b_new",
+    "target": "yellow_pyramid",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "left",
+    "strategy": "right",
+    "start_xy": [
+     -3.96,
+     31.9
+    ],
+    "start_yaw_deg": -18.92,
+    "start_height_m": 6.45,
+    "target_bearing_deg": -103.22,
+    "start_distance_m": 37.67,
+    "start_direction_deg": 57.86,
+    "instruction_id": "approach",
+    "instruction": "Approach the yellow pyramid.",
+    "plan": {
+     "ticks": 56,
+     "clearance_m": 16.73,
+     "climbed_m": 0.0,
+     "acquired_tick": 19,
+     "states": {
+      "search": 19,
+      "approach": 33,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": null
+   },
+   {
+    "id": "g2-0110-yellow_pyramid-search",
+    "split": "g2",
+    "seed": 110,
+    "map": "blocks",
+    "layout": "a_new",
+    "target": "yellow_pyramid",
+    "kind": "search",
+    "case": "search",
+    "band": "far",
+    "sector": "right",
+    "strategy": "right",
+    "start_xy": [
+     24.7,
+     -4.7
+    ],
+    "start_yaw_deg": 104.17,
+    "start_height_m": 8.55,
+    "target_bearing_deg": 70.32,
+    "start_distance_m": 48.92,
+    "start_direction_deg": 354.49,
+    "instruction_id": "find",
+    "instruction": "Find the yellow pyramid.",
+    "plan": {
+     "ticks": 52,
+     "clearance_m": 17.8,
+     "climbed_m": 0.0,
+     "acquired_tick": 3,
+     "states": {
+      "search": 3,
+      "align": 1,
+      "approach": 44,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": null
+   },
+   {
+    "id": "g2-0111-yellow_pyramid-search",
+    "split": "g2",
+    "seed": 111,
+    "map": "blocks",
+    "layout": "b_new",
+    "target": "yellow_pyramid",
+    "kind": "search",
+    "case": "search",
+    "band": "near",
+    "sector": "behind",
+    "strategy": "right",
+    "start_xy": [
+     -7.91,
+     12.65
+    ],
+    "start_yaw_deg": -319.05,
+    "start_height_m": 7.53,
+    "target_bearing_deg": 177.24,
+    "start_distance_m": 20.47,
+    "start_direction_deg": 38.18,
+    "instruction_id": "approach",
+    "instruction": "Approach the yellow pyramid.",
+    "plan": {
+     "ticks": 33,
+     "clearance_m": 28.33,
+     "climbed_m": 0.0,
+     "acquired_tick": 12,
+     "states": {
+      "search": 12,
+      "align": 1,
+      "approach": 16,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": null
+   }
+  ],
+  "G3": [
+   {
+    "id": "g3-0120-blue_cone-visible",
+    "split": "g3",
+    "seed": 120,
+    "map": "yard",
+    "layout": "a",
+    "target": "blue_cone",
+    "kind": "visible",
+    "case": "visible",
+    "band": "medium",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     2992.53,
+     3024.14
+    ],
+    "start_yaw_deg": 57.9,
+    "start_height_m": 5.18,
+    "target_bearing_deg": -7.86,
+    "start_distance_m": 27.21,
+    "start_direction_deg": 230.04,
+    "instruction_id": "find",
+    "instruction": "Find the blue cone.",
+    "plan": {
+     "ticks": 26,
+     "clearance_m": 20.36,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 22,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": null
+   },
+   {
+    "id": "g3-0121-orange_ball-visible",
+    "split": "g3",
+    "seed": 121,
+    "map": "yard",
+    "layout": "a",
+    "target": "orange_ball",
+    "kind": "visible",
+    "case": "visible",
+    "band": "medium",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     2912.66,
+     3108.58
+    ],
+    "start_yaw_deg": -67.29,
+    "start_height_m": 8.22,
+    "target_bearing_deg": 0.66,
+    "start_distance_m": 31.13,
+    "start_direction_deg": 113.36,
+    "instruction_id": "approach",
+    "instruction": "Approach the orange ball.",
+    "plan": {
+     "ticks": 29,
+     "clearance_m": 54.03,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 25,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": null
+   },
+   {
+    "id": "g3-0122-red_cube-visible",
+    "split": "g3",
+    "seed": 122,
+    "map": "yard",
+    "layout": "a",
+    "target": "red_cube",
+    "kind": "visible",
+    "case": "visible",
+    "band": "medium",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     3054.87,
+     3029.6
+    ],
+    "start_yaw_deg": -69.92,
+    "start_height_m": 5.98,
+    "target_bearing_deg": 7.0,
+    "start_distance_m": 33.24,
+    "start_direction_deg": 117.08,
+    "instruction_id": "find",
+    "instruction": "Find the red cube.",
+    "plan": {
+     "ticks": 32,
+     "clearance_m": 15.08,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 28,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": null
+   },
+   {
+    "id": "g3-0123-green_cylinder-visible",
+    "split": "g3",
+    "seed": 123,
+    "map": "yard",
+    "layout": "a",
+    "target": "green_cylinder",
+    "kind": "visible",
+    "case": "visible",
+    "band": "medium",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     2937.29,
+     2973.97
+    ],
+    "start_yaw_deg": 31.68,
+    "start_height_m": 8.58,
+    "target_bearing_deg": 3.54,
+    "start_distance_m": 27.79,
+    "start_direction_deg": 215.21,
+    "instruction_id": "approach",
+    "instruction": "Approach the green cylinder.",
+    "plan": {
+     "ticks": 26,
+     "clearance_m": 16.48,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 22,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": null
+   },
+   {
+    "id": "g3-0124-blue_cone-peripheral",
+    "split": "g3",
+    "seed": 124,
+    "map": "yard",
+    "layout": "a",
+    "target": "blue_cone",
+    "kind": "peripheral",
+    "case": "peripheral",
+    "band": "near",
+    "sector": "front_right",
+    "strategy": "right",
+    "start_xy": [
+     3009.54,
+     3024.68
+    ],
+    "start_yaw_deg": 60.59,
+    "start_height_m": 6.41,
+    "target_bearing_deg": 28.1,
+    "start_distance_m": 20.32,
+    "start_direction_deg": 268.69,
+    "instruction_id": "find",
+    "instruction": "Find the blue cone.",
+    "plan": {
+     "ticks": 20,
+     "clearance_m": 32.22,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 16,
+      "stop": 4
+     }
+    },
+    "requested_kind": "peripheral",
+    "in_wedge": null
+   },
+   {
+    "id": "g3-0125-orange_ball-peripheral",
+    "split": "g3",
+    "seed": 125,
+    "map": "yard",
+    "layout": "a",
+    "target": "orange_ball",
+    "kind": "peripheral",
+    "case": "peripheral",
+    "band": "near",
+    "sector": "front_right",
+    "strategy": "right",
+    "start_xy": [
+     2915.68,
+     3093.92
+    ],
+    "start_yaw_deg": -86.67,
+    "start_height_m": 6.24,
+    "target_bearing_deg": 30.48,
+    "start_distance_m": 16.75,
+    "start_direction_deg": 123.81,
+    "instruction_id": "approach",
+    "instruction": "Approach the orange ball.",
+    "plan": {
+     "ticks": 17,
+     "clearance_m": 53.78,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "align": 1,
+      "approach": 12,
+      "stop": 4
+     }
+    },
+    "requested_kind": "peripheral",
+    "in_wedge": null
+   },
+   {
+    "id": "g3-0126-red_cube-peripheral",
+    "split": "g3",
+    "seed": 126,
+    "map": "yard",
+    "layout": "a",
+    "target": "red_cube",
+    "kind": "peripheral",
+    "case": "peripheral",
+    "band": "near",
+    "sector": "front_right",
+    "strategy": "right",
+    "start_xy": [
+     3088.76,
+     2988.32
+    ],
+    "start_yaw_deg": 121.21,
+    "start_height_m": 6.25,
+    "target_bearing_deg": 26.9,
+    "start_distance_m": 22.1,
+    "start_direction_deg": 328.11,
+    "instruction_id": "find",
+    "instruction": "Find the red cube.",
+    "plan": {
+     "ticks": 22,
+     "clearance_m": 39.4,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 18,
+      "stop": 4
+     }
+    },
+    "requested_kind": "peripheral",
+    "in_wedge": null
+   },
+   {
+    "id": "g3-0127-green_cylinder-peripheral",
+    "split": "g3",
+    "seed": 127,
+    "map": "yard",
+    "layout": "a",
+    "target": "green_cylinder",
+    "kind": "peripheral",
+    "case": "peripheral",
+    "band": "near",
+    "sector": "front_right",
+    "strategy": "right",
+    "start_xy": [
+     2958.81,
+     3012.7
+    ],
+    "start_yaw_deg": -124.78,
+    "start_height_m": 5.44,
+    "target_bearing_deg": 37.79,
+    "start_distance_m": 22.74,
+    "start_direction_deg": 93.01,
+    "instruction_id": "approach",
+    "instruction": "Approach the green cylinder.",
+    "plan": {
+     "ticks": 23,
+     "clearance_m": 25.78,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "align": 1,
+      "approach": 18,
+      "stop": 4
+     }
+    },
+    "requested_kind": "peripheral",
+    "in_wedge": null
+   },
+   {
+    "id": "g3-0128-blue_cone-search",
+    "split": "g3",
+    "seed": 128,
+    "map": "yard",
+    "layout": "a",
+    "target": "blue_cone",
+    "kind": "search",
+    "case": "search",
+    "band": "near",
+    "sector": "behind",
+    "strategy": "right",
+    "start_xy": [
+     3016.14,
+     3025.88
+    ],
+    "start_yaw_deg": 275.91,
+    "start_height_m": 5.68,
+    "target_bearing_deg": -168.1,
+    "start_distance_m": 20.09,
+    "start_direction_deg": 287.81,
+    "instruction_id": "find",
+    "instruction": "Find the blue cone.",
+    "plan": {
+     "ticks": 33,
+     "clearance_m": 35.96,
+     "climbed_m": 0.0,
+     "acquired_tick": 13,
+     "states": {
+      "search": 13,
+      "align": 1,
+      "approach": 15,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": null
+   },
+   {
+    "id": "g3-0129-orange_ball-search",
+    "split": "g3",
+    "seed": 129,
+    "map": "yard",
+    "layout": "a",
+    "target": "orange_ball",
+    "kind": "search",
+    "case": "search",
+    "band": "near",
+    "sector": "left",
+    "strategy": "right",
+    "start_xy": [
+     2912.04,
+     3067.72
+    ],
+    "start_yaw_deg": 127.52,
+    "start_height_m": 6.72,
+    "target_bearing_deg": -84.06,
+    "start_distance_m": 17.85,
+    "start_direction_deg": 223.46,
+    "instruction_id": "approach",
+    "instruction": "Approach the orange ball.",
+    "plan": {
+     "ticks": 38,
+     "clearance_m": 34.72,
+     "climbed_m": 0.0,
+     "acquired_tick": 20,
+     "states": {
+      "search": 20,
+      "align": 1,
+      "approach": 13,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": null
+   },
+   {
+    "id": "g3-0130-red_cube-search",
+    "split": "g3",
+    "seed": 130,
+    "map": "yard",
+    "layout": "a",
+    "target": "red_cube",
+    "kind": "search",
+    "case": "search",
+    "band": "near",
+    "sector": "behind_left",
+    "strategy": "right",
+    "start_xy": [
+     3053.06,
+     2988.91
+    ],
+    "start_yaw_deg": 184.49,
+    "start_height_m": 5.24,
+    "target_bearing_deg": -151.28,
+    "start_distance_m": 20.25,
+    "start_direction_deg": 213.21,
+    "instruction_id": "find",
+    "instruction": "Find the red cube.",
+    "plan": {
+     "ticks": 35,
+     "clearance_m": 31.56,
+     "climbed_m": 0.0,
+     "acquired_tick": 15,
+     "states": {
+      "search": 15,
+      "approach": 16,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": null
+   },
+   {
+    "id": "g3-0131-green_cylinder-search",
+    "split": "g3",
+    "seed": 131,
+    "map": "yard",
+    "layout": "a",
+    "target": "green_cylinder",
+    "kind": "search",
+    "case": "search",
+    "band": "near",
+    "sector": "behind_left",
+    "strategy": "right",
+    "start_xy": [
+     2971.38,
+     3004.15
+    ],
+    "start_yaw_deg": 19.12,
+    "start_height_m": 5.16,
+    "target_bearing_deg": -147.92,
+    "start_distance_m": 18.15,
+    "start_direction_deg": 51.2,
+    "instruction_id": "approach",
+    "instruction": "Approach the green cylinder.",
+    "plan": {
+     "ticks": 33,
+     "clearance_m": 34.35,
+     "climbed_m": 0.0,
+     "acquired_tick": 15,
+     "states": {
+      "search": 15,
+      "align": 1,
+      "approach": 13,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": null
+   },
+   {
+    "id": "g3-0132-blue_cone-search",
+    "split": "g3",
+    "seed": 132,
+    "map": "yard",
+    "layout": "a",
+    "target": "blue_cone",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "front_right",
+    "strategy": "right",
+    "start_xy": [
+     3023.14,
+     3066.91
+    ],
+    "start_yaw_deg": -188.39,
+    "start_height_m": 7.75,
+    "target_bearing_deg": 67.43,
+    "start_distance_m": 25.55,
+    "start_direction_deg": 59.04,
+    "instruction_id": "find",
+    "instruction": "Find the blue cone.",
+    "plan": {
+     "ticks": 29,
+     "clearance_m": 30.86,
+     "climbed_m": 0.0,
+     "acquired_tick": 3,
+     "states": {
+      "search": 3,
+      "align": 1,
+      "approach": 21,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": null
+   },
+   {
+    "id": "g3-0133-orange_ball-search",
+    "split": "g3",
+    "seed": 133,
+    "map": "yard",
+    "layout": "a",
+    "target": "orange_ball",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "behind_right",
+    "strategy": "right",
+    "start_xy": [
+     2946.59,
+     3062.29
+    ],
+    "start_yaw_deg": -1.96,
+    "start_height_m": 6.05,
+    "target_bearing_deg": 142.6,
+    "start_distance_m": 27.92,
+    "start_direction_deg": 320.64,
+    "instruction_id": "approach",
+    "instruction": "Approach the orange ball.",
+    "plan": {
+     "ticks": 37,
+     "clearance_m": 20.79,
+     "climbed_m": 0.0,
+     "acquired_tick": 9,
+     "states": {
+      "search": 9,
+      "align": 1,
+      "approach": 23,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": null
+   },
+   {
+    "id": "g3-0134-red_cube-search",
+    "split": "g3",
+    "seed": 134,
+    "map": "yard",
+    "layout": "a",
+    "target": "red_cube",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "right",
+    "strategy": "right",
+    "start_xy": [
+     3066.25,
+     3037.78
+    ],
+    "start_yaw_deg": -189.17,
+    "start_height_m": 7.75,
+    "target_bearing_deg": 104.84,
+    "start_distance_m": 37.97,
+    "start_direction_deg": 95.66,
+    "instruction_id": "find",
+    "instruction": "Find the red cube.",
+    "plan": {
+     "ticks": 44,
+     "clearance_m": 6.23,
+     "climbed_m": 0.0,
+     "acquired_tick": 6,
+     "states": {
+      "search": 6,
+      "align": 1,
+      "approach": 33,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": null
+   },
+   {
+    "id": "g3-0135-green_cylinder-search",
+    "split": "g3",
+    "seed": 135,
+    "map": "yard",
+    "layout": "a",
+    "target": "green_cylinder",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "behind",
+    "strategy": "right",
+    "start_xy": [
+     2974.67,
+     3016.51
+    ],
+    "start_yaw_deg": -281.57,
+    "start_height_m": 8.47,
+    "target_bearing_deg": 162.61,
+    "start_distance_m": 30.3,
+    "start_direction_deg": 61.04,
+    "instruction_id": "approach",
+    "instruction": "Approach the green cylinder.",
+    "plan": {
+     "ticks": 41,
+     "clearance_m": 21.99,
+     "climbed_m": 0.0,
+     "acquired_tick": 11,
+     "states": {
+      "search": 11,
+      "align": 1,
+      "approach": 25,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": null
+   },
+   {
+    "id": "g3-0136-blue_cone-search",
+    "split": "g3",
+    "seed": 136,
+    "map": "yard",
+    "layout": "a",
+    "target": "blue_cone",
+    "kind": "search",
+    "case": "search",
+    "band": "far",
+    "sector": "behind",
+    "strategy": "right",
+    "start_xy": [
+     3032.01,
+     2995.57
+    ],
+    "start_yaw_deg": 274.14,
+    "start_height_m": 5.26,
+    "target_bearing_deg": -160.14,
+    "start_distance_m": 54.11,
+    "start_direction_deg": 294.0,
+    "instruction_id": "find",
+    "instruction": "Find the blue cone.",
+    "plan": {
+     "ticks": 68,
+     "clearance_m": 11.89,
+     "climbed_m": 0.0,
+     "acquired_tick": 14,
+     "states": {
+      "search": 14,
+      "align": 1,
+      "approach": 49,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": null
+   },
+   {
+    "id": "g3-0137-orange_ball-search",
+    "split": "g3",
+    "seed": 137,
+    "map": "yard",
+    "layout": "a",
+    "target": "orange_ball",
+    "kind": "search",
+    "case": "search",
+    "band": "far",
+    "sector": "behind_left",
+    "strategy": "right",
+    "start_xy": [
+     2969.99,
+     3061.08
+    ],
+    "start_yaw_deg": 312.2,
+    "start_height_m": 5.53,
+    "target_bearing_deg": -155.0,
+    "start_distance_m": 48.8,
+    "start_direction_deg": 337.19,
+    "instruction_id": "approach",
+    "instruction": "Approach the orange ball.",
+    "plan": {
+     "ticks": 63,
+     "clearance_m": 19.58,
+     "climbed_m": 0.0,
+     "acquired_tick": 14,
+     "states": {
+      "search": 14,
+      "align": 1,
+      "approach": 44,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": null
+   },
+   {
+    "id": "g3-0138-red_cube-search",
+    "split": "g3",
+    "seed": 138,
+    "map": "yard",
+    "layout": "a",
+    "target": "red_cube",
+    "kind": "search",
+    "case": "search",
+    "band": "far",
+    "sector": "behind",
+    "strategy": "right",
+    "start_xy": [
+     3107.71,
+     3022.96
+    ],
+    "start_yaw_deg": -316.07,
+    "start_height_m": 6.31,
+    "target_bearing_deg": 167.4,
+    "start_distance_m": 44.15,
+    "start_direction_deg": 31.33,
+    "instruction_id": "find",
+    "instruction": "Find the red cube.",
+    "plan": {
+     "ticks": 55,
+     "clearance_m": 39.64,
+     "climbed_m": 0.0,
+     "acquired_tick": 11,
+     "states": {
+      "search": 11,
+      "align": 1,
+      "approach": 39,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": null
+   },
+   {
+    "id": "g3-0139-green_cylinder-search",
+    "split": "g3",
+    "seed": 139,
+    "map": "yard",
+    "layout": "a",
+    "target": "green_cylinder",
+    "kind": "search",
+    "case": "search",
+    "band": "far",
+    "sector": "behind",
+    "strategy": "right",
+    "start_xy": [
+     2991.04,
+     2958.62
+    ],
+    "start_yaw_deg": -43.76,
+    "start_height_m": 8.4,
+    "target_bearing_deg": 178.45,
+    "start_distance_m": 44.14,
+    "start_direction_deg": 314.69,
+    "instruction_id": "approach",
+    "instruction": "Approach the green cylinder.",
+    "plan": {
+     "ticks": 56,
+     "clearance_m": 27.46,
+     "climbed_m": 0.0,
+     "acquired_tick": 12,
+     "states": {
+      "search": 12,
+      "align": 1,
+      "approach": 39,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": null
+   }
+  ],
+  "G4": [
+   {
+    "id": "g4-0160-yellow_pyramid-visible",
+    "split": "g4",
+    "seed": 160,
+    "map": "yard",
+    "layout": "a_new",
+    "target": "yellow_pyramid",
+    "kind": "visible",
+    "case": "visible",
+    "band": "medium",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     3064.98,
+     2896.19
+    ],
+    "start_yaw_deg": 134.73,
+    "start_height_m": 5.02,
+    "target_bearing_deg": 1.41,
+    "start_distance_m": 41.58,
+    "start_direction_deg": 316.14,
+    "instruction_id": "find",
+    "instruction": "Find the yellow pyramid.",
+    "plan": {
+     "ticks": 40,
+     "clearance_m": 29.27,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 36,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": null
+   },
+   {
+    "id": "g4-0161-yellow_pyramid-visible",
+    "split": "g4",
+    "seed": 161,
+    "map": "yard",
+    "layout": "a_new",
+    "target": "yellow_pyramid",
+    "kind": "visible",
+    "case": "visible",
+    "band": "far",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     2998.62,
+     2954.84
+    ],
+    "start_yaw_deg": -30.86,
+    "start_height_m": 5.17,
+    "target_bearing_deg": -8.51,
+    "start_distance_m": 47.05,
+    "start_direction_deg": 140.63,
+    "instruction_id": "approach",
+    "instruction": "Approach the yellow pyramid.",
+    "plan": {
+     "ticks": 45,
+     "clearance_m": 8.87,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 41,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": null
+   },
+   {
+    "id": "g4-0162-yellow_pyramid-peripheral",
+    "split": "g4",
+    "seed": 162,
+    "map": "yard",
+    "layout": "a_new",
+    "target": "yellow_pyramid",
+    "kind": "peripheral",
+    "case": "peripheral",
+    "band": "near",
+    "sector": "front_left",
+    "strategy": "right",
+    "start_xy": [
+     3016.94,
+     2938.76
+    ],
+    "start_yaw_deg": -12.04,
+    "start_height_m": 5.66,
+    "target_bearing_deg": -25.26,
+    "start_distance_m": 22.7,
+    "start_direction_deg": 142.7,
+    "instruction_id": "find",
+    "instruction": "Find the yellow pyramid.",
+    "plan": {
+     "ticks": 22,
+     "clearance_m": 11.39,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 18,
+      "stop": 4
+     }
+    },
+    "requested_kind": "peripheral",
+    "in_wedge": null
+   },
+   {
+    "id": "g4-0163-yellow_pyramid-search",
+    "split": "g4",
+    "seed": 163,
+    "map": "yard",
+    "layout": "a_new",
+    "target": "yellow_pyramid",
+    "kind": "search",
+    "case": "search",
+    "band": "near",
+    "sector": "right",
+    "strategy": "right",
+    "start_xy": [
+     3050.23,
+     2936.1
+    ],
+    "start_yaw_deg": -250.6,
+    "start_height_m": 7.06,
+    "target_bearing_deg": 106.69,
+    "start_distance_m": 18.85,
+    "start_direction_deg": 36.09,
+    "instruction_id": "approach",
+    "instruction": "Approach the yellow pyramid.",
+    "plan": {
+     "ticks": 25,
+     "clearance_m": 20.77,
+     "climbed_m": 0.0,
+     "acquired_tick": 6,
+     "states": {
+      "search": 6,
+      "align": 1,
+      "approach": 14,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": null
+   },
+   {
+    "id": "g4-0164-yellow_pyramid-search",
+    "split": "g4",
+    "seed": 164,
+    "map": "yard",
+    "layout": "a_new",
+    "target": "yellow_pyramid",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "behind_left",
+    "strategy": "right",
+    "start_xy": [
+     3051.81,
+     2891.13
+    ],
+    "start_yaw_deg": 253.4,
+    "start_height_m": 7.71,
+    "target_bearing_deg": -137.0,
+    "start_distance_m": 37.82,
+    "start_direction_deg": 296.4,
+    "instruction_id": "find",
+    "instruction": "Find the yellow pyramid.",
+    "plan": {
+     "ticks": 54,
+     "clearance_m": 34.92,
+     "climbed_m": 0.0,
+     "acquired_tick": 16,
+     "states": {
+      "search": 16,
+      "align": 1,
+      "approach": 33,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": null
+   },
+   {
+    "id": "g4-0165-yellow_pyramid-search",
+    "split": "g4",
+    "seed": 165,
+    "map": "yard",
+    "layout": "a_new",
+    "target": "yellow_pyramid",
+    "kind": "search",
+    "case": "search",
+    "band": "far",
+    "sector": "behind",
+    "strategy": "right",
+    "start_xy": [
+     3054.74,
+     2972.29
+    ],
+    "start_yaw_deg": -279.93,
+    "start_height_m": 7.83,
+    "target_bearing_deg": 167.27,
+    "start_distance_m": 51.25,
+    "start_direction_deg": 67.34,
+    "instruction_id": "approach",
+    "instruction": "Approach the yellow pyramid.",
+    "plan": {
+     "ticks": 63,
+     "clearance_m": 22.08,
+     "climbed_m": 0.0,
+     "acquired_tick": 11,
+     "states": {
+      "search": 11,
+      "align": 1,
+      "approach": 47,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": null
+   }
+  ],
+  "P": [
+   {
+    "id": "p-0000-blue_cone-visible-locate",
+    "split": "p",
+    "seed": 0,
+    "map": "blocks",
+    "layout": "a",
+    "target": "blue_cone",
+    "kind": "visible",
+    "case": "visible",
+    "band": "far",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     112.56,
+     -76.44
+    ],
+    "start_yaw_deg": 123.82,
+    "start_height_m": 5.27,
+    "target_bearing_deg": -6.54,
+    "start_distance_m": 46.17,
+    "start_direction_deg": 297.28,
+    "instruction_id": "locate",
+    "instruction": "Locate the blue cone.",
+    "plan": {
+     "ticks": 45,
+     "clearance_m": 9.08,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 41,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": true,
+    "base": "g1-0000-blue_cone-visible"
+   },
+   {
+    "id": "p-0000-blue_cone-visible-search_for",
+    "split": "p",
+    "seed": 0,
+    "map": "blocks",
+    "layout": "a",
+    "target": "blue_cone",
+    "kind": "visible",
+    "case": "visible",
+    "band": "far",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     112.56,
+     -76.44
+    ],
+    "start_yaw_deg": 123.82,
+    "start_height_m": 5.27,
+    "target_bearing_deg": -6.54,
+    "start_distance_m": 46.17,
+    "start_direction_deg": 297.28,
+    "instruction_id": "search_for",
+    "instruction": "Search for the blue cone.",
+    "plan": {
+     "ticks": 45,
+     "clearance_m": 9.08,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 41,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": true,
+    "base": "g1-0000-blue_cone-visible"
+   },
+   {
+    "id": "p-0000-blue_cone-visible-find_and_approach",
+    "split": "p",
+    "seed": 0,
+    "map": "blocks",
+    "layout": "a",
+    "target": "blue_cone",
+    "kind": "visible",
+    "case": "visible",
+    "band": "far",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     112.56,
+     -76.44
+    ],
+    "start_yaw_deg": 123.82,
+    "start_height_m": 5.27,
+    "target_bearing_deg": -6.54,
+    "start_distance_m": 46.17,
+    "start_direction_deg": 297.28,
+    "instruction_id": "find_and_approach",
+    "instruction": "Find and approach the blue cone.",
+    "plan": {
+     "ticks": 45,
+     "clearance_m": 9.08,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 41,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": true,
+    "base": "g1-0000-blue_cone-visible"
+   },
+   {
+    "id": "p-0001-orange_ball-visible-locate",
+    "split": "p",
+    "seed": 1,
+    "map": "blocks",
+    "layout": "b",
+    "target": "orange_ball",
+    "kind": "visible",
+    "case": "visible",
+    "band": "far",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     35.99,
+     -8.83
+    ],
+    "start_yaw_deg": 32.34,
+    "start_height_m": 8.58,
+    "target_bearing_deg": 4.24,
+    "start_distance_m": 68.69,
+    "start_direction_deg": 216.58,
+    "instruction_id": "locate",
+    "instruction": "Locate the orange ball.",
+    "plan": {
+     "ticks": 67,
+     "clearance_m": 4.76,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 63,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": true,
+    "base": "g1-0001-orange_ball-visible"
+   },
+   {
+    "id": "p-0001-orange_ball-visible-search_for",
+    "split": "p",
+    "seed": 1,
+    "map": "blocks",
+    "layout": "b",
+    "target": "orange_ball",
+    "kind": "visible",
+    "case": "visible",
+    "band": "far",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     35.99,
+     -8.83
+    ],
+    "start_yaw_deg": 32.34,
+    "start_height_m": 8.58,
+    "target_bearing_deg": 4.24,
+    "start_distance_m": 68.69,
+    "start_direction_deg": 216.58,
+    "instruction_id": "search_for",
+    "instruction": "Search for the orange ball.",
+    "plan": {
+     "ticks": 67,
+     "clearance_m": 4.76,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 63,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": true,
+    "base": "g1-0001-orange_ball-visible"
+   },
+   {
+    "id": "p-0001-orange_ball-visible-find_and_approach",
+    "split": "p",
+    "seed": 1,
+    "map": "blocks",
+    "layout": "b",
+    "target": "orange_ball",
+    "kind": "visible",
+    "case": "visible",
+    "band": "far",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     35.99,
+     -8.83
+    ],
+    "start_yaw_deg": 32.34,
+    "start_height_m": 8.58,
+    "target_bearing_deg": 4.24,
+    "start_distance_m": 68.69,
+    "start_direction_deg": 216.58,
+    "instruction_id": "find_and_approach",
+    "instruction": "Find and approach the orange ball.",
+    "plan": {
+     "ticks": 67,
+     "clearance_m": 4.76,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 63,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": true,
+    "base": "g1-0001-orange_ball-visible"
+   },
+   {
+    "id": "p-0002-red_cube-visible-locate",
+    "split": "p",
+    "seed": 2,
+    "map": "blocks",
+    "layout": "a",
+    "target": "red_cube",
+    "kind": "visible",
+    "case": "visible",
+    "band": "far",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     85.6,
+     -116.53
+    ],
+    "start_yaw_deg": 133.91,
+    "start_height_m": 7.7,
+    "target_bearing_deg": 2.02,
+    "start_distance_m": 46.76,
+    "start_direction_deg": 315.93,
+    "instruction_id": "locate",
+    "instruction": "Locate the red cube.",
+    "plan": {
+     "ticks": 45,
+     "clearance_m": 15.07,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 41,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": true,
+    "base": "g1-0002-red_cube-visible"
+   },
+   {
+    "id": "p-0002-red_cube-visible-search_for",
+    "split": "p",
+    "seed": 2,
+    "map": "blocks",
+    "layout": "a",
+    "target": "red_cube",
+    "kind": "visible",
+    "case": "visible",
+    "band": "far",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     85.6,
+     -116.53
+    ],
+    "start_yaw_deg": 133.91,
+    "start_height_m": 7.7,
+    "target_bearing_deg": 2.02,
+    "start_distance_m": 46.76,
+    "start_direction_deg": 315.93,
+    "instruction_id": "search_for",
+    "instruction": "Search for the red cube.",
+    "plan": {
+     "ticks": 45,
+     "clearance_m": 15.07,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 41,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": true,
+    "base": "g1-0002-red_cube-visible"
+   },
+   {
+    "id": "p-0002-red_cube-visible-find_and_approach",
+    "split": "p",
+    "seed": 2,
+    "map": "blocks",
+    "layout": "a",
+    "target": "red_cube",
+    "kind": "visible",
+    "case": "visible",
+    "band": "far",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     85.6,
+     -116.53
+    ],
+    "start_yaw_deg": 133.91,
+    "start_height_m": 7.7,
+    "target_bearing_deg": 2.02,
+    "start_distance_m": 46.76,
+    "start_direction_deg": 315.93,
+    "instruction_id": "find_and_approach",
+    "instruction": "Find and approach the red cube.",
+    "plan": {
+     "ticks": 45,
+     "clearance_m": 15.07,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 41,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": true,
+    "base": "g1-0002-red_cube-visible"
+   },
+   {
+    "id": "p-0003-green_cylinder-visible-locate",
+    "split": "p",
+    "seed": 3,
+    "map": "blocks",
+    "layout": "b",
+    "target": "green_cylinder",
+    "kind": "visible",
+    "case": "visible",
+    "band": "far",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     86.7,
+     -116.48
+    ],
+    "start_yaw_deg": 140.03,
+    "start_height_m": 5.07,
+    "target_bearing_deg": -3.13,
+    "start_distance_m": 47.53,
+    "start_direction_deg": 316.9,
+    "instruction_id": "locate",
+    "instruction": "Locate the green cylinder.",
+    "plan": {
+     "ticks": 46,
+     "clearance_m": 13.95,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 42,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": true,
+    "base": "g1-0003-green_cylinder-visible"
+   },
+   {
+    "id": "p-0003-green_cylinder-visible-search_for",
+    "split": "p",
+    "seed": 3,
+    "map": "blocks",
+    "layout": "b",
+    "target": "green_cylinder",
+    "kind": "visible",
+    "case": "visible",
+    "band": "far",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     86.7,
+     -116.48
+    ],
+    "start_yaw_deg": 140.03,
+    "start_height_m": 5.07,
+    "target_bearing_deg": -3.13,
+    "start_distance_m": 47.53,
+    "start_direction_deg": 316.9,
+    "instruction_id": "search_for",
+    "instruction": "Search for the green cylinder.",
+    "plan": {
+     "ticks": 46,
+     "clearance_m": 13.95,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 42,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": true,
+    "base": "g1-0003-green_cylinder-visible"
+   },
+   {
+    "id": "p-0003-green_cylinder-visible-find_and_approach",
+    "split": "p",
+    "seed": 3,
+    "map": "blocks",
+    "layout": "b",
+    "target": "green_cylinder",
+    "kind": "visible",
+    "case": "visible",
+    "band": "far",
+    "sector": "front",
+    "strategy": "right",
+    "start_xy": [
+     86.7,
+     -116.48
+    ],
+    "start_yaw_deg": 140.03,
+    "start_height_m": 5.07,
+    "target_bearing_deg": -3.13,
+    "start_distance_m": 47.53,
+    "start_direction_deg": 316.9,
+    "instruction_id": "find_and_approach",
+    "instruction": "Find and approach the green cylinder.",
+    "plan": {
+     "ticks": 46,
+     "clearance_m": 13.95,
+     "climbed_m": 0.0,
+     "acquired_tick": 0,
+     "states": {
+      "approach": 42,
+      "stop": 4
+     }
+    },
+    "requested_kind": "visible",
+    "in_wedge": true,
+    "base": "g1-0003-green_cylinder-visible"
+   },
+   {
+    "id": "p-0016-blue_cone-search-locate",
+    "split": "p",
+    "seed": 16,
+    "map": "blocks",
+    "layout": "a",
+    "target": "blue_cone",
+    "kind": "search",
+    "case": "search",
+    "band": "near",
+    "sector": "right",
+    "strategy": "right",
+    "start_xy": [
+     69.13,
+     -35.9
+    ],
+    "start_yaw_deg": -99.13,
+    "start_height_m": 8.93,
+    "target_bearing_deg": 100.42,
+    "start_distance_m": 22.27,
+    "start_direction_deg": 181.29,
+    "instruction_id": "locate",
+    "instruction": "Locate the blue cone.",
+    "plan": {
+     "ticks": 28,
+     "clearance_m": 7.63,
+     "climbed_m": 0.0,
+     "acquired_tick": 6,
+     "states": {
+      "search": 6,
+      "approach": 18,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": false,
+    "base": "g1-0016-blue_cone-search"
+   },
+   {
+    "id": "p-0016-blue_cone-search-search_for",
+    "split": "p",
+    "seed": 16,
+    "map": "blocks",
+    "layout": "a",
+    "target": "blue_cone",
+    "kind": "search",
+    "case": "search",
+    "band": "near",
+    "sector": "right",
+    "strategy": "right",
+    "start_xy": [
+     69.13,
+     -35.9
+    ],
+    "start_yaw_deg": -99.13,
+    "start_height_m": 8.93,
+    "target_bearing_deg": 100.42,
+    "start_distance_m": 22.27,
+    "start_direction_deg": 181.29,
+    "instruction_id": "search_for",
+    "instruction": "Search for the blue cone.",
+    "plan": {
+     "ticks": 28,
+     "clearance_m": 7.63,
+     "climbed_m": 0.0,
+     "acquired_tick": 6,
+     "states": {
+      "search": 6,
+      "approach": 18,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": false,
+    "base": "g1-0016-blue_cone-search"
+   },
+   {
+    "id": "p-0016-blue_cone-search-find_and_approach",
+    "split": "p",
+    "seed": 16,
+    "map": "blocks",
+    "layout": "a",
+    "target": "blue_cone",
+    "kind": "search",
+    "case": "search",
+    "band": "near",
+    "sector": "right",
+    "strategy": "right",
+    "start_xy": [
+     69.13,
+     -35.9
+    ],
+    "start_yaw_deg": -99.13,
+    "start_height_m": 8.93,
+    "target_bearing_deg": 100.42,
+    "start_distance_m": 22.27,
+    "start_direction_deg": 181.29,
+    "instruction_id": "find_and_approach",
+    "instruction": "Find and approach the blue cone.",
+    "plan": {
+     "ticks": 28,
+     "clearance_m": 7.63,
+     "climbed_m": 0.0,
+     "acquired_tick": 6,
+     "states": {
+      "search": 6,
+      "approach": 18,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": false,
+    "base": "g1-0016-blue_cone-search"
+   },
+   {
+    "id": "p-0017-orange_ball-search-locate",
+    "split": "p",
+    "seed": 17,
+    "map": "blocks",
+    "layout": "b",
+    "target": "orange_ball",
+    "kind": "search",
+    "case": "search",
+    "band": "far",
+    "sector": "front_right",
+    "strategy": "right",
+    "start_xy": [
+     103.22,
+     85.42
+    ],
+    "start_yaw_deg": -164.75,
+    "start_height_m": 7.61,
+    "target_bearing_deg": 61.99,
+    "start_distance_m": 54.67,
+    "start_direction_deg": 77.25,
+    "instruction_id": "locate",
+    "instruction": "Locate the orange ball.",
+    "plan": {
+     "ticks": 57,
+     "clearance_m": 4.52,
+     "climbed_m": 0.0,
+     "acquired_tick": 2,
+     "states": {
+      "search": 2,
+      "align": 1,
+      "approach": 50,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": false,
+    "base": "g1-0017-orange_ball-search"
+   },
+   {
+    "id": "p-0017-orange_ball-search-search_for",
+    "split": "p",
+    "seed": 17,
+    "map": "blocks",
+    "layout": "b",
+    "target": "orange_ball",
+    "kind": "search",
+    "case": "search",
+    "band": "far",
+    "sector": "front_right",
+    "strategy": "right",
+    "start_xy": [
+     103.22,
+     85.42
+    ],
+    "start_yaw_deg": -164.75,
+    "start_height_m": 7.61,
+    "target_bearing_deg": 61.99,
+    "start_distance_m": 54.67,
+    "start_direction_deg": 77.25,
+    "instruction_id": "search_for",
+    "instruction": "Search for the orange ball.",
+    "plan": {
+     "ticks": 57,
+     "clearance_m": 4.52,
+     "climbed_m": 0.0,
+     "acquired_tick": 2,
+     "states": {
+      "search": 2,
+      "align": 1,
+      "approach": 50,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": false,
+    "base": "g1-0017-orange_ball-search"
+   },
+   {
+    "id": "p-0017-orange_ball-search-find_and_approach",
+    "split": "p",
+    "seed": 17,
+    "map": "blocks",
+    "layout": "b",
+    "target": "orange_ball",
+    "kind": "search",
+    "case": "search",
+    "band": "far",
+    "sector": "front_right",
+    "strategy": "right",
+    "start_xy": [
+     103.22,
+     85.42
+    ],
+    "start_yaw_deg": -164.75,
+    "start_height_m": 7.61,
+    "target_bearing_deg": 61.99,
+    "start_distance_m": 54.67,
+    "start_direction_deg": 77.25,
+    "instruction_id": "find_and_approach",
+    "instruction": "Find and approach the orange ball.",
+    "plan": {
+     "ticks": 57,
+     "clearance_m": 4.52,
+     "climbed_m": 0.0,
+     "acquired_tick": 2,
+     "states": {
+      "search": 2,
+      "align": 1,
+      "approach": 50,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": false,
+    "base": "g1-0017-orange_ball-search"
+   },
+   {
+    "id": "p-0018-red_cube-search-locate",
+    "split": "p",
+    "seed": 18,
+    "map": "blocks",
+    "layout": "a",
+    "target": "red_cube",
+    "kind": "search",
+    "case": "search",
+    "band": "far",
+    "sector": "right",
+    "strategy": "right",
+    "start_xy": [
+     6.69,
+     -77.92
+    ],
+    "start_yaw_deg": -88.57,
+    "start_height_m": 8.59,
+    "target_bearing_deg": 80.92,
+    "start_distance_m": 45.72,
+    "start_direction_deg": 172.35,
+    "instruction_id": "locate",
+    "instruction": "Locate the red cube.",
+    "plan": {
+     "ticks": 50,
+     "clearance_m": 17.29,
+     "climbed_m": 0.0,
+     "acquired_tick": 4,
+     "states": {
+      "search": 4,
+      "align": 1,
+      "approach": 41,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": false,
+    "base": "g1-0018-red_cube-search"
+   },
+   {
+    "id": "p-0018-red_cube-search-search_for",
+    "split": "p",
+    "seed": 18,
+    "map": "blocks",
+    "layout": "a",
+    "target": "red_cube",
+    "kind": "search",
+    "case": "search",
+    "band": "far",
+    "sector": "right",
+    "strategy": "right",
+    "start_xy": [
+     6.69,
+     -77.92
+    ],
+    "start_yaw_deg": -88.57,
+    "start_height_m": 8.59,
+    "target_bearing_deg": 80.92,
+    "start_distance_m": 45.72,
+    "start_direction_deg": 172.35,
+    "instruction_id": "search_for",
+    "instruction": "Search for the red cube.",
+    "plan": {
+     "ticks": 50,
+     "clearance_m": 17.29,
+     "climbed_m": 0.0,
+     "acquired_tick": 4,
+     "states": {
+      "search": 4,
+      "align": 1,
+      "approach": 41,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": false,
+    "base": "g1-0018-red_cube-search"
+   },
+   {
+    "id": "p-0018-red_cube-search-find_and_approach",
+    "split": "p",
+    "seed": 18,
+    "map": "blocks",
+    "layout": "a",
+    "target": "red_cube",
+    "kind": "search",
+    "case": "search",
+    "band": "far",
+    "sector": "right",
+    "strategy": "right",
+    "start_xy": [
+     6.69,
+     -77.92
+    ],
+    "start_yaw_deg": -88.57,
+    "start_height_m": 8.59,
+    "target_bearing_deg": 80.92,
+    "start_distance_m": 45.72,
+    "start_direction_deg": 172.35,
+    "instruction_id": "find_and_approach",
+    "instruction": "Find and approach the red cube.",
+    "plan": {
+     "ticks": 50,
+     "clearance_m": 17.29,
+     "climbed_m": 0.0,
+     "acquired_tick": 4,
+     "states": {
+      "search": 4,
+      "align": 1,
+      "approach": 41,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": false,
+    "base": "g1-0018-red_cube-search"
+   },
+   {
+    "id": "p-0019-green_cylinder-search-locate",
+    "split": "p",
+    "seed": 19,
+    "map": "blocks",
+    "layout": "b",
+    "target": "green_cylinder",
+    "kind": "search",
+    "case": "search",
+    "band": "far",
+    "sector": "right",
+    "strategy": "right",
+    "start_xy": [
+     91.95,
+     -105.8
+    ],
+    "start_yaw_deg": 68.36,
+    "start_height_m": 7.13,
+    "target_bearing_deg": 83.01,
+    "start_distance_m": 45.51,
+    "start_direction_deg": 331.37,
+    "instruction_id": "locate",
+    "instruction": "Locate the green cylinder.",
+    "plan": {
+     "ticks": 50,
+     "clearance_m": 8.05,
+     "climbed_m": 0.0,
+     "acquired_tick": 4,
+     "states": {
+      "search": 4,
+      "align": 1,
+      "approach": 41,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": false,
+    "base": "g1-0019-green_cylinder-search"
+   },
+   {
+    "id": "p-0019-green_cylinder-search-search_for",
+    "split": "p",
+    "seed": 19,
+    "map": "blocks",
+    "layout": "b",
+    "target": "green_cylinder",
+    "kind": "search",
+    "case": "search",
+    "band": "far",
+    "sector": "right",
+    "strategy": "right",
+    "start_xy": [
+     91.95,
+     -105.8
+    ],
+    "start_yaw_deg": 68.36,
+    "start_height_m": 7.13,
+    "target_bearing_deg": 83.01,
+    "start_distance_m": 45.51,
+    "start_direction_deg": 331.37,
+    "instruction_id": "search_for",
+    "instruction": "Search for the green cylinder.",
+    "plan": {
+     "ticks": 50,
+     "clearance_m": 8.05,
+     "climbed_m": 0.0,
+     "acquired_tick": 4,
+     "states": {
+      "search": 4,
+      "align": 1,
+      "approach": 41,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": false,
+    "base": "g1-0019-green_cylinder-search"
+   },
+   {
+    "id": "p-0019-green_cylinder-search-find_and_approach",
+    "split": "p",
+    "seed": 19,
+    "map": "blocks",
+    "layout": "b",
+    "target": "green_cylinder",
+    "kind": "search",
+    "case": "search",
+    "band": "far",
+    "sector": "right",
+    "strategy": "right",
+    "start_xy": [
+     91.95,
+     -105.8
+    ],
+    "start_yaw_deg": 68.36,
+    "start_height_m": 7.13,
+    "target_bearing_deg": 83.01,
+    "start_distance_m": 45.51,
+    "start_direction_deg": 331.37,
+    "instruction_id": "find_and_approach",
+    "instruction": "Find and approach the green cylinder.",
+    "plan": {
+     "ticks": 50,
+     "clearance_m": 8.05,
+     "climbed_m": 0.0,
+     "acquired_tick": 4,
+     "states": {
+      "search": 4,
+      "align": 1,
+      "approach": 41,
+      "stop": 4
+     }
+    },
+    "requested_kind": "search",
+    "in_wedge": false,
+    "base": "g1-0019-green_cylinder-search"
+   }
+  ],
+  "S": [
+   {
+    "id": "s-0180-blue_cone-left",
+    "split": "s",
+    "seed": 180,
+    "map": "blocks",
+    "layout": "a",
+    "target": "blue_cone",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "left",
+    "strategy": "right",
+    "start_xy": [
+     111.58,
+     -69.76
+    ],
+    "start_yaw_deg": 210.43,
+    "start_height_m": 6.91,
+    "target_bearing_deg": -90.0,
+    "start_distance_m": 39.85,
+    "start_direction_deg": 300.43,
+    "instruction_id": "find",
+    "instruction": "Find the blue cone.",
+    "plan": {
+     "ticks": 60,
+     "clearance_m": 9.88,
+     "climbed_m": 0.0,
+     "acquired_tick": 20,
+     "states": {
+      "search": 20,
+      "align": 1,
+      "approach": 35,
+      "stop": 4
+     }
+    },
+    "side": "left"
+   },
+   {
+    "id": "s-0181-blue_cone-right",
+    "split": "s",
+    "seed": 181,
+    "map": "blocks",
+    "layout": "a",
+    "target": "blue_cone",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "right",
+    "strategy": "right",
+    "start_xy": [
+     111.58,
+     -69.76
+    ],
+    "start_yaw_deg": 30.43,
+    "start_height_m": 6.91,
+    "target_bearing_deg": 90.0,
+    "start_distance_m": 39.85,
+    "start_direction_deg": 300.43,
+    "instruction_id": "find",
+    "instruction": "Find the blue cone.",
+    "plan": {
+     "ticks": 45,
+     "clearance_m": 9.88,
+     "climbed_m": 0.0,
+     "acquired_tick": 5,
+     "states": {
+      "search": 5,
+      "align": 1,
+      "approach": 35,
+      "stop": 4
+     }
+    },
+    "side": "right"
+   },
+   {
+    "id": "s-0182-blue_cone-behind_left",
+    "split": "s",
+    "seed": 182,
+    "map": "blocks",
+    "layout": "a",
+    "target": "blue_cone",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "behind_left",
+    "strategy": "right",
+    "start_xy": [
+     111.58,
+     -69.76
+    ],
+    "start_yaw_deg": 255.43,
+    "start_height_m": 6.91,
+    "target_bearing_deg": -135.0,
+    "start_distance_m": 39.85,
+    "start_direction_deg": 300.43,
+    "instruction_id": "find",
+    "instruction": "Find the blue cone.",
+    "plan": {
+     "ticks": 56,
+     "clearance_m": 9.88,
+     "climbed_m": 0.0,
+     "acquired_tick": 16,
+     "states": {
+      "search": 16,
+      "align": 1,
+      "approach": 35,
+      "stop": 4
+     }
+    },
+    "side": "behind_left"
+   },
+   {
+    "id": "s-0183-blue_cone-behind_right",
+    "split": "s",
+    "seed": 183,
+    "map": "blocks",
+    "layout": "a",
+    "target": "blue_cone",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "behind_right",
+    "strategy": "right",
+    "start_xy": [
+     111.58,
+     -69.76
+    ],
+    "start_yaw_deg": -14.57,
+    "start_height_m": 6.91,
+    "target_bearing_deg": 135.0,
+    "start_distance_m": 39.85,
+    "start_direction_deg": 300.43,
+    "instruction_id": "find",
+    "instruction": "Find the blue cone.",
+    "plan": {
+     "ticks": 48,
+     "clearance_m": 9.89,
+     "climbed_m": 0.0,
+     "acquired_tick": 8,
+     "states": {
+      "search": 8,
+      "align": 1,
+      "approach": 35,
+      "stop": 4
+     }
+    },
+    "side": "behind_right"
+   },
+   {
+    "id": "s-0184-orange_ball-left",
+    "split": "s",
+    "seed": 184,
+    "map": "blocks",
+    "layout": "b",
+    "target": "orange_ball",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "left",
+    "strategy": "right",
+    "start_xy": [
+     116.87,
+     61.76
+    ],
+    "start_yaw_deg": -40.93,
+    "start_height_m": 8.45,
+    "target_bearing_deg": -90.0,
+    "start_distance_m": 39.26,
+    "start_direction_deg": 49.07,
+    "instruction_id": "find",
+    "instruction": "Find the orange ball.",
+    "plan": {
+     "ticks": 59,
+     "clearance_m": 10.99,
+     "climbed_m": 0.0,
+     "acquired_tick": 20,
+     "states": {
+      "search": 20,
+      "align": 1,
+      "approach": 34,
+      "stop": 4
+     }
+    },
+    "side": "left"
+   },
+   {
+    "id": "s-0185-orange_ball-right",
+    "split": "s",
+    "seed": 185,
+    "map": "blocks",
+    "layout": "b",
+    "target": "orange_ball",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "right",
+    "strategy": "right",
+    "start_xy": [
+     116.87,
+     61.76
+    ],
+    "start_yaw_deg": -220.93,
+    "start_height_m": 8.45,
+    "target_bearing_deg": 90.0,
+    "start_distance_m": 39.26,
+    "start_direction_deg": 49.07,
+    "instruction_id": "find",
+    "instruction": "Find the orange ball.",
+    "plan": {
+     "ticks": 44,
+     "clearance_m": 10.99,
+     "climbed_m": 0.0,
+     "acquired_tick": 5,
+     "states": {
+      "search": 5,
+      "align": 1,
+      "approach": 34,
+      "stop": 4
+     }
+    },
+    "side": "right"
+   },
+   {
+    "id": "s-0186-orange_ball-behind_left",
+    "split": "s",
+    "seed": 186,
+    "map": "blocks",
+    "layout": "b",
+    "target": "orange_ball",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "behind_left",
+    "strategy": "right",
+    "start_xy": [
+     116.87,
+     61.76
+    ],
+    "start_yaw_deg": 4.07,
+    "start_height_m": 8.45,
+    "target_bearing_deg": -135.0,
+    "start_distance_m": 39.26,
+    "start_direction_deg": 49.07,
+    "instruction_id": "find",
+    "instruction": "Find the orange ball.",
+    "plan": {
+     "ticks": 55,
+     "clearance_m": 11.0,
+     "climbed_m": 0.0,
+     "acquired_tick": 16,
+     "states": {
+      "search": 16,
+      "align": 1,
+      "approach": 34,
+      "stop": 4
+     }
+    },
+    "side": "behind_left"
+   },
+   {
+    "id": "s-0187-orange_ball-behind_right",
+    "split": "s",
+    "seed": 187,
+    "map": "blocks",
+    "layout": "b",
+    "target": "orange_ball",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "behind_right",
+    "strategy": "right",
+    "start_xy": [
+     116.87,
+     61.76
+    ],
+    "start_yaw_deg": -265.93,
+    "start_height_m": 8.45,
+    "target_bearing_deg": 135.0,
+    "start_distance_m": 39.26,
+    "start_direction_deg": 49.07,
+    "instruction_id": "find",
+    "instruction": "Find the orange ball.",
+    "plan": {
+     "ticks": 48,
+     "clearance_m": 10.99,
+     "climbed_m": 0.0,
+     "acquired_tick": 8,
+     "states": {
+      "search": 8,
+      "align": 1,
+      "approach": 35,
+      "stop": 4
+     }
+    },
+    "side": "behind_right"
+   },
+   {
+    "id": "s-0188-red_cube-left",
+    "split": "s",
+    "seed": 188,
+    "map": "blocks",
+    "layout": "a",
+    "target": "red_cube",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "left",
+    "strategy": "right",
+    "start_xy": [
+     15.23,
+     -106.68
+    ],
+    "start_yaw_deg": 121.67,
+    "start_height_m": 8.73,
+    "target_bearing_deg": -90.0,
+    "start_distance_m": 43.2,
+    "start_direction_deg": 211.67,
+    "instruction_id": "find",
+    "instruction": "Find the red cube.",
+    "plan": {
+     "ticks": 63,
+     "clearance_m": 28.76,
+     "climbed_m": 0.0,
+     "acquired_tick": 20,
+     "states": {
+      "search": 20,
+      "align": 1,
+      "approach": 38,
+      "stop": 4
+     }
+    },
+    "side": "left"
+   },
+   {
+    "id": "s-0189-red_cube-right",
+    "split": "s",
+    "seed": 189,
+    "map": "blocks",
+    "layout": "a",
+    "target": "red_cube",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "right",
+    "strategy": "right",
+    "start_xy": [
+     15.23,
+     -106.68
+    ],
+    "start_yaw_deg": -58.33,
+    "start_height_m": 8.73,
+    "target_bearing_deg": 90.0,
+    "start_distance_m": 43.2,
+    "start_direction_deg": 211.67,
+    "instruction_id": "find",
+    "instruction": "Find the red cube.",
+    "plan": {
+     "ticks": 48,
+     "clearance_m": 28.76,
+     "climbed_m": 0.0,
+     "acquired_tick": 5,
+     "states": {
+      "search": 5,
+      "align": 1,
+      "approach": 38,
+      "stop": 4
+     }
+    },
+    "side": "right"
+   },
+   {
+    "id": "s-0190-red_cube-behind_left",
+    "split": "s",
+    "seed": 190,
+    "map": "blocks",
+    "layout": "a",
+    "target": "red_cube",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "behind_left",
+    "strategy": "right",
+    "start_xy": [
+     15.23,
+     -106.68
+    ],
+    "start_yaw_deg": 166.67,
+    "start_height_m": 8.73,
+    "target_bearing_deg": -135.0,
+    "start_distance_m": 43.2,
+    "start_direction_deg": 211.67,
+    "instruction_id": "find",
+    "instruction": "Find the red cube.",
+    "plan": {
+     "ticks": 59,
+     "clearance_m": 28.79,
+     "climbed_m": 0.0,
+     "acquired_tick": 16,
+     "states": {
+      "search": 16,
+      "align": 1,
+      "approach": 38,
+      "stop": 4
+     }
+    },
+    "side": "behind_left"
+   },
+   {
+    "id": "s-0191-red_cube-behind_right",
+    "split": "s",
+    "seed": 191,
+    "map": "blocks",
+    "layout": "a",
+    "target": "red_cube",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "behind_right",
+    "strategy": "right",
+    "start_xy": [
+     15.23,
+     -106.68
+    ],
+    "start_yaw_deg": -103.33,
+    "start_height_m": 8.73,
+    "target_bearing_deg": 135.0,
+    "start_distance_m": 43.2,
+    "start_direction_deg": 211.67,
+    "instruction_id": "find",
+    "instruction": "Find the red cube.",
+    "plan": {
+     "ticks": 52,
+     "clearance_m": 28.74,
+     "climbed_m": 0.0,
+     "acquired_tick": 8,
+     "states": {
+      "search": 8,
+      "align": 1,
+      "approach": 39,
+      "stop": 4
+     }
+    },
+    "side": "behind_right"
+   },
+   {
+    "id": "s-0192-green_cylinder-left",
+    "split": "s",
+    "seed": 192,
+    "map": "blocks",
+    "layout": "b",
+    "target": "green_cylinder",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "left",
+    "strategy": "right",
+    "start_xy": [
+     20.05,
+     -109.56
+    ],
+    "start_yaw_deg": 128.66,
+    "start_height_m": 6.78,
+    "target_bearing_deg": -90.0,
+    "start_distance_m": 40.92,
+    "start_direction_deg": 218.66,
+    "instruction_id": "find",
+    "instruction": "Find the green cylinder.",
+    "plan": {
+     "ticks": 61,
+     "clearance_m": 29.91,
+     "climbed_m": 0.0,
+     "acquired_tick": 20,
+     "states": {
+      "search": 20,
+      "align": 1,
+      "approach": 36,
+      "stop": 4
+     }
+    },
+    "side": "left"
+   },
+   {
+    "id": "s-0193-green_cylinder-right",
+    "split": "s",
+    "seed": 193,
+    "map": "blocks",
+    "layout": "b",
+    "target": "green_cylinder",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "right",
+    "strategy": "right",
+    "start_xy": [
+     20.05,
+     -109.56
+    ],
+    "start_yaw_deg": -51.34,
+    "start_height_m": 6.78,
+    "target_bearing_deg": 90.0,
+    "start_distance_m": 40.92,
+    "start_direction_deg": 218.66,
+    "instruction_id": "find",
+    "instruction": "Find the green cylinder.",
+    "plan": {
+     "ticks": 46,
+     "clearance_m": 29.92,
+     "climbed_m": 0.0,
+     "acquired_tick": 5,
+     "states": {
+      "search": 5,
+      "align": 1,
+      "approach": 36,
+      "stop": 4
+     }
+    },
+    "side": "right"
+   },
+   {
+    "id": "s-0194-green_cylinder-behind_left",
+    "split": "s",
+    "seed": 194,
+    "map": "blocks",
+    "layout": "b",
+    "target": "green_cylinder",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "behind_left",
+    "strategy": "right",
+    "start_xy": [
+     20.05,
+     -109.56
+    ],
+    "start_yaw_deg": 173.66,
+    "start_height_m": 6.78,
+    "target_bearing_deg": -135.0,
+    "start_distance_m": 40.92,
+    "start_direction_deg": 218.66,
+    "instruction_id": "find",
+    "instruction": "Find the green cylinder.",
+    "plan": {
+     "ticks": 57,
+     "clearance_m": 29.94,
+     "climbed_m": 0.0,
+     "acquired_tick": 16,
+     "states": {
+      "search": 16,
+      "align": 1,
+      "approach": 36,
+      "stop": 4
+     }
+    },
+    "side": "behind_left"
+   },
+   {
+    "id": "s-0195-green_cylinder-behind_right",
+    "split": "s",
+    "seed": 195,
+    "map": "blocks",
+    "layout": "b",
+    "target": "green_cylinder",
+    "kind": "search",
+    "case": "search",
+    "band": "medium",
+    "sector": "behind_right",
+    "strategy": "right",
+    "start_xy": [
+     20.05,
+     -109.56
+    ],
+    "start_yaw_deg": -96.34,
+    "start_height_m": 6.78,
+    "target_bearing_deg": 135.0,
+    "start_distance_m": 40.92,
+    "start_direction_deg": 218.66,
+    "instruction_id": "find",
+    "instruction": "Find the green cylinder.",
+    "plan": {
+     "ticks": 50,
+     "clearance_m": 29.89,
+     "climbed_m": 0.0,
+     "acquired_tick": 8,
+     "states": {
+      "search": 8,
+      "align": 1,
+      "approach": 37,
+      "stop": 4
+     }
+    },
+    "side": "behind_right"
+   }
+  ]
+ }
+}
