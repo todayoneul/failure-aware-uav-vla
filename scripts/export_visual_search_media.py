@@ -22,15 +22,17 @@ CASES={'A':'A  target centred','B':'B  target at the edge','C':'C  target not vi
 NAMES={'baseline':'AeroVLA, sentence only','oft':'AeroVLA-OFT, sentence only','teacher':'Teacher (uses the target position)'}
 
 
-LEVELS={'G0':'G0 - seen start','G1':'G1 - unseen start','G2':'G2 - unseen object','G3':'G3 - unseen map','G4':'G4 - unseen map and object',
+LEVELS={'G0':'G0 - seen start','G1':'G1 - unseen start','G2':'G2 - unseen object','G3':'G3 - held-out scene','G4':'G4 - held-out scene and object',
         'P':'G1 - unseen words','S':'G1 - side probe'}
 
 
-def export_gif(record,episode,output,scale,seconds,hold,model_name=None):
+def export_gif(record,episode,output,scale,seconds,hold,model_name=None,every=1):
     from src.visual_search.maps import load_map
     data=json.loads((Path(record)/'episodes'/f'{episode}.json').read_text());summary=data['summary'];frames=[]
     directory=Path(record)/data['traj_rel_dir'];map_config=load_map(summary.get('map','blocks'))
     for index,step in enumerate(data['steps']):
+        # A long flight is thinned to every n-th decision; the last one is always kept.
+        if index%every and index!=len(data['steps'])-1:continue
         front=cv2.imread(str(directory/'frontcamera'/step['img_name']));down=cv2.imread(str(directory/'downcamera'/step['img_name']))
         live={'mode':'VISUAL SEARCH','model':summary['policy'],'model_name':model_name,'episode':summary,'step':step,
               'map':map_config['name'],'target':map_config['objects'][summary['target']]['noun'],'level':LEVELS.get(summary.get('set')),
@@ -119,13 +121,13 @@ def main():
     parser=argparse.ArgumentParser();commands=parser.add_subparsers(dest='command',required=True)
     gif=commands.add_parser('gif');gif.add_argument('--record',required=True);gif.add_argument('--episode',required=True);gif.add_argument('--output',required=True)
     gif.add_argument('--scale',type=float,default=.6);gif.add_argument('--seconds',type=float,default=.25);gif.add_argument('--hold',type=float,default=2.5)
-    gif.add_argument('--model-name')
+    gif.add_argument('--model-name');gif.add_argument('--every',type=int,default=1,help='keep every n-th decision')
     paths=commands.add_parser('trajectories');paths.add_argument('runs',nargs='+');paths.add_argument('--map',required=True);paths.add_argument('--output',required=True)
     paths.add_argument('--cases',nargs='+',default=['A','B','C']);paths.add_argument('--targets',required=True,help='JSON file with landmark id -> [x, y]')
     flown=commands.add_parser('flown');flown.add_argument('runs',nargs='+',help='LABEL=DIRECTORY');flown.add_argument('--output',required=True)
     flown.add_argument('--columns',type=int,default=2)
     args=parser.parse_args()
-    if args.command=='gif':export_gif(args.record,args.episode,args.output,args.scale,args.seconds,args.hold,args.model_name)
+    if args.command=='gif':export_gif(args.record,args.episode,args.output,args.scale,args.seconds,args.hold,args.model_name,args.every)
     elif args.command=='flown':export_flown(args.runs,args.output,args.columns)
     else:
         target_centre.update(json.loads(Path(args.targets).read_text()));export_trajectories(args.runs,args.map,args.output,args.cases)

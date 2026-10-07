@@ -23,6 +23,9 @@
 !/outputs/examples/visual_search_oft_reacquire.gif
 !/outputs/examples/visual_search_trajectories.jpg
 !/outputs/examples/visual_search_dataset/
+!/outputs/examples/generalization/
+# Frozen result tables of the generalisation runs (small files; the raw run folders stay local).
+!/outputs/generalization/
 
 # Downloaded simulator, datasets and model weights.
 /assets/

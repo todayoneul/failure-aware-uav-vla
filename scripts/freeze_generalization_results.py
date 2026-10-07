@@ -9,6 +9,7 @@ directory receives:
   motion_comparison.csv      decision cycle, latency, action and heading change, clipping, collisions
   episodes.csv               one row per episode
   representative_failures/   for each category of each model: the episode's trace and a picture of it
+  comparison_levels.csv, comparison_failures.csv   with --compare A B: the two models side by side
 
 Stages of an episode (the success criterion itself is unchanged: stopped by itself, within the
 radius, no collision):
@@ -117,6 +118,7 @@ def main():
     parser=argparse.ArgumentParser();parser.add_argument('runs',nargs='+',help='MODEL:LEVEL=DIRECTORY');parser.add_argument('--output',required=True)
     parser.add_argument('--checkpoint',action='append',default=[],help='MODEL=DIRECTORY of a checkpoint whose training record is copied into the summary')
     parser.add_argument('--no-pictures',action='store_true')
+    parser.add_argument('--compare',nargs=2,metavar=('BEFORE','AFTER'),help='two model names to put side by side')
     args=parser.parse_args();output=Path(args.output);(output/'representative_failures').mkdir(parents=True,exist_ok=True)
     runs=[];geometries={};rows_out=[]
     for item in args.runs:
@@ -191,6 +193,30 @@ def main():
     for name,table in (('generalization_levels.csv',levels),('failure_taxonomy.csv',taxonomy),('motion_comparison.csv',motions),('episodes.csv',rows_out)):
         with (output/name).open('w',newline='',encoding='utf-8') as file:
             writer=csv.DictWriter(file,fieldnames=list(table[0]) if table else ['empty']);writer.writeheader();writer.writerows(table)
+    if args.compare:
+        before,after=args.compare
+        def cell(model,level,key):
+            found=[row for row in levels if row['model']==model and row['level']==level]
+            return f'{found[0][key]}/{found[0]["episodes"]}' if found else ''
+        side=[{'level':level,before:cell(before,level,'success'),after:cell(after,level,'success'),
+               f'{before} acquired':'' if not cell(before,level,'success') else f'{next(r for r in levels if r["model"]==before and r["level"]==level)["acquired"]}/{next(r for r in levels if r["model"]==before and r["level"]==level)["started_hidden"]}',
+               f'{after} acquired':'' if not cell(after,level,'success') else f'{next(r for r in levels if r["model"]==after and r["level"]==level)["acquired"]}/{next(r for r in levels if r["model"]==after and r["level"]==level)["started_hidden"]}'}
+              for level in LEVELS if cell(before,level,'success') or cell(after,level,'success')]
+        both=[level for level in LEVELS if cell(before,level,'success') and cell(after,level,'success')]
+        failures=[{'category':code,'name':CATEGORIES[code],
+                   before:sum(row['count'] for row in taxonomy if row['model']==before and row['category']==code and row['level'] in both),
+                   after:sum(row['count'] for row in taxonomy if row['model']==after and row['category']==code and row['level'] in both)} for code in CATEGORIES]
+        for name,table in (('comparison_levels.csv',side),('comparison_failures.csv',failures)):
+            with (output/name).open('w',newline='',encoding='utf-8') as file:
+                writer=csv.DictWriter(file,fieldnames=list(table[0]));writer.writeheader();writer.writerows(table)
+        summary['comparison']={'levels':side,'failures':failures,'levels_compared':both}
+        (output/'summary.json').write_text(json.dumps(summary,indent=1))
+        print(f'| Level | {before} | {after} |');print('|---|---:|---:|')
+        for row in side:print(f'| {row["level"]} | {row[before]} | {row[after]} |')
+        print(f'\n| Failure (levels {", ".join(both)}) | {before} | {after} |');print('|---|---:|---:|')
+        for row in failures:
+            if row[before] or row[after]:print(f'| {row["category"]} {row["name"]} | {row[before]} | {row[after]} |')
+        print()
     models=list(dict.fromkeys(run['model'] for run in runs))
     print('| Model | '+' | '.join(level for level in LEVELS)+' |');print('|---|'+'---:|'*len(LEVELS))
     for model in models:

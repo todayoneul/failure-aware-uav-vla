@@ -18,7 +18,7 @@ from src.visual_search.maps import load_map,MapGeometry
 
 LEVELS=('G0','G1','G2','G3','G4','P','S')
 NAMES={'G0':'G0 seen map, seen object, seen start','G1':'G1 seen map, seen object, unseen start','G2':'G2 seen map, unseen object',
-       'G3':'G3 unseen map, seen object','G4':'G4 unseen map, unseen object','P':'G1 starts, unseen wording','S':'G1 side probe'}
+       'G3':'G3 held-out scene, seen object','G4':'G4 held-out scene, unseen object','P':'G1 starts, unseen wording','S':'G1 side probe'}
 
 
 def mean(values):
