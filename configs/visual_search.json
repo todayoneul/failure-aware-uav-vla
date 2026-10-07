@@ -1,0 +1,31 @@
+{
+  "description": "Visual search on Project AirSim Blocks: the policy gets Front/Down RGB and one sentence. Target coordinates are used only to place the vehicle, to drive the teacher and to score.",
+  "cruise_height_m": 6.0,
+  "success_radius_m": 15.0,
+  "arrive_distance_m": 12.0,
+  "stop_ticks": 4,
+  "max_ticks": 170,
+  "max_decisions_baseline": 30,
+  "visibility_margin_m": 6.5,
+  "targets": {
+    "blue_cone": {"noun": "the blue cone", "start_bearing_deg": [150, 205], "start_distance_m": [28, 45]},
+    "orange_ball": {"noun": "the orange ball", "start_bearing_deg": [155, 210], "start_distance_m": [28, 45]}
+  },
+  "instructions": {
+    "approach": "Approach {noun}.",
+    "find": "Find {noun}."
+  },
+  "cases": {
+    "A": {"label": "visible, centred", "yaw_offset_deg": [0, 8], "instruction": "approach"},
+    "B": {"label": "visible, at the edge of the front view", "yaw_offset_deg": [28, 40], "instruction": "approach"},
+    "C": {"label": "not visible at the start", "yaw_offset_deg": [100, 180], "instruction": "find"},
+    "D": {"label": "seen, then lost after a forced turn", "yaw_offset_deg": [0, 8], "instruction": "find", "kick_after_ticks": [10, 25], "kick_deg": [70, 140]},
+    "L": {"label": "both objects in view from a place no training episode started at; the sentence names one", "start_xy": [45.0, 0.0], "start_yaw_deg": 0.0, "yaw_jitter_deg": 5.0, "instruction": "approach"}
+  },
+  "teacher": {
+    "centre_deg": 30.0,
+    "search_direction": "right",
+    "sweep_before_climb_deg": 400.0,
+    "climb_m": 3.0
+  }
+}
