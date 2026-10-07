@@ -1,0 +1,161 @@
+[
+ {
+  "traj_rel_dir": "blocks/C-blue_cone-101",
+  "img_name": "000000.png",
+  "instruction": "<image>\nFind the blue cone.",
+  "label": {
+   "fwd": 0.0,
+   "down": 0.0,
+   "yaw": 0.21
+  },
+  "is_last_step": false,
+  "is_penultimate": false,
+  "chunk": [
+   [
+    0.0,
+    0.0,
+    0.21
+   ],
+   [
+    0.0,
+    0.0,
+    0.21
+   ],
+   [
+    0.0,
+    0.0,
+    0.21
+   ],
+   [
+    0.0,
+    0.0,
+    0.21
+   ]
+  ],
+  "proprio": [
+   1.971921290757334e-07,
+   -8.472101989707727e-07,
+   0.001411341829225421,
+   0.198258904616038,
+   0.0
+  ],
+  "meta": {
+   "episode_id": "C-blue_cone-101",
+   "case": "C",
+   "target": "blue_cone",
+   "step": 0,
+   "target_visible": false,
+   "target_in_front_fov": false,
+   "target_visible_down": false,
+   "bearing_deg": 165.18127456310506,
+   "distance_m": 37.00861185007073,
+   "teacher_state": "search"
+  }
+ },
+ {
+  "traj_rel_dir": "blocks/B-blue_cone-100",
+  "img_name": "000002.png",
+  "instruction": "<image>\nApproach the blue cone.",
+  "label": {
+   "fwd": 0.5125369637258859,
+   "down": 0.0,
+   "yaw": -0.21
+  },
+  "is_last_step": false,
+  "is_penultimate": false,
+  "chunk": [
+   [
+    0.5125369637258859,
+    0.0,
+    -0.21
+   ],
+   [
+    0.9647397298611543,
+    0.0,
+    -0.01846223427196489
+   ],
+   [
+    0.8498388491600058,
+    0.0,
+    0.0786241947222524
+   ],
+   [
+    0.9971684785993977,
+    0.0,
+    0.001482581138435746
+   ]
+  ],
+  "proprio": [
+   -2.000659056286737e-07,
+   -1.0341442363140009e-07,
+   -0.00020671720267273486,
+   0.198066246509552,
+   -1.0471356638104785
+  ],
+  "meta": {
+   "episode_id": "B-blue_cone-100",
+   "case": "B",
+   "target": "blue_cone",
+   "step": 2,
+   "target_visible": true,
+   "target_in_front_fov": true,
+   "target_visible_down": false,
+   "bearing_deg": -14.623891088223422,
+   "distance_m": 30.898170752712282,
+   "teacher_state": "approach"
+  }
+ },
+ {
+  "traj_rel_dir": "blocks/A-blue_cone-100",
+  "img_name": "000030.png",
+  "instruction": "<image>\nApproach the blue cone.",
+  "label": {
+   "fwd": 0.0,
+   "down": 0.0,
+   "yaw": 0.0
+  },
+  "is_last_step": false,
+  "is_penultimate": false,
+  "chunk": [
+   [
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0
+   ]
+  ],
+  "proprio": [
+   0.5667722361956254,
+   4.59963092724891e-07,
+   0.012417865917086601,
+   0.19969719250996906,
+   -1.097273450967764e-06
+  ],
+  "meta": {
+   "episode_id": "A-blue_cone-100",
+   "case": "A",
+   "target": "blue_cone",
+   "step": 30,
+   "target_visible": true,
+   "target_in_front_fov": true,
+   "target_visible_down": false,
+   "bearing_deg": 5.883227647468623e-05,
+   "distance_m": 11.806991926521746,
+   "teacher_state": "stop"
+  }
+ }
+]

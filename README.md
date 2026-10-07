@@ -86,6 +86,28 @@ AeroVLA에 전달된 Front/Down RGB와 생성된 forward/down/yaw 행동입니�
 
 그 과정에서 미션이 `invalid_action`으로 끝나던 원인도 찾았습니다. 이동 명령의 숫자 토큰 하나가 원본 OpenVLA의 action 토큰으로 바뀐 출력이었고, 유효한 토큰만 고르도록 디코더를 바꾼 뒤로는 그런 종료가 없습니다. [상세](docs/model_evaluation.md#깨진-출력-블록-위-목표-지시문만으로-찾아가기).
 
+### 방향 힌트 없이 찾아가게 할 수 있나요? (AeroVLA-OFT)
+
+![AeroVLA-OFT visual search 데모](outputs/examples/visual_search_demo.png)
+
+```powershell
+.\scripts\run_visual_search_demo.ps1 -Model baseline   # 기존 AeroVLA
+.\scripts\run_visual_search_demo.ps1 -Model oft        # AeroVLA-OFT (checkpoint를 학습한 PC에서)
+```
+
+**Visual Search Mode**에서는 모델이 Front/Down 영상과 `Find the blue cone.` 같은 문장 하나만 받습니다. 목표 좌표와 방향 힌트는 점수를 매기는 데만 씁니다.
+
+| 시작 조건 (각 6회) | 기존 AeroVLA | AeroVLA-OFT |
+|---|---:|---:|
+| 목표가 정면에 보임 | 3/6 | 6/6 |
+| 목표가 가장자리에 보임 | 0/6 | 6/6 |
+| 목표가 안 보임 | 0/6 | 5/6 |
+| 접근 중 강제로 돌려 놓침 | - | 6/6 |
+
+AeroVLA-OFT는 AeroVLA adapter를 고정한 채 OpenVLA-OFT 방식의 head(한 번의 forward로 연속값 행동 4개)와 새 LoRA를 얹고, teacher가 비행한 72 episode로 학습한 pilot입니다. RTX 5070 12GB에서 39분 걸렸습니다. 판단 주기는 6.3초에서 0.52초로 줄었습니다.
+
+**같은 맵, 같은 두 물체에서만 확인했습니다.** 학습에 없던 위치에서 시작하면 2/6이고, 다른 맵에서는 시험하지 않았습니다. [구조·데이터·학습·결과·한계](docs/aerovla_oft.md).
+
 ## System Architecture
 
 ```text
@@ -134,6 +156,8 @@ outputs/examples/  드론·관찰·AI·장애 화면과 짧은 GIF
 - [x] Continuous flight: re-plan in the air instead of stopping every step
 - [x] Grammar-constrained action decoding; roof targets approached from above
 - [x] Instruction-only prompt mode and its evaluation (the model does not follow it)
+- [x] Visual Search Mode (no direction hint) and AeroVLA-OFT pilot: continuous action chunk head on top of AeroVLA
+- [ ] Visual search beyond the training map and start region
 - [ ] Reaching a described landmark and stopping near it
 - [ ] Additional failure types
 - [ ] Failure detection

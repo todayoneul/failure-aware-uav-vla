@@ -1,0 +1,60 @@
+{
+ "episodes": 72,
+ "train_episodes": 58,
+ "val_episodes": 14,
+ "samples": 2923,
+ "train_samples": 2227,
+ "val_samples": 696,
+ "by_case_episodes": {
+  "A": 12,
+  "B": 12,
+  "C": 24,
+  "D": 24
+ },
+ "by_target_episodes": {
+  "blue_cone": 36,
+  "orange_ball": 36
+ },
+ "by_teacher_state": {
+  "approach": 2055,
+  "stop": 288,
+  "align": 66,
+  "search": 514
+ },
+ "target_visible": {
+  "visible": 2389,
+  "not visible": 534
+ },
+ "chunk_size": 4,
+ "tick_s": 0.5,
+ "action_bounds": {
+  "forward_m": [
+   0.0,
+   1.0
+  ],
+  "down_m": [
+   -0.5,
+   0.5
+  ],
+  "yaw_rad": [
+   -0.21,
+   0.21
+  ]
+ },
+ "val_episode_ids": [
+  "A-blue_cone-101",
+  "B-blue_cone-102",
+  "C-blue_cone-100",
+  "C-blue_cone-102",
+  "C-blue_cone-201",
+  "C-orange_ball-104",
+  "C-orange_ball-201",
+  "C-orange_ball-204",
+  "D-blue_cone-200",
+  "D-blue_cone-201",
+  "D-orange_ball-100",
+  "D-orange_ball-201",
+  "D-orange_ball-203",
+  "D-orange_ball-205"
+ ]
+}

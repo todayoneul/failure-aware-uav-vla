@@ -19,6 +19,8 @@
 | [model_evaluation.jpg](model_evaluation.jpg) | `outputs/model_eval/` 7개 run의 `results.json`을 `scripts/summarize_model_evaluation.py`로 그림 | 69 trial의 실제 궤적, 조건별 8칸. 배경은 simulator top-down 촬영이며 모델 입력이 아님 |
 | [model_evaluation_frames.jpg](model_evaluation_frames.jpg) | `outputs/model_eval/run1/frames/`의 step별 모델 입력 | 실제 Front/Down 입력과 그 step의 모델 출력. 위: 102m 비행 후 cone 옆 LAND, 아래: 설명은 cone인데 힌트가 가리킨 ball 위에서 LAND |
 | [model_evaluation_roof.jpg](model_evaluation_roof.jpg) | `outputs/model_eval/roof`, `instruction`의 `results.json`을 `outputs/model_eval/make_roof_figure.py`(로컬)로 그림 | 지붕 목표 6회의 평면도와 측면도, 지시문만 준 6회의 평면도. 배경은 simulator top-down 영상 |
+| [visual_search_demo.png](visual_search_demo.png) | `outputs/visual_search/demo/viewer.png`, `run_visual_search_demo.ps1 -Model oft -Cases C` | AeroVLA-OFT visual search의 실제 관찰 창: 뒤돌아 시작해 43 tick 뒤 목표 11.1m에서 정지. 십자는 화면용 복사본에만 있음 |
+| [visual_search_dataset/](visual_search_dataset/) | `datasets/projectairsim_visual_search/pilot`에서 sample 3개 | 학습 데이터 예시: `samples.json`(search / approach / stop), `samples.jpg`(각 Front 위·Down 아래), `summary.json`(전체 통계) |
 | [mission_landmark.png](mission_landmark.png) | `outputs/mission_demo/` 대화형 세션의 `current_view.png` | Blue cone landmark 미션: 43 step, 모델 LAND, 착륙, 목표 3.59m |
 
 `control_drift.png`는 AeroVLA가 장애를 감지하거나 복구했다는 결과가 아니다. 전체 frame dump와 raw 로그는 Git에서 제외한다.

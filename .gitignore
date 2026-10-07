@@ -18,6 +18,8 @@
 !/outputs/examples/mission_landmark.png
 !/outputs/examples/model_evaluation_frames.jpg
 !/outputs/examples/model_evaluation_roof.jpg
+!/outputs/examples/visual_search_demo.png
+!/outputs/examples/visual_search_dataset/
 
 # Downloaded simulator, datasets and model weights.
 /assets/

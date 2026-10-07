@@ -87,3 +87,16 @@ step마다 멈추는 대신 도착 2초 전에 다음 판단을 시작해 명령
 - **지시문만:** 저장 프레임 135장에서 회전 방향이 목표 쪽 10 / 반대 8(힌트가 있으면 21 / 3). 실제 비행 6회 중 지시한 물체 20m 안 정지 0회.
 - **대화형 데모:** 2세션 3미션 정상 종료. 지붕 목표는 30.7m, 21.0m에서 정지해 실패, 지시문 모드는 첫 step LAND.
 - **Tests:** Python 94/94, Windows PowerShell 5.1 검사 4개 통과.
+
+## AeroVLA-OFT와 Visual Search — 2026-10-07
+
+브랜치 `feat/aerovla-oft-visual-search`. 상세: [AeroVLA-OFT](aerovla_oft.md).
+
+- **조사:** 공식 AeroVLA 학습 코드·데이터 형식(텍스트 bin 99개, LoRA r64, 방향 문장이 데이터에 포함)과 OpenVLA-OFT 구현(병렬 디코딩, L1 head, chunk, proprio, FiLM)을 확인했다.
+- **Baseline (AeroVLA, 문장만):** A 3/6, B 0/6, C 0/6. C에서 목표가 시야에 들어온 적 없음.
+- **학습 가능성:** NF4 + LoRA r16 + head, batch 1에서 최대 9.8GiB, step당 0.42초. 추론 forward 181ms.
+- **Dataset:** teacher 72 episode, 2,923 sample (search 514, stop 288). episode 단위 58 / 14 split.
+- **Overfit:** 48 sample에서 L1 0.64 → 0.044, 재로드 차이 0.0.
+- **Pilot:** 1,200 update, 39분. train L1 0.023, val 0.322(첫 행동 0.254).
+- **AeroVLA-OFT:** A 6/6, B 6/6, C 5/6, D 6/6. 판단 주기 6.26초 → 0.52초. 학습 범위 밖 시작에서는 2/6.
+- **하지 않은 것:** FiLM, proprio 비교, 다른 맵, Blur와의 결합, LAND.
