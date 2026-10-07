@@ -27,13 +27,15 @@ class MLPResNetBlock(nn.Module):
 
 class ActionHead(nn.Module):
     """OpenVLA-OFT's L1 regression head: per chunk step, the `action_dim` action-token states -> one action."""
-    def __init__(self,llm_dim,hidden_dim,blocks,chunk_size):
-        super().__init__();self.chunk_size=chunk_size
+    def __init__(self,llm_dim,hidden_dim,blocks,chunk_size,bounded=False):
+        super().__init__();self.chunk_size=chunk_size;self.bounded=bounded
         self.model=nn.Sequential(nn.LayerNorm(llm_dim*ACTION_DIM),nn.Linear(llm_dim*ACTION_DIM,hidden_dim),nn.ReLU(),
                                  *[MLPResNetBlock(hidden_dim) for _ in range(blocks)],nn.LayerNorm(hidden_dim),nn.Linear(hidden_dim,ACTION_DIM))
     def forward(self,states):
         # states: (batch, chunk * action_dim, llm_dim) -> (batch, chunk, action_dim)
-        return self.model(states.reshape(states.shape[0],self.chunk_size,-1))
+        actions=self.model(states.reshape(states.shape[0],self.chunk_size,-1))
+        # Optional: squash into the normalised range instead of leaving the clip to denormalisation.
+        return torch.tanh(actions) if self.bounded else actions
 
 
 class ProprioProjector(nn.Module):
@@ -74,7 +76,8 @@ class AeroVLAOFT:
         self.peft.base_model.set_adapter([AEROVLA_ADAPTER,OFT_ADAPTER])
         self.core=self.peft.base_model.model
         llm_dim=self.core.language_model.config.hidden_size
-        self.head=ActionHead(llm_dim,config['head']['hidden_dim'],config['head']['blocks'],self.chunk).to(self.device)
+        self.head=ActionHead(llm_dim,config['head']['hidden_dim'],config['head']['blocks'],self.chunk,
+                             bounded=config['head'].get('output','linear')=='tanh').to(self.device)
         self.use_proprio=bool(config['proprio']['enabled'])
         self.proprio_projector=ProprioProjector(len(config['proprio']['fields']),llm_dim).to(self.device) if self.use_proprio else None
         if checkpoint is not None:
