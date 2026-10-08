@@ -91,7 +91,8 @@ def collisions(records):
         counts=collections.Counter(values);return sorted(str(value) for value,count in counts.items() if count>1)
     return {'episode_ids':repeated(record['summary']['id'] for record in records),
             # A landing start flown again as an approach shares its seed and its pose on purpose; the task tells the two apart.
-            'seeds':repeated((record['summary'].get('map','blocks'),record['summary'].get('seed'),record['summary'].get('task','approach'))
+            'seeds':repeated((record['summary'].get('map','blocks'),record['summary'].get('seed'),record['summary'].get('task','approach'),
+                              record['summary']['target'] if record['summary'].get('twin_of') else None)
                              for record in records if 'split' in record['summary']),
             'folders':repeated(record['traj_rel_dir'] for record in records),
             'starts':repeated(tuple(record['summary']['start_xy'])+(record['summary']['target'],record['summary'].get('task','approach'))

@@ -87,6 +87,28 @@
     "query_reach_m": 120.0,
     "separation_m": 6.0,
     "train_layouts": {"field": ["a", "b", "c", "d"], "lot": ["a", "b", "c", "d"], "blocks": ["c", "d"]},
+    "round_b": {
+      "description": "Second round of additions, planned after the first Gen-v3 checkpoint did not pass the smoke gate (docs/aerovla_oft_gen_v3.md). Three of its four failed flights ended at an object of the right colour and the wrong shape; in the first round another object of the target's colour was nearer than the target in 5 of 240 starts. These kinds put that case in front of the model: the same pose told to go to each of several objects that share a colour or a shape, and starts where an object of the target's colour is nearer or is what the first view shows.",
+      "seeds": {"train": [10000, 14999], "val": [15000, 15999]},
+      "kinds": {
+        "query_search": {"base": "search", "task": "approach", "distance_m": [20.0, 60.0], "count": [16, 2],
+                         "targets": ["blue_pad", "blue_cube", "blue_cylinder", "blue_cone", "red_pad", "blue_cylinder", "red_cube", "blue_cube", "green_cylinder", "blue_cone"],
+                         "query_twins": {"relations": ["same_color", "same_shape"], "min": 2, "max": 3, "reach_m": 95.0}},
+        "query_visible": {"base": "visible", "task": "approach", "distance_m": [24.0, 60.0], "count": [16, 2],
+                          "targets": ["blue_cube", "blue_pad", "blue_cone", "blue_cylinder", "red_cube", "blue_pad", "green_cylinder", "blue_cylinder", "red_pad", "blue_cube"],
+                          "query_twins": {"relations": ["same_color", "same_shape"], "min": 2, "max": 3, "reach_m": 95.0}},
+        "nearer_same_color": {"base": "visible", "task": "approach", "distance_m": [30.0, 60.0], "bearing_deg": [0.0, 25.0], "count": [24, 2],
+                              "targets": ["blue_cube", "blue_cylinder", "blue_cone", "blue_pad", "red_cube", "blue_cylinder", "blue_cube", "red_pad"],
+                              "distractor": {"relation": "same_color", "nearer_by_m": 8.0, "within_m": 60.0}},
+        "land_past_same_color": {"base": "search", "task": "land", "distance_m": [14.0, 44.0], "count": [20, 2],
+                                 "distractor": {"relation": "same_color", "within_m": 50.0}},
+        "land_nearer_same_color": {"base": "visible", "task": "land", "distance_m": [30.0, 60.0], "bearing_deg": [0.0, 25.0], "count": [12, 1],
+                                   "distractor": {"relation": "same_color", "nearer_by_m": 8.0, "within_m": 60.0}},
+        "land_offset_hop": {"base": "visible", "task": "land", "distance_m": [14.0, 44.0], "count": [24, 2],
+                            "pushes": {"sequence": [{"when": "descend", "below_m": 3.0, "ticks": [2, 4], "forward_m": 0.8, "down_m": 0.25, "max_distance_m": 3.2},
+                                                    {"when": "landed", "ticks": [2, 3], "up_m": 0.4}]}}
+      }
+    },
     "gates": {
       "description": "Checks that must pass, in this order, before the 156 fresh test starts are flown (scripts/gate_gen_v3.py). Smoke and representative use validation starts of the training plan, never the test set. Fixed before the checkpoints they judge existed.",
       "pilot": {"what": "checkpoint trained on the pilot episodes alone, flown from 4 of their poses with both sentences", "land_touchdowns_min": 3, "approach_touchdowns_max": 0, "approach_hover_min": 3, "probe_min": 0.7},

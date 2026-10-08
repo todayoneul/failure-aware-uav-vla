@@ -148,6 +148,25 @@ class LandingTeacherTests(unittest.TestCase):
         self.assertAlmostEqual(pushes.step('stop',dict(near,height_m=4.1),.21)[1],.1);self.assertFalse(pushes.pending());self.assertIsNone(pushes.step('stop',near,.21))
         self.assertIsNone(Pushes({'pushes':[{'ticks':3,'forward_m':.8,'down_m':0.,'until_m':1.5,'floor_m':1.5}]}).step('stop',dict(near,distance_m=1.),.21))
 
+    def test_a_landing_can_be_pushed_off_the_middle_and_made_to_hop(self):
+        from src.visual_search.generalization import Pushes
+        scene=SCENES['field'];spec=gen_v3.spec_of(CONFIG,'land_offset_hop',V3['round_b'])
+        episode=make_start(CONFIG,OFT,scene,'a','blue_pad','land_offset_hop','v3',7,'t',spec=spec,task='land',instruction_id='land',max_ticks=V3['max_ticks'])
+        self.assertEqual([p['when'] for p in episode['pushes']],['descend','landed']);states=episode['plan']['states']
+        self.assertEqual(states['push'],sum(p['ticks'] for p in episode['pushes']));self.assertEqual(states['landed'],CONFIG['stop_ticks'])
+        plan=rollout(CONFIG,OFT,MapGeometry(scene,'a'),episode,14.)
+        # It ends on the pad, away from the middle but inside the part of it where the descent goes on.
+        self.assertTrue(plan['landed']);self.assertGreater(plan['final_distance_m'],LANDING['teacher']['align_radius_m']-.8)
+        self.assertLess(plan['final_distance_m'],LANDING['touchdown']['landing_region_half_width_m'])
+        low=dict(bearing_deg=0.,distance_m=1.,height_m=5.,surface_m=2.5)
+        pushes=Pushes({'pushes':[{'when':'descend','below_m':3.,'ticks':2,'forward_m':.8,'down_m':.25,'max_distance_m':3.2},{'when':'landed','ticks':1,'up_m':.3}]})
+        self.assertIsNone(pushes.step('descend',dict(low,height_m=6.),.21));self.assertIsNone(pushes.step('final',low,.21))
+        self.assertEqual(pushes.step('descend',low,.21),[.8,.25,0.]);self.assertEqual(pushes.step('descend',low,.21),[.8,.25,0.])
+        self.assertIsNone(pushes.step('descend',low,.21));self.assertTrue(pushes.pending())
+        self.assertEqual(pushes.step('landed',low,.21),[0.,-.3,0.]);self.assertFalse(pushes.pending())
+        # A push never carries the vehicle out of the part of the pad where it would go on descending.
+        self.assertIsNone(Pushes({'pushes':[{'when':'descend','below_m':3.,'ticks':3,'forward_m':.8,'down_m':.25,'max_distance_m':3.2}]}).step('descend',dict(low,distance_m=3.3),.21))
+
     def test_it_eases_in_over_the_pad_and_turns_before_it_flies(self):
         far=self.teacher.act(view(distance_m=30.))[0][0];close=self.teacher.act(view(distance_m=3.,over=True))[0][0]
         self.assertEqual(far,1.);self.assertAlmostEqual(close,3./LANDING['teacher']['ease_m'])
@@ -353,6 +372,11 @@ class ScoreTests(unittest.TestCase):
         env.collisions.append(self.event('BluePadMark2',2.52));touchdown,hit=env.contacts()
         self.assertEqual((touchdown['object'],hit),('blue_pad',None));self.assertEqual([round(v,2) for v in touchdown['offset_m']],[1.,-2.])
         env.collisions+=[self.event('BluePad',2.5,stamp=300,offset=(3.,3.))]*50;self.assertEqual(env.contacts()[0]['time_stamp'],200)
+        # Standing on the pad is read from the vehicle: at the touchdown height and still. Lifted off again, it is not on the pad,
+        # though the first touchdown stays on record.
+        z=touchdown['position'][2];at=lambda height,speed:{'position':[0.,0.,z-height],'velocity':[0.,0.,speed]}
+        self.assertEqual(env.resting(at(0.,0.)),'blue_pad');self.assertIsNone(env.resting(at(.3,0.)));self.assertIsNone(env.resting(at(0.,.3)))
+        self.assertEqual(env.contacts()[0]['object'],'blue_pad');self.assertIsNone(self.environment().resting(at(0.,0.)))
         env=self.environment();env.collisions.append(self.event('BluePad',1.2));self.assertEqual(env.contacts(),(None,'BluePad'))
         env=self.environment();env.collisions.append(self.event('FieldBarn',6.));self.assertEqual(env.contacts(),(None,'FieldBarn'))
         env=self.environment();env.collisions.append(self.event('RedPad',2.5));self.assertEqual(env.contacts()[0]['object'],'red_pad')
@@ -374,6 +398,9 @@ class ScoreTests(unittest.TestCase):
         other=self.summary(flight,touchdown=dict(down,object='red_pad'))
         self.assertEqual((other['success'],other['selected'],other['wrong_target'],other['landed_on']),(False,'red_pad',True,'red_pad'))
         self.assertFalse(self.summary(flight,touchdown=down,hit='FieldBarn')['success'])
+        # Touched down, then lifted off again and stopped in the air: not a landing.
+        hopped=flight+[step(1.,over=True,height=3.)];result=self.summary(hopped,touchdown=down)
+        self.assertFalse(result['success']);self.assertTrue(result['touchdown']['left_the_pad_again'])
 
     def test_an_approach_ends_in_the_air(self):
         hover=[step(30.,forward=1.),step(11.),step(11.)]

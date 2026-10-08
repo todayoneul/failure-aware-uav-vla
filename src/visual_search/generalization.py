@@ -141,13 +141,28 @@ class Pushes:
 
     def pending(self):return bool(self.queue) or self.left>0
 
+    def due(self,item,state,view):
+        """Has the moment of the next forced move come?"""
+        when=item.get('when','stop')
+        # A landing pushed sideways during its last metres, so that it touches down away from the middle of the pad.
+        if when=='descend':return state=='descend' and view['height_m']-view['surface_m']<=item['below_m']
+        # A hop after touchdown: the vehicle is lifted a little and has to come down and stop again.
+        if when=='landed':return state=='landed'
+        self.stopped=self.stopped+1 if state in STOP_STATES else 0
+        return self.stopped>=(1 if self.done==0 else self.hold)
+
     def step(self,state,view,yaw_max):
         """The forced action for this tick, or None. `state` is the teacher's state at this tick."""
         if self.left>0:self.left-=1
         else:
-            self.stopped=self.stopped+1 if state in STOP_STATES else 0
-            if not self.queue or self.stopped<(1 if self.done==0 else self.hold):return None
+            if not self.queue or not self.due(self.queue[0],state,view):return None
             self.current=self.queue.pop(0);self.left=self.current['ticks']-1;self.done+=1;self.stopped=0
+        when=self.current.get('when','stop')
+        if when=='landed':return [0.,-self.current['up_m'],0.]
+        if when=='descend':
+            # Straight on while still coming down, but not out of the part of the pad where the descent goes on.
+            if view['distance_m']>=self.current['max_distance_m']:self.left=0;return None
+            return [self.current['forward_m'],self.current['down_m'],0.]
         # Not past the middle of the pad, and not lower than a safe height above its top.
         if view['distance_m']<=self.current['until_m']:self.left=0;return None
         yaw=max(-yaw_max,min(yaw_max,math.radians(view['bearing_deg'])))
@@ -191,8 +206,8 @@ def rollout(config,oft,geometry,episode,ceiling_m):
     rest=geometry.objects[target]['size_m'][2]
     for tick in range(episode.get('max_ticks',settings['max_ticks'])):
         view=geometric_view(config,geometry,target,x,y,height,yaw)
-        # Touchdown: over the pad and down on its top. The simulator holds the vehicle there.
-        landed=landed or (task=='land' and view['over'] and height<=rest+1e-6)
+        # Touchdown: over the pad and down on its top. The simulator holds the vehicle there until it is told to climb.
+        landed=task=='land' and view['over'] and height<=rest+1e-6
         view.update(task=task,landed=landed)
         action,state=teacher.act(view)
         if view['visible'] and acquired is None:acquired=tick
@@ -203,7 +218,7 @@ def rollout(config,oft,geometry,episode,ceiling_m):
         states[state]=states.get(state,0)+1
         stops=stops+1 if state in STOP_STATES else 0
         if stops>=config['stop_ticks'] and not pushes.pending():reason='teacher_stop';break
-        if landed:continue
+        if landed and action[1]>=0:continue
         yaw+=action[2];x+=action[0]*math.cos(yaw);y+=action[0]*math.sin(yaw);height-=action[1];top=max(top,height)
         if task=='land' and geometry.over(x,y,target):height=max(height,rest)
         clearance=min(clearance,geometry.nearest(x,y,above_m=height-settings['corridor_clearance_m'],ignore=(target,))[0])
@@ -305,9 +320,13 @@ def make_start(config,oft,map_config,layout,target,kind,band,seed,split,strategy
         if spec:episode['base']=kind
         if spec.get('pushes'):
             push=spec['pushes']
-            episode['pushes']=[{'ticks':rng.randint(*push['ticks']),'forward_m':push['forward_m'],'down_m':rng.choice(push['down_m']),
-                                'until_m':push['until_m'],'floor_m':push['floor_m']} for _ in range(rng.randint(*push['count']))]
-            episode['push_hold']=push['hold']
+            if 'sequence' in push:
+                # Forced moves of a landing, each at its own moment (see Pushes.due).
+                episode['pushes']=[{**{k:v for k,v in item.items() if k!='ticks'},'ticks':rng.randint(*item['ticks'])} for item in push['sequence']]
+            else:
+                episode['pushes']=[{'ticks':rng.randint(*push['ticks']),'forward_m':push['forward_m'],'down_m':rng.choice(push['down_m']),
+                                    'until_m':push['until_m'],'floor_m':push['floor_m']} for _ in range(rng.randint(*push['count']))]
+                episode['push_hold']=push['hold']
         if task!='approach' or max_ticks or shown is not None:
             episode['task']=task;episode['others_in_view']=shown or []
             if max_ticks:episode['max_ticks']=max_ticks
@@ -317,7 +336,7 @@ def make_start(config,oft,map_config,layout,target,kind,band,seed,split,strategy
         plan=rollout(config,oft,geometry,episode,ceiling)
         if plan['reason']!='teacher_stop' or (task=='land' and not plan['landed']):continue
         if kind=='altitude' and plan['climbed_m']<settings['altitude_min_climb_m']:continue
-        if kind!='altitude' and plan['climbed_m']>0:continue
+        if kind!='altitude' and plan['climbed_m']>0 and not (spec.get('pushes') and task=='land'):continue
         episode['plan']={'ticks':plan['ticks'],'clearance_m':round(plan['clearance_m'],2),'climbed_m':round(plan['climbed_m'],2),
                          'acquired_tick':plan['acquired_tick'],'states':plan['states']}
         return episode

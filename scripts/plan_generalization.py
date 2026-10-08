@@ -213,12 +213,12 @@ def describe_v3(episodes):
             'teacher_ticks':[min(e['plan']['ticks'] for e in episodes),max(e['plan']['ticks'] for e in episodes)]}
 
 
-def check_v3(config,test,plans,held_out,long_range):
+def check_v3(config,test,plans,held_out,long_range,recipe=None):
     """A Gen-v3 training plan may not touch the test scene, a test layout, a held-out object, a test sentence or a test start."""
     settings=config['gen_v3'];problems=[];points=gen_v3.test_points(test,held_out,long_range);radius=settings['separation_m'];maps={}
     unseen={phrase for task in settings['instructions'].values() for phrase in task['held_out']}
     for split,episodes in plans.items():
-        low,high=settings['seeds'][split]
+        low,high=(settings[recipe] if recipe and split in settings[recipe]['seeds'] else settings)['seeds'][split]
         for episode in episodes:
             scene=maps.setdefault(episode['map'],load_map(episode['map']))
             if episode['map'] not in settings['train_layouts'] or episode['layout'] not in settings['train_layouts'][episode['map']]:
@@ -329,7 +329,9 @@ def main():
     draw.add_argument('--sets',nargs='+',default=['G1','S']);draw.add_argument('--output',required=True)
     draw.add_argument('--test-file',help='another file of held-out sets to draw instead of the first one (e.g. configs/gen_v3_test_spawns.json)')
     commands.add_parser('long');commands.add_parser('v3-test')
-    for name in ('v3-train','v3-pilot'):commands.add_parser(name).add_argument('--output',required=True)
+    for name in ('v3-train','v3-pilot'):
+        sub=commands.add_parser(name);sub.add_argument('--output',required=True)
+        sub.add_argument('--recipe',help='a later round of additions (gen_v3.<recipe>) instead of the first')
     commands.add_parser('v3-check').add_argument('--plan',required=True)
     args=parser.parse_args();config=load_config();oft=load_oft_config()
     if args.command=='test':
@@ -356,19 +358,21 @@ def main():
             for name,episodes in data['sets'].items():print(name,json.dumps(describe_v3(episodes)))
             return
         test=json.loads(V3_FILE.read_text(encoding='utf-8'));long_range=json.loads(LONG_FILE.read_text(encoding='utf-8'))
+        recipe=getattr(args,'recipe',None)
         if args.command=='v3-check':
             plan=json.loads(Path(args.plan).read_text());plans={split:plan[split] for split in ('train','val','pilot') if split in plan}
+            recipe=plan['recipe'].split('.',1)[1] if '.' in plan.get('recipe','') else None
         elif args.command=='v3-pilot':plans={'pilot':gen_v3.plan_pilot(config,oft)}
         else:
             points=gen_v3.test_points(test,held_out,long_range)
-            plans={split:gen_v3.plan_training(config,oft,split,points,held_out) for split in ('train','val')}
-        problems=check_v3(config,test,plans,held_out,long_range)
-        if problems:raise SystemExit(chr(10).join(problems))
+            plans={split:gen_v3.plan_training(config,oft,split,points,held_out,args.recipe) for split in ('train','val')}
+        problems=check_v3(config,test,plans,held_out,long_range,recipe)
+        if problems:raise SystemExit(chr(10).join(problems[:20]))
         if args.command=='v3-check':
             print(f'OK: {sum(len(v) for v in plans.values())} planned starts are clear of the test scene, the test layouts, the held-out words and '
                   f'{len(gen_v3.test_points(test,held_out,long_range))} evaluation starts (radius {config["gen_v3"]["separation_m"]} m)');return
         output=Path(args.output);output.mkdir(parents=True,exist_ok=True)
-        (output/'plan.json').write_text(json.dumps({'recipe':'gen_v3','test_file':V3_FILE.relative_to(ROOT).as_posix(),
+        (output/'plan.json').write_text(json.dumps({'recipe':f'gen_v3.{args.recipe}' if getattr(args,'recipe',None) else 'gen_v3','test_file':V3_FILE.relative_to(ROOT).as_posix(),
                                                     'summary':{split:describe_v3(episodes) for split,episodes in plans.items()},**plans},indent=1))
         for split,episodes in plans.items():print(split,json.dumps(describe_v3(episodes)))
         return

@@ -15,7 +15,7 @@ The test set is written once, before any training episode is planned, into confi
 import math
 import random
 from .maps import load_map,object_position
-from .generalization import make_start,variant,in_wedge
+from .generalization import make_start,variant,in_wedge,related
 
 TEST_SCENE='depot'
 TRAIN_MAPS=('field','lot','field','lot','field','blocks','lot','field','lot','field','lot','blocks')
@@ -27,9 +27,9 @@ LAND_TARGETS=('blue_pad','blue_pad','red_pad')
 RELATIONS=('same_shape','same_color','any')
 
 
-def spec_of(config,kind):
+def spec_of(config,kind,round_=None):
     """A kind of the Gen-v3 recipe with its ranges filled in from the named distance range."""
-    settings=config['gen_v3'];spec=dict(settings['kinds'][kind])
+    settings=config['gen_v3'];spec=dict((round_ or settings)['kinds'][kind])
     if 'range' in spec:spec['distance_m']=settings['ranges_m'][spec['range']]
     if 'distractor' in spec:spec['distractor']={'within_m':settings['distractor_within_m'],**spec['distractor']}
     return spec
@@ -186,13 +186,15 @@ def test_points(test,held_out=None,long_range=None):
     return points
 
 
-def plan_training(config,oft,split,points,held_out):
+def plan_training(config,oft,split,points,held_out,recipe=None):
     """The added training or validation episodes: every kind of the recipe, cycling scenes, layouts, objects, sides and sentences.
 
-    Each of those cycles has its own counter, so no object is tied to one sentence, one side or one layout."""
-    settings=config['gen_v3'];seed=settings['seeds'][split][0];episodes=[];maps={};column=0 if split=='train' else 1;turns={};running=0
+    Each of those cycles has its own counter, so no object is tied to one sentence, one side or one layout.
+    `recipe` names a later round of additions (gen_v3.<recipe>): its own kinds and its own first seeds."""
+    settings=config['gen_v3'];round_=settings[recipe] if recipe else settings
+    seed=round_['seeds'][split][0];episodes=[];maps={};column=0 if split=='train' else 1;turns={};running=0
     def turn(key,pool):return pool[turns.get(key,0)%len(pool)]
-    for kind,entry in settings['kinds'].items():
+    for kind,entry in round_['kinds'].items():
         if 'count' not in entry:continue
         task=entry['task'];phrases=settings['instructions'][task]['train']
         for index in range(entry['count'][column]):
@@ -201,13 +203,17 @@ def plan_training(config,oft,split,points,held_out):
                 map_id=TRAIN_MAPS[(running+shift)%len(TRAIN_MAPS)];scene=maps.setdefault(map_id,load_map(map_id))
                 layout=turn(('layout',map_id,task),settings['train_layouts'][map_id])
                 # Blocks gets the pads only: its own objects were trained there already.
-                pool=[t for t in (LAND_TARGETS if task=='land' or entry.get('targets')=='pads' else APPROACH_TARGETS)
+                named=entry.get('targets')
+                pool=[t for t in (named if isinstance(named,list) else LAND_TARGETS if task=='land' or named=='pads' else APPROACH_TARGETS)
                       if t in scene['layouts'][layout] and (map_id!='blocks' or t in PADS)]
-                target=turn(('target',task,map_id=='blocks'),pool);spec=spec_of(config,kind)
+                if not pool:turns[('layout',map_id,task)]=turns.get(('layout',map_id,task),0)+1;continue
+                target=turn(('target',task,map_id=='blocks'),pool);spec=spec_of(config,kind,round_)
                 if 'distractor' in spec and 'relation' not in entry['distractor']:spec['distractor']['relation']=RELATIONS[(turns.get(('relation',kind),0)+shift)%len(RELATIONS)]
                 episode,seed=plan_one(config,oft,scene,layout,target,kind,spec,task,turn(('phrase',task,target),phrases),seed,split,
                                       f'{split}-{{seed:04d}}-{target}-{kind}',side=turn(('side',kind,target),(1,-1)),
                                       excluded=exclusion(config,points,scene,layout,target,held_out),tries=12)
+                # A pose for query twins is kept only if enough of the other objects can be reached from it.
+                if episode and entry.get('query_twins') and len(query_twins(config,oft,scene,episode,kind,entry['query_twins'],{}))<entry['query_twins']['min']:episode=None
                 if episode:
                     for key in (('layout',map_id,task),('target',task,map_id=='blocks'),('phrase',task,target),('side',kind,target),('relation',kind)):turns[key]=turns.get(key,0)+1
                     break
@@ -223,7 +229,25 @@ def plan_training(config,oft,split,points,held_out):
                 if other:
                     other.update(kind=kind+'_approach',case=kind+'_approach',twin_of=episode['id']);episodes.append(other)
                     turns[('phrase','approach',episode['target'])]=turns.get(('phrase','approach',episode['target']),0)+1
+            if entry.get('query_twins'):
+                episodes+=query_twins(config,oft,scene,episode,kind,entry['query_twins'],turns)
     return episodes
+
+
+def query_twins(config,oft,scene,episode,kind,rule,turns):
+    """The same pose told to go to another object that shares the colour or the shape of the first: only the noun differs,
+    and with it where the flight goes. `turns` holds the sentence counters and is advanced for every twin made."""
+    phrases=config['gen_v3']['instructions']['approach']['train'];twins=[]
+    distance=lambda name:math.dist(object_position(scene,episode['layout'],name),episode['start_xy'])
+    others=[name for name in scene['layouts'][episode['layout']] if any(related(scene,episode['target'],name,relation) for relation in rule['relations'])
+            and distance(name)<=rule['reach_m']]
+    for name in sorted(others,key=distance)[:rule['max']]:
+        key=('phrase','approach',name)
+        other=variant(config,oft,scene,episode,episode['id'].replace(episode['target'],name)+'-query',target=name,task='approach',
+                      instruction_id=phrases[turns.get(key,0)%len(phrases)],allow_climb=True)
+        if other:
+            other.update(kind=kind+'_query',case=kind+'_query',twin_of=episode['id']);twins.append(other);turns[key]=turns.get(key,0)+1
+    return twins
 
 
 def plan_pilot(config,oft):

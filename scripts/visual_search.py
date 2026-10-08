@@ -141,6 +141,14 @@ class SearchEnv:
 
     def collided(self):return self.contacts()[1] is not None
 
+    def resting(self,state):
+        """The pad the vehicle stands on now, or None. The simulator reports one contact per touchdown, not a stream while the
+        vehicle rests, so this is read from the vehicle itself: at the height it touched down at and not moving vertically.
+        A vehicle told to climb leaves the pad again; the first touchdown stays on record either way."""
+        if self.touchdown is None:return None
+        still=abs(state['position'][2]-self.touchdown['position'][2])<=.03 and abs(state['velocity'][2])<=.05
+        return self.touchdown['object'] if still else None
+
     def apparent(self,meta):
         """Size of the target's bounding box in one camera's image, in pixels and as a share of the image. Occlusion is ignored;
         this is how large the object could look, kept with the log and never shown to a policy."""
@@ -216,16 +224,20 @@ def landing_summary(episode,steps,config,landing,stopped,touchdown,hit,others):
                       'down_camera_aligned':any(s.get('over') and s['distance_m']<=stage['aligned_m'] for s in steps),
                       'descent_started':descent,'touchdown':bool(touchdown and touchdown['object']==episode['target']),'self_stop':bool(stopped)}}
     if touchdown:
-        before=next((s for s in reversed(steps) if not s.get('landed')),steps[0]);velocity=before.get('velocity',[0.,0.,0.])
+        # The speed of the first touchdown: what the vehicle was doing at the last decision before it.
+        first=next((index for index,s in enumerate(steps) if s.get('landed')),len(steps)-1)
+        velocity=steps[max(0,first-1)].get('velocity',[0.,0.,0.])
         error=math.hypot(*touchdown['offset_m'])
         result['touchdown']={'object':touchdown['object'],'offset_m':touchdown['offset_m'],'horizontal_error_m':error,
                              'inside_region':max(abs(v) for v in touchdown['offset_m'])<=rule['landing_region_half_width_m'],
                              'vertical_speed_mps':velocity[2],'horizontal_speed_mps':math.hypot(velocity[0],velocity[1]),
-                             'step':next((index for index,s in enumerate(steps) if s.get('landed')),len(steps)-1)}
+                             'step':first,'left_the_pad_again':any(not s.get('landed') for s in steps[first:])}
         result['touchdown']['soft']=(abs(velocity[2])<=rule['max_vertical_speed_mps'] and result['touchdown']['horizontal_speed_mps']<=rule['max_horizontal_speed_mps'])
     if task=='land':
         down=result.get('touchdown')
-        result['land_success']=bool(down and down['object']==episode['target'] and down['inside_region'] and down['soft'] and stopped and not hit)
+        # ... and still standing on it when the flight ends (a vehicle that hopped off and stopped in the air has not landed).
+        result['land_success']=bool(down and down['object']==episode['target'] and down['inside_region'] and down['soft'] and stopped and not hit
+                                    and last.get('landed'))
         result['stages']['land_success']=result['land_success']
     return result
 
@@ -282,6 +294,7 @@ async def run_episode(env,episode,policy,args,record):
             landed_ticks+=1
             if landed_ticks>env.landing['after_touchdown_ticks']:reason='landed_no_stop';break
         observation=env.observe();private=observation['privileged'];state=observation['state']
+        resting=env.resting(state);on_pad=resting is not None
         proprio=proprio_vector(state,env.ground_z,oft,observation['yaw_rate'])
         inputs=policy_inputs(observation['frames']['front'],observation['frames']['down'],episode['instruction'],
                              proprio if oft['proprio']['enabled'] else None)
@@ -289,7 +302,7 @@ async def run_episode(env,episode,policy,args,record):
               'height_m':private['height_m'],'bearing_deg':private['bearing_deg'],'distance_m':private['distance_m'],
               'front_seen':private['front']['seen'],'front_in_fov':private['front']['in_fov'],'down_seen':private['down']['seen'],
               'front_pixel':private['front']['pixel'],'down_pixel':private['down']['pixel'],'ahead_m':private['ahead_m'],
-              'over':private['over'],'landed':touchdown is not None,'velocity':state['velocity'],'target_size':private['size'],
+              'over':private['over'],'landed':on_pad,'velocity':state['velocity'],'target_size':private['size'],
               'input_sha256':{name:digest(inputs[name]) for name in ('front','down')},'proprio':proprio}
         perturbed=False
         if args.policy=='baseline':
@@ -313,7 +326,7 @@ async def run_episode(env,episode,policy,args,record):
                 label,mode=teacher.act({'bearing_deg':private['bearing_deg'],'distance_m':private['distance_m'],'visible':private['front']['seen'],
                                         'below':private['down']['seen'],'ahead_m':private['ahead_m'],'height_m':private['height_m'],
                                         'over':private['over'],'surface_m':private['surface_m'],'task':task,
-                                        'landed':bool(touchdown and touchdown['object']==episode['target'])})
+                                        'landed':resting==episode['target']})
             else:label,mode=teacher.act(private['bearing_deg'],private['distance_m'],private['front']['seen'])
             if args.policy=='teacher':
                 action=label;step['teacher_state']=mode;step['teacher_action']=list(label)
