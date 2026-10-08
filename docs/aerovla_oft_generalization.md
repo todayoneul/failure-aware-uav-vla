@@ -1,6 +1,6 @@
 # AeroVLA-OFT 일반화 — 시작 위치, 물체, 맵
 
-2026-10-07~08 실행. 브랜치 `exp/aerovla-oft-generalization`. [pilot](aerovla_oft.md)의 코드와 checkpoint는 그대로 두고 그 위에 추가했다.
+2026-10-07~08 실행. 브랜치 `exp/aerovla-oft-generalization`. [pilot](aerovla_oft.md)의 코드와 checkpoint는 그대로 두고 그 위에 추가했다. 이 문서는 Gen-v1까지이고, 남은 실패를 분류해 고친 결과는 [Gen-v2 문서](aerovla_oft_gen_v2.md)에 있다.
 
 **요약**
 

@@ -100,3 +100,31 @@ step마다 멈추는 대신 도착 2초 전에 다음 판단을 시작해 명령
 - **Pilot:** 1,200 update, 39분. train L1 0.023, val 0.322(첫 행동 0.254).
 - **AeroVLA-OFT:** A 6/6, B 6/6, C 5/6, D 6/6. 판단 주기 6.26초 → 0.52초. 학습 범위 밖 시작에서는 2/6.
 - **하지 않은 것:** FiLM, proprio 비교, 다른 맵, Blur와의 결합, LAND.
+
+## AeroVLA-OFT 일반화 (Gen-v1) — 2026-10-07~08
+
+브랜치 `exp/aerovla-oft-generalization`. 상세: [일반화](aerovla_oft_generalization.md).
+
+- **준비:** 맵을 `configs/maps/`로 옮김. Blocks에 red cube, green cylinder, 벽 4개, 평가 전용 yellow pyramid를 실행 중에 띄움. 같은 simulator 안에 두 번째 장면 Yard를 만듦(학습 비행 0회).
+- **Held-out:** 학습 계획 전에 G1 32, G2 12, G3 20, G4 6, 문장 변형 24, 좌우 시험 16회의 시작 상태를 고정. 학습 시작점은 6m 이상 떨어지고 물체 자리마다 60° 방향을 비움.
+- **Teacher:** 영상으로 정해지는 규칙만 학습에 사용(오른쪽 회전, 앞이 막히면 상승). 좌우를 50/50으로 섞으면 탐색 frame의 yaw 예측이 +0.88 → +0.07.
+- **Dataset:** 292 episode(260 / 32), 11,745 sample, teacher 실패 0, train/val 누출 0.
+- **학습:** 2,250 update에서 조기 종료, 검증 최저 1,250 update. train 0.115 / val 0.092, peak 9.8GiB, 108분.
+- **Action range:** pilot의 범위 밖 예측 24%는 label이 한계값인 축의 1–2% 초과. tanh head는 같은 300 update에서 val 0.151 → 0.383이라 쓰지 않음.
+- **결과:** G0 20/20, G1 27/32, G2 9/12, G3 19/20, G4 2/6, 문장 변형 21/24, 좌우 시험 16/16, 충돌 0. 처음에 안 보이던 목표 73/73 획득.
+- **비교:** pilot G1 4/32(자기 장면·문장으로 5/16), G3 cone·ball 6/10, G2 0/6. 기존 AeroVLA G1 step 1/16, continuous 0/16.
+- **대조:** 다른 물체를 지시하면 가까운 물체에 멈춘 것은 pyramid 옆 0/12, Yard 2/20.
+- **찾은 문제:** 연속 실행 시 simulator 포트 해제 대기, scene reload 때 조명 초기화(Yard 저녁 조명). 둘 다 고침. 모델의 탐색 회전이 teacher의 절반 속도(14°/s 대 27°/s)인 것은 고치지 않음.
+
+## AeroVLA-OFT Gen-v2 — 2026-10-08
+
+같은 브랜치. 상세: [Gen-v2](aerovla_oft_gen_v2.md). 동결한 표: `outputs/generalization/gen_v1_final/`, `gen_v2_final/`.
+
+- **분석:** Gen-v1의 실패 16회를 10개 분류로 나눔. 탐색 실패 0, 다른 물체로 감 0, 이른 정지 4, 찾은 뒤 계속 상승 4, 접근 실패 4, 문장 변형에서만 3, 미정지 1. 병목은 찾은 뒤의 전환과 정지.
+- **바꾼 것:** dataset만. 전환 장면 153 episode(벽 넘어 상승 39, 높은 곳 접근 32, 정지 거리 부근 40, 가장자리의 가까운 목표 28, 가깝고 시야 밖 14)를 더해 445 episode, 16,765 sample.
+- **학습:** 처음부터 같은 설정으로 4,000 update(검증이 끝까지 내려감). train 0.049 / val 0.070. Gen-v1의 검증 frame으로는 0.092 → 0.067.
+- **결과:** G0 20/20, G1 32/32, G2 11/12, G3 18/20, G4 4/6, 문장 변형 24/24, 좌우 시험 16/16, 충돌 0. 합계 114 → 125/130.
+- **실패 분류:** 이른 정지 4 → 0, 계속 상승 4 → 0, 문장 변형 3 → 0, 접근 실패 4 → 4, 미정지 1 → 1. 남은 5회는 모두 44m 이상 시작(Yard 2, 처음 보는 물체 3).
+- **주의:** 보강 종류를 같은 held-out set의 실패에서 골랐고 학습량도 늘었다. 새 held-out 추정치가 아니다.
+- **Tests:** Python 146/146, PowerShell 4/4.
+- **다음:** 새 seed의 held-out 시작 상태에서 Visual Search + Gaussian Blur.

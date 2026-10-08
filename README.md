@@ -11,7 +11,7 @@
 | Front/Down 영상 → AeroVLA → 드론 이동 (closed loop) | 동작 | `.\scripts\run_blur_demo.ps1` |
 | Gaussian Blur를 실제 모델 입력에 주입 | 동작 | 같은 창에서 B, 1/2/3 |
 | 맵에서 목표를 골라 보내기 (방향 힌트 사용) | 동작. 20m 안 정지는 조건에 따라 0–60% | `.\scripts\run_mission_demo.ps1` |
-| 문장만 주고 찾아가기 (방향 힌트 없음) | AeroVLA-OFT pilot으로 이 맵에서 동작. 다른 맵은 미확인 | `.\scripts\run_visual_search_demo.ps1` |
+| 문장만 주고 찾아가기 (방향 힌트 없음) | AeroVLA-OFT로 동작. 처음 보는 시작 32/32, 학습하지 않은 장면 18/20. 처음 보는 물체는 약함 | `.\scripts\run_visual_search_demo.ps1` |
 | 장애 자동 감지·복구 | 아직 없음 | - |
 
 모델과 simulator는 저장소에 없습니다. 준비 방법은 [setup](docs/setup.md)에 있습니다.
@@ -20,31 +20,39 @@
 
 ### 1. 문장만 주고 찾아가기 — Visual Search
 
-![AeroVLA-OFT가 뒤돌아 선 상태에서 파란 원뿔을 찾아 접근하는 실제 비행](outputs/examples/visual_search_oft.gif)
+![벽 뒤에서 시작한 AeroVLA-OFT가 올라가서 빨간 정육면체를 찾고 접근해 멈추는 실제 비행](outputs/examples/generalization/climb_g1_v2.gif)
 
-`Find the blue cone.` 한 문장과 Front/Down 영상만 받은 **AeroVLA-OFT**의 실제 비행입니다(2배속). 목표가 뒤에 있어 처음에는 보이지 않습니다. 오른쪽으로 돌며 찾고, 보이면 그쪽으로 틀어 접근하고, 11m 앞에서 스스로 멈춥니다. 목표 좌표와 방향 힌트는 모델에 들어가지 않습니다. 십자 표시는 화면용 복사본에만 있고, 모델 입력이 카메라 원본과 같은지 hash로 확인해 표시합니다.
+`Find the red cube.` 한 문장과 Front/Down 영상만 받은 **AeroVLA-OFT**의 실제 비행입니다. 목표는 벽 뒤에 있어 처음에는 보이지 않습니다. 앞이 막혀 있으면 올라가고, 오른쪽으로 돌며 찾고, 보이면 그쪽으로 접근해 10.5m 앞에서 스스로 멈춥니다. 목표 좌표와 방향 힌트는 모델에 들어가지 않습니다. 십자 표시는 화면용 복사본에만 있고, 모델 입력이 카메라 원본과 같은지 hash로 확인해 표시합니다. 이 시작 위치는 학습에 쓰지 않은 것입니다.
 
 ```powershell
+.\scripts\run_visual_search_demo.ps1 -Model oft -Checkpoint outputs/aerovla_oft/checkpoints/generalization_v2 -Level G1 -Target red_cube
+.\scripts\run_visual_search_demo.ps1 -Model oft -Checkpoint outputs/aerovla_oft/checkpoints/generalization_v2 -Level G3 -Target orange_ball   # 학습하지 않은 장면
 .\scripts\run_visual_search_demo.ps1 -Model baseline   # 기존 AeroVLA
-.\scripts\run_visual_search_demo.ps1 -Model oft        # AeroVLA-OFT (checkpoint를 학습한 PC에서)
 ```
 
-![같은 시작 조건에서 기존 AeroVLA와 AeroVLA-OFT의 실제 궤적](outputs/examples/visual_search_trajectories.jpg)
+**AeroVLA-OFT**는 AeroVLA adapter를 고정한 채 OpenVLA-OFT 방식의 head를 얹은 것입니다. 한 번의 forward로 연속값 행동 4개를 내고 그중 1개를 실행합니다(판단 주기 0.5초, 기존 AeroVLA는 6.4초). teacher가 비행한 episode로 RTX 5070 12GB에서 LoRA만 학습했습니다. 세 번 학습했고, 매번 학습에 쓰지 않은 고정된 시작 상태에서 평가했습니다.
 
-같은 시작 조건에서의 실제 궤적입니다. 위는 기존 AeroVLA, 아래는 AeroVLA-OFT입니다.
+| 평가 (학습에 쓰지 않은 시작 상태) | 기존 AeroVLA | Pilot (72 episode) | Gen-v1 (292) | Gen-v2 (445) |
+|---|---:|---:|---:|---:|
+| G1. 본 맵·본 물체, 처음 보는 시작 | 1/16 | 4/32 | 27/32 | **32/32** |
+| G3. 학습하지 않은 장면(Yard), 본 물체 | - | 6/10 | 19/20 | 18/20 |
+| G2. 처음 보는 물체 (yellow pyramid) | - | 0/6 | 9/12 | 11/12 |
+| G4. Yard + 처음 보는 물체 | - | - | 2/6 | 4/6 |
+| 학습에 없던 문장 (`Locate`, `Search for`, …) | - | - | 21/24 | 24/24 |
+| 충돌 | 1/16 | 3/32 | 0/130 | 0/130 |
 
-| 시작 조건 (각 6회) | 기존 AeroVLA | AeroVLA-OFT |
-|---|---:|---:|
-| A. 목표가 정면에 보임 | 3/6 | 6/6 |
-| B. 목표가 화면 가장자리에 보임 | 0/6 | 6/6 |
-| C. 목표가 안 보임 | 0/6 | 5/6 |
-| D. 접근 중 강제로 돌려 놓침 ([GIF](outputs/examples/visual_search_oft_reacquire.gif)) | - | 6/6 |
-| 판단 주기 | 6.3초 | 0.52초 |
+![같은 시작 상태에서 Gen-v1과 Gen-v2의 실제 궤적](outputs/examples/generalization/flown_g1_v1_v2.jpg)
 
-- **AeroVLA-OFT**는 AeroVLA adapter를 고정한 채 OpenVLA-OFT 방식의 head를 얹은 것입니다. 한 번의 forward로 연속값 행동 4개를 내고 그중 1개를 실행합니다. teacher가 비행한 72 episode로 RTX 5070 12GB에서 39분 학습한 pilot입니다.
-- **같은 맵, 같은 두 물체에서만 확인했습니다.** 학습에 없던 위치에서 시작하면 2/6이고, 다른 맵은 시험하지 않았습니다.
+G1의 실제 궤적입니다. 위는 Gen-v1, 아래는 Gen-v2이고, 채운 점은 15m 안에서 스스로 멈춘 곳, 네모는 실패입니다.
 
-[구조·데이터·학습·결과·한계](docs/aerovla_oft.md)
+- **Pilot은 자기 구역 밖에서는 못 했습니다.** 자기 장면과 문장으로도 처음 보는 시작에서는 5/16입니다. 시작 위치·방향·거리·고도와 물체를 넓힌 데이터(Gen-v1)로 27/32가 됐습니다.
+- **Gen-v1의 실패는 목표를 못 찾아서가 아니었습니다.** 처음에 안 보이던 목표 73개를 모두 찾았고, 실패는 높은 곳에서 일찍 멈추거나 목표 앞에서 계속 올라가서 생겼습니다. 그 부분의 데이터만 더한 Gen-v2에서 이 실패가 8회에서 0회가 됐습니다.
+- **문장을 따릅니다.** 같은 자리에서 다른 물체를 지시하면 가까이 보이는 물체로 가지 않습니다(20회 중 2회만 그 물체에 멈춤).
+- **읽을 때 주의할 점.** Yard는 같은 simulator 안에 만든 다른 장면이지 다른 환경이 아닙니다. Gen-v2는 같은 평가 set의 실패를 보고 고친 것이라 새 추정치가 아닙니다. 처음 보는 물체와 44m 이상 먼 시작은 아직 약합니다.
+
+GIF: [탐색](outputs/examples/generalization/search_g1.gif) · [놓친 뒤 다시 찾기](outputs/examples/generalization/reacquire_g1.gif) · [Yard](outputs/examples/generalization/yard_g3.gif) · [Gen-v1의 실패](outputs/examples/generalization/failure_g1_v1.gif)와 [같은 시작에서의 Gen-v2](outputs/examples/generalization/fixed_g1_v2.gif) · [pilot 단계의 비행](outputs/examples/visual_search_oft.gif)
+
+문서: [pilot — 구조와 학습 가능성](docs/aerovla_oft.md) · [Gen-v1 — 시작 위치·물체·장면 일반화](docs/aerovla_oft_generalization.md) · [Gen-v2 — 실패 분류와 전환 데이터 보강](docs/aerovla_oft_gen_v2.md)
 
 ### 2. 맵에서 목표를 골라 보내기 — Coordinate Goal Mode
 
@@ -103,7 +111,10 @@
 | 말로만 시키면 (기존 AeroVLA) | 지시한 물체 20m 안 정지 0/6 | [해당 절](docs/model_evaluation.md#3-지시문만으로-찾아가기) |
 | 미션이 `invalid_action`으로 끝나던 이유 | 숫자 토큰 하나가 원본 OpenVLA의 action 토큰으로 바뀜. 디코더를 고친 뒤 0회 | [해당 절](docs/model_evaluation.md#1-invalid-출력은-토큰-하나가-바뀐-이동-명령이었다) |
 | 연속 비행의 효과 | 정지 시간 18–21% → 5–8%. 벽 충돌은 더 잦았음(10회 중 5회 대 8회 중 1회) | [연속 비행](docs/model_evaluation.md#연속-비행) |
-| 힌트 없이 찾게 학습시킬 수 있는가 | 이 맵에서는 가능(위 Visual Search 표) | [AeroVLA-OFT](docs/aerovla_oft.md) |
+| 힌트 없이 찾게 학습시킬 수 있는가 | 이 맵에서는 가능. pilot은 자기 구역에서 23/24 | [AeroVLA-OFT](docs/aerovla_oft.md) |
+| 그 모델은 시작 위치를 외운 것인가 | pilot은 그렇다(처음 보는 시작 4/32). 데이터를 넓힌 Gen-v1은 27/32, 학습하지 않은 장면 19/20 | [일반화](docs/aerovla_oft_generalization.md) |
+| 남은 실패는 못 찾아서인가, 찾은 뒤인가 | 찾은 뒤. 찾기는 73/73. 전환 데이터를 더한 Gen-v2는 32/32 | [Gen-v2](docs/aerovla_oft_gen_v2.md) |
+| 탐색 방향을 섞어 가르치면 | 탐색이 사라짐(탐색 frame의 yaw 예측 +0.88 → +0.07). 영상 한 장만 보는 정책이라서 | [해당 절](docs/aerovla_oft_generalization.md#teacher) |
 
 ## System Architecture
 
@@ -127,7 +138,7 @@ simulator는 Windows에서, 모델은 WSL2 Ubuntu에서 실행하고 직접 통�
 RTX 5070 12GB / Windows + WSL2 / Project AirSim Blocks / OpenVLA-7B + AeroVLA LoRA / NF4 + BF16 compute.
 
 - 기존 AeroVLA: 추론 약 1.0초, 판단 한 번 약 4.5–6.3초, GPU peak 9.76GiB ([baseline](docs/baseline.md))
-- AeroVLA-OFT: 추론 약 0.4초(simulator와 함께), 학습 peak 9.8GiB
+- AeroVLA-OFT: 추론 약 0.4초(simulator와 함께), 학습 peak 9.8GiB, 학습 39분(pilot) – 140분(Gen-v2)
 
 ## Repository Structure
 
@@ -135,13 +146,15 @@ RTX 5070 12GB / Windows + WSL2 / Project AirSim Blocks / OpenVLA-7B + AeroVLA Lo
 src/integration/     모델 loader, 카메라·행동 변환, 실행기
 src/mission/         지도 좌표, landmark, 미션 상태와 판정
 src/failures/        Gaussian Blur와 control protocol
-src/visual_search/   Visual Search episode, teacher 정책
+src/visual_search/   Visual Search episode, 맵 정의와 기하, 시작 상태 계획, teacher 정책
 src/aerovla_oft/     AeroVLA-OFT 모델과 행동·chunk 규칙
-scripts/             launcher(.ps1), 평가·학습·요약 스크립트
+scripts/             launcher(.ps1), 계획·평가·학습·요약·동결 스크립트
 configs/             비행·미션 한도, landmark, 평가 protocol, OFT 설정
-tests/               simulator 없이 도는 테스트 (Python 110개 + PowerShell 4개)
+configs/maps/        맵 파일(장애물, 물체, layout). 고정된 held-out 시작 상태는 configs/generalization_test_spawns.json
+tests/               simulator 없이 도는 테스트 (Python 146개 + PowerShell 4개)
 docs/                아래 문서
 outputs/examples/    README에 쓰는 실제 화면과 GIF
+outputs/generalization/  동결한 결과 표와 실패 분류 (원자료는 로컬에만)
 ```
 
 ## 문서
@@ -153,15 +166,17 @@ outputs/examples/    README에 쓰는 실제 화면과 GIF
 | [gaussian_blur_demo](docs/gaussian_blur_demo.md) | Blur 주입 데모 |
 | [mission_demo](docs/mission_demo.md) · [full_map_grounding](docs/full_map_grounding.md) | 미션 데모 조작, 지도와 Inspector |
 | [model_evaluation](docs/model_evaluation.md) | 하네스 수정, 69회 평가, 연속 비행, 디코더, 블록 위 목표, 지시문 |
-| [aerovla_oft](docs/aerovla_oft.md) | Visual Search Mode와 AeroVLA-OFT |
+| [aerovla_oft](docs/aerovla_oft.md) | Visual Search Mode와 AeroVLA-OFT pilot |
+| [aerovla_oft_generalization](docs/aerovla_oft_generalization.md) | 맵 정의, held-out 시작 상태, teacher, Gen-v1의 G0–G4 결과와 대조 시험 |
+| [aerovla_oft_gen_v2](docs/aerovla_oft_gen_v2.md) | Gen-v1 결과 동결, 실패 분류, 전환 데이터 보강, Gen-v1 대 Gen-v2 |
 | [experiments](docs/experiments.md) | 날짜별 실험 요약 |
 | [failure_plan](docs/failure_plan.md) | 이후 넣을 장애 후보 |
 
 ## 한계
 
-- **맵 하나에서 본 결과입니다.** Blocks 맵, 물체 몇 개, 조건당 3–6회입니다.
+- **simulator 하나에서 본 결과입니다.** Blocks 맵과 그 안에 만든 두 번째 장면(Yard), 물체 다섯 개, 조건당 수 회에서 수십 회입니다.
 - **Coordinate Goal Mode의 방향 힌트는 목표 좌표에서 나옵니다.** 카메라만으로 얻는 정보가 아닙니다.
-- **AeroVLA-OFT는 pilot입니다.** teacher의 고정 규칙을 흉내 내고, 학습 구역 밖에서는 약합니다. LAND와 착륙은 넣지 않았습니다.
+- **AeroVLA-OFT는 teacher를 흉내 낸 것입니다.** 탐색은 기억 없는 한 방향 회전이고, 처음 보는 물체와 먼 거리 시작에서 약합니다. LAND와 착륙은 넣지 않았습니다. Gen-v2의 숫자는 같은 평가 set을 보고 고친 뒤의 것입니다.
 - **장애물 회피가 없습니다.** 충돌하면 simulator가 기체를 고정해 그 비행은 끝납니다.
 - **모델 전체 fine-tuning, TravelUAV benchmark는 하지 않았습니다.** 학습은 LoRA pilot뿐입니다.
 - 모델 weight, checkpoint, dataset, simulator, raw 로그는 Git에 넣지 않습니다.
@@ -175,8 +190,9 @@ outputs/examples/    README에 쓰는 실제 화면과 GIF
 - [x] Model self-evaluation with landmarks and prompt ablations
 - [x] Continuous flight, grammar-constrained decoding, roof approach
 - [x] Visual Search Mode and the AeroVLA-OFT pilot
-- [ ] Visual search beyond the training map and start region
-- [ ] Visual Search + Gaussian Blur
+- [x] Visual search from unseen starts and in a held-out scene (Gen-v1), failure taxonomy and transition data (Gen-v2)
+- [ ] Visual Search + Gaussian Blur, measured on fresh held-out starts
+- [ ] Unseen-object grounding, turn rate of the executor
 - [ ] Additional failure types
 - [ ] Failure detection and basic recovery
 
