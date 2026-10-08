@@ -467,4 +467,72 @@ class FreezeTests(unittest.TestCase):
         self.assertEqual(climb_after_sight(self.rows([False,False],[6.,20.])),0.)
 
 
+class LongRangeTests(unittest.TestCase):
+    """The fresh held-out starts by start distance, and how a flown episode of them is read."""
+    @classmethod
+    def setUpClass(cls):
+        from scripts import plan_generalization as planner
+        cls.planner=planner;cls.held_out=json.loads(TEST_FILE.read_text(encoding='utf-8'))
+        cls.data=json.loads(planner.LONG_FILE.read_text(encoding='utf-8'));cls.settings=CONFIG['generalization']['long_range']
+
+    def test_the_long_range_file_is_reproduced_exactly_by_its_generator(self):
+        self.assertEqual(self.planner.build_long(CONFIG,OFT,self.held_out),self.data)
+
+    def test_every_band_holds_both_scenes_both_kinds_of_start_and_unseen_objects(self):
+        for name,(low,high) in self.settings['ranges_m'].items():
+            episodes=self.data['sets'][name];self.assertEqual(len(episodes),12)
+            self.assertTrue(all(low<=e['start_distance_m']<=high and e['range']==name for e in episodes))
+            self.assertEqual({e['map'] for e in episodes},{'blocks','yard'})
+            self.assertEqual(sorted(e['kind'] for e in episodes),['search']*6+['visible']*6)
+            self.assertEqual(sum(not e['object_seen_in_training'] for e in episodes),4)
+            self.assertTrue(all((e['target']=='yellow_pyramid')!=e['object_seen_in_training'] for e in episodes))
+            # In view at the start means the teacher's dry run sees it at once; a search start does not.
+            self.assertTrue(all((e['plan']['acquired_tick']==0)==(e['kind']=='visible') for e in episodes))
+
+    def test_seeds_are_fresh_and_starts_are_clear_of_every_earlier_start(self):
+        low,high=self.settings['seeds'];seeds=CONFIG['generalization']['seeds'];episodes=[e for es in self.data['sets'].values() for e in es]
+        self.assertTrue(all(low<=e['seed']<=high for e in episodes));self.assertEqual(len({e['seed'] for e in episodes}),len(episodes))
+        self.assertTrue(all(high_<low for _,high_ in seeds.values()))
+        earlier=self.planner.earlier_starts(self.held_out);self.assertGreater(len(earlier),500)
+        for episode in episodes:
+            for _,_,where,xy in earlier:
+                if where==episode['map']:self.assertGreaterEqual(math.hypot(episode['start_xy'][0]-xy[0],episode['start_xy'][1]-xy[1]),self.settings['separation_m'])
+        # The farthest band lies beyond anything a training episode started from.
+        self.assertLess(self.data['training_start_distance_max_m'],self.settings['ranges_m']['L3'][0])
+        self.assertTrue(all(e['nearest_training_start_m'] is None for e in episodes if e['map']=='yard'))
+
+    def rows(self,seen,distances,stamps=None):
+        return [{'front_seen':flag,'down_seen':False,'distance_m':distance,'height_m':6.,'position':[0.,0.,-7.],'action':[.5,0.,0.],'epoch':float(index)}
+                for index,(flag,distance) in enumerate(zip(seen,distances))]
+
+    def test_an_episode_is_read_in_stages_and_a_failure_gets_one_type(self):
+        from scripts.freeze_long_range import measure,failure_type,TYPES
+        base={'target':'blue_cone','map':'blocks','layout':'a','stopped':False,'reason':'max_steps','success':False,'object_seen_in_training':True}
+        def read(seen,distances,**changes):
+            episode=dict(base,**changes);measured=measure(episode,self.rows(seen,distances),15.,{})
+            return measured,failure_type(episode,measured,15.)
+        measured,kind=read([False,False,False],[60.,60.,60.])
+        self.assertEqual((measured['search_success'],measured['first_acquisition_step'],measured['timeout'],kind),(False,None,True,'LONG_SEARCH_FAILURE'))
+        measured,kind=read([False,True,True],[60.,55.,40.])
+        self.assertEqual((measured['search_success'],measured['first_acquisition_step'],measured['approach_success'],kind),(True,1,False,'LONG_APPROACH_FAILURE'))
+        measured,kind=read([True,True,True],[60.,30.,18.],stopped=True,reason='model_stop')
+        self.assertEqual((measured['initially_visible'],measured['entered_20m'],measured['entered_15m'],measured['self_stop'],kind),(True,True,False,True,'LONG_STOP_FAILURE'))
+        measured,kind=read([True,True],[60.,12.],stopped=True,reason='model_stop',success=True)
+        self.assertEqual((measured['task_success'],measured['entered_15m'],kind),(True,True,None))
+        self.assertEqual(read([True,True],[60.,12.],reason='collision')[1],'COLLISION')
+        self.assertEqual(read([True,True],[60.,50.],stopped=True,reason='model_stop',stopped_at_other=['orange_ball'],object_seen_in_training=False)[1],
+                         'UNSEEN_OBJECT_GROUNDING_FAILURE')
+        self.assertEqual(read([True,True],[60.,50.],stopped=True,reason='model_stop',stopped_at_other=['orange_ball'])[1],'LONG_APPROACH_FAILURE')
+        self.assertEqual(len(TYPES),5)
+
+    def test_tallies_count_stages_over_all_episodes_and_acquisition_over_hidden_starts(self):
+        from scripts.freeze_long_range import tally
+        item=lambda **changes:dict({'initially_visible':False,'ever_acquired':True,'first_acquisition_step':10,'entered_20m':True,'entered_15m':True,
+                                    'self_stop':True,'task_success':True,'collision':False,'timeout':False},**changes)
+        row=tally([item(),item(initially_visible=True,first_acquisition_step=0),item(ever_acquired=False,first_acquisition_step=None,entered_20m=False,
+                                                                                  entered_15m=False,self_stop=False,task_success=False,timeout=True)])
+        self.assertEqual((row['episodes'],row['acquired'],row['started_hidden'],row['hidden_acquired'],row['entered_20m'],row['success'],row['timeout']),(3,2,2,1,2,2,1))
+        self.assertEqual(row['median_steps_to_acquire'],10)
+
+
 if __name__=='__main__':unittest.main()

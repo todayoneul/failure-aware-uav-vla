@@ -8,6 +8,8 @@
   g0      pick training starts to replay as the seen-start test
   check   confirm that no planned training or validation start is near a held-out start or in a wedge
   figure  draw the map with every planned start
+  long    write configs/long_range_test_spawns.json once: fresh held-out starts in three bands of start
+          distance (L1, L2, L3), in both scenes, for seen and unseen objects, away from every earlier start
 """
 import argparse
 import collections
@@ -33,6 +35,14 @@ G2_ROWS=(('visible','near',None),('visible','medium',None),('visible','far',None
          ('search','far',1),('search','near','behind'))
 G3_ROWS=(('visible','medium',None),('peripheral','near',1),('search','near',-1),('search','medium',1),('search','far','behind'))
 G4_ROWS=(('visible','medium',None),('visible','far',None),('peripheral','near',-1),('search','near',1),('search','medium',-1),('search','far','behind'))
+LONG_FILE=ROOT/'configs/long_range_test_spawns.json'
+# Earlier plans a long-range start must keep away from: both recorded datasets and the replayed seen starts.
+EARLIER_PLANS=('outputs/examples/generalization/dataset_plan.json','outputs/examples/generalization/dataset_v2_added_plan.json',
+               'configs/generalization_seen_starts.json')
+# One long-range episode per row and band: map, layout, object. Half start with the object in view, half do not.
+LONG_ROWS=(('blocks','a','blue_cone'),('blocks','b','orange_ball'),('blocks','a','red_cube'),('blocks','b','green_cylinder'),
+           ('yard','a','blue_cone'),('yard','a','orange_ball'),('yard','a','red_cube'),('yard','a','green_cylinder'),
+           ('blocks','a_new','yellow_pyramid'),('blocks','b_new','yellow_pyramid'),('yard','a_new','yellow_pyramid'),('yard','a_new','yellow_pyramid'))
 SIDE_BEARINGS=(('left',-90.),('right',90.),('behind_left',-135.),('behind_right',135.))
 WEDGE_DEG=60.
 
@@ -135,6 +145,57 @@ def build_test(config,oft):
             'exclusion_radius_m':config['generalization']['exclusion_radius_m'],'wedge_deg':WEDGE_DEG,'wedges':wedges,'sets':sets}
 
 
+def earlier_starts(held_out):
+    """Every start planned before the long-range set: (set name, id, map, xy)."""
+    points=[(name,e['id'],e['map'],e['start_xy']) for name,episodes in held_out['sets'].items() for e in episodes]
+    for path in EARLIER_PLANS:
+        data=json.loads((ROOT/path).read_text(encoding='utf-8'))
+        for name,episodes in (data['sets'] if 'sets' in data else {key:data[key] for key in ('train','val')}).items():
+            points+=[(name,e['id'],e['map'],e['start_xy']) for e in episodes]
+    return points
+
+
+def nearest_earlier(points,map_id,xy,training):
+    """Distance to the closest earlier start in the same map, among training/validation starts or among held-out ones."""
+    distances=[math.hypot(xy[0]-p[0],xy[1]-p[1]) for name,_,where,p in points if where==map_id and (name in ('train','val','G0'))==training]
+    return round(min(distances),1) if distances else None
+
+
+def build_long(config,oft,held_out):
+    settings=config['generalization']['long_range'];points=earlier_starts(held_out);sets={};seed=settings['seeds'][0];maps={}
+    for number,(name,span) in enumerate(settings['ranges_m'].items()):
+        sets[name]=[]
+        for index,(map_id,layout,target) in enumerate(LONG_ROWS):
+            map_config=maps.setdefault(map_id,load_map(map_id));unseen=target in map_config['held_out_objects']
+            # In view for every other row, shifted by one from band to band so each object gets both over the set.
+            kind=('visible','search')[(index+number)%2];side=(1,-1,'behind')[(index//2+number)%3];episode=None
+            excluded=lambda x,y,direction,m=map_id:any(where==m and math.hypot(x-p[0],y-p[1])<settings['separation_m'] for _,_,where,p in points)
+            # Where the map has no clear line of this length to an object, the next seen object takes the row.
+            planned=target;order=[target] if unseen else [target]+[other for other in map_config['train_objects'] if other!=target]
+            for target in order:
+                for attempt in range(20):
+                    episode=make_start(config,oft,map_config,layout,target,kind,'far',seed,name.lower(),side=side if kind=='search' else None,
+                                       excluded=excluded,instruction_id=('find','approach')[index%2],
+                                       spec={'base':kind,'distance_m':span},name=f'{name.lower()}-{seed:04d}-{target}-{kind}')
+                    seed+=1
+                    if episode:break
+                if episode:break
+            if episode is None:raise RuntimeError(f'No {name} start for {planned} ({kind}) in {map_id}/{layout}')
+            if target!=planned:episode['planned_object']=planned
+            wedge=held_out['wedges'].get(map_id,{}).get(layout,{}).get(target)
+            episode.update(range=name,range_m=span,object_seen_in_training=not unseen,in_wedge=bool(wedge and in_wedge(episode['start_direction_deg'],wedge)),
+                           nearest_training_start_m=nearest_earlier(points,map_id,episode['start_xy'],True),
+                           nearest_held_out_start_m=nearest_earlier(points,map_id,episode['start_xy'],False))
+            points.append((name,episode['id'],map_id,episode['start_xy']));sets[name].append(episode)
+    return {'description':'Fresh held-out start states by start distance, planned after Gen-v2 was trained and evaluated. Seeds '
+                          f'{settings["seeds"][0]}+ were never used before; every start is at least {settings["separation_m"]} m from every training, '
+                          'validation and earlier held-out start of its map. No model was trained on, selected with or changed after these.',
+            'levels':{name:f'start {span[0]:.0f}-{span[1]:.0f} m from the target' for name,span in settings['ranges_m'].items()},
+            'separation_m':settings['separation_m'],'earlier_plans':list(EARLIER_PLANS)+['configs/generalization_test_spawns.json'],
+            'training_start_distance_max_m':max(e['start_distance_m'] for path in EARLIER_PLANS[:2] for key in ('train','val')
+                                                for e in json.loads((ROOT/path).read_text(encoding='utf-8'))[key]),'sets':sets}
+
+
 def histogram(episodes,key):return dict(sorted(collections.Counter(key(episode) for episode in episodes).items()))
 
 
@@ -224,6 +285,7 @@ def main():
     checker=commands.add_parser('check');checker.add_argument('--plan',required=True)
     draw=commands.add_parser('figure');draw.add_argument('--plan');draw.add_argument('--map',default='blocks');draw.add_argument('--layout',default='a')
     draw.add_argument('--sets',nargs='+',default=['G1','S']);draw.add_argument('--output',required=True)
+    commands.add_parser('long')
     args=parser.parse_args();config=load_config();oft=load_oft_config()
     if args.command=='test':
         if TEST_FILE.exists():raise SystemExit(f'{TEST_FILE} exists; the held-out starts are fixed and are not regenerated')
@@ -231,6 +293,17 @@ def main():
         for name,episodes in data['sets'].items():print(name,json.dumps(describe(config,episodes)))
         return
     held_out=json.loads(TEST_FILE.read_text(encoding='utf-8'))
+    if args.command=='long':
+        if LONG_FILE.exists():raise SystemExit(f'{LONG_FILE} exists; the long-range starts are fixed and are not regenerated')
+        data=build_long(config,oft,held_out);LONG_FILE.write_text(json.dumps(data,indent=1)+chr(10),encoding='utf-8',newline=chr(10))
+        for name,episodes in data['sets'].items():
+            print(name,json.dumps({'episodes':len(episodes),'by_map':histogram(episodes,lambda e:e['map']),'by_kind':histogram(episodes,lambda e:e['kind']),
+                                   'unseen_object':sum(not e['object_seen_in_training'] for e in episodes),
+                                   'distance':[min(e['start_distance_m'] for e in episodes),max(e['start_distance_m'] for e in episodes)],
+                                   'nearest_training':min((e['nearest_training_start_m'] for e in episodes if e['nearest_training_start_m'] is not None),default=None),
+                                   'nearest_held_out':min((e['nearest_held_out_start_m'] for e in episodes if e['nearest_held_out_start_m'] is not None),default=None),
+                                   'teacher_ticks':[min(e['plan']['ticks'] for e in episodes),max(e['plan']['ticks'] for e in episodes)]}))
+        return
     if args.command=='train':
         map_config=load_map(args.map);seeds=config['generalization']['seeds']
         plans={'train':plan_split(config,oft,map_config,'train',range(seeds['train'][0],seeds['train'][0]+args.episodes),held_out),

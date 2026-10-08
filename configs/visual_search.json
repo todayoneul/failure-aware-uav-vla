@@ -50,6 +50,12 @@
     "instructions": {"train": ["find", "approach"], "held_out": ["locate", "search_for", "find_and_approach"]},
     "teacher": {"centre_deg": 30.0, "blocked_m": 16.0, "safety_m": 6.0, "scan_deg": 60.0, "sweep_before_climb_deg": 360.0, "climb_m": 2.0},
     "seeds": {"test": [0, 199], "train": [1000, 4999], "val": [5000, 5999]},
+    "long_range": {
+      "description": "Fresh held-out starts by start distance (configs/long_range_test_spawns.json), planned after Gen-v2 was trained. No training episode starts farther than 70 m.",
+      "seeds": [6000, 6999],
+      "ranges_m": {"L1": [40.0, 55.0], "L2": [55.0, 70.0], "L3": [70.0, 90.0]},
+      "separation_m": 6.0
+    },
     "targeted_v2": {
       "description": "Episodes added for Gen-v2: what to do once the target is found. Counts are [train, val]; `base` is the kind whose planning rules apply.",
       "seeds": {"train": 2000, "val": 5100},

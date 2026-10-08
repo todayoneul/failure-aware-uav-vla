@@ -40,7 +40,7 @@ from src.aerovla_oft.spec import load_config as load_oft_config,proprio_vector,i
 
 MANIFEST=ROOT/'outputs/integration/model-downloads.json'
 LEVELS={'G0':'G0 - seen start','G1':'G1 - unseen start','G2':'G2 - unseen object','G3':'G3 - held-out scene','G4':'G4 - held-out scene and object',
-        'P':'G1 - unseen words','S':'G1 - side probe'}
+        'P':'G1 - unseen words','S':'G1 - side probe','L1':'L1 - start 40-55 m','L2':'L2 - start 55-70 m','L3':'L3 - start 70-90 m'}
 
 
 def digest(frame):return hashlib.sha256(frame.tobytes()).hexdigest()
