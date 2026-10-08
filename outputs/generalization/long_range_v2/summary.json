@@ -1,0 +1,785 @@
+{
+ "plan": "configs/long_range_test_spawns.json",
+ "definitions": {
+  "approach_m": 20.0,
+  "in_view": "front or down camera",
+  "success": "stopped by itself within the success radius, no collision (unchanged)",
+  "failure_types": [
+   "COLLISION",
+   "LONG_SEARCH_FAILURE",
+   "UNSEEN_OBJECT_GROUNDING_FAILURE",
+   "LONG_APPROACH_FAILURE",
+   "LONG_STOP_FAILURE"
+  ]
+ },
+ "episodes_with_errors": {
+  "OFT Gen-v2:L1": [],
+  "OFT Gen-v2:L2": [],
+  "OFT Gen-v2:L3": [],
+  "Teacher:L1": [],
+  "Teacher:L2": [],
+  "Teacher:L3": []
+ },
+ "models": {
+  "OFT Gen-v2": {
+   "by_range": {
+    "L1 40-55m": {
+     "episodes": 12,
+     "acquired": 12,
+     "started_hidden": 6,
+     "hidden_acquired": 6,
+     "median_steps_to_acquire": 21.5,
+     "entered_20m": 11,
+     "entered_15m": 11,
+     "self_stop": 11,
+     "success": 11,
+     "collision": 0,
+     "timeout": 1
+    },
+    "L2 55-70m": {
+     "episodes": 12,
+     "acquired": 12,
+     "started_hidden": 6,
+     "hidden_acquired": 6,
+     "median_steps_to_acquire": 20.5,
+     "entered_20m": 8,
+     "entered_15m": 8,
+     "self_stop": 8,
+     "success": 8,
+     "collision": 0,
+     "timeout": 4
+    },
+    "L3 70-90m": {
+     "episodes": 12,
+     "acquired": 12,
+     "started_hidden": 6,
+     "hidden_acquired": 6,
+     "median_steps_to_acquire": 20.0,
+     "entered_20m": 8,
+     "entered_15m": 8,
+     "self_stop": 9,
+     "success": 8,
+     "collision": 0,
+     "timeout": 3
+    },
+    "All": {
+     "episodes": 36,
+     "acquired": 36,
+     "started_hidden": 18,
+     "hidden_acquired": 18,
+     "median_steps_to_acquire": 20.5,
+     "entered_20m": 27,
+     "entered_15m": 27,
+     "self_stop": 28,
+     "success": 27,
+     "collision": 0,
+     "timeout": 8
+    }
+   },
+   "by_object": {
+    "L1 seen object": {
+     "episodes": 8,
+     "acquired": 8,
+     "started_hidden": 4,
+     "hidden_acquired": 4,
+     "median_steps_to_acquire": 20.0,
+     "entered_20m": 8,
+     "entered_15m": 8,
+     "self_stop": 8,
+     "success": 8,
+     "collision": 0,
+     "timeout": 0
+    },
+    "L1 unseen object": {
+     "episodes": 4,
+     "acquired": 4,
+     "started_hidden": 2,
+     "hidden_acquired": 2,
+     "median_steps_to_acquire": 25.5,
+     "entered_20m": 3,
+     "entered_15m": 3,
+     "self_stop": 3,
+     "success": 3,
+     "collision": 0,
+     "timeout": 1
+    },
+    "L2 seen object": {
+     "episodes": 8,
+     "acquired": 8,
+     "started_hidden": 4,
+     "hidden_acquired": 4,
+     "median_steps_to_acquire": 20.5,
+     "entered_20m": 6,
+     "entered_15m": 6,
+     "self_stop": 6,
+     "success": 6,
+     "collision": 0,
+     "timeout": 2
+    },
+    "L2 unseen object": {
+     "episodes": 4,
+     "acquired": 4,
+     "started_hidden": 2,
+     "hidden_acquired": 2,
+     "median_steps_to_acquire": 52.5,
+     "entered_20m": 2,
+     "entered_15m": 2,
+     "self_stop": 2,
+     "success": 2,
+     "collision": 0,
+     "timeout": 2
+    },
+    "L3 seen object": {
+     "episodes": 8,
+     "acquired": 8,
+     "started_hidden": 4,
+     "hidden_acquired": 4,
+     "median_steps_to_acquire": 20.0,
+     "entered_20m": 6,
+     "entered_15m": 6,
+     "self_stop": 7,
+     "success": 6,
+     "collision": 0,
+     "timeout": 1
+    },
+    "L3 unseen object": {
+     "episodes": 4,
+     "acquired": 4,
+     "started_hidden": 2,
+     "hidden_acquired": 2,
+     "median_steps_to_acquire": 27.5,
+     "entered_20m": 2,
+     "entered_15m": 2,
+     "self_stop": 2,
+     "success": 2,
+     "collision": 0,
+     "timeout": 2
+    },
+    "All seen object": {
+     "episodes": 24,
+     "acquired": 24,
+     "started_hidden": 12,
+     "hidden_acquired": 12,
+     "median_steps_to_acquire": 20.0,
+     "entered_20m": 20,
+     "entered_15m": 20,
+     "self_stop": 21,
+     "success": 20,
+     "collision": 0,
+     "timeout": 3
+    },
+    "All unseen object": {
+     "episodes": 12,
+     "acquired": 12,
+     "started_hidden": 6,
+     "hidden_acquired": 6,
+     "median_steps_to_acquire": 25.5,
+     "entered_20m": 7,
+     "entered_15m": 7,
+     "self_stop": 7,
+     "success": 7,
+     "collision": 0,
+     "timeout": 5
+    }
+   },
+   "by_map": {
+    "L1 blocks": {
+     "episodes": 6,
+     "acquired": 6,
+     "started_hidden": 3,
+     "hidden_acquired": 3,
+     "median_steps_to_acquire": 29,
+     "entered_20m": 5,
+     "entered_15m": 5,
+     "self_stop": 5,
+     "success": 5,
+     "collision": 0,
+     "timeout": 1
+    },
+    "L1 yard": {
+     "episodes": 6,
+     "acquired": 6,
+     "started_hidden": 3,
+     "hidden_acquired": 3,
+     "median_steps_to_acquire": 21,
+     "entered_20m": 6,
+     "entered_15m": 6,
+     "self_stop": 6,
+     "success": 6,
+     "collision": 0,
+     "timeout": 0
+    },
+    "L2 blocks": {
+     "episodes": 6,
+     "acquired": 6,
+     "started_hidden": 3,
+     "hidden_acquired": 3,
+     "median_steps_to_acquire": 51,
+     "entered_20m": 6,
+     "entered_15m": 6,
+     "self_stop": 6,
+     "success": 6,
+     "collision": 0,
+     "timeout": 0
+    },
+    "L2 yard": {
+     "episodes": 6,
+     "acquired": 6,
+     "started_hidden": 3,
+     "hidden_acquired": 3,
+     "median_steps_to_acquire": 9,
+     "entered_20m": 2,
+     "entered_15m": 2,
+     "self_stop": 2,
+     "success": 2,
+     "collision": 0,
+     "timeout": 4
+    },
+    "L3 blocks": {
+     "episodes": 6,
+     "acquired": 6,
+     "started_hidden": 3,
+     "hidden_acquired": 3,
+     "median_steps_to_acquire": 18,
+     "entered_20m": 6,
+     "entered_15m": 6,
+     "self_stop": 6,
+     "success": 6,
+     "collision": 0,
+     "timeout": 0
+    },
+    "L3 yard": {
+     "episodes": 6,
+     "acquired": 6,
+     "started_hidden": 3,
+     "hidden_acquired": 3,
+     "median_steps_to_acquire": 26,
+     "entered_20m": 2,
+     "entered_15m": 2,
+     "self_stop": 3,
+     "success": 2,
+     "collision": 0,
+     "timeout": 3
+    },
+    "All blocks": {
+     "episodes": 18,
+     "acquired": 18,
+     "started_hidden": 9,
+     "hidden_acquired": 9,
+     "median_steps_to_acquire": 20,
+     "entered_20m": 17,
+     "entered_15m": 17,
+     "self_stop": 17,
+     "success": 17,
+     "collision": 0,
+     "timeout": 1
+    },
+    "All yard": {
+     "episodes": 18,
+     "acquired": 18,
+     "started_hidden": 9,
+     "hidden_acquired": 9,
+     "median_steps_to_acquire": 21,
+     "entered_20m": 10,
+     "entered_15m": 10,
+     "self_stop": 11,
+     "success": 10,
+     "collision": 0,
+     "timeout": 7
+    }
+   },
+   "by_start": {
+    "in view at the start": {
+     "episodes": 18,
+     "acquired": 18,
+     "started_hidden": 0,
+     "hidden_acquired": 0,
+     "median_steps_to_acquire": null,
+     "entered_20m": 12,
+     "entered_15m": 12,
+     "self_stop": 13,
+     "success": 12,
+     "collision": 0,
+     "timeout": 5
+    },
+    "out of view at the start": {
+     "episodes": 18,
+     "acquired": 18,
+     "started_hidden": 18,
+     "hidden_acquired": 18,
+     "median_steps_to_acquire": 20.5,
+     "entered_20m": 15,
+     "entered_15m": 15,
+     "self_stop": 15,
+     "success": 15,
+     "collision": 0,
+     "timeout": 3
+    }
+   },
+   "failure_types": [
+    {
+     "model": "OFT Gen-v2",
+     "failure_type": "COLLISION",
+     "count": 0,
+     "timeouts": 0,
+     "unseen_object": 0,
+     "passed_over": 0,
+     "early_stop": 0,
+     "by_range": {
+      "L1": 0,
+      "L2": 0,
+      "L3": 0
+     },
+     "episodes": []
+    },
+    {
+     "model": "OFT Gen-v2",
+     "failure_type": "LONG_SEARCH_FAILURE",
+     "count": 0,
+     "timeouts": 0,
+     "unseen_object": 0,
+     "passed_over": 0,
+     "early_stop": 0,
+     "by_range": {
+      "L1": 0,
+      "L2": 0,
+      "L3": 0
+     },
+     "episodes": []
+    },
+    {
+     "model": "OFT Gen-v2",
+     "failure_type": "UNSEEN_OBJECT_GROUNDING_FAILURE",
+     "count": 0,
+     "timeouts": 0,
+     "unseen_object": 0,
+     "passed_over": 0,
+     "early_stop": 0,
+     "by_range": {
+      "L1": 0,
+      "L2": 0,
+      "L3": 0
+     },
+     "episodes": []
+    },
+    {
+     "model": "OFT Gen-v2",
+     "failure_type": "LONG_APPROACH_FAILURE",
+     "count": 9,
+     "timeouts": 8,
+     "unseen_object": 5,
+     "passed_over": 8,
+     "early_stop": 1,
+     "by_range": {
+      "L1": 1,
+      "L2": 4,
+      "L3": 4
+     },
+     "episodes": [
+      "l1-6008-yellow_pyramid-visible",
+      "l2-6017-blue_cone-search",
+      "l2-6018-orange_ball-visible",
+      "l2-6023-yellow_pyramid-search",
+      "l2-6024-yellow_pyramid-visible",
+      "l3-6089-blue_cone-visible",
+      "l3-6091-red_cube-visible",
+      "l3-6095-yellow_pyramid-visible",
+      "l3-6096-yellow_pyramid-search"
+     ]
+    },
+    {
+     "model": "OFT Gen-v2",
+     "failure_type": "LONG_STOP_FAILURE",
+     "count": 0,
+     "timeouts": 0,
+     "unseen_object": 0,
+     "passed_over": 0,
+     "early_stop": 0,
+     "by_range": {
+      "L1": 0,
+      "L2": 0,
+      "L3": 0
+     },
+     "episodes": []
+    }
+   ],
+   "failures": 9,
+   "timeouts": 8
+  },
+  "Teacher": {
+   "by_range": {
+    "L1 40-55m": {
+     "episodes": 12,
+     "acquired": 12,
+     "started_hidden": 6,
+     "hidden_acquired": 6,
+     "median_steps_to_acquire": 10.5,
+     "entered_20m": 12,
+     "entered_15m": 12,
+     "self_stop": 12,
+     "success": 12,
+     "collision": 0,
+     "timeout": 0
+    },
+    "L2 55-70m": {
+     "episodes": 12,
+     "acquired": 12,
+     "started_hidden": 6,
+     "hidden_acquired": 6,
+     "median_steps_to_acquire": 9.5,
+     "entered_20m": 12,
+     "entered_15m": 12,
+     "self_stop": 12,
+     "success": 12,
+     "collision": 0,
+     "timeout": 0
+    },
+    "L3 70-90m": {
+     "episodes": 12,
+     "acquired": 12,
+     "started_hidden": 6,
+     "hidden_acquired": 6,
+     "median_steps_to_acquire": 11.0,
+     "entered_20m": 12,
+     "entered_15m": 12,
+     "self_stop": 12,
+     "success": 12,
+     "collision": 0,
+     "timeout": 0
+    },
+    "All": {
+     "episodes": 36,
+     "acquired": 36,
+     "started_hidden": 18,
+     "hidden_acquired": 18,
+     "median_steps_to_acquire": 10.5,
+     "entered_20m": 36,
+     "entered_15m": 36,
+     "self_stop": 36,
+     "success": 36,
+     "collision": 0,
+     "timeout": 0
+    }
+   },
+   "by_object": {
+    "L1 seen object": {
+     "episodes": 8,
+     "acquired": 8,
+     "started_hidden": 4,
+     "hidden_acquired": 4,
+     "median_steps_to_acquire": 10.0,
+     "entered_20m": 8,
+     "entered_15m": 8,
+     "self_stop": 8,
+     "success": 8,
+     "collision": 0,
+     "timeout": 0
+    },
+    "L1 unseen object": {
+     "episodes": 4,
+     "acquired": 4,
+     "started_hidden": 2,
+     "hidden_acquired": 2,
+     "median_steps_to_acquire": 11.5,
+     "entered_20m": 4,
+     "entered_15m": 4,
+     "self_stop": 4,
+     "success": 4,
+     "collision": 0,
+     "timeout": 0
+    },
+    "L2 seen object": {
+     "episodes": 8,
+     "acquired": 8,
+     "started_hidden": 4,
+     "hidden_acquired": 4,
+     "median_steps_to_acquire": 11.0,
+     "entered_20m": 8,
+     "entered_15m": 8,
+     "self_stop": 8,
+     "success": 8,
+     "collision": 0,
+     "timeout": 0
+    },
+    "L2 unseen object": {
+     "episodes": 4,
+     "acquired": 4,
+     "started_hidden": 2,
+     "hidden_acquired": 2,
+     "median_steps_to_acquire": 7.0,
+     "entered_20m": 4,
+     "entered_15m": 4,
+     "self_stop": 4,
+     "success": 4,
+     "collision": 0,
+     "timeout": 0
+    },
+    "L3 seen object": {
+     "episodes": 8,
+     "acquired": 8,
+     "started_hidden": 4,
+     "hidden_acquired": 4,
+     "median_steps_to_acquire": 11.0,
+     "entered_20m": 8,
+     "entered_15m": 8,
+     "self_stop": 8,
+     "success": 8,
+     "collision": 0,
+     "timeout": 0
+    },
+    "L3 unseen object": {
+     "episodes": 4,
+     "acquired": 4,
+     "started_hidden": 2,
+     "hidden_acquired": 2,
+     "median_steps_to_acquire": 14.0,
+     "entered_20m": 4,
+     "entered_15m": 4,
+     "self_stop": 4,
+     "success": 4,
+     "collision": 0,
+     "timeout": 0
+    },
+    "All seen object": {
+     "episodes": 24,
+     "acquired": 24,
+     "started_hidden": 12,
+     "hidden_acquired": 12,
+     "median_steps_to_acquire": 10.5,
+     "entered_20m": 24,
+     "entered_15m": 24,
+     "self_stop": 24,
+     "success": 24,
+     "collision": 0,
+     "timeout": 0
+    },
+    "All unseen object": {
+     "episodes": 12,
+     "acquired": 12,
+     "started_hidden": 6,
+     "hidden_acquired": 6,
+     "median_steps_to_acquire": 10.0,
+     "entered_20m": 12,
+     "entered_15m": 12,
+     "self_stop": 12,
+     "success": 12,
+     "collision": 0,
+     "timeout": 0
+    }
+   },
+   "by_map": {
+    "L1 blocks": {
+     "episodes": 6,
+     "acquired": 6,
+     "started_hidden": 3,
+     "hidden_acquired": 3,
+     "median_steps_to_acquire": 12,
+     "entered_20m": 6,
+     "entered_15m": 6,
+     "self_stop": 6,
+     "success": 6,
+     "collision": 0,
+     "timeout": 0
+    },
+    "L1 yard": {
+     "episodes": 6,
+     "acquired": 6,
+     "started_hidden": 3,
+     "hidden_acquired": 3,
+     "median_steps_to_acquire": 10,
+     "entered_20m": 6,
+     "entered_15m": 6,
+     "self_stop": 6,
+     "success": 6,
+     "collision": 0,
+     "timeout": 0
+    },
+    "L2 blocks": {
+     "episodes": 6,
+     "acquired": 6,
+     "started_hidden": 3,
+     "hidden_acquired": 3,
+     "median_steps_to_acquire": 10,
+     "entered_20m": 6,
+     "entered_15m": 6,
+     "self_stop": 6,
+     "success": 6,
+     "collision": 0,
+     "timeout": 0
+    },
+    "L2 yard": {
+     "episodes": 6,
+     "acquired": 6,
+     "started_hidden": 3,
+     "hidden_acquired": 3,
+     "median_steps_to_acquire": 5,
+     "entered_20m": 6,
+     "entered_15m": 6,
+     "self_stop": 6,
+     "success": 6,
+     "collision": 0,
+     "timeout": 0
+    },
+    "L3 blocks": {
+     "episodes": 6,
+     "acquired": 6,
+     "started_hidden": 3,
+     "hidden_acquired": 3,
+     "median_steps_to_acquire": 10,
+     "entered_20m": 6,
+     "entered_15m": 6,
+     "self_stop": 6,
+     "success": 6,
+     "collision": 0,
+     "timeout": 0
+    },
+    "L3 yard": {
+     "episodes": 6,
+     "acquired": 6,
+     "started_hidden": 3,
+     "hidden_acquired": 3,
+     "median_steps_to_acquire": 11,
+     "entered_20m": 6,
+     "entered_15m": 6,
+     "self_stop": 6,
+     "success": 6,
+     "collision": 0,
+     "timeout": 0
+    },
+    "All blocks": {
+     "episodes": 18,
+     "acquired": 18,
+     "started_hidden": 9,
+     "hidden_acquired": 9,
+     "median_steps_to_acquire": 10,
+     "entered_20m": 18,
+     "entered_15m": 18,
+     "self_stop": 18,
+     "success": 18,
+     "collision": 0,
+     "timeout": 0
+    },
+    "All yard": {
+     "episodes": 18,
+     "acquired": 18,
+     "started_hidden": 9,
+     "hidden_acquired": 9,
+     "median_steps_to_acquire": 11,
+     "entered_20m": 18,
+     "entered_15m": 18,
+     "self_stop": 18,
+     "success": 18,
+     "collision": 0,
+     "timeout": 0
+    }
+   },
+   "by_start": {
+    "in view at the start": {
+     "episodes": 18,
+     "acquired": 18,
+     "started_hidden": 0,
+     "hidden_acquired": 0,
+     "median_steps_to_acquire": null,
+     "entered_20m": 18,
+     "entered_15m": 18,
+     "self_stop": 18,
+     "success": 18,
+     "collision": 0,
+     "timeout": 0
+    },
+    "out of view at the start": {
+     "episodes": 18,
+     "acquired": 18,
+     "started_hidden": 18,
+     "hidden_acquired": 18,
+     "median_steps_to_acquire": 10.5,
+     "entered_20m": 18,
+     "entered_15m": 18,
+     "self_stop": 18,
+     "success": 18,
+     "collision": 0,
+     "timeout": 0
+    }
+   },
+   "failure_types": [
+    {
+     "model": "Teacher",
+     "failure_type": "COLLISION",
+     "count": 0,
+     "timeouts": 0,
+     "unseen_object": 0,
+     "passed_over": 0,
+     "early_stop": 0,
+     "by_range": {
+      "L1": 0,
+      "L2": 0,
+      "L3": 0
+     },
+     "episodes": []
+    },
+    {
+     "model": "Teacher",
+     "failure_type": "LONG_SEARCH_FAILURE",
+     "count": 0,
+     "timeouts": 0,
+     "unseen_object": 0,
+     "passed_over": 0,
+     "early_stop": 0,
+     "by_range": {
+      "L1": 0,
+      "L2": 0,
+      "L3": 0
+     },
+     "episodes": []
+    },
+    {
+     "model": "Teacher",
+     "failure_type": "UNSEEN_OBJECT_GROUNDING_FAILURE",
+     "count": 0,
+     "timeouts": 0,
+     "unseen_object": 0,
+     "passed_over": 0,
+     "early_stop": 0,
+     "by_range": {
+      "L1": 0,
+      "L2": 0,
+      "L3": 0
+     },
+     "episodes": []
+    },
+    {
+     "model": "Teacher",
+     "failure_type": "LONG_APPROACH_FAILURE",
+     "count": 0,
+     "timeouts": 0,
+     "unseen_object": 0,
+     "passed_over": 0,
+     "early_stop": 0,
+     "by_range": {
+      "L1": 0,
+      "L2": 0,
+      "L3": 0
+     },
+     "episodes": []
+    },
+    {
+     "model": "Teacher",
+     "failure_type": "LONG_STOP_FAILURE",
+     "count": 0,
+     "timeouts": 0,
+     "unseen_object": 0,
+     "passed_over": 0,
+     "early_stop": 0,
+     "by_range": {
+      "L1": 0,
+      "L2": 0,
+      "L3": 0
+     },
+     "episodes": []
+    }
+   ],
+   "failures": 0,
+   "timeouts": 0
+  }
+ }
+}

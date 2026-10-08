@@ -15,7 +15,11 @@ and a failed episode gets exactly one type, decided in this order:
   LONG_STOP_FAILURE                it came within 20 m and did not end stopped inside the radius
 
 How the episode ended (self-stop, timeout, collision) is recorded separately, so a timeout is counted
-both as a timeout and under the stage it ran out in.
+both as a timeout and under the stage it ran out in. So is what the policy did with the target in
+view, because `in view` is the simulator's statement, not the policy's:
+
+  passed_over   the target came into view at least twice and the vehicle went on turning each time
+  early_stop    the vehicle stopped by itself outside the radius
 
 The output directory receives summary.json, episodes.csv, range_results.csv, seen_unseen.csv,
 map_results.csv, failure_types.csv and failures/ (a trace and a picture of every failed episode).
@@ -23,6 +27,7 @@ map_results.csv, failure_types.csv and failures/ (a trace and a picture of every
 import argparse
 import csv
 import json
+import math
 import statistics
 import sys
 from pathlib import Path
@@ -41,7 +46,8 @@ def measure(episode,rows,radius,geometries):
     """Everything recorded about one flown episode."""
     seen=[in_view(row) for row in rows];first=next((index for index,flag in enumerate(seen) if flag),None)
     distances=[row['distance_m'] for row in rows];other=nearest_other(episode,rows,geometries)
-    tail=distances[-21:]
+    tail=distances[-21:];entries=sum(flag and not before for before,flag in zip([False]+seen,seen))
+    viewed=[row for row,flag in zip(rows,seen) if flag]
     after=seen[first:] if first is not None else []
     return {'initially_visible':seen[0],'ever_acquired':any(seen),'first_acquisition_step':first,
             'first_acquisition_s':None if first is None else round(rows[first]['epoch']-rows[0]['epoch'],1),
@@ -52,6 +58,8 @@ def measure(episode,rows,radius,geometries):
             'search_success':any(seen),'approach_success':min(distances)<=APPROACH_M,'task_success':bool(episode['success']),
             # Diagnostics for a failure: was it still getting closer when it ended, how long it kept the target in view, how it moved.
             'closing_at_end_m':round(tail[0]-tail[-1],1),'in_view_after_acquisition':round(sum(after)/len(after),2) if after else None,
+            'times_came_into_view':entries,'decisions_in_view':len(viewed),'turns_deg':round(sum(abs(math.degrees(row['action'][2])) for row in rows)),
+            'forward_m_per_step_in_view':round(statistics.mean(row['action'][0] for row in viewed),3) if viewed else None,
             'forward_m_per_step':round(statistics.mean(row['action'][0] for row in rows),3),
             'climbed_m':round(max(row['height_m'] for row in rows)-rows[0]['height_m'],1),'climb_after_sight_m':round(climb_after_sight(rows),1),
             'nearest_other_m':round(other[0],1),'nearest_other':other[1]}
@@ -65,6 +73,13 @@ def failure_type(episode,measured,radius):
                                                            (measured['nearest_other_m']<=radius and not measured['approach_success'])):
         return 'UNSEEN_OBJECT_GROUNDING_FAILURE'
     return 'LONG_STOP_FAILURE' if measured['approach_success'] else 'LONG_APPROACH_FAILURE'
+
+
+def mechanism(measured):
+    if measured['task_success']:return ''
+    if measured['self_stop']:return 'early_stop'
+    if measured['times_came_into_view']>=2 and not measured['approach_success']:return 'passed_over'
+    return 'other'
 
 
 def tally(items):
@@ -105,7 +120,7 @@ def main():
                     'instruction':episode['instruction'],'seed':episode['seed'],'planned_distance_m':episode['start_distance_m'],
                     'initial_bearing_deg':episode['target_bearing_deg'],'initial_altitude_m':episode['start_height_m'],**measured,
                     'end':'collision' if measured['collision'] else 'self_stop' if measured['self_stop'] else 'timeout' if measured['timeout'] else episode['reason'],
-                    'failure_type':kind or ''}
+                    'failure_type':kind or '','mechanism':mechanism(measured)}
             items.append(record)
             if kind and model!='Teacher':
                 name=f'{model}_{level}_{kind}_{episode["id"]}'.replace(' ','_')
@@ -126,15 +141,16 @@ def main():
         by_map+=[(f'All {scene}',tally([i for i in mine if i['map']==scene])) for scene in ('blocks','yard')]
         by_start=[(label,tally([i for i in mine if i['kind']==kind])) for label,kind in (('in view at the start','visible'),('out of view at the start','search'))]
         types=[{'model':model,'failure_type':kind,'count':len(found),'timeouts':sum(i['timeout'] for i in found),
-                'unseen_object':sum(not i['object_seen_in_training'] for i in found),'by_range':{name:sum(i['range']==name for i in found) for name in ranges},
+                'unseen_object':sum(not i['object_seen_in_training'] for i in found),
+                'passed_over':sum(i['mechanism']=='passed_over' for i in found),'early_stop':sum(i['mechanism']=='early_stop' for i in found),'by_range':{name:sum(i['range']==name for i in found) for name in ranges},
                 'episodes':[i['episode'] for i in found]} for kind in TYPES for found in [[i for i in failed if i['failure_type']==kind]]]
         summary['models'][model]={'by_range':dict(by_range),'by_object':dict(by_object),'by_map':dict(by_map),'by_start':dict(by_start),'failure_types':types,
                                   'failures':len(failed),'timeouts':sum(i['timeout'] for i in mine)}
         print(f'\n# {model}');table('## Distance','Range',by_range);table('## Seen and unseen objects','Range and object',by_object)
         table('## Scene','Range and scene',by_map);table('## Start','Start',by_start)
-        print('\n## Failure types\n');print('| Type | Count | of which timeout | Unseen object | L1 | L2 | L3 | Episodes |');print('|---|---:|---:|---:|---:|---:|---:|---|')
+        print('\n## Failure types\n');print('| Type | Count | of which timeout | Passed over | Early stop | Unseen object | L1 | L2 | L3 | Episodes |');print('|---|---:|---:|---:|---:|---:|---:|---:|---:|---|')
         for row in types:
-            print(f'| {row["failure_type"]} | {row["count"]} | {row["timeouts"]} | {row["unseen_object"]} | '+' | '.join(str(row['by_range'].get(name,0)) for name in ('L1','L2','L3'))
+            print(f'| {row["failure_type"]} | {row["count"]} | {row["timeouts"]} | {row["passed_over"]} | {row["early_stop"]} | {row["unseen_object"]} | '+' | '.join(str(row['by_range'].get(name,0)) for name in ('L1','L2','L3'))
                   +f' | {", ".join(row["episodes"])} |')
         if model!='Teacher':
             flat=lambda rows,first:[{first:name,**row} for name,row in rows]

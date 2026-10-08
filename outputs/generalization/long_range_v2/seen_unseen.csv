@@ -1,0 +1,9 @@
+range_and_object,episodes,acquired,started_hidden,hidden_acquired,median_steps_to_acquire,entered_20m,entered_15m,self_stop,success,collision,timeout
+L1 seen object,8,8,4,4,20.0,8,8,8,8,0,0
+L1 unseen object,4,4,2,2,25.5,3,3,3,3,0,1
+L2 seen object,8,8,4,4,20.5,6,6,6,6,0,2
+L2 unseen object,4,4,2,2,52.5,2,2,2,2,0,2
+L3 seen object,8,8,4,4,20.0,6,6,7,6,0,1
+L3 unseen object,4,4,2,2,27.5,2,2,2,2,0,2
+All seen object,24,24,12,12,20.0,20,20,21,20,0,3
+All unseen object,12,12,6,6,25.5,7,7,7,7,0,5

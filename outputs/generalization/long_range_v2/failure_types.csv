@@ -1,0 +1,6 @@
+model,failure_type,count,timeouts,unseen_object,passed_over,early_stop,by_range,episodes
+OFT Gen-v2,COLLISION,0,0,0,0,0,"{""L1"": 0, ""L2"": 0, ""L3"": 0}",
+OFT Gen-v2,LONG_SEARCH_FAILURE,0,0,0,0,0,"{""L1"": 0, ""L2"": 0, ""L3"": 0}",
+OFT Gen-v2,UNSEEN_OBJECT_GROUNDING_FAILURE,0,0,0,0,0,"{""L1"": 0, ""L2"": 0, ""L3"": 0}",
+OFT Gen-v2,LONG_APPROACH_FAILURE,9,8,5,8,1,"{""L1"": 1, ""L2"": 4, ""L3"": 4}",l1-6008-yellow_pyramid-visible l2-6017-blue_cone-search l2-6018-orange_ball-visible l2-6023-yellow_pyramid-search l2-6024-yellow_pyramid-visible l3-6089-blue_cone-visible l3-6091-red_cube-visible l3-6095-yellow_pyramid-visible l3-6096-yellow_pyramid-search
+OFT Gen-v2,LONG_STOP_FAILURE,0,0,0,0,0,"{""L1"": 0, ""L2"": 0, ""L3"": 0}",

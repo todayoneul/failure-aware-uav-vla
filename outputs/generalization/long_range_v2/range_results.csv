@@ -1,0 +1,5 @@
+range,episodes,acquired,started_hidden,hidden_acquired,median_steps_to_acquire,entered_20m,entered_15m,self_stop,success,collision,timeout
+L1 40-55m,12,12,6,6,21.5,11,11,11,11,0,1
+L2 55-70m,12,12,6,6,20.5,8,8,8,8,0,4
+L3 70-90m,12,12,6,6,20.0,8,8,9,8,0,3
+All,36,36,18,18,20.5,27,27,28,27,0,8

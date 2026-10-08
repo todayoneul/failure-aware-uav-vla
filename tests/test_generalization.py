@@ -524,6 +524,11 @@ class LongRangeTests(unittest.TestCase):
                          'UNSEEN_OBJECT_GROUNDING_FAILURE')
         self.assertEqual(read([True,True],[60.,50.],stopped=True,reason='model_stop',stopped_at_other=['orange_ball'])[1],'LONG_APPROACH_FAILURE')
         self.assertEqual(len(TYPES),5)
+        # `In view` is the simulator's word: a policy that keeps turning past the target is told apart from one that never had it in view.
+        from scripts.freeze_long_range import mechanism
+        measured,kind=read([True,False,True,False,True],[60.]*5)
+        self.assertEqual((measured['times_came_into_view'],measured['decisions_in_view'],kind,mechanism(measured)),(3,3,'LONG_APPROACH_FAILURE','passed_over'))
+        self.assertEqual(mechanism(read([True,True],[60.,50.],stopped=True,reason='model_stop')[0]),'early_stop')
 
     def test_tallies_count_stages_over_all_episodes_and_acquisition_over_hidden_starts(self):
         from scripts.freeze_long_range import tally
