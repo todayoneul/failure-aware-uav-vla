@@ -289,4 +289,150 @@ class TrainingPlanTests(unittest.TestCase):
         self.assertEqual(words[('approach','blue_pad')],set(V3['instructions']['approach']['train']))
 
 
+def step(distance,seen=True,forward=0.,height=7.,over=False,landed=False,down_seen=False,bearing=0.):
+    return {'distance_m':distance,'front_seen':seen,'down_seen':down_seen,'action':[forward,0.,0.],'height_m':height,'over':over,'landed':landed,
+            'bearing_deg':bearing,'position':[0.,0.,-8.],'velocity':[0.,0.,.3],'epoch':0.}
+
+
+class ScoreTests(unittest.TestCase):
+    """How a flown episode is read: touchdown, the landing rule, the object it ended at, the stage it failed at."""
+    @classmethod
+    def setUpClass(cls):
+        try:
+            from scripts import visual_search
+        except ImportError as error:raise unittest.SkipTest(f'simulator client not installed here: {error}')
+        cls.runner=visual_search
+
+    def environment(self,layout='a'):
+        env=self.runner.SearchEnv.__new__(self.runner.SearchEnv);scene=SCENES['field']
+        env.landing=LANDING;env.map_config=scene;env.layout=layout;env.geometry=MapGeometry(scene,layout);env.ground_z=-1.19;env.flight_stamp=100
+        env.collisions=[];env.scanned=0;env.touchdown=None;env.hit=None
+        return env
+
+    def event(self,name,height,stamp=200,offset=(1.,-2.)):
+        centre=SCENES['field']['sites']['S1']
+        return {'time_stamp':stamp,'object_name':name,'position':{'x':centre[0]+offset[0],'y':centre[1]+offset[1],'z':-1.19-height}}
+
+    def test_touching_a_pad_from_above_is_a_touchdown_and_anything_else_a_collision(self):
+        env=self.environment();env.collisions.append(self.event('Ground',0.,stamp=50));self.assertEqual(env.contacts(),(None,None))
+        env.collisions.append(self.event('BluePadMark2',2.52));touchdown,hit=env.contacts()
+        self.assertEqual((touchdown['object'],hit),('blue_pad',None));self.assertEqual([round(v,2) for v in touchdown['offset_m']],[1.,-2.])
+        env.collisions+=[self.event('BluePad',2.5,stamp=300,offset=(3.,3.))]*50;self.assertEqual(env.contacts()[0]['time_stamp'],200)
+        env=self.environment();env.collisions.append(self.event('BluePad',1.2));self.assertEqual(env.contacts(),(None,'BluePad'))
+        env=self.environment();env.collisions.append(self.event('FieldBarn',6.));self.assertEqual(env.contacts(),(None,'FieldBarn'))
+        env=self.environment();env.collisions.append(self.event('RedPad',2.5));self.assertEqual(env.contacts()[0]['object'],'red_pad')
+
+    def summary(self,steps,stopped=True,touchdown=None,hit=None,task='land',target='blue_pad',others=None):
+        episode={'id':'e','target':target,'task':task}
+        return self.runner.summarise(episode,steps,CONFIG,'model_stop' if stopped else 'max_steps',stopped,others or {'red_pad':42.},LANDING,touchdown,hit)
+
+    def test_the_landing_rule(self):
+        flight=[step(30.,forward=1.),step(10.,forward=1.),step(2.,over=True),step(1.,over=True,height=4.),step(1.,over=True,height=2.5,landed=True)]
+        down={'object':'blue_pad','offset_m':[.6,-.8],'position':[0,0,0],'time_stamp':1}
+        result=self.summary(flight,touchdown=down)
+        self.assertTrue(result['success'] and result['land_success'] and result['correct_target']);self.assertAlmostEqual(result['touchdown']['horizontal_error_m'],1.)
+        self.assertEqual(result['stages'],{'target_acquired':True,'correct_target':True,'approached':True,'down_camera_aligned':True,'descent_started':True,
+                                           'touchdown':True,'self_stop':True,'land_success':True})
+        self.assertFalse(self.summary(flight,stopped=False,touchdown=down)['success'])
+        self.assertFalse(self.summary(flight,touchdown=dict(down,offset_m=[6.8,0.]))['success'])
+        fast=[dict(item,velocity=[0.,0.,.95]) for item in flight];self.assertFalse(self.summary(fast,touchdown=down)['touchdown']['soft'])
+        other=self.summary(flight,touchdown=dict(down,object='red_pad'))
+        self.assertEqual((other['success'],other['selected'],other['wrong_target'],other['landed_on']),(False,'red_pad',True,'red_pad'))
+        self.assertFalse(self.summary(flight,touchdown=down,hit='FieldBarn')['success'])
+
+    def test_an_approach_ends_in_the_air(self):
+        hover=[step(30.,forward=1.),step(11.),step(11.)]
+        result=self.summary(hover,task='approach');self.assertTrue(result['success']);self.assertEqual((result['selected'],result['landed']),('blue_pad',False))
+        landed=self.summary(hover+[step(1.,over=True,landed=True)],task='approach',touchdown={'object':'blue_pad','offset_m':[0.,0.],'position':[0,0,0],'time_stamp':1})
+        self.assertFalse(landed['success'])
+        wrong=self.summary([step(60.),step(50.)],task='approach',others={'red_pad':9.})
+        self.assertEqual((wrong['success'],wrong['selected'],wrong['wrong_target']),(False,'red_pad',True))
+        self.assertIsNone(self.summary([step(60.),step(50.)],stopped=False,task='approach',others={'red_pad':9.})['selected'])
+
+
+class ReadingTests(unittest.TestCase):
+    """The frozen tables: the grounding step, the stage of a failure, the checkpoint rule and the size buckets."""
+    def record(self,rows,**episode):
+        from scripts.freeze_gen_v3 import read
+        base={'id':'e','target':'blue_pad','map':'field','layout':'a','stopped':False,'success':False,'reason':'max_steps'};base.update(episode)
+        return read(base,rows,CONFIG['success_radius_m'],LANDING,{},{})
+
+    def test_grounding_is_flying_toward_the_target_while_it_is_in_view(self):
+        from scripts.freeze_gen_v3 import transition
+        turning=[step(60.,seen=flag) for flag in (False,True,True,False,True,False)]
+        self.assertEqual({k:transition(turning)[k] for k in ('views','grounded','decisions_in_view')},{'views':2,'grounded':False,'decisions_in_view':3})
+        first=transition([step(60.,forward=1.)]*4);self.assertTrue(first['grounded'] and first['grounded_on_first_view']);self.assertEqual(first['views_before_grounding'],0)
+        later=transition(turning+[step(60.,forward=1.)]*3);self.assertEqual((later['grounded'],later['grounded_on_first_view'],later['views_before_grounding']),(True,False,2))
+        # Forward commands with the target out of view are not grounding, and two are not enough.
+        self.assertFalse(transition([step(60.,seen=False,forward=1.)]*5)['grounded']);self.assertFalse(transition([step(60.,forward=1.)]*2+[step(60.)])['grounded'])
+
+    def test_a_failure_is_named_by_the_first_stage_it_did_not_pass(self):
+        point=lambda distance:[centre[0]+distance,centre[1],-8.]
+        centre=SCENES['field']['sites']['S1'];far=[dict(step(60.,seen=False),position=point(60.))]*3
+        self.assertEqual(self.record(far)['failure'],'SEARCH')
+        passed=[dict(step(60.,seen=flag),position=point(60.)) for flag in (True,False,True,False)];result=self.record(passed)
+        self.assertEqual((result['failure'],result['mechanism']),('GROUNDING','passed over'))
+        begun=[dict(step(60.-i,forward=1.),position=point(60.-i)) for i in range(5)];self.assertEqual(self.record(begun)['failure'],'APPROACH')
+        near=begun+[dict(step(14.),position=point(14.))];self.assertEqual(self.record(near)['failure'],'STOP')
+        self.assertEqual(self.record(near,task='land')['failure'],'ALIGNMENT')
+        hover=self.record(near,task='land',stopped=True,reason='model_stop',selected='blue_pad')
+        self.assertEqual((hover['failure'],hover['mechanism'],hover['terminal'],hover['terminal_as_asked']),('ALIGNMENT','hovered instead of landing','hovered',False))
+        over=near+[dict(step(1.,over=True),position=point(1.))];self.assertEqual(self.record(over,task='land')['failure'],'DESCENT')
+        down={'horizontal_error_m':1.,'vertical_speed_mps':.3,'horizontal_speed_mps':0.,'inside_region':True,'soft':True}
+        landed=self.record(over+[dict(step(1.,over=True,landed=True,height=2.5),position=point(1.))],task='land',landed=True,landed_on='blue_pad',selected='blue_pad',touchdown=down)
+        self.assertEqual((landed['failure'],landed['mechanism'],landed['terminal_as_asked']),('LANDING','no stop after touchdown',True))
+        self.assertEqual(self.record(near,reason='collision')['failure'],'COLLISION')
+        wrong=self.record(begun,stopped=True,reason='model_stop',selected='red_pad')
+        self.assertEqual((wrong['failure'],wrong['selected_relation'],wrong['wrong_object']),('WRONG_TARGET','same shape','red_pad'))
+        self.assertEqual(self.record(begun,stopped=True,reason='model_stop',selected='blue_cube')['selected_relation'],'same colour')
+        self.assertEqual(self.record(near,success=True,stopped=True,selected='blue_pad')['failure'],'')
+
+    def test_the_checkpoint_rule_is_the_lowest_loss_then_the_behaviour_score_inside_the_band(self):
+        try:
+            from scripts.train_aerovla_oft import select,behaviour,BOOSTS
+        except ImportError as error:self.skipTest(f'torch not installed here: {error}')
+        entry=lambda loss,score:{'val_l1':loss,'score':score}
+        self.assertTrue(select(None,.1,entry(.1,.5),.02))
+        self.assertTrue(select(entry(.1,.5),.09,entry(.09,.4),0.));self.assertFalse(select(entry(.09,.4),.09,entry(.095,.9),0.))
+        # Inside the band the better behaviour wins; a new lowest loss does not replace a better-behaved checkpoint that is still inside it.
+        self.assertTrue(select(entry(.1,.5),.1,entry(.101,.6),.02));self.assertFalse(select(entry(.1,.6),.099,entry(.099,.5),.02))
+        self.assertTrue(select(entry(.1,.9),.09,entry(.09,.5),.02));self.assertFalse(select(entry(.09,.5),.09,entry(.095,.9),.02))
+        self.assertEqual([behaviour(a,OFT) for a in ([-1.,0.,0.],[-1.,.6,0.],[-1.,-1.,0.],[1.,0.,.2],[-1.,0.,1.],[-.2,.5,0.])],
+                         ['stop','descend','climb','advance','turn','advance'])
+        self.assertTrue(BOOSTS['small_visible']({'size_bucket':'small','target_visible':True}));self.assertFalse(BOOSTS['small_visible']({'size_bucket':'small','target_visible':False}))
+        self.assertTrue(BOOSTS['landing']({'teacher_state':'descend'}));self.assertFalse(BOOSTS['landing']({'teacher_state':'approach'}))
+
+    def test_size_buckets_are_thirds_of_the_frames_that_show_the_target(self):
+        from scripts.build_visual_search_dataset import size_buckets,collisions
+        samples=[{'meta':{'target_visible':True,'target_size':value/100}} for value in range(1,10)]+[{'meta':{'target_visible':False,'target_size':.5}},{'meta':{'target_visible':True,'target_size':None}}]
+        edges=size_buckets(samples);self.assertEqual(edges,[.04,.07])
+        self.assertEqual([s['meta']['size_bucket'] for s in samples],['small']*3+['medium']*3+['large']*3+[None,None])
+        self.assertIsNone(size_buckets(samples[:2]))
+        # A landing start and its approach twin share a seed and a pose; two landings from one pose would be the same data twice.
+        record=lambda name,task:{'summary':{'id':name,'map':'field','seed':3,'split':'train','task':task,'start_xy':[1.,2.],'target':'blue_pad'},'traj_rel_dir':name}
+        self.assertFalse(any(collisions([record('a','land'),record('b','approach')]).values()))
+        self.assertTrue(collisions([record('a','land'),record('b','land')])['starts'])
+
+
+class GateTests(unittest.TestCase):
+    """The checks in front of the full evaluation."""
+    def test_a_gate_is_passed_only_when_every_line_holds(self):
+        from scripts.gate_gen_v3 import judge
+        table,passed=judge({'successes':(7,'>=',7),'collisions':(0,'<=',1)});self.assertTrue(passed);self.assertEqual(table[0]['needs'],'>= 7')
+        self.assertFalse(judge({'successes':(6,'>=',7),'collisions':(0,'<=',1)})[1]);self.assertFalse(judge({'successes':(9,'>=',7),'collisions':(2,'<=',1)})[1])
+
+    def test_smoke_and_representative_starts_are_validation_starts_not_test_starts(self):
+        from scripts.gate_gen_v3 import smoke_ids
+        gates=V3['gates'];kinds=gates['smoke']['kinds'];self.assertEqual(len(kinds),gates['smoke']['episodes']);self.assertEqual(len(set(kinds)),len(kinds))
+        held_out=json.loads((ROOT/'configs/generalization_test_spawns.json').read_text(encoding='utf-8'));test=json.loads(TEST_FILE.read_text(encoding='utf-8'))
+        val=gen_v3.plan_training(CONFIG,OFT,'val',gen_v3.test_points(test,held_out),held_out);ids=smoke_ids(CONFIG,{'val':val})
+        self.assertEqual(len(set(ids)),10);chosen=[e for e in val if e['id'] in ids]
+        self.assertEqual([e['kind'] for e in chosen if e['id'] in ids],[e['kind'] for e in val if e['id'] in ids])
+        self.assertEqual({e['kind'] for e in chosen},set(kinds))
+        low,high=V3['seeds']['val'];self.assertTrue(all(low<=e['seed']<=high and e['map'] in V3['train_layouts'] for e in val))
+        tested={e['id'] for episodes in test['sets'].values() for e in episodes};self.assertFalse(tested&{e['id'] for e in val})
+        self.assertGreaterEqual(len(val),gates['representative']['episodes_min'])
+        self.assertTrue({'land_visible','land_visible_approach','far_land_search','far_visible'}<=set(kinds))
+
+
 if __name__=='__main__':unittest.main()

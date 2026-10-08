@@ -51,7 +51,9 @@ def render(live,front,down,result=None):
         if frame is not None:canvas[202:586,left:left+384]=cv2.resize(marked(frame,step.get(f'{key}_pixel'),seen),(384,384),interpolation=cv2.INTER_NEAREST)
     same=input_matches(live,front,down)
     text('Model input = raw camera frame (no marker): '+{True:'VERIFIED',False:'MISMATCH',None:'--'}[same],20,612,.5,GREEN if same else RED)
-    text('SEARCH STATE',830,190,.45);text('Target visible' if step['front_seen'] else 'Target not visible',830,218,.7,GREEN if step['front_seen'] else RED,2)
+    text('SEARCH STATE',830,190,.45)
+    if step.get('landed'):text('On the pad',830,218,.7,GREEN,2)
+    else:text('Target visible' if step['front_seen'] else 'Target not visible',830,218,.7,GREEN if step['front_seen'] else RED,2)
     text('DISTANCE',830,254,.45);text(f'{step["distance_m"]:.1f} m   bearing {step["bearing_deg"]:+.0f} deg',830,280,.62)
     text(f'success radius {live["success_radius_m"]:.0f} m   step {step["step"]}',830,304,.45)
     text('ACTION CHUNK  (forward m / down m / yaw deg)',830,344,.45)
@@ -62,6 +64,8 @@ def render(live,front,down,result=None):
     if 'raw_output' in step:text('model text: '+step['raw_output'][:28],830,552,.5)
     if 'inference_ms' in step:text(f'inference {step["inference_ms"]:.0f} ms',830,578,.5)
     text('FAILURE',830,618,.45);text(live.get('failure','NORMAL'),830,644,.7)
+    # What the sentence asks for at the end of the flight: stop in the air near the object, or touch down on it.
+    text('TASK',1010,618,.45);text('LAND' if episode.get('task')=='land' else 'APPROACH',1010,644,.7,PURPLE,2)
     if result and result.get('episode')==episode['id']:
         text(f'Episode ended: {result["reason"]}, {result["final_distance_m"]:.1f} m from the target',20,660,.6,GREEN if result['stopped'] and result['final_distance_m']<=live['success_radius_m'] else RED,2)
     text('Q / Esc closes this window; the run continues in the worker',20,740,.45)

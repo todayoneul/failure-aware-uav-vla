@@ -41,8 +41,23 @@ def episode_samples(record,chunk_size):
                                 'kind':summary.get('kind',summary['case']),'strategy':summary.get('strategy','right'),
                                 'step':step['step'],'target_visible':step['front_seen'],'target_in_front_fov':step['front_in_fov'],
                                 'target_visible_down':step['down_seen'],'bearing_deg':step['bearing_deg'],'distance_m':step['distance_m'],
-                                'height_m':step.get('height_m'),'teacher_state':step['teacher_state']}})
+                                'height_m':step.get('height_m'),'teacher_state':step['teacher_state'],
+                                # Analysis only: what the sentence asks for, whether the vehicle stands on a pad, and how large
+                                # the target's bounding box is in the front image (share of the image; never a model input).
+                                'task':summary.get('task','approach'),'landed':bool(step.get('landed')),'over':bool(step.get('over')),
+                                'target_size':((step.get('target_size') or {}).get('front') or {}).get('image_fraction')}})
     return samples
+
+
+def size_buckets(samples):
+    """Small, medium and large by the thirds of the recorded sizes of the frames that show the target. Returns the two edges."""
+    sizes=sorted(s['meta']['target_size'] for s in samples if s['meta']['target_visible'] and s['meta'].get('target_size'))
+    if len(sizes)<3:return None
+    edges=[sizes[len(sizes)//3],sizes[2*len(sizes)//3]]
+    for sample in samples:
+        size=sample['meta'].get('target_size')
+        sample['meta']['size_bucket']=None if not (size and sample['meta']['target_visible']) else 'small' if size<edges[0] else 'medium' if size<edges[1] else 'large'
+    return edges
 
 
 def count(items,key):return dict(sorted(collections.Counter(key(item) for item in items).items(),key=lambda pair:str(pair[0])))
@@ -75,9 +90,12 @@ def collisions(records):
     def repeated(values):
         counts=collections.Counter(values);return sorted(str(value) for value,count in counts.items() if count>1)
     return {'episode_ids':repeated(record['summary']['id'] for record in records),
-            'seeds':repeated((record['summary'].get('map','blocks'),record['summary'].get('seed')) for record in records if 'split' in record['summary']),
+            # A landing start flown again as an approach shares its seed and its pose on purpose; the task tells the two apart.
+            'seeds':repeated((record['summary'].get('map','blocks'),record['summary'].get('seed'),record['summary'].get('task','approach'))
+                             for record in records if 'split' in record['summary']),
             'folders':repeated(record['traj_rel_dir'] for record in records),
-            'starts':repeated(tuple(record['summary']['start_xy'])+(record['summary']['target'],) for record in records if 'start_xy' in record['summary'])}
+            'starts':repeated(tuple(record['summary']['start_xy'])+(record['summary']['target'],record['summary'].get('task','approach'))
+                              for record in records if 'start_xy' in record['summary'])}
 
 
 def build(root,config,validation_fraction,seed):
@@ -85,15 +103,22 @@ def build(root,config,validation_fraction,seed):
 
 
 def build_records(everything,config,validation_fraction,seed):
-    records=[record for record in everything if record['steps'] and not record['summary'].get('error') and record['summary']['reason']=='teacher_stop']
+    # A landing episode is kept only if the teacher actually landed by the landing rule.
+    records=[record for record in everything if record['steps'] and not record['summary'].get('error') and record['summary']['reason']=='teacher_stop'
+             and (record['summary'].get('task','approach')!='land' or record['summary'].get('land_success'))]
     dropped=count([record for record in everything if record not in records],lambda r:r['summary'].get('reason','error'))
     planned=all(record['summary'].get('split') in ('train','val') for record in records)
     if planned:validation_ids={record['summary']['id'] for record in records if record['summary']['split']=='val'}
-    else:validation_ids=set(split_episodes([record['summary']['id'] for record in records],validation_fraction,seed)[1])
+    else:
+        # A start flown twice with different sentences stays on one side: the two flights share their first frames.
+        group=lambda record:record['summary'].get('twin_of') or record['summary']['id']
+        chosen=set(split_episodes([group(record) for record in records],validation_fraction,seed)[1])
+        validation_ids={record['summary']['id'] for record in records if group(record) in chosen}
     splits={'train':[],'val':[]}
     for record in records:
         splits['val' if record['summary']['id'] in validation_ids else 'train']+=episode_samples(record,config['chunk_size'])
     samples=splits['train']+splits['val'];bounds=config['action_bounds'];summaries=[record['summary'] for record in records]
+    edges=size_buckets(samples)
     outside=sum(any(not low-1e-9<=value<=high+1e-9 for value,(low,high) in zip(step,bounds.values())) for sample in samples for step in sample['chunk'])
     search=[s for s in summaries if not s.get('initially_seen',True) or s.get('base',s.get('kind')) in ('search','altitude','reacquire')]
     climbed=[s for s in search if s.get('climbed_m',0.)>=1.]
@@ -115,6 +140,12 @@ def build_records(everything,config,validation_fraction,seed):
              'sample_distance_m':count(samples,lambda s:distance_bin(s['meta']['distance_m'])),
              'sample_bearing_sector':count(samples,lambda s:sector_of(s['meta']['bearing_deg'])),
              'by_teacher_state':count(samples,lambda s:s['meta']['teacher_state']),
+             'tasks':count(summaries,lambda s:s.get('task','approach')),'samples_by_task':count(samples,lambda s:s['meta']['task']),
+             'landing_episodes':sum(bool(s.get('land_success')) for s in summaries),
+             'apparent_size':None if edges is None else {'what':"share of the front image covered by the target's bounding box, frames that show the target",
+                                                         'small_below':edges[0],'large_from':edges[1],
+                                                         'samples':count([s for s in samples if s['meta'].get('size_bucket')],lambda s:s['meta']['size_bucket']),
+                                                         'frames_without_a_recorded_size':sum(s['meta'].get('target_size') is None for s in samples)},
              'target_visible':count(samples,lambda s:'visible' if s['meta']['target_visible'] else 'not visible'),
              'labels_outside_action_bounds':outside,
              'memory_strategy_samples':sum(s['meta']['strategy'] not in STATELESS_STRATEGIES for s in samples),

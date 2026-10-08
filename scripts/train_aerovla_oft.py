@@ -6,6 +6,11 @@
   verify:  --verify <checkpoint dir> --dataset <root>   reloads the checkpoint in a fresh process and
            compares its predictions with the ones stored at save time
   score:   --score <checkpoint dir> --dataset <root>    validation L1 of a checkpoint on any dataset
+  probe:   --probe <checkpoint dir> --dataset <root>    the same frames with the sentence changed: does the action follow the words?
+
+Which checkpoint is kept is decided by a rule given before training starts (--select-band): the lowest
+validation L1, and among evaluations within the band of it the one whose first action most often has the
+teacher's kind (advance or turn; stop or descend). With a band of 0 this is the lowest validation L1.
 """
 import os
 os.environ['HF_HUB_OFFLINE']='1';os.environ['TRANSFORMERS_OFFLINE']='1'
@@ -18,11 +23,31 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
 import torch
 from PIL import Image
-from src.aerovla_oft.spec import load_config,normalize_action
+from src.aerovla_oft.spec import load_config,normalize_action,denormalize_action,is_stop
 from src.aerovla_oft.model import AeroVLAOFT
 
 MANIFEST=ROOT/'outputs/integration/model-downloads.json'
 AXES=('forward','down','yaw')
+# Frames that can be drawn more often than their share: far, small targets in view, and the last part of a landing.
+BOOSTS={'small_visible':lambda meta:meta.get('size_bucket')=='small' and meta['target_visible'],
+        'landing':lambda meta:meta['teacher_state'] in ('final','descend','landed')}
+GROUNDING=('advance','turn');TERMINAL=('stop','descend')
+
+
+def behaviour(normalised,config):
+    """The kind of a first action: stop, descend, climb, advance, or turn."""
+    action=denormalize_action(normalised,config);forward,down,_=action
+    if is_stop(action,config):return 'stop'
+    if down>=.1 and forward<.15:return 'descend'
+    if down<=-.1:return 'climb'
+    return 'advance' if forward>=.15 else 'turn'
+
+
+def select(kept,lowest,entry,band):
+    """Should this evaluation replace the kept checkpoint? `kept` and `entry` carry val_l1 and score; `lowest` already includes the entry."""
+    limit=lowest*(1+band)+1e-12
+    if entry['val_l1']>limit:return False
+    return kept is None or kept['val_l1']>limit or entry['score']>kept['score']+1e-9
 
 
 def load_samples(root,name):return json.loads((Path(root)/f'{name}.json').read_text())
@@ -61,7 +86,7 @@ def evaluate(model,root,samples,config):
     """Mean L1 on normalised chunks: overall, for the executed first action, and by teacher state.
 
     Also how far the head leaves the normalised range, since anything beyond it is clipped when flown."""
-    model.head.eval();total=first=0.;states={};predictions=[];outside=[0,0,0];any_outside=0;at_bound=[0,0,0]
+    model.head.eval();total=first=0.;states={};predictions=[];outside=[0,0,0];any_outside=0;at_bound=[0,0,0];kinds=[]
     for sample in samples:
         pixels,texts,targets,proprio=batch_of(model,root,[sample],config)
         with torch.autocast('cuda',dtype=torch.bfloat16):predicted=model.forward(pixels,texts,proprio).float().cpu()
@@ -73,9 +98,18 @@ def evaluate(model,root,samples,config):
             outside[axis]+=abs(value)>1;at_bound[axis]+=abs(targets[0,0,axis].item())>=.999
         any_outside+=bool((predicted[0,0].abs()>1).any())
         predictions.append(predicted[0].tolist())
+        kinds.append((behaviour(targets[0,0].tolist(),config),behaviour(predicted[0,0].tolist(),config),sample['meta'].get('task','approach')))
     model.head.train()
     count=max(1,len(samples))
+    def accuracy(labels,task=None):
+        chosen=[(label,got) for label,got,what in kinds if label in labels and (task is None or what==task)]
+        return sum(label==got for label,got in chosen)/len(chosen) if chosen else None
+    grounding,terminal=accuracy(GROUNDING),accuracy(TERMINAL)
     return {'l1':total/count,'first_action_l1':first/count,'samples':len(samples),
+            # Does the first action have the teacher's kind? Advance or turn is the grounding decision; stop or descend is how a flight ends.
+            'behaviour':{'grounding_accuracy':grounding,'terminal_accuracy':terminal,'all':accuracy(GROUNDING+TERMINAL+('climb',)),
+                         'terminal_accuracy_land':accuracy(TERMINAL,'land'),'terminal_accuracy_approach':accuracy(TERMINAL,'approach'),
+                         'score':sum(value for value in (grounding,terminal) if value is not None)/max(1,sum(value is not None for value in (grounding,terminal)))},
             'first_action_l1_by_state':{name:b['error']/b['count'] for name,b in states.items()},
             'first_action_mean_by_state':{name:[value/b['count'] for value in b['sum']] for name,b in states.items()},
             'label_mean_by_state':{name:[value/b['count'] for value in b['label']] for name,b in states.items()},
@@ -114,6 +148,13 @@ def train(args):
     for sample in samples:counts[sample['meta']['teacher_state']]=counts.get(sample['meta']['teacher_state'],0)+1
     if args.balance>1:
         weights=[min(args.balance,len(samples)/(len(counts)*counts[sample['meta']['teacher_state']])) for sample in samples]
+    boosts={name:float(factor) for name,factor in (item.split('=') for item in args.boost)};boosted={}
+    if boosts:
+        weights=weights or [1.]*len(samples)
+        for index,sample in enumerate(samples):
+            for name,factor in boosts.items():
+                if BOOSTS[name](sample['meta']):weights[index]*=factor;boosted[name]=boosted.get(name,0)+1
+    lowest=float('inf')
 
     def record(update,final_train=None,final_val=None,stored=None):
         return {'dataset':str(args.dataset),'dataset_summary':json.loads((Path(args.dataset)/'summary.json').read_text()),
@@ -121,7 +162,8 @@ def train(args):
                 'train_samples_used':len(samples),'val_samples_used':len(validation),'eval_samples':args.eval_samples,'updates':update+1,'planned_updates':updates,
                 'batch_size':batch_size,'gradient_accumulation':accumulation,
                 'samples_seen':(update+1)*batch_size*accumulation,'epochs':(update+1)*batch_size*accumulation/len(samples),
-                'learning_rate':learning_rate,'balance':args.balance,'train_state_counts':counts,
+                'learning_rate':learning_rate,'balance':args.balance,'train_state_counts':counts,'boost':boosts,'boosted_samples':boosted,
+                'selection':{'band':args.select_band,'rule':'lowest validation L1; among evaluations within the band of it, the highest mean of grounding and terminal accuracy'},
                 'peak_allocated_GiB':torch.cuda.max_memory_allocated()/2**30,'peak_reserved_GiB':torch.cuda.max_memory_reserved()/2**30,
                 'train_seconds':time.time()-started,'final_train':final_train,'final_val':final_val,'best':best,
                 'stopped_early':stopped_early,'history':history,'gpu':torch.cuda.get_device_name(0),'reload_reference':stored}
@@ -139,11 +181,12 @@ def train(args):
             entry={'update':update,'train_l1_ema':running,'elapsed_s':time.time()-started}
             if validation and ((update%args.eval_every==0 and update>0) or last):
                 entry['val'],stored=evaluate(model,args.dataset,validation,config)
-                # The checkpoint that is kept is the one with the lowest validation loss, not the last one.
-                if best is None or entry['val']['l1']<best['val_l1']-1e-4:
-                    best={'update':update,'val_l1':entry['val']['l1'],'val_first_action_l1':entry['val']['first_action_l1'],'train_l1_ema':running}
-                    stale=0;model.save(output,{'training':record(update,None,entry['val'],stored[:8])})
-                else:stale+=1
+                # The checkpoint that is kept follows the rule fixed before training (see the top of this file), not the last evaluation.
+                improved=entry['val']['l1']<lowest-1e-4;lowest=min(lowest,entry['val']['l1']);stale=0 if improved else stale+1
+                candidate={'update':update,'val_l1':entry['val']['l1'],'val_first_action_l1':entry['val']['first_action_l1'],'train_l1_ema':running,
+                           'score':entry['val']['behaviour']['score'],'behaviour':entry['val']['behaviour']}
+                if select(best,lowest,candidate,args.select_band):
+                    best=candidate;model.save(output,{'training':record(update,None,entry['val'],stored[:8])})
                 entry['best_update']=best['update']
             history.append(entry);print(json.dumps(entry),flush=True)
             if args.patience and stale>=args.patience:stopped_early=True;break
@@ -168,6 +211,42 @@ def score(args):
     samples=stratified(load_samples(args.dataset,args.val_file),args.eval_samples)
     metrics,_=evaluate(model,args.dataset,samples,saved['config'])
     result={'checkpoint':str(args.score),'dataset':str(args.dataset),'val_file':args.val_file,'metrics':metrics}
+    print(json.dumps(result,indent=1))
+    if args.output:Path(args.output).write_text(json.dumps(result,indent=1))
+
+
+@torch.no_grad()
+def probe(args):
+    """The same frames with only the sentence changed.
+
+    Frames near a pad from landing episodes are shown with the landing sentence and with an approach sentence: the
+    first should keep flying or descend, the second should stop. Frames that show the target are shown with the
+    sentence naming the other pad: the vehicle should stop advancing on it."""
+    saved=json.loads((Path(args.probe)/'manifest.json').read_text());config=saved['config'];model=AeroVLAOFT(MANIFEST,config,checkpoint=args.probe)
+    samples=load_samples(args.dataset,args.val_file) or load_samples(args.dataset,args.train_file);rng=random.Random(0)
+    def first(sample,text):
+        pixels,_,_,proprio=batch_of(model,args.dataset,[sample],config)
+        with torch.autocast('cuda',dtype=torch.bfloat16):return model.forward(pixels,[text],proprio).float().cpu()[0,0].tolist()
+    near=[s for s in samples if s['meta'].get('task')=='land' and s['meta']['teacher_state'] in ('final','descend') and 'landing pad' in s['instruction']]
+    seen=[s for s in samples if s['meta']['target_visible'] and s['meta']['teacher_state']=='approach' and s['meta']['target'] in ('blue_pad','red_pad')]
+    rng.shuffle(near);rng.shuffle(seen);result={'checkpoint':str(args.probe),'dataset':str(args.dataset)}
+    rows=[]
+    for sample in near[:args.probe_samples]:
+        text=sample['instruction'].replace('<image>\n','',1);noun='the blue landing pad' if 'blue' in text else 'the red landing pad'
+        land=first(sample,text);approach=first(sample,f'Approach {noun}.')
+        rows.append({'state':sample['meta']['teacher_state'],'land':behaviour(land,config),'approach':behaviour(approach,config),
+                     'difference':sum(abs(a-b) for a,b in zip(land,approach))/3})
+    result['task_swap']={'frames':len(rows),'land_sentence_keeps_going':sum(r['land'] in ('advance','descend') for r in rows)/max(1,len(rows)),
+                         'approach_sentence_stops':sum(r['approach']=='stop' for r in rows)/max(1,len(rows)),
+                         'mean_action_difference':sum(r['difference'] for r in rows)/max(1,len(rows))}
+    rows=[]
+    for sample in seen[:args.probe_samples]:
+        text=sample['instruction'].replace('<image>\n','',1);other=text.replace('blue','\0').replace('red','blue').replace('\0','red')
+        own=first(sample,text);swapped=first(sample,other)
+        rows.append({'own':behaviour(own,config),'other':behaviour(swapped,config),'difference':sum(abs(a-b) for a,b in zip(own,swapped))/3})
+    result['object_swap']={'frames':len(rows),'own_sentence_advances':sum(r['own']=='advance' for r in rows)/max(1,len(rows)),
+                           'other_pad_named_still_advances':sum(r['other']=='advance' for r in rows)/max(1,len(rows)),
+                           'mean_action_difference':sum(r['difference'] for r in rows)/max(1,len(rows))}
     print(json.dumps(result,indent=1))
     if args.output:Path(args.output).write_text(json.dumps(result,indent=1))
 
@@ -202,7 +281,12 @@ if __name__=='__main__':
     parser.add_argument('--head-output',choices=('linear','tanh'));parser.add_argument('--name',help='model name stored with the checkpoint')
     parser.add_argument('--init',help='checkpoint to continue from')
     parser.add_argument('--score',help='checkpoint to evaluate on the validation file; --output then names a JSON file')
+    parser.add_argument('--probe',help='checkpoint to show the same frames to with the sentence changed; --output then names a JSON file')
+    parser.add_argument('--probe-samples',type=int,default=60)
+    parser.add_argument('--boost',nargs='*',default=[],help='NAME=FACTOR: draw these frames more often (small_visible, landing)')
+    parser.add_argument('--select-band',type=float,default=0.,help='relative band above the lowest validation L1 inside which the behaviour score decides')
     arguments=parser.parse_args()
-    if arguments.score:score(arguments)
+    if arguments.probe:probe(arguments)
+    elif arguments.score:score(arguments)
     elif arguments.verify:verify(arguments)
     else:train(arguments)

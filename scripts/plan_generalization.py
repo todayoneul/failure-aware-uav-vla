@@ -267,7 +267,8 @@ def check(config,held_out,plans):
     return problems
 
 
-COLORS={'blue_cone':(200,150,20),'orange_ball':(20,120,240),'red_cube':(40,40,215),'green_cylinder':(40,150,30),'yellow_pyramid':(20,200,230)}
+COLORS={'blue_cone':(200,150,20),'orange_ball':(20,120,240),'red_cube':(40,40,215),'green_cylinder':(40,150,30),'yellow_pyramid':(20,200,230),
+        'blue_pad':(230,90,10),'red_pad':(60,20,170),'blue_cube':(170,70,40),'blue_cylinder':(210,140,70)}
 
 
 def figure(map_config,layout,groups,output,wedges=None,title='',paths=(),legend=None):
@@ -326,6 +327,7 @@ def main():
     checker=commands.add_parser('check');checker.add_argument('--plan',required=True)
     draw=commands.add_parser('figure');draw.add_argument('--plan');draw.add_argument('--map',default='blocks');draw.add_argument('--layout',default='a')
     draw.add_argument('--sets',nargs='+',default=['G1','S']);draw.add_argument('--output',required=True)
+    draw.add_argument('--test-file',help='another file of held-out sets to draw instead of the first one (e.g. configs/gen_v3_test_spawns.json)')
     commands.add_parser('long');commands.add_parser('v3-test')
     for name in ('v3-train','v3-pilot'):commands.add_parser(name).add_argument('--output',required=True)
     commands.add_parser('v3-check').add_argument('--plan',required=True)
@@ -410,9 +412,10 @@ def main():
         map_config=load_map(args.map);groups=[]
         if args.plan:
             plan=json.loads(Path(args.plan).read_text());groups.append(('train',[e for e in plan['train']+plan['val'] if e['map']==args.map],'dot'))
-        groups.append(('held-out',[e for name in args.sets for e in held_out['sets'][name] if e['map']==args.map],'cross'))
-        figure(map_config,args.layout,groups,args.output,held_out['wedges'].get(args.map,{}).get(args.layout),
-               f'{map_config["name"]}, layout {args.layout}')
+        shown=json.loads(Path(args.test_file).read_text(encoding='utf-8')) if args.test_file else held_out
+        groups.append(('held-out',[e for name in args.sets for e in shown['sets'][name] if e['map']==args.map],'cross'))
+        figure(map_config,args.layout,groups,args.output,None if args.test_file else held_out['wedges'].get(args.map,{}).get(args.layout),
+               f'{map_config["name"]}, layout {args.layout}',legend='dot: training start   cross: held-out start   colour: the object named' if args.test_file else None)
 
 
 if __name__=='__main__':main()

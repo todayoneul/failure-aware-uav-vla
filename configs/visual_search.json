@@ -76,7 +76,7 @@
   "gen_v3": {
     "description": "Gen-v3: precise grounding among distractors, far and small targets, and landing (docs/aerovla_oft_gen_v3.md). Kinds with a count are recorded as training data, [train, val]; the others are used by the fresh test set only. `base` is the kind whose planning rules apply; `task` is what the sentence asks for at the end.",
     "max_ticks": 320,
-    "seeds": {"test": [8000, 8999], "train": [3000, 3999], "val": [5300, 5599], "pilot": [9000, 9099]},
+    "seeds": {"test": [8000, 8999], "train": [3000, 4999], "val": [5300, 5999], "pilot": [9000, 9099]},
     "instructions": {
       "approach": {"train": ["find", "approach"], "held_out": ["locate", "search_for", "find_and_approach"]},
       "land": {"train": ["land", "land_on"], "held_out": ["locate_land", "search_approach_land", "find_long_land"]}
@@ -87,6 +87,15 @@
     "query_reach_m": 120.0,
     "separation_m": 6.0,
     "train_layouts": {"field": ["a", "b", "c", "d"], "lot": ["a", "b", "c", "d"], "blocks": ["c", "d"]},
+    "gates": {
+      "description": "Checks that must pass, in this order, before the 156 fresh test starts are flown (scripts/gate_gen_v3.py). Smoke and representative use validation starts of the training plan, never the test set. Fixed before the checkpoints they judge existed.",
+      "pilot": {"what": "checkpoint trained on the pilot episodes alone, flown from 4 of their poses with both sentences", "land_touchdowns_min": 3, "approach_touchdowns_max": 0, "approach_hover_min": 3, "probe_min": 0.7},
+      "smoke": {"what": "final checkpoint, the first validation start of each kind listed", "episodes": 10,
+                "kinds": ["pair_side_by_side", "distractor_centred", "search_past", "far_visible", "far_search", "land_visible", "land_visible_approach", "land_search", "land_near", "far_land_search"],
+                "success_min": 7, "landing_success_min": 1, "far_success_min": 1, "collisions_max": 1, "errors_max": 0},
+      "representative": {"what": "final checkpoint, every validation start the teacher finished", "episodes_min": 30, "success_rate_min": 0.8, "landing_success_rate_min": 0.75,
+                         "grounded_rate_min": 0.9, "terminal_as_asked_rate_min": 0.9, "wrong_target_max": 2, "collisions_max": 1, "errors_max": 0}
+    },
     "kinds": {
       "ground_visible": {"base": "visible", "task": "approach", "distance_m": [14.0, 44.0]},
       "ground_edge": {"base": "peripheral", "task": "approach", "distance_m": [14.0, 44.0]},
