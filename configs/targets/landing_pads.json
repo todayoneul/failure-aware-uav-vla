@@ -1,0 +1,39 @@
+{
+  "description": "What counts as landing on a pad. Every number follows from the pad (configs/targets/objects.json), the vehicle (configs/robot_quadrotor_fastphysics.jsonc) or a measurement in the simulator (docs/aerovla_oft_gen_v3.md, 'Landing in the simulator'); none is tuned to a result.",
+  "pads": ["blue_pad", "red_pad"],
+  "pad": {"size_m": [14.0, 14.0, 2.5], "top_surface_m": 2.5, "mark_thickness_m": 0.06},
+  "vehicle": {
+    "half_span_m": 0.4,
+    "half_span_from": "rotor hubs at +-0.253 m on both axes plus the propeller radius",
+    "rest_offset_m": 0.19,
+    "rest_offset_from": "height of the body origin above the surface it rests on, measured at spawn (0.193 m) and on a pad's marking (0.158 m)"
+  },
+  "touchdown": {
+    "definition": "the collision topic names the pad or its marking while the vehicle is above the pad's top surface; the simulator holds the vehicle still from that moment",
+    "from_above_tolerance_m": 0.3,
+    "landing_region_half_width_m": 6.6,
+    "landing_region_from": "pad half-width (7.0 m) minus the vehicle half-span (0.4 m): the whole vehicle stands on the pad",
+    "max_vertical_speed_mps": 0.75,
+    "max_vertical_speed_from": "the action range allows 1.0 m/s of descent and the teacher's final descent is 0.5 m/s; half-way between the two separates a controlled descent from one at full rate",
+    "max_horizontal_speed_mps": 0.5,
+    "max_horizontal_speed_from": "a quarter of the 2.0 m/s the action range allows forward"
+  },
+  "stages": {
+    "approach_m": 20.0,
+    "aligned_m": 3.5,
+    "aligned_from": "a quarter of the pad's width: the marking's centre lies inside the middle of the down view from every flight height used",
+    "descent_started_m": 1.0
+  },
+  "teacher": {
+    "align_radius_m": 1.75,
+    "align_radius_from": "an eighth of the pad's width",
+    "ease_m": 6.0,
+    "min_forward_m": 0.15,
+    "slow_height_m": 2.5,
+    "final_descent_m": 0.25,
+    "glide_distance_m": 25.0,
+    "glide_height_m": 7.0,
+    "glide_down_m": 0.25
+  },
+  "after_touchdown_ticks": 8
+}

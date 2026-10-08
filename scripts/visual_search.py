@@ -3,6 +3,11 @@
 Policies see Front/Down RGB and one sentence (`policy_inputs`). The target centre is used here to place
 the vehicle, to score, and by the teacher; it is never passed to a learned policy.
 
+A sentence either asks to approach an object (stop in the air near it) or to land on a pad. Landing is
+flown with the same three action axes as everything else: there is no call to the simulator's own
+landing routine anywhere in an episode. Touching a pad from above ends the flight where it stands
+(the simulator holds the vehicle); touching anything else is a collision.
+
   --policy baseline   AeroVLA NF4, instruction only, its own step actions and LAND (--flight continuous
                       hands each action over in flight instead of stopping after it)
   --policy teacher    scripted expert; with --record it writes an AeroVLA-format dataset
@@ -33,14 +38,17 @@ from src.mission.scene import prepare_mission_config
 from src.mission.grounding import target_visibility,matched_camera_images
 from src.mission.flight import climb_to
 from src.visual_search.episodes import load_config,make_episode,relative_target,policy_inputs,Teacher
-from src.visual_search.generalization import SearchTeacher
-from src.visual_search.maps import load_map,MapGeometry,scene_objects
+from src.visual_search.generalization import SearchTeacher,STOP_STATES
+from src.visual_search.maps import load_map,MapGeometry,scene_objects,load_landing,owner_of,lighting
 from src.visual_search.shapes import mesh
 from src.aerovla_oft.spec import load_config as load_oft_config,proprio_vector,is_stop
 
 MANIFEST=ROOT/'outputs/integration/model-downloads.json'
 LEVELS={'G0':'G0 - seen start','G1':'G1 - unseen start','G2':'G2 - unseen object','G3':'G3 - held-out scene','G4':'G4 - held-out scene and object',
-        'P':'G1 - unseen words','S':'G1 - side probe','L1':'L1 - start 40-55 m','L2':'L2 - start 55-70 m','L3':'L3 - start 70-90 m'}
+        'P':'G1 - unseen words','S':'G1 - side probe','L1':'L1 - start 40-55 m','L2':'L2 - start 55-70 m','L3':'L3 - start 70-90 m',
+        'Q1':'Q1 - basic grounding','Q2':'Q2 - colour distractor','Q3':'Q3 - shape distractor','Q4':'Q4 - position swap','Q5':'Q5 - query swap',
+        'Q6':'Q6 - approach or land','Q7':'Q7 - far grounding','Q8':'Q8 - landing','Q8R':'Q8 - landing, red pad','Q10':'Q10 - unseen words',
+        'QS':'seen scene, held-out layout'}
 
 
 def digest(frame):return hashlib.sha256(frame.tobytes()).hexdigest()
@@ -53,7 +61,7 @@ def pose_at(x,y,z):
 class SearchEnv:
     def __init__(self,client,config,oft,output):
         self.client,self.config,self.oft,self.output=client,config,oft,Path(output)
-        self.maps={};self.verified=set();self.meshes={}
+        self.maps={};self.verified=set();self.meshes={};self.landing=load_landing()
         self.limits=flight_limits(json.loads((ROOT/'configs/flight_limits.json').read_text()))
 
     def map(self,name):
@@ -79,8 +87,8 @@ class SearchEnv:
                 if key not in self.meshes:self.meshes[key]=mesh(item['shape'],item['size_m'],item['color'],item['name'])
                 self.world.spawn_object_from_file(item['name'],'gltf',self.meshes[key],True,pose_at(x,y,z),[1,1,1],False)
         # Loading a scene puts the sun back to its default, so a map's lighting is set again for every episode.
-        lighting=map_config.get('lighting')
-        if lighting:self.world.set_time_of_day(True,lighting['time_of_day'],False,1.,1.,True)
+        light=lighting(map_config,layout)
+        if light:self.world.set_time_of_day(True,light['time_of_day'],False,1.,1.,True)
 
     async def reset(self,episode):
         map_config=self.map(episode.get('map','blocks'));layout=episode.get('layout','pilot')
@@ -95,7 +103,10 @@ class SearchEnv:
         self.drone=Drone(self.client,self.world,'Drone1');self.collisions=[]
         self.client.subscribe(self.drone.robot_info['collision_info'],lambda _,message:self.collisions.append(message))
         self.geometry=MapGeometry(map_config,layout);self.target=episode['target'];ground=map_config['ground_z']
-        item=self.geometry.objects[self.target]
+        self.map_config=map_config;self.layout=layout;self.task=episode.get('task','approach');self.scanned=0;self.touchdown=None;self.hit=None
+        item=self.geometry.objects[self.target];self.surface=item['size_m'][2] if item['landable'] else 0.
+        self.corners=[[item['centre'][0]+dx*item['size_m'][0]/2,item['centre'][1]+dy*item['size_m'][1]/2,ground-h*item['size_m'][2]]
+                      for dx in (-1,1) for dy in (-1,1) for h in (0,1)]
         # Scored point: the object's centre at half its height. Sight is tested at several heights because
         # the vehicle's own arms cross the middle rows of the front view.
         self.centre=[item['centre'][0],item['centre'][1],ground-item['size_m'][2]/2]
@@ -108,11 +119,42 @@ class SearchEnv:
         sample=self.drone.get_ground_truth_kinematics();self.flight_stamp=sample['time_stamp']
         self.setpoint_z=adapt_state(sample)['position'][2];self.previous_yaw=None;self.previous_stamp=None
 
-    def collided(self):return any(event.get('time_stamp',0)>self.flight_stamp for event in self.collisions)
+    def contacts(self):
+        """Read the collision events that arrived since the last call: a touchdown on a pad, or a collision.
+
+        A pad (or its marking) touched while the vehicle is above its top is a touchdown; the first one is
+        kept with the vehicle's place at that moment. Anything else touched is a collision."""
+        tolerance=self.landing['touchdown']['from_above_tolerance_m']
+        events=self.collisions[self.scanned:];self.scanned+=len(events)
+        for event in events:
+            if event.get('time_stamp',0)<=self.flight_stamp or self.hit:continue
+            owner=owner_of(self.map_config,self.layout,event.get('object_name',''))
+            top=self.geometry.objects[owner]['size_m'][2] if owner and self.geometry.objects[owner]['landable'] else None
+            # Heights are counted from where the vehicle rested at the start, so standing on a pad reads as the pad's height.
+            if top is not None and self.ground_z-event['position']['z']>=top-tolerance:
+                if self.touchdown is None:
+                    centre=self.geometry.objects[owner]['centre']
+                    self.touchdown={'object':owner,'position':[event['position']['x'],event['position']['y'],event['position']['z']],
+                                    'offset_m':[event['position']['x']-centre[0],event['position']['y']-centre[1]],'time_stamp':event['time_stamp']}
+            else:self.hit=event.get('object_name') or 'unknown'
+        return self.touchdown,self.hit
+
+    def collided(self):return self.contacts()[1] is not None
+
+    def apparent(self,meta):
+        """Size of the target's bounding box in one camera's image, in pixels and as a share of the image. Occlusion is ignored;
+        this is how large the object could look, kept with the log and never shown to a policy."""
+        pixels=[item['pixel'] for item in (target_visibility(corner,meta) for corner in self.corners) if item['pixel']]
+        if len(pixels)<len(self.corners):return None
+        width,height=meta['width'],meta['height']
+        x0,x1=max(0.,min(p[0] for p in pixels)),min(float(width),max(p[0] for p in pixels))
+        y0,y1=max(0.,min(p[1] for p in pixels)),min(float(height),max(p[1] for p in pixels))
+        if x1<=x0 or y1<=y0:return None
+        return {'width_px':round(x1-x0,1),'height_px':round(y1-y0,1),'area_px':round((x1-x0)*(y1-y0),1),'image_fraction':round((x1-x0)*(y1-y0)/(width*height),5)}
 
     def observe(self):
         """Raw frames for the policy plus privileged target geometry for the teacher and the score."""
-        frames={};visibility={}
+        frames={};visibility={};sizes={}
         for sensor,name in (('FrontCamera','front'),('DownCamera','down')):
             for attempt in range(4):
                 # A camera request now and then comes back empty; ask again rather than lose the episode.
@@ -124,6 +166,7 @@ class SearchEnv:
             seen=any(item['in_fov'] and item.get('observed_depth_m') is not None
                      and item['observed_depth_m']>=item['expected_depth_m']-self.config['visibility_margin_m'] for item in items)
             visibility[name]={'in_fov':any(item['in_fov'] for item in items),'seen':bool(seen),'pixel':items[1]['pixel']}
+            sizes[name]=self.apparent(meta)
         sample=self.drone.get_ground_truth_kinematics();state=adapt_state(sample)
         bearing,distance,yaw=relative_target(state,self.centre)
         rate=0.
@@ -136,7 +179,8 @@ class SearchEnv:
                                   settings['corridor_clearance_m'],ignore=(self.target,))
         return {'frames':frames,'state':state,'yaw':yaw,'yaw_rate':rate,'stamp':sample['time_stamp'],
                 'privileged':{'bearing_deg':bearing,'distance_m':distance,'front':visibility['front'],'down':visibility['down'],
-                              'ahead_m':ahead,'height_m':height}}
+                              'ahead_m':ahead,'height_m':height,'over':self.geometry.over(state['position'][0],state['position'][1],self.target),
+                              'surface_m':self.surface,'size':sizes}}
 
     async def tick(self,action,yaw):
         """One small continuous motion; the command outlasts the tick so the next one takes over in flight."""
@@ -157,7 +201,36 @@ class SearchEnv:
         except Exception:pass
 
 
-def summarise(episode,steps,config,reason,stopped,others=None):
+def landing_summary(episode,steps,config,landing,stopped,touchdown,hit,others):
+    """What an episode did about its target and, for a landing, how far through the landing it got."""
+    radius=config['success_radius_m'];stage=landing['stages'];rule=landing['touchdown'];task=episode.get('task','approach');last=steps[-1]
+    distances=[s['distance_m'] for s in steps];seen=[bool(s['front_seen'] or s['down_seen']) for s in steps]
+    # The object the vehicle ended at: the one it stands on, or else the nearest one within the success radius.
+    near=sorted((distance,name) for name,distance in {**(others or {}),episode['target']:last['distance_m']}.items() if distance<=radius)
+    selected=touchdown['object'] if touchdown else near[0][1] if near and stopped else None
+    over=[index for index,s in enumerate(steps) if s.get('over')]
+    descent=bool(over) and min(s['height_m'] for s in steps[over[0]:])<=steps[over[0]]['height_m']-stage['descent_started_m']
+    result={'task':task,'selected':selected,'correct_target':selected==episode['target'],'wrong_target':selected is not None and selected!=episode['target'],
+            'landed':touchdown is not None,'landed_on':touchdown['object'] if touchdown else None,'hit':hit,
+            'stages':{'target_acquired':any(seen),'correct_target':selected==episode['target'],'approached':min(distances)<=stage['approach_m'],
+                      'down_camera_aligned':any(s.get('over') and s['distance_m']<=stage['aligned_m'] for s in steps),
+                      'descent_started':descent,'touchdown':bool(touchdown and touchdown['object']==episode['target']),'self_stop':bool(stopped)}}
+    if touchdown:
+        before=next((s for s in reversed(steps) if not s.get('landed')),steps[0]);velocity=before.get('velocity',[0.,0.,0.])
+        error=math.hypot(*touchdown['offset_m'])
+        result['touchdown']={'object':touchdown['object'],'offset_m':touchdown['offset_m'],'horizontal_error_m':error,
+                             'inside_region':max(abs(v) for v in touchdown['offset_m'])<=rule['landing_region_half_width_m'],
+                             'vertical_speed_mps':velocity[2],'horizontal_speed_mps':math.hypot(velocity[0],velocity[1]),
+                             'step':next((index for index,s in enumerate(steps) if s.get('landed')),len(steps)-1)}
+        result['touchdown']['soft']=(abs(velocity[2])<=rule['max_vertical_speed_mps'] and result['touchdown']['horizontal_speed_mps']<=rule['max_horizontal_speed_mps'])
+    if task=='land':
+        down=result.get('touchdown')
+        result['land_success']=bool(down and down['object']==episode['target'] and down['inside_region'] and down['soft'] and stopped and not hit)
+        result['stages']['land_success']=result['land_success']
+    return result
+
+
+def summarise(episode,steps,config,reason,stopped,others=None,landing=None,touchdown=None,hit=None):
     distances=[s['distance_m'] for s in steps];first=steps[0];last=steps[-1]
     turns=[s['action'][2] for s in steps if abs(s['action'][2])>1e-3]
     toward=None
@@ -170,9 +243,12 @@ def summarise(episode,steps,config,reason,stopped,others=None):
     radius=config['success_radius_m'];heights=[s['height_m'] for s in steps]
     # A stop beside another object of the scene, while the named one is out of range.
     wrong=[name for name,distance in (others or {}).items() if stopped and distance<=radius and last['distance_m']>radius]
-    return {**episode,'reason':reason,'stopped':stopped,'steps':len(steps),'initial_distance_m':first['distance_m'],
+    extra=landing_summary(episode,steps,config,landing,stopped,touchdown,hit,others) if landing else {}
+    # Approach: stopped by itself in the air within the radius. Land: the landing rule (configs/targets/landing_pads.json).
+    success=extra['land_success'] if extra.get('task')=='land' else bool(stopped and last['distance_m']<=radius and reason!='collision' and not extra.get('landed'))
+    return {**episode,**extra,'reason':reason,'stopped':stopped,'steps':len(steps),'initial_distance_m':first['distance_m'],
             'final_distance_m':last['distance_m'],'minimum_distance_m':min(distances),
-            'success':bool(stopped and last['distance_m']<=radius and reason!='collision'),
+            'success':success,
             'reached':min(distances)<=radius,
             'initially_seen':first['front_seen'],'first_turn_toward_target':toward,
             'first_turn':None if not turns else ('right' if turns[0]>0 else 'left'),
@@ -188,14 +264,20 @@ def summarise(episode,steps,config,reason,stopped,others=None):
 async def run_episode(env,episode,policy,args,record):
     config,oft=env.config,env.oft;steps=[];reason='max_steps';stopped=False;stop_count=0
     planned='strategy' in episode;kick=episode.get('kick');kick_left=0.;altitude_setpoint=None
-    teacher=SearchTeacher(config,oft,episode['strategy'],env.ceiling) if planned else Teacher(config,oft)
+    teacher=SearchTeacher(config,oft,episode['strategy'],env.ceiling,env.landing) if planned else Teacher(config,oft)
+    task=episode.get('task','approach');landed_ticks=0
     frames_dir=(record['root']/record['rel']) if record else None
     if record:
         for name in ('frontcamera','downcamera'):(frames_dir/name).mkdir(parents=True,exist_ok=True)
-    limit=config['max_decisions_baseline'] if args.policy=='baseline' else config['generalization']['max_ticks'] if planned else config['max_ticks']
+    limit=config['max_decisions_baseline'] if args.policy=='baseline' else episode.get('max_ticks',config['generalization']['max_ticks']) if planned else config['max_ticks']
     for index in range(limit):
         started=time.monotonic()
-        if env.collided():reason='collision';break
+        touchdown,hit=env.contacts()
+        if hit:reason='collision';break
+        if touchdown:
+            # The vehicle stands on a pad and no longer moves; a policy that has not stopped a few decisions later never will.
+            landed_ticks+=1
+            if landed_ticks>env.landing['after_touchdown_ticks']:reason='landed_no_stop';break
         observation=env.observe();private=observation['privileged'];state=observation['state']
         proprio=proprio_vector(state,env.ground_z,oft,observation['yaw_rate'])
         inputs=policy_inputs(observation['frames']['front'],observation['frames']['down'],episode['instruction'],
@@ -204,6 +286,7 @@ async def run_episode(env,episode,policy,args,record):
               'height_m':private['height_m'],'bearing_deg':private['bearing_deg'],'distance_m':private['distance_m'],
               'front_seen':private['front']['seen'],'front_in_fov':private['front']['in_fov'],'down_seen':private['down']['seen'],
               'front_pixel':private['front']['pixel'],'down_pixel':private['down']['pixel'],'ahead_m':private['ahead_m'],
+              'over':private['over'],'landed':touchdown is not None,'velocity':state['velocity'],'target_size':private['size'],
               'input_sha256':{name:digest(inputs[name]) for name in ('front','down')},'proprio':proprio}
         perturbed=False
         if args.policy=='baseline':
@@ -225,7 +308,9 @@ async def run_episode(env,episode,policy,args,record):
         else:
             if planned:
                 label,mode=teacher.act({'bearing_deg':private['bearing_deg'],'distance_m':private['distance_m'],'visible':private['front']['seen'],
-                                        'below':private['down']['seen'],'ahead_m':private['ahead_m'],'height_m':private['height_m']})
+                                        'below':private['down']['seen'],'ahead_m':private['ahead_m'],'height_m':private['height_m'],
+                                        'over':private['over'],'surface_m':private['surface_m'],'task':task,
+                                        'landed':bool(touchdown and touchdown['object']==episode['target'])})
             else:label,mode=teacher.act(private['bearing_deg'],private['distance_m'],private['front']['seen'])
             if args.policy=='teacher':
                 action=label;step['teacher_state']=mode;step['teacher_action']=list(label)
@@ -259,13 +344,14 @@ async def run_episode(env,episode,policy,args,record):
                                              'success_radius_m':config['success_radius_m'],'failure':'NORMAL',
                                              'raw_sha256':{name:digest(observation['frames'][name]) for name in ('front','down')}}))
             temporary.replace(Path(args.output)/'live.json')
-    if env.collided():reason='collision'
+    touchdown,hit=env.contacts()
+    if hit:reason='collision'
     others=env.others(steps[-1]['position']) if steps else None
     await env.close()
     if args.live:
         (Path(args.output)/'live_result.json').write_text(json.dumps({'episode':episode['id'],'reason':reason,'stopped':stopped,
                                                                       'final_distance_m':steps[-1]['distance_m'] if steps else None}))
-    return summarise(episode,steps,config,reason,stopped,others),steps
+    return summarise(episode,steps,config,reason,stopped,others,env.landing,touchdown,hit),steps
 
 
 def planned_episodes(args,config):

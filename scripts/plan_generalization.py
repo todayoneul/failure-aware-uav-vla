@@ -10,6 +10,11 @@
   figure  draw the map with every planned start
   long    write configs/long_range_test_spawns.json once: fresh held-out starts in three bands of start
           distance (L1, L2, L3), in both scenes, for seen and unseen objects, away from every earlier start
+  v3-test   write configs/gen_v3_test_spawns.json once: the fresh Gen-v3 sets (grounding among distractors,
+            position and query swaps, approach or land, far starts, the canonical landing mission)
+  v3-train  write the added Gen-v3 training and validation plans, kept away from every evaluation start
+  v3-pilot  write the small plan of the canonical check (each pose once to land and once to approach)
+  v3-check  confirm that a Gen-v3 plan stays out of the test scene, the test layouts and the test starts
 """
 import argparse
 import collections
@@ -24,6 +29,7 @@ from src.visual_search.episodes import load_config
 from src.visual_search.maps import load_map,MapGeometry,object_position
 from src.visual_search.generalization import (make_start,plan_split,plan_targeted,rollout,sector_of,band_of,in_wedge,exclusion,
                                               instruction_for_id,BANDS,KINDS)
+from src.visual_search import gen_v3
 from src.aerovla_oft.spec import load_config as load_oft_config
 
 TEST_FILE=ROOT/'configs/generalization_test_spawns.json'
@@ -43,6 +49,7 @@ EARLIER_PLANS=('outputs/examples/generalization/dataset_plan.json','outputs/exam
 LONG_ROWS=(('blocks','a','blue_cone'),('blocks','b','orange_ball'),('blocks','a','red_cube'),('blocks','b','green_cylinder'),
            ('yard','a','blue_cone'),('yard','a','orange_ball'),('yard','a','red_cube'),('yard','a','green_cylinder'),
            ('blocks','a_new','yellow_pyramid'),('blocks','b_new','yellow_pyramid'),('yard','a_new','yellow_pyramid'),('yard','a_new','yellow_pyramid'))
+V3_FILE=ROOT/'configs/gen_v3_test_spawns.json'
 SIDE_BEARINGS=(('left',-90.),('right',90.),('behind_left',-135.),('behind_right',135.))
 WEDGE_DEG=60.
 
@@ -196,6 +203,40 @@ def build_long(config,oft,held_out):
                                                 for e in json.loads((ROOT/path).read_text(encoding='utf-8'))[key]),'sets':sets}
 
 
+def describe_v3(episodes):
+    return {'episodes':len(episodes),'by_kind':histogram(episodes,lambda e:e['kind']),'by_task':histogram(episodes,lambda e:e.get('task','approach')),
+            'by_map':histogram(episodes,lambda e:e['map']),'by_layout':histogram(episodes,lambda e:f'{e["map"]}/{e["layout"]}'),
+            'by_target':histogram(episodes,lambda e:e['target']),'by_instruction':histogram(episodes,lambda e:e['instruction']),
+            'by_start_distance':histogram(episodes,lambda e:'55 m and more' if e['start_distance_m']>=55 else '24-55 m' if e['start_distance_m']>=24 else 'under 24 m'),
+            'start_in_view':sum(e['plan']['acquired_tick']==0 for e in episodes),
+            'another_object_in_first_view':sum(any(o['distance_m']<=90 for o in e.get('others_in_view',[])) for e in episodes),
+            'teacher_ticks':[min(e['plan']['ticks'] for e in episodes),max(e['plan']['ticks'] for e in episodes)]}
+
+
+def check_v3(config,test,plans,held_out,long_range):
+    """A Gen-v3 training plan may not touch the test scene, a test layout, a held-out object, a test sentence or a test start."""
+    settings=config['gen_v3'];problems=[];points=gen_v3.test_points(test,held_out,long_range);radius=settings['separation_m'];maps={}
+    unseen={phrase for task in settings['instructions'].values() for phrase in task['held_out']}
+    for split,episodes in plans.items():
+        low,high=settings['seeds'][split]
+        for episode in episodes:
+            scene=maps.setdefault(episode['map'],load_map(episode['map']))
+            if episode['map'] not in settings['train_layouts'] or episode['layout'] not in settings['train_layouts'][episode['map']]:
+                problems.append(f'{episode["id"]}: {episode["map"]}/{episode["layout"]} is not a training layout')
+            if set(scene['layouts'][episode['layout']])&set(scene['held_out_objects']) or episode['target'] in scene['held_out_objects']:
+                problems.append(f'{episode["id"]}: a held-out object stands in the layout')
+            if episode['instruction_id'] in unseen:problems.append(f'{episode["id"]}: told in held-out words')
+            if not low<=episode['seed']<=high:problems.append(f'{episode["id"]}: seed outside the {split} range')
+            for where,(px,py) in points:
+                if where==episode['map'] and math.hypot(episode['start_xy'][0]-px,episode['start_xy'][1]-py)<radius:
+                    problems.append(f'{episode["id"]}: within {radius} m of an evaluation start');break
+            wedge=gen_v3.site_wedge(held_out,scene,episode['layout'],episode['target'])
+            if wedge and in_wedge(episode['start_direction_deg'],wedge):problems.append(f'{episode["id"]}: inside a held-out wedge')
+    ids=[e['id'] for episodes in plans.values() for e in episodes]
+    if len(ids)!=len(set(ids)):problems.append('duplicate episode ids')
+    return problems
+
+
 def histogram(episodes,key):return dict(sorted(collections.Counter(key(episode) for episode in episodes).items()))
 
 
@@ -285,7 +326,9 @@ def main():
     checker=commands.add_parser('check');checker.add_argument('--plan',required=True)
     draw=commands.add_parser('figure');draw.add_argument('--plan');draw.add_argument('--map',default='blocks');draw.add_argument('--layout',default='a')
     draw.add_argument('--sets',nargs='+',default=['G1','S']);draw.add_argument('--output',required=True)
-    commands.add_parser('long')
+    commands.add_parser('long');commands.add_parser('v3-test')
+    for name in ('v3-train','v3-pilot'):commands.add_parser(name).add_argument('--output',required=True)
+    commands.add_parser('v3-check').add_argument('--plan',required=True)
     args=parser.parse_args();config=load_config();oft=load_oft_config()
     if args.command=='test':
         if TEST_FILE.exists():raise SystemExit(f'{TEST_FILE} exists; the held-out starts are fixed and are not regenerated')
@@ -303,6 +346,29 @@ def main():
                                    'nearest_training':min((e['nearest_training_start_m'] for e in episodes if e['nearest_training_start_m'] is not None),default=None),
                                    'nearest_held_out':min((e['nearest_held_out_start_m'] for e in episodes if e['nearest_held_out_start_m'] is not None),default=None),
                                    'teacher_ticks':[min(e['plan']['ticks'] for e in episodes),max(e['plan']['ticks'] for e in episodes)]}))
+        return
+    if args.command.startswith('v3'):
+        if args.command=='v3-test':
+            if V3_FILE.exists():raise SystemExit(f'{V3_FILE} exists; the Gen-v3 test starts are fixed and are not regenerated')
+            data=gen_v3.build_test(config,oft);V3_FILE.write_text(json.dumps(data,indent=1)+chr(10),encoding='utf-8',newline=chr(10))
+            for name,episodes in data['sets'].items():print(name,json.dumps(describe_v3(episodes)))
+            return
+        test=json.loads(V3_FILE.read_text(encoding='utf-8'));long_range=json.loads(LONG_FILE.read_text(encoding='utf-8'))
+        if args.command=='v3-check':
+            plan=json.loads(Path(args.plan).read_text());plans={split:plan[split] for split in ('train','val','pilot') if split in plan}
+        elif args.command=='v3-pilot':plans={'pilot':gen_v3.plan_pilot(config,oft)}
+        else:
+            points=gen_v3.test_points(test,held_out,long_range)
+            plans={split:gen_v3.plan_training(config,oft,split,points,held_out) for split in ('train','val')}
+        problems=check_v3(config,test,plans,held_out,long_range)
+        if problems:raise SystemExit(chr(10).join(problems))
+        if args.command=='v3-check':
+            print(f'OK: {sum(len(v) for v in plans.values())} planned starts are clear of the test scene, the test layouts, the held-out words and '
+                  f'{len(gen_v3.test_points(test,held_out,long_range))} evaluation starts (radius {config["gen_v3"]["separation_m"]} m)');return
+        output=Path(args.output);output.mkdir(parents=True,exist_ok=True)
+        (output/'plan.json').write_text(json.dumps({'recipe':'gen_v3','test_file':V3_FILE.relative_to(ROOT).as_posix(),
+                                                    'summary':{split:describe_v3(episodes) for split,episodes in plans.items()},**plans},indent=1))
+        for split,episodes in plans.items():print(split,json.dumps(describe_v3(episodes)))
         return
     if args.command=='train':
         map_config=load_map(args.map);seeds=config['generalization']['seeds']

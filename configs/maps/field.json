@@ -1,0 +1,38 @@
+{
+  "id": "field",
+  "name": "Field",
+  "description": "A training scene assembled at run time far from the Blocks geometry, inside the same simulator binary: grass, hedges, a barn, a silo. Eight object sites, three of them 42 m pairs so that two candidates can share one view. Layouts a-d are trained on and differ in where every object stands, in the colour of the ground and in the time of day; layout e is kept for testing.",
+  "scene": "scene_basic_drone.jsonc",
+  "obstacles": null,
+  "catalogue": "../targets/objects.json",
+  "ground_z": -1.0,
+  "origin": [-3000.0, 3000.0],
+  "area": {"x": [-135.0, 135.0], "y": [-135.0, 135.0]},
+  "altitude": {"start_m": [5.0, 9.0], "ceiling_m": 14.0},
+  "lighting": {"time_of_day": "2024-06-21 10:00:00"},
+  "layout_lighting": {"c": {"time_of_day": "2024-06-21 15:30:00"}, "d": {"time_of_day": "2024-06-21 15:30:00"}},
+  "structures": [
+    {"name": "FieldGrass", "shape": "box", "size_m": [560.0, 560.0, 0.3], "position": [0.0, 0.0], "color": [0.33, 0.42, 0.27], "obstacle": false, "lift_m": -0.25, "layouts": ["a", "b", "e"]},
+    {"name": "FieldDryGrass", "shape": "box", "size_m": [560.0, 560.0, 0.3], "position": [0.0, 0.0], "color": [0.5, 0.52, 0.4], "obstacle": false, "lift_m": -0.25, "layouts": ["c", "d"]},
+    {"name": "FieldHedge1", "shape": "box", "size_m": [3.0, 36.0, 4.0], "position": [-45.0, 5.0], "color": [0.1, 0.28, 0.1]},
+    {"name": "FieldHedge2", "shape": "box", "size_m": [36.0, 3.0, 4.0], "position": [30.0, 25.0], "color": [0.1, 0.28, 0.1]},
+    {"name": "FieldBarn", "shape": "box", "size_m": [18.0, 12.0, 9.0], "position": [-100.0, 40.0], "color": [0.42, 0.3, 0.2]},
+    {"name": "FieldSilo", "shape": "cylinder", "size_m": [9.0, 9.0, 16.0], "position": [40.0, -25.0], "color": [0.75, 0.75, 0.72]},
+    {"name": "FieldWall", "shape": "box", "size_m": [3.0, 36.0, 9.0], "position": [-30.0, -80.0], "color": [0.6, 0.55, 0.5]},
+    {"name": "FieldShed", "shape": "box", "size_m": [14.0, 10.0, 6.0], "position": [100.0, 20.0], "color": [0.6, 0.6, 0.55]},
+    {"name": "FieldTower", "shape": "box", "size_m": [5.0, 5.0, 20.0], "position": [-20.0, 105.0], "color": [0.8, 0.8, 0.82]}
+  ],
+  "sites": {"S1": [-80.0, -60.0], "S2": [-80.0, -18.0], "S3": [10.0, 70.0], "S4": [52.0, 70.0], "S5": [60.0, -70.0], "S6": [88.0, -38.0], "S7": [-40.0, 60.0], "S8": [0.0, -30.0]},
+  "pairs": [["S1", "S2"], ["S3", "S4"], ["S5", "S6"]],
+  "train_objects": ["blue_pad", "red_pad", "blue_cube", "red_cube", "blue_cylinder", "green_cylinder", "orange_ball", "blue_cone"],
+  "held_out_objects": [],
+  "layouts": {
+    "a": {"blue_pad": "S1", "red_pad": "S2", "blue_cylinder": "S3", "green_cylinder": "S4", "blue_cube": "S5", "red_cube": "S6", "orange_ball": "S7", "blue_cone": "S8"},
+    "b": {"red_pad": "S1", "blue_pad": "S2", "green_cylinder": "S3", "blue_cylinder": "S4", "red_cube": "S5", "blue_cube": "S6", "blue_cone": "S7", "orange_ball": "S8"},
+    "c": {"blue_cylinder": "S1", "red_cube": "S2", "blue_pad": "S3", "blue_cube": "S4", "red_pad": "S5", "orange_ball": "S6", "green_cylinder": "S7", "blue_cone": "S8"},
+    "d": {"blue_cone": "S1", "green_cylinder": "S2", "red_cube": "S3", "red_pad": "S4", "blue_cylinder": "S5", "blue_pad": "S6", "blue_cube": "S7", "orange_ball": "S8"},
+    "e": {"red_pad": "S1", "blue_cylinder": "S2", "green_cylinder": "S3", "red_cube": "S4", "blue_cone": "S5", "blue_cube": "S6", "blue_pad": "S7", "orange_ball": "S8"}
+  },
+  "train_layouts": ["a", "b", "c", "d"],
+  "held_out_layouts": ["e"]
+}

@@ -13,7 +13,7 @@ comparison and are marked as such.
 """
 import math
 import random
-from .maps import MapGeometry
+from .maps import MapGeometry,load_landing
 
 KINDS=('visible','peripheral','search','altitude','reacquire')
 SECTORS=('front','front_right','right','behind_right','behind','behind_left','left','front_left')
@@ -22,6 +22,9 @@ BANDS=('near','medium','far')
 STATELESS_STRATEGIES=('right',)
 MEMORY_STRATEGIES=('left','scan','last_seen','sweep_climb')
 STRATEGIES=STATELESS_STRATEGIES+MEMORY_STRATEGIES
+# What an instruction asks for at the end: stop in the air near the object, or touch down on it.
+TASKS=('approach','land')
+STOP_STATES=('stop','landed')
 
 
 def sector_of(bearing_deg):
@@ -56,10 +59,15 @@ class SearchTeacher:
     Close and in view (front or down camera): stop. In view: turn to it and fly forward once roughly
     centred, climbing first if something close stands in the way. Not in view: climb if a close
     obstacle fills the view ahead, otherwise keep turning.
+
+    When the view says the task is to land (`task`), nothing changes until the target is found; then
+    it flies on over the pad instead of stopping short, descends once it is over the middle, and
+    gives the zero action only after touchdown. Every label is still a function of the two views.
     """
-    def __init__(self,config,oft,strategy='right',ceiling_m=14.):
+    def __init__(self,config,oft,strategy='right',ceiling_m=14.,landing=None):
         if strategy not in STRATEGIES:raise ValueError(f'Unknown search strategy: {strategy!r}')
         self.config=config;self.settings=config['generalization']['teacher'];self.strategy=strategy;self.ceiling=ceiling_m
+        self.landing=(landing or load_landing())['teacher']
         (_,self.forward_max),(_,self.down_max),(_,self.yaw_max)=oft['action_bounds'].values()
         self.last_side=None;self.swept=0.;self.pending_climb=0.
         self.leg_sign=1.;self.leg_left=self.leg_length=self.settings['scan_deg']
@@ -78,9 +86,25 @@ class SearchTeacher:
     def act(self,view):
         """view: bearing_deg, distance_m, visible, below, ahead_m, height_m -> (action, state name)."""
         settings=self.settings;bearing=view['bearing_deg'];distance=view['distance_m']
-        if distance<=self.config['arrive_distance_m'] and (view['visible'] or view['below']):
+        landing=view.get('task')=='land'
+        if landing and view.get('landed'):return [0.,0.,0.],'landed'
+        if not landing and distance<=self.config['arrive_distance_m'] and (view['visible'] or view['below']):
             return [0.,0.,0.],'stop'
         can_climb=view['height_m']<self.ceiling-.25
+        if landing and (view['visible'] or view['below'] or view.get('over')):
+            land=self.landing;above=view['height_m']-view['surface_m']
+            self.last_side=1. if bearing>=0 else -1.;self.swept=0.
+            if distance<=land['align_radius_m']:
+                # Over the middle of the pad: straight down, slower over the last metres.
+                return [0.,self.down_max if above>land['slow_height_m'] else land['final_descent_m'],0.],'descend'
+            yaw=max(-self.yaw_max,min(self.yaw_max,math.radians(bearing)))
+            if view['visible'] and view['ahead_m']<settings['safety_m'] and can_climb:return [0.,-self.down_max,yaw],'climb'
+            forward=self.forward_max*max(0.,1-abs(bearing)/settings['centre_deg'])
+            # Ease in over the pad instead of flying across it.
+            forward=min(forward,max(land['min_forward_m'],distance/land['ease_m']))
+            # Coming in high, lose height on the way so the pad stays in one of the two views.
+            down=land['glide_down_m'] if distance<=land['glide_distance_m'] and above>land['glide_height_m'] else 0.
+            return [forward,down,yaw],('approach' if distance>self.config['arrive_distance_m'] else 'final') if forward>.05 else 'align'
         if view['visible']:
             self.last_side=1. if bearing>=0 else -1.;self.swept=0.
             self.leg_sign=1.;self.leg_left=self.leg_length=settings['scan_deg']
@@ -115,6 +139,7 @@ def geometric_view(config,geometry,target,x,y,height_m,yaw_rad):
     top=item['size_m'][2]
     below=height_m>top and distance-item['size_m'][0]/2<=(height_m-top)*math.tan(math.radians(half))
     return {'bearing_deg':bearing,'distance_m':distance,'visible':visible,'below':below,'height_m':height_m,
+            'over':geometry.over(x,y,target),'surface_m':top if item['landable'] else 0.,
             'ahead_m':geometry.ahead(x,y,yaw_rad,height_m,settings['ahead_reach_m'],settings['corridor_clearance_m'],ignore=(target,))}
 
 
@@ -129,25 +154,32 @@ def kick_turn(episode,index,left,yaw_max):
 
 def rollout(config,oft,geometry,episode,ceiling_m):
     """Fly the teacher through an episode on the map's boxes: kinematics only, no simulator."""
-    settings=config['generalization'];teacher=SearchTeacher(config,oft,episode['strategy'],ceiling_m)
+    settings=config['generalization'];landing=load_landing();teacher=SearchTeacher(config,oft,episode['strategy'],ceiling_m,landing)
     x,y=episode['start_xy'];yaw=math.radians(episode['start_yaw_deg']);height=episode['start_height_m'];target=episode['target']
     kick_left=0.;stops=0;clearance=float('inf');states={};acquired=None;top=height;reason='max_steps';tick=0
-    yaw_max=oft['action_bounds']['yaw_rad'][1]
-    for tick in range(settings['max_ticks']):
+    yaw_max=oft['action_bounds']['yaw_rad'][1];task=episode.get('task','approach');landed=False
+    # Heights are counted from where the vehicle rests on the ground, so standing on a pad reads as the pad's height.
+    rest=geometry.objects[target]['size_m'][2]
+    for tick in range(episode.get('max_ticks',settings['max_ticks'])):
         view=geometric_view(config,geometry,target,x,y,height,yaw)
+        # Touchdown: over the pad and down on its top. The simulator holds the vehicle there.
+        landed=landed or (task=='land' and view['over'] and height<=rest+1e-6)
+        view.update(task=task,landed=landed)
         action,state=teacher.act(view)
         if view['visible'] and acquired is None:acquired=tick
         turn,kick_left=kick_turn(episode,tick,kick_left,yaw_max)
         if turn is not None:action=[0.,0.,turn];state='kick'
         states[state]=states.get(state,0)+1
-        stops=stops+1 if state=='stop' else 0
+        stops=stops+1 if state in STOP_STATES else 0
         if stops>=config['stop_ticks']:reason='teacher_stop';break
+        if landed:continue
         yaw+=action[2];x+=action[0]*math.cos(yaw);y+=action[0]*math.sin(yaw);height-=action[1];top=max(top,height)
+        if task=='land' and geometry.over(x,y,target):height=max(height,rest)
         clearance=min(clearance,geometry.nearest(x,y,above_m=height-settings['corridor_clearance_m'],ignore=(target,))[0])
         if clearance<settings['rollout_clearance_m']:reason='too_close';break
     final=math.hypot(geometry.objects[target]['centre'][0]-x,geometry.objects[target]['centre'][1]-y)
     return {'reason':reason,'ticks':tick+1,'clearance_m':clearance,'climbed_m':top-episode['start_height_m'],'states':states,
-            'acquired_tick':acquired,'final_distance_m':final}
+            'acquired_tick':acquired,'final_distance_m':final,'landed':landed}
 
 
 def _bearing(settings,kind,rng,side=None,span=None):
@@ -162,14 +194,47 @@ def _bearing(settings,kind,rng,side=None,span=None):
     return sign*rng.uniform(low,high)
 
 
+def related(map_config,target,other,relation):
+    """Whether `other` is a distractor of the given kind for `target`: same_color, same_shape, a list of names, or any."""
+    if other==target:return False
+    if isinstance(relation,(list,tuple)):return other in relation
+    if relation in ('same_color','same_shape'):
+        key=relation.split('_')[1];a=map_config['objects'][target].get('attributes',{});b=map_config['objects'][other].get('attributes',{})
+        return key in a and a.get(key)==b.get(key)
+    return True
+
+
+def others_in_view(config,geometry,target,x,y,height_m,yaw_deg,view_deg):
+    """Every other object of the layout that the front view shows from a pose: name, bearing (right positive), distance."""
+    found=[]
+    for name,item in geometry.objects.items():
+        if name==target:continue
+        dx,dy=item['centre'][0]-x,item['centre'][1]-y
+        bearing=(math.degrees(math.atan2(dy,dx))-yaw_deg+180.)%360.-180.
+        if abs(bearing)<=view_deg and geometry.sees(x,y,height_m,name):
+            found.append({'name':name,'bearing_deg':round(bearing,1),'distance_m':round(math.hypot(dx,dy),1)})
+    return found
+
+
+def distractor_ok(rule,map_config,target,distance,shown):
+    """Does the start show a distractor the way a rule asks: in view, near the middle of it, or nearer than the target."""
+    fits=[item for item in shown if related(map_config,target,item['name'],rule.get('relation','any')) and item['distance_m']<=rule.get('within_m',float('inf'))]
+    if rule.get('centred_deg') is not None:fits=[item for item in fits if abs(item['bearing_deg'])<=rule['centred_deg']]
+    if rule.get('nearer_by_m') is not None:fits=[item for item in fits if item['distance_m']<=distance-rule['nearer_by_m']]
+    # Side by side: about as far away as the target, so neither stands out by its size in the view.
+    if rule.get('max_gap_m') is not None:fits=[item for item in fits if abs(item['distance_m']-distance)<=rule['max_gap_m']]
+    return bool(fits)
+
+
 def make_start(config,oft,map_config,layout,target,kind,band,seed,split,strategy='right',side=None,
-               direction_deg=None,excluded=None,instruction_id=None,name=None,spec=None):
+               direction_deg=None,excluded=None,instruction_id=None,name=None,spec=None,task='approach',max_ticks=None):
     """One start state, or None when the map offers none of this kind for this object.
 
     `direction_deg` restricts where the start lies as seen from the target (low, high); `excluded`
     is a predicate over (x, y, direction) that keeps training starts away from held-out ones.
     `spec` describes a targeted kind: the base kind whose rules it follows and its own ranges of
-    distance, target bearing and start height.
+    distance, target bearing and start height; `spec['distractor']` asks for another object in the
+    first view. `task` is what the instruction asks for at the end (approach or land).
     """
     settings=config['generalization'];geometry=MapGeometry(map_config,layout);centre=geometry.objects[target]['centre']
     rng=random.Random(f'{map_config["id"]}|{split}|{seed}|{target}|{kind}|{band}')
@@ -197,17 +262,24 @@ def make_start(config,oft,map_config,layout,target,kind,band,seed,split,strategy
             if not sees:continue
             if not geometry.corridor_clear((x,y),centre,height,settings['corridor_half_width_m'],settings['corridor_clearance_m'],ignore=(target,)):continue
         to_target=math.degrees(math.atan2(centre[1]-y,centre[0]-x))
+        shown=None
+        if spec.get('distractor') or task=='land':
+            shown=others_in_view(config,geometry,target,x,y,height,to_target-bearing,settings['fov_half_deg'])
+            if spec.get('distractor') and not distractor_ok(spec['distractor'],map_config,target,distance,shown):continue
         episode={'id':name or f'{split}-{seed:04d}-{target}-{label}','split':split,'seed':seed,'map':map_config['id'],'layout':layout,
                  'target':target,'kind':label,'case':label,'band':band_of(config,distance) if spec else band,'sector':sector_of(bearing),'strategy':strategy,
                  'start_xy':[round(x,2),round(y,2)],'start_yaw_deg':round(to_target-bearing,2),'start_height_m':round(height,2),
                  'target_bearing_deg':round(bearing,2),'start_distance_m':round(distance,2),'start_direction_deg':round(direction%360.,2),
                  'instruction_id':instruction_id,'instruction':instruction_for_id(config,map_config,target,instruction_id)}
         if spec:episode['base']=kind
+        if task!='approach' or max_ticks or shown is not None:
+            episode['task']=task;episode['others_in_view']=shown or []
+            if max_ticks:episode['max_ticks']=max_ticks
         if kind=='reacquire':
             kick=settings['kick']
             episode['kick']={'after_ticks':rng.randint(*kick['after_ticks']),'degrees':round(rng.choice((-1,1))*rng.uniform(*kick['degrees']),1)}
         plan=rollout(config,oft,geometry,episode,ceiling)
-        if plan['reason']!='teacher_stop':continue
+        if plan['reason']!='teacher_stop' or (task=='land' and not plan['landed']):continue
         if kind=='altitude' and plan['climbed_m']<settings['altitude_min_climb_m']:continue
         if kind!='altitude' and plan['climbed_m']>0:continue
         episode['plan']={'ticks':plan['ticks'],'clearance_m':round(plan['clearance_m'],2),'climbed_m':round(plan['climbed_m'],2),
@@ -217,7 +289,29 @@ def make_start(config,oft,map_config,layout,target,kind,band,seed,split,strategy
 
 
 def instruction_for_id(config,map_config,target,instruction_id):
-    return config['instructions'][instruction_id].format(noun=map_config['objects'][target]['noun'])
+    spec=map_config['objects'][target]
+    return config['instructions'][instruction_id].format(noun=spec['noun'],noun_long=spec.get('noun_long',spec['noun']))
+
+
+def variant(config,oft,map_config,episode,name,layout=None,target=None,task=None,instruction_id=None,split=None,allow_climb=False):
+    """The same vehicle pose with something else changed: the layout, the object named, or what the sentence asks for.
+
+    Returns None when the teacher does not finish the changed episode in the dry run."""
+    layout=layout or episode['layout'];target=target or episode['target'];task=task or episode.get('task','approach')
+    geometry=MapGeometry(map_config,layout);centre=geometry.objects[target]['centre'];x,y=episode['start_xy']
+    to_target=math.degrees(math.atan2(centre[1]-y,centre[0]-x));bearing=(to_target-episode['start_yaw_deg']+180.)%360.-180.
+    instruction_id=instruction_id or episode['instruction_id'];distance=math.hypot(centre[0]-x,centre[1]-y)
+    changed={k:v for k,v in episode.items() if k not in ('plan','kick','requested_kind','in_wedge')}
+    changed.update(id=name,layout=layout,target=target,task=task,split=split or episode['split'],target_bearing_deg=round(bearing,2),
+                   start_distance_m=round(distance,2),start_direction_deg=round(math.degrees(math.atan2(y-centre[1],x-centre[0]))%360.,2),
+                   sector=sector_of(bearing),instruction_id=instruction_id,instruction=instruction_for_id(config,map_config,target,instruction_id),
+                   others_in_view=others_in_view(config,geometry,target,x,y,episode['start_height_m'],episode['start_yaw_deg'],
+                                                 config['generalization']['fov_half_deg']),base_start=episode['id'])
+    plan=rollout(config,oft,geometry,changed,map_config['altitude']['ceiling_m'])
+    if plan['reason']!='teacher_stop' or (task=='land' and not plan['landed']) or (plan['climbed_m']>0 and not allow_climb):return None
+    changed['plan']={'ticks':plan['ticks'],'clearance_m':round(plan['clearance_m'],2),'climbed_m':round(plan['climbed_m'],2),
+                     'acquired_tick':plan['acquired_tick'],'states':plan['states']}
+    return changed
 
 
 def exclusion(held_out,map_id,layout,target,radius_m):

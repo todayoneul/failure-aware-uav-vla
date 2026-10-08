@@ -1,0 +1,41 @@
+{
+  "id": "depot",
+  "name": "Depot",
+  "description": "Scene C: a fresh held-out scene within the same simulator and run time, assembled far from every other scene: gravel, container rows, a crane, tanks, and a low morning sun. No training or validation episode was ever flown here and its layouts were fixed before any Gen-v3 training data was planned. The yellow pyramid, which no training scene contains, stands here as a distractor.",
+  "scene": "scene_basic_drone.jsonc",
+  "obstacles": null,
+  "catalogue": "../targets/objects.json",
+  "ground_z": -1.0,
+  "origin": [-3000.0, -3000.0],
+  "area": {"x": [-135.0, 135.0], "y": [-135.0, 135.0]},
+  "altitude": {"start_m": [5.0, 9.0], "ceiling_m": 14.0},
+  "lighting": {"time_of_day": "2024-06-21 08:00:00"},
+  "structures": [
+    {"name": "DepotGravel", "shape": "box", "size_m": [560.0, 560.0, 0.3], "position": [0.0, 0.0], "color": [0.46, 0.4, 0.36], "obstacle": false, "lift_m": -0.25},
+    {"name": "DepotRow1", "shape": "box", "size_m": [5.0, 28.0, 5.2], "position": [-35.0, 30.0], "color": [0.85, 0.85, 0.8]},
+    {"name": "DepotRow2", "shape": "box", "size_m": [26.0, 5.0, 7.8], "position": [10.0, -55.0], "color": [0.33, 0.36, 0.28]},
+    {"name": "DepotCrane", "shape": "box", "size_m": [5.0, 5.0, 22.0], "position": [30.0, 5.0], "color": [0.35, 0.35, 0.38]},
+    {"name": "DepotTank1", "shape": "cylinder", "size_m": [14.0, 14.0, 8.0], "position": [70.0, 75.0], "color": [0.9, 0.9, 0.9]},
+    {"name": "DepotTank2", "shape": "cylinder", "size_m": [14.0, 14.0, 8.0], "position": [-40.0, -85.0], "color": [0.9, 0.9, 0.9]},
+    {"name": "DepotWall", "shape": "box", "size_m": [40.0, 3.0, 9.0], "position": [-20.0, -20.0], "color": [0.5, 0.45, 0.4]},
+    {"name": "DepotShed", "shape": "box", "size_m": [16.0, 10.0, 6.0], "position": [105.0, -60.0], "color": [0.3, 0.3, 0.33]},
+    {"name": "DepotGantry", "shape": "box", "size_m": [3.0, 30.0, 12.0], "position": [-110.0, 10.0], "color": [0.55, 0.5, 0.3]}
+  ],
+  "sites": {"D1": [-70.0, -40.0], "D2": [-70.0, 2.0], "D3": [-10.0, 75.0], "D4": [30.0, 60.0], "D5": [60.0, -75.0], "D6": [60.0, -33.0], "D7": [95.0, 30.0], "D8": [-5.0, -90.0], "D9": [-95.0, 70.0]},
+  "pairs": [["D1", "D2"], ["D3", "D4"], ["D5", "D6"]],
+  "train_objects": [],
+  "seen_objects": ["blue_pad", "red_pad", "blue_cube", "red_cube", "blue_cylinder", "green_cylinder", "orange_ball", "blue_cone"],
+  "held_out_objects": ["yellow_pyramid"],
+  "layouts": {
+    "c1": {"blue_pad": "D1", "red_pad": "D2", "blue_cylinder": "D3", "blue_cube": "D4", "red_cube": "D5", "green_cylinder": "D6", "orange_ball": "D7", "blue_cone": "D8", "yellow_pyramid": "D9"},
+    "c2": {"red_pad": "D1", "blue_pad": "D2", "blue_cylinder": "D3", "blue_cube": "D4", "red_cube": "D5", "green_cylinder": "D6", "orange_ball": "D7", "blue_cone": "D8", "yellow_pyramid": "D9"},
+    "c3": {"blue_cube": "D1", "red_cube": "D2", "blue_pad": "D3", "blue_cylinder": "D4", "red_pad": "D5", "yellow_pyramid": "D6", "green_cylinder": "D7", "orange_ball": "D8", "blue_cone": "D9"},
+    "c4": {"blue_cube": "D1", "red_cube": "D2", "blue_cylinder": "D3", "blue_pad": "D4", "red_pad": "D5", "yellow_pyramid": "D6", "green_cylinder": "D7", "orange_ball": "D8", "blue_cone": "D9"},
+    "c5": {"orange_ball": "D1", "green_cylinder": "D2", "red_pad": "D3", "red_cube": "D4", "blue_pad": "D5", "blue_cube": "D6", "blue_cylinder": "D7", "yellow_pyramid": "D8", "blue_cone": "D9"},
+    "c6": {"orange_ball": "D1", "green_cylinder": "D2", "red_pad": "D3", "red_cube": "D4", "blue_cube": "D5", "blue_pad": "D6", "blue_cylinder": "D7", "yellow_pyramid": "D8", "blue_cone": "D9"},
+    "c7": {"blue_cone": "D1", "blue_cylinder": "D2", "red_cube": "D3", "green_cylinder": "D4", "orange_ball": "D5", "red_pad": "D6", "blue_pad": "D7", "blue_cube": "D8", "yellow_pyramid": "D9"}
+  },
+  "swaps": {"c1": "c2", "c2": "c1", "c3": "c4", "c4": "c3", "c5": "c6", "c6": "c5"},
+  "train_layouts": [],
+  "held_out_layouts": ["c1", "c2", "c3", "c4", "c5", "c6", "c7"]
+}

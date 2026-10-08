@@ -14,7 +14,15 @@ from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[2]
 MAPS=ROOT/'configs/maps'
+TARGETS=ROOT/'configs/targets'
 SIGHT_FRACTIONS=(.25,.5,.75,.9)
+# A pad is seen by its top surface: its centre (second, as the reference point) and a point toward each edge.
+PAD_SIGHT=((1,0),(0,0),(-1,0),(0,1),(0,-1))
+
+
+def load_landing():
+    """The landing rule (configs/targets/landing_pads.json)."""
+    return json.loads((TARGETS/'landing_pads.json').read_text(encoding='utf-8'))
 
 
 def load_map(name):
@@ -27,6 +35,16 @@ def load_map(name):
         boxes=[{'name':b['name'],'min':b['min'],'max':b['max'],'top_m':b['top_m']} for b in audit['boxes']]
         config['native_objects']=audit.get('objects',{})
     config['boxes']=boxes
+    if config.get('catalogue'):
+        # Shared object definitions; a map's own entry for an object wins.
+        catalogue=json.loads((path.parent/config['catalogue']).read_text(encoding='utf-8'))
+        config['objects']={**catalogue['objects'],**config.get('objects',{})};config['mark']=catalogue['mark']
+    if 'origin' in config:
+        # A scene written around its own centre is moved to where it stands in the simulator.
+        ox,oy=config.pop('origin');shift=lambda point:[point[0]+ox,point[1]+oy]
+        config['area']={'x':[value+ox for value in config['area']['x']],'y':[value+oy for value in config['area']['y']]}
+        config['sites']={name:shift(point) for name,point in config.get('sites',{}).items()}
+        for item in config.get('structures',[]):item['position']=shift(item['position'])
     for layout,places in config['layouts'].items():
         for target in places:
             if target not in config['objects']:raise ValueError(f'Layout {layout!r} places an undefined object: {target}')
@@ -43,7 +61,24 @@ def object_position(config,layout,target):
     place=config['layouts'][layout][target]
     if place=='native':
         return list(config['native_objects'][config['objects'][target]['native']]['center'])
+    if isinstance(place,str):return list(config['sites'][place])
     return list(place)
+
+
+def lighting(config,layout):
+    """The lighting of one layout: its own if the map gives one, otherwise the map's."""
+    return config.get('layout_lighting',{}).get(layout,config.get('lighting'))
+
+
+def mark_parts(config,target,centre):
+    """The pieces of the H on top of a landable object: name, centre, size."""
+    spec=config['objects'][target];mark=config['mark'];sx,sy,top=spec['size_m'];parts=[]
+    for index,(dx,dy,length_x,length_y) in enumerate(((0.,-mark['bar_offset']*sy,mark['bar_length']*sx,mark['bar_width']*sy),
+                                                      (0.,mark['bar_offset']*sy,mark['bar_length']*sx,mark['bar_width']*sy),
+                                                      (0.,0.,mark['bar_width']*sx,2*mark['bar_offset']*sy-mark['bar_width']*sy))):
+        parts.append({'name':f'{spec["object"]}Mark{index}','position':[centre[0]+dx,centre[1]+dy],
+                      'size_m':[round(length_x,3),round(length_y,3),mark['thickness_m']],'shape':'box','color':spec['mark_color'],'lift_m':top})
+    return parts
 
 
 class MapGeometry:
@@ -55,13 +90,21 @@ class MapGeometry:
             if item.get('obstacle',True):self.boxes.append(footprint(item['name'],item['position'],item['size_m']))
         for target in config['layouts'][layout]:
             centre=object_position(config,layout,target);size=config['objects'][target]['size_m']
-            self.objects[target]={'centre':centre,'size_m':size}
+            self.objects[target]={'centre':centre,'size_m':size,'landable':bool(config['objects'][target].get('landable'))}
             self.boxes.append(footprint(target,centre,size))
 
     def sight_points(self,target):
         """Points up the middle of the object, as heights above the ground; the top one is near its tip."""
         item=self.objects[target]
+        if item['landable']:
+            (x,y),(sx,sy,top)=item['centre'],item['size_m']
+            return [[x+ox*sx*.35,y+oy*sy*.35,top] for ox,oy in PAD_SIGHT]
         return [[item['centre'][0],item['centre'][1],item['size_m'][2]*fraction] for fraction in SIGHT_FRACTIONS]
+
+    def over(self,x,y,target):
+        """True when a point is inside the target's footprint."""
+        item=self.objects[target]
+        return abs(x-item['centre'][0])<=item['size_m'][0]/2 and abs(y-item['centre'][1])<=item['size_m'][1]/2
 
     @staticmethod
     def _gap(box,x,y):
@@ -144,8 +187,18 @@ def scene_objects(config,layout):
                       'shape':item['shape'],'color':item['color'],'lift_m':item.get('lift_m',0.)})
     for target,place in config['layouts'][layout].items():
         if place=='native':continue
-        spec=config['objects'][target];entry={'name':spec['object'],'position':list(place),'size_m':spec['size_m'],'lift_m':0.}
+        centre=object_position(config,layout,target)
+        spec=config['objects'][target];entry={'name':spec['object'],'position':centre,'size_m':spec['size_m'],'lift_m':0.}
         if 'asset' in spec:entry.update(asset=spec['asset'],scale=spec['scale'])
         else:entry.update(shape=spec['shape'],color=spec['color'])
         items.append(entry)
+        if spec.get('landable'):items+=mark_parts(config,target,centre)
     return items
+
+
+def owner_of(config,layout,name):
+    """Which object of the layout a simulator object name belongs to (a pad's marking belongs to the pad), or None."""
+    for target in config['layouts'][layout]:
+        spec=config['objects'][target];own=spec.get('object') or spec.get('native')
+        if name==own or (spec.get('landable') and name.startswith(f'{own}Mark')):return target
+    return None

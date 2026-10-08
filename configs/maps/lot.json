@@ -1,0 +1,38 @@
+{
+  "id": "lot",
+  "name": "Lot",
+  "description": "A second training scene assembled at run time, inside the same simulator binary: asphalt or concrete, a warehouse, trucks, a barrier wall. Its sites, its pairs and the objects that share a pair differ from the Field's. Layouts a-d are trained on; layout e is kept for testing.",
+  "scene": "scene_basic_drone.jsonc",
+  "obstacles": null,
+  "catalogue": "../targets/objects.json",
+  "ground_z": -1.0,
+  "origin": [3000.0, -3000.0],
+  "area": {"x": [-135.0, 135.0], "y": [-135.0, 135.0]},
+  "altitude": {"start_m": [5.0, 9.0], "ceiling_m": 14.0},
+  "lighting": {"time_of_day": "2024-06-21 12:30:00"},
+  "layout_lighting": {"c": {"time_of_day": "2024-06-21 17:00:00"}, "d": {"time_of_day": "2024-06-21 17:00:00"}},
+  "structures": [
+    {"name": "LotAsphalt", "shape": "box", "size_m": [560.0, 560.0, 0.3], "position": [0.0, 0.0], "color": [0.22, 0.22, 0.24], "obstacle": false, "lift_m": -0.25, "layouts": ["a", "b", "e"]},
+    {"name": "LotConcrete", "shape": "box", "size_m": [560.0, 560.0, 0.3], "position": [0.0, 0.0], "color": [0.62, 0.62, 0.6], "obstacle": false, "lift_m": -0.25, "layouts": ["c", "d"]},
+    {"name": "LotWarehouse", "shape": "box", "size_m": [30.0, 20.0, 10.0], "position": [20.0, -15.0], "color": [0.55, 0.57, 0.6]},
+    {"name": "LotTruck1", "shape": "box", "size_m": [4.0, 11.0, 4.0], "position": [-70.0, -55.0], "color": [0.9, 0.9, 0.88]},
+    {"name": "LotTruck2", "shape": "box", "size_m": [11.0, 4.0, 4.0], "position": [0.0, 45.0], "color": [0.9, 0.9, 0.88]},
+    {"name": "LotBarrier", "shape": "box", "size_m": [3.0, 36.0, 9.0], "position": [-55.0, -15.0], "color": [0.7, 0.7, 0.68]},
+    {"name": "LotStack", "shape": "box", "size_m": [12.0, 6.0, 8.0], "position": [95.0, 5.0], "color": [0.3, 0.35, 0.3]},
+    {"name": "LotTank", "shape": "cylinder", "size_m": [12.0, 12.0, 7.0], "position": [-10.0, 100.0], "color": [0.85, 0.85, 0.85]},
+    {"name": "LotMast", "shape": "box", "size_m": [4.0, 4.0, 20.0], "position": [55.0, -20.0], "color": [0.4, 0.4, 0.42]}
+  ],
+  "sites": {"L1": [-20.0, -80.0], "L2": [22.0, -80.0], "L3": [-85.0, 20.0], "L4": [-85.0, 62.0], "L5": [70.0, 30.0], "L6": [40.0, 60.0], "L7": [80.0, -50.0], "L8": [-30.0, 5.0]},
+  "pairs": [["L1", "L2"], ["L3", "L4"], ["L5", "L6"]],
+  "train_objects": ["blue_pad", "red_pad", "blue_cube", "red_cube", "blue_cylinder", "green_cylinder", "orange_ball", "blue_cone"],
+  "held_out_objects": [],
+  "layouts": {
+    "a": {"blue_pad": "L1", "blue_cylinder": "L2", "red_pad": "L3", "red_cube": "L4", "blue_cube": "L5", "green_cylinder": "L6", "orange_ball": "L7", "blue_cone": "L8"},
+    "b": {"blue_cylinder": "L1", "blue_pad": "L2", "red_cube": "L3", "red_pad": "L4", "green_cylinder": "L5", "blue_cube": "L6", "blue_cone": "L7", "orange_ball": "L8"},
+    "c": {"orange_ball": "L1", "blue_cube": "L2", "blue_pad": "L3", "red_pad": "L4", "blue_cone": "L5", "blue_cylinder": "L6", "red_cube": "L7", "green_cylinder": "L8"},
+    "d": {"red_pad": "L1", "green_cylinder": "L2", "blue_cylinder": "L3", "red_cube": "L4", "blue_cube": "L5", "blue_pad": "L6", "blue_cone": "L7", "orange_ball": "L8"},
+    "e": {"blue_cube": "L1", "red_pad": "L2", "blue_cone": "L3", "orange_ball": "L4", "green_cylinder": "L5", "red_cube": "L6", "blue_cylinder": "L7", "blue_pad": "L8"}
+  },
+  "train_layouts": ["a", "b", "c", "d"],
+  "held_out_layouts": ["e"]
+}
