@@ -201,7 +201,8 @@ def plan_training(config,oft,split,points,held_out):
                 map_id=TRAIN_MAPS[(running+shift)%len(TRAIN_MAPS)];scene=maps.setdefault(map_id,load_map(map_id))
                 layout=turn(('layout',map_id,task),settings['train_layouts'][map_id])
                 # Blocks gets the pads only: its own objects were trained there already.
-                pool=[t for t in (LAND_TARGETS if task=='land' else APPROACH_TARGETS) if t in scene['layouts'][layout] and (map_id!='blocks' or t in PADS)]
+                pool=[t for t in (LAND_TARGETS if task=='land' or entry.get('targets')=='pads' else APPROACH_TARGETS)
+                      if t in scene['layouts'][layout] and (map_id!='blocks' or t in PADS)]
                 target=turn(('target',task,map_id=='blocks'),pool);spec=spec_of(config,kind)
                 if 'distractor' in spec and 'relation' not in entry['distractor']:spec['distractor']['relation']=RELATIONS[(turns.get(('relation',kind),0)+shift)%len(RELATIONS)]
                 episode,seed=plan_one(config,oft,scene,layout,target,kind,spec,task,turn(('phrase',task,target),phrases),seed,split,
@@ -235,4 +236,9 @@ def plan_pilot(config,oft):
             other=variant(config,oft,scene,episode,episode['id']+'-approach',task='approach',instruction_id='approach')
             if other:break
         other.update(kind=kind+'_approach',case=kind+'_approach',twin_of=episode['id']);episodes+=[episode,other]
+    # Approach flights pushed on past the place they stop at, where the label is to stop again.
+    for index,target in enumerate(('blue_pad','blue_pad','red_pad','blue_pad','red_pad','blue_pad')):
+        episode,seed=plan_one(config,oft,scene,'a',target,'approach_pushed',spec_of(config,'approach_pushed'),'approach',('approach','find')[index%2],seed,'pilot',
+                              f'pilot-{{seed:04d}}-{target}-approach_pushed',side=(1,-1)[index%2],tries=100)
+        episodes.append(episode)
     return episodes

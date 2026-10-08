@@ -38,7 +38,7 @@ from src.mission.scene import prepare_mission_config
 from src.mission.grounding import target_visibility,matched_camera_images
 from src.mission.flight import climb_to
 from src.visual_search.episodes import load_config,make_episode,relative_target,policy_inputs,Teacher
-from src.visual_search.generalization import SearchTeacher,STOP_STATES
+from src.visual_search.generalization import SearchTeacher,STOP_STATES,Pushes
 from src.visual_search.maps import load_map,MapGeometry,scene_objects,load_landing,owner_of,lighting
 from src.visual_search.shapes import mesh
 from src.aerovla_oft.spec import load_config as load_oft_config,proprio_vector,is_stop
@@ -84,7 +84,7 @@ class SearchEnv:
             if 'asset' in item:self.world.spawn_object(item['name'],item['asset'],pose_at(x,y,z),item['scale'],False)
             else:
                 key=(item['shape'],tuple(item['size_m']),tuple(item['color']))
-                if key not in self.meshes:self.meshes[key]=mesh(item['shape'],item['size_m'],item['color'],item['name'])
+                if key not in self.meshes:self.meshes[key]=mesh(item['shape'],item['size_m'],item['color'],item['name'],**item.get('detail',{}))
                 self.world.spawn_object_from_file(item['name'],'gltf',self.meshes[key],True,pose_at(x,y,z),[1,1,1],False)
         # Loading a scene puts the sun back to its default, so a map's lighting is set again for every episode.
         light=lighting(map_config,layout)
@@ -244,8 +244,11 @@ def summarise(episode,steps,config,reason,stopped,others=None,landing=None,touch
     # A stop beside another object of the scene, while the named one is out of range.
     wrong=[name for name,distance in (others or {}).items() if stopped and distance<=radius and last['distance_m']>radius]
     extra=landing_summary(episode,steps,config,landing,stopped,touchdown,hit,others) if landing else {}
-    # Approach: stopped by itself in the air within the radius. Land: the landing rule (configs/targets/landing_pads.json).
-    success=extra['land_success'] if extra.get('task')=='land' else bool(stopped and last['distance_m']<=radius and reason!='collision' and not extra.get('landed'))
+    # Approach: stopped by itself in the air within the radius, without having come down over a pad (a forced push aside).
+    # Land: the landing rule (configs/targets/landing_pads.json).
+    came_down=bool(extra and extra['stages']['descent_started'] and not episode.get('pushes'))
+    success=extra['land_success'] if extra.get('task')=='land' else bool(stopped and last['distance_m']<=radius and reason!='collision'
+                                                                         and not extra.get('landed') and not came_down)
     return {**episode,**extra,'reason':reason,'stopped':stopped,'steps':len(steps),'initial_distance_m':first['distance_m'],
             'final_distance_m':last['distance_m'],'minimum_distance_m':min(distances),
             'success':success,
@@ -265,7 +268,7 @@ async def run_episode(env,episode,policy,args,record):
     config,oft=env.config,env.oft;steps=[];reason='max_steps';stopped=False;stop_count=0
     planned='strategy' in episode;kick=episode.get('kick');kick_left=0.;altitude_setpoint=None
     teacher=SearchTeacher(config,oft,episode['strategy'],env.ceiling,env.landing) if planned else Teacher(config,oft)
-    task=episode.get('task','approach');landed_ticks=0
+    task=episode.get('task','approach');landed_ticks=0;pushes=Pushes(episode)
     frames_dir=(record['root']/record['rel']) if record else None
     if record:
         for name in ('frontcamera','downcamera'):(frames_dir/name).mkdir(parents=True,exist_ok=True)
@@ -324,6 +327,11 @@ async def run_episode(env,episode,policy,args,record):
                 # A forced turn away from the target, for the teacher and for a tested policy alike: flown, never a label.
                 turn=max(-oft['action_bounds']['yaw_rad'][1],min(oft['action_bounds']['yaw_rad'][1],kick_left))
                 kick_left-=turn;action=[0.,0.,turn];perturbed=True;step['teacher_state']='kick'
+            if planned:
+                # A forced move past the place an approach stops at, flown by the teacher and by a tested policy alike: never a label.
+                forced=pushes.step(mode,{'bearing_deg':private['bearing_deg'],'distance_m':private['distance_m'],'height_m':private['height_m'],
+                                         'surface_m':private['surface_m']},oft['action_bounds']['yaw_rad'][1])
+                if forced:action=forced;perturbed=True;step['teacher_state']='push'
             step['action']=list(action);step['perturbed']=perturbed
             if record:
                 name=f'{index:06d}.png'
@@ -331,7 +339,8 @@ async def run_episode(env,episode,policy,args,record):
                 step['img_name']=name
             halted=is_stop(action,oft) and not perturbed
             stop_count=stop_count+1 if halted else 0
-            if stop_count>=config['stop_ticks']:steps.append(step);reason='model_stop' if args.policy=='oft' else 'teacher_stop';stopped=True;break
+            if stop_count>=config['stop_ticks'] and not pushes.pending():
+                steps.append(step);reason='model_stop' if args.policy=='oft' else 'teacher_stop';stopped=True;break
             await env.tick(action,observation['yaw'])
             await asyncio.sleep(max(0.,oft['tick_s']-(time.monotonic()-started)))
         steps.append(step)

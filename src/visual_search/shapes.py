@@ -7,7 +7,7 @@ import json
 import math
 import struct
 
-KINDS=('box','cylinder','cone','pyramid')
+KINDS=('box','cylinder','cone','pyramid','grid')
 
 
 def _pack(triangles,color,name):
@@ -56,10 +56,24 @@ def _prism(radius,height,sides,top,turn=0.):
     return triangles
 
 
-def mesh(kind,size_m,color,name='shape'):
+def _grid(size_x,size_y,height,spacing,line):
+    """Thin bars in both directions across a rectangle, as one mesh: lines `line` wide every `spacing` metres."""
+    triangles=[]
+    for length,across,along_x in ((size_x,size_y,True),(size_y,size_x,False)):
+        # The outermost lines stay inside the rectangle.
+        count=int((across-line)/spacing);start=-count*spacing/2
+        for index in range(count+1):
+            offset=start+index*spacing;bar=_box(length,line,height) if along_x else _box(line,length,height)
+            # glTF axes: x across, y up, z along the other ground axis.
+            triangles+=[tuple((x,y,z+offset) if along_x else (x+offset,y,z) for x,y,z in triangle) for triangle in bar]
+    return triangles
+
+
+def mesh(kind,size_m,color,name='shape',spacing_m=1.,line_m=.05):
     """GLB bytes for one object. `size_m` is its bounding box: [x, y, height]."""
     size_x,size_y,height=size_m
     if kind=='box':triangles=_box(size_x,size_y,height)
+    elif kind=='grid':triangles=_grid(size_x,size_y,height,spacing_m,line_m)
     elif kind=='cylinder':triangles=_prism(size_x/2,height,24,size_x/2)
     elif kind=='cone':triangles=_prism(size_x/2,height,32,0)
     # Four sides, turned so that the base edges run along the axes and match the bounding box.

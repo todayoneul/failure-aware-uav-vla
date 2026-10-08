@@ -107,6 +107,8 @@
       "search_past": {"base": "search", "task": "approach", "distance_m": [16.0, 44.0], "distractor": {}, "count": [28, 3]},
       "far_visible": {"base": "visible", "task": "approach", "range": "far", "count": [42, 4]},
       "far_search": {"base": "search", "task": "approach", "range": "far", "count": [42, 4]},
+      "approach_pushed": {"base": "visible", "task": "approach", "distance_m": [14.0, 34.0], "targets": "pads", "count": [30, 3],
+                          "pushes": {"count": [2, 3], "ticks": [2, 6], "forward_m": 0.8, "down_m": [0.0, 0.0, 0.25], "hold": 7, "until_m": 1.5, "floor_m": 1.5}},
       "land_visible": {"base": "visible", "task": "land", "distance_m": [14.0, 44.0], "count": [30, 3], "approach_twin": 3},
       "land_edge": {"base": "peripheral", "task": "land", "distance_m": [14.0, 44.0], "count": [20, 2]},
       "land_search": {"base": "search", "task": "land", "distance_m": [14.0, 44.0], "count": [30, 3], "approach_twin": 3},

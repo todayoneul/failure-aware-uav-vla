@@ -81,7 +81,11 @@ class SceneTests(unittest.TestCase):
         self.assertTrue(geometry.over(centre[0]+6.9,centre[1]-6.9,'blue_pad'));self.assertFalse(geometry.over(centre[0]+7.1,centre[1],'blue_pad'))
         self.assertEqual(len(MapGeometry(scene,'a').sight_points('blue_cube')),4)
         items=scene_objects(scene,'a');marks=[item for item in items if item['name'].startswith('BluePadMark')]
-        self.assertEqual(len(marks),3)
+        # Three bars of the H and one mesh of fine lines over the whole top.
+        self.assertEqual(len(marks),4);self.assertEqual([item['shape'] for item in marks],['box','box','box','grid'])
+        grid=marks[-1];self.assertEqual(grid['size_m'][:2],[14.,14.]);self.assertLess(grid['size_m'][2],marks[0]['size_m'][2])
+        from src.visual_search.shapes import mesh
+        self.assertGreater(len(mesh('grid',grid['size_m'],grid['color'],'g',**grid['detail'])),len(mesh('box',grid['size_m'],grid['color'],'b')))
         for mark in marks:
             self.assertEqual(mark['lift_m'],2.5);self.assertTrue(geometry.over(mark['position'][0]+mark['size_m'][0]/2,mark['position'][1]+mark['size_m'][1]/2,'blue_pad'))
             self.assertEqual(owner_of(scene,'a',mark['name']),'blue_pad')
@@ -112,6 +116,37 @@ class LandingTeacherTests(unittest.TestCase):
         action,state=self.teacher.act(view(distance_m=4.,over=True,below=True,height_m=8.));self.assertEqual(action[1],0.);self.assertGreater(action[0],0.)
         action,state=self.teacher.act(view(distance_m=1.,over=True,height_m=2.5,landed=True));self.assertEqual((action,state),([0.,0.,0.],'landed'))
         self.assertTrue(is_stop(action,OFT))
+
+    def test_low_over_the_pad_it_keeps_descending_after_a_small_drift(self):
+        land=LANDING['teacher'];drifted=dict(distance_m=land['align_radius_m']+.4,over=True,below=True,bearing_deg=170.)
+        # A few decimetres past the align radius, low: still down, not a turn back toward the centre.
+        self.assertEqual(self.teacher.act(view(height_m=2.5+1.,**drifted)),([0.,land['final_descent_m'],0.],'descend'))
+        # High up the same offset is still an approach, and beyond the commit radius it is too.
+        self.assertEqual(self.teacher.act(view(height_m=2.5+land['commit_height_m']+1.,**drifted))[1],'align')
+        self.assertNotEqual(self.teacher.act(view(height_m=3.,distance_m=land['commit_radius_m']+.5,over=True,below=True))[1],'descend')
+
+    def test_an_approach_stops_wherever_it_is_inside_the_stop_distance(self):
+        over=dict(task='approach',distance_m=4.,visible=False,below=False,over=True)
+        self.assertEqual(self.teacher.act(view(**over)),([0.,0.,0.],'stop'))
+        # Over an object that is not a pad there is no such rule: it is not in view, so the search goes on.
+        self.assertEqual(self.teacher.act(view(surface_m=0.,**over))[1],'search')
+
+    def test_a_pushed_approach_is_forced_past_its_stop_and_has_to_stop_again(self):
+        from src.visual_search.generalization import Pushes
+        scene=SCENES['field'];spec=gen_v3.spec_of(CONFIG,'approach_pushed')
+        episode=make_start(CONFIG,OFT,scene,'a','blue_pad','approach_pushed','v3',5,'t',spec=spec,instruction_id='approach',max_ticks=V3['max_ticks'])
+        self.assertIn(len(episode['pushes']),(2,3));self.assertEqual(episode['push_hold'],spec['pushes']['hold'])
+        states=episode['plan']['states'];self.assertEqual(states['push'],sum(p['ticks'] for p in episode['pushes']))
+        # After the first push the stop is held long enough for label chunks without a forced move, and the last stop ends the episode.
+        self.assertEqual(states['stop'],(len(episode['pushes'])-1)*(spec['pushes']['hold']-1)+CONFIG['stop_ticks']);self.assertNotIn('descend',states)
+        plan=rollout(CONFIG,OFT,MapGeometry(scene,'a'),episode,14.)
+        self.assertFalse(plan['landed']);self.assertLess(plan['final_distance_m'],CONFIG['arrive_distance_m']-2.)
+        self.assertNotIn('pushes',variant(CONFIG,OFT,scene,episode,'plain'))
+        pushes=Pushes({'pushes':[{'ticks':2,'forward_m':.8,'down_m':.25,'until_m':1.5,'floor_m':1.5}],'push_hold':7})
+        near=dict(bearing_deg=0.,distance_m=11.,height_m=6.,surface_m=2.5)
+        self.assertIsNone(pushes.step('approach',near,.21));self.assertEqual(pushes.step('stop',near,.21),[.8,.25,0.]);self.assertTrue(pushes.pending())
+        self.assertAlmostEqual(pushes.step('stop',dict(near,height_m=4.1),.21)[1],.1);self.assertFalse(pushes.pending());self.assertIsNone(pushes.step('stop',near,.21))
+        self.assertIsNone(Pushes({'pushes':[{'ticks':3,'forward_m':.8,'down_m':0.,'until_m':1.5,'floor_m':1.5}]}).step('stop',dict(near,distance_m=1.),.21))
 
     def test_it_eases_in_over_the_pad_and_turns_before_it_flies(self):
         far=self.teacher.act(view(distance_m=30.))[0][0];close=self.teacher.act(view(distance_m=3.,over=True))[0][0]
@@ -345,6 +380,9 @@ class ScoreTests(unittest.TestCase):
         result=self.summary(hover,task='approach');self.assertTrue(result['success']);self.assertEqual((result['selected'],result['landed']),('blue_pad',False))
         landed=self.summary(hover+[step(1.,over=True,landed=True)],task='approach',touchdown={'object':'blue_pad','offset_m':[0.,0.],'position':[0,0,0],'time_stamp':1})
         self.assertFalse(landed['success'])
+        # Coming down over the pad and hanging just above it is not what an approach asks for.
+        low=self.summary([step(30.,forward=1.),step(5.,over=True,height=7.),step(4.,over=True,height=2.6),step(4.,over=True,height=2.6)],task='approach')
+        self.assertFalse(low['success']);self.assertTrue(low['stages']['descent_started'])
         wrong=self.summary([step(60.),step(50.)],task='approach',others={'red_pad':9.})
         self.assertEqual((wrong['success'],wrong['selected'],wrong['wrong_target']),(False,'red_pad',True))
         self.assertIsNone(self.summary([step(60.),step(50.)],stopped=False,task='approach',others={'red_pad':9.})['selected'])

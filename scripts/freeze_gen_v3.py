@@ -10,7 +10,7 @@ model flew it and whenever, from its step log:
   approached   the vehicle came within 20 m of the target
   selected     the object the flight ended at: the pad it stands on, or the nearest object within the
                success radius if it stopped by itself
-  success      approach: stopped by itself in the air within the radius of the target
+  success      approach: stopped by itself in the air within the radius of the target, without having come down over a pad
                land: the landing rule of configs/targets/landing_pads.json
 
 A failed episode gets exactly one stage, the first one it did not pass:
@@ -73,7 +73,8 @@ def read(episode,rows,radius,landing,geometries,maps):
     over=[index for index,row in enumerate(rows) if row.get('over')]
     aligned=any(row.get('over') and row['distance_m']<=stage['aligned_m'] for row in rows)
     descended=bool(over) and min(row['height_m'] for row in rows[over[0]:])<=rows[over[0]]['height_m']-stage['descent_started_m']
-    hovered=bool(episode['stopped'] and not landed)
+    # Stopped in the air without having come down over a pad: what an approach asks for.
+    hovered=bool(episode['stopped'] and not landed and not descended)
     scene=maps.setdefault(episode.get('map','blocks'),load_map(episode.get('map','blocks')));objects=scene['objects']
     def relation(name):
         if name is None:return 'none'

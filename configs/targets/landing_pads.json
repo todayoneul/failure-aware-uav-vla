@@ -27,6 +27,9 @@
   "teacher": {
     "align_radius_m": 1.75,
     "align_radius_from": "an eighth of the pad's width",
+    "commit_radius_m": 3.5,
+    "commit_height_m": 3.0,
+    "commit_from": "once the vehicle is low over the pad and still within a quarter of its width of the centre it keeps descending; without this a drift of a few decimetres past the align radius turned the label into 'turn back' just above the surface (pilot flight pilot-9000)",
     "ease_m": 6.0,
     "min_forward_m": 0.15,
     "slow_height_m": 2.5,
@@ -35,5 +38,5 @@
     "glide_height_m": 7.0,
     "glide_down_m": 0.25
   },
-  "after_touchdown_ticks": 8
+  "after_touchdown_ticks": 20
 }

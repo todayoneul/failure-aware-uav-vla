@@ -2870,13 +2870,13 @@
     "others_in_view": [],
     "max_ticks": 320,
     "plan": {
-     "ticks": 51,
+     "ticks": 47,
      "clearance_m": 11.0,
      "climbed_m": 0.0,
      "acquired_tick": 0,
      "states": {
       "approach": 23,
-      "final": 13,
+      "final": 9,
       "descend": 11,
       "landed": 4
      }
@@ -5642,7 +5642,7 @@
     "others_in_view": [],
     "max_ticks": 320,
     "plan": {
-     "ticks": 103,
+     "ticks": 100,
      "clearance_m": 15.87,
      "climbed_m": 0.0,
      "acquired_tick": 13,
@@ -5650,7 +5650,7 @@
       "search": 13,
       "align": 1,
       "approach": 63,
-      "final": 12,
+      "final": 9,
       "descend": 10,
       "landed": 4
      }
@@ -5698,13 +5698,13 @@
     ],
     "max_ticks": 320,
     "plan": {
-     "ticks": 92,
+     "ticks": 88,
      "clearance_m": 11.67,
      "climbed_m": 0.0,
      "acquired_tick": 0,
      "states": {
       "approach": 66,
-      "final": 12,
+      "final": 8,
       "descend": 10,
       "landed": 4
      }
@@ -6232,7 +6232,7 @@
     "others_in_view": [],
     "max_ticks": 320,
     "plan": {
-     "ticks": 112,
+     "ticks": 108,
      "clearance_m": 22.56,
      "climbed_m": 0.0,
      "acquired_tick": 13,
@@ -6240,7 +6240,7 @@
       "search": 13,
       "align": 1,
       "approach": 71,
-      "final": 13,
+      "final": 9,
       "descend": 10,
       "landed": 4
      }
@@ -7135,7 +7135,7 @@
     "range": "far",
     "base_start": "q8-8122-blue_pad-far_land_search",
     "plan": {
-     "ticks": 103,
+     "ticks": 100,
      "clearance_m": 15.87,
      "climbed_m": 0.0,
      "acquired_tick": 13,
@@ -7143,7 +7143,7 @@
       "search": 13,
       "align": 1,
       "approach": 63,
-      "final": 12,
+      "final": 9,
       "descend": 10,
       "landed": 4
      }
@@ -7181,7 +7181,7 @@
     "range": "far",
     "base_start": "q8-8122-blue_pad-far_land_search",
     "plan": {
-     "ticks": 103,
+     "ticks": 100,
      "clearance_m": 15.87,
      "climbed_m": 0.0,
      "acquired_tick": 13,
@@ -7189,7 +7189,7 @@
       "search": 13,
       "align": 1,
       "approach": 63,
-      "final": 12,
+      "final": 9,
       "descend": 10,
       "landed": 4
      }
@@ -7227,7 +7227,7 @@
     "range": "far",
     "base_start": "q8-8122-blue_pad-far_land_search",
     "plan": {
-     "ticks": 103,
+     "ticks": 100,
      "clearance_m": 15.87,
      "climbed_m": 0.0,
      "acquired_tick": 13,
@@ -7235,7 +7235,7 @@
       "search": 13,
       "align": 1,
       "approach": 63,
-      "final": 12,
+      "final": 9,
       "descend": 10,
       "landed": 4
      }

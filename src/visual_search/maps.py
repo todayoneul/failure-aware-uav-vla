@@ -78,6 +78,11 @@ def mark_parts(config,target,centre):
                                                       (0.,0.,mark['bar_width']*sx,2*mark['bar_offset']*sy-mark['bar_width']*sy))):
         parts.append({'name':f'{spec["object"]}Mark{index}','position':[centre[0]+dx,centre[1]+dy],
                       'size_m':[round(length_x,3),round(length_y,3),mark['thickness_m']],'shape':'box','color':spec['mark_color'],'lift_m':top})
+    grid=mark.get('grid')
+    if grid:
+        # Fine lines over the whole top: from a few decimetres up they are thin and many, on the surface one fills the view.
+        parts.append({'name':f'{spec["object"]}MarkGrid','position':list(centre),'size_m':[sx,sy,grid['thickness_m']],'shape':'grid','color':spec['mark_color'],
+                      'lift_m':top,'detail':{'spacing_m':grid['spacing_m'],'line_m':grid['line_m']}})
     return parts
 
 

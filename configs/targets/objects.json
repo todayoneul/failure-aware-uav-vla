@@ -13,6 +13,7 @@
   },
   "mark": {
     "description": "A white H on top of a pad, sized from the pad: two bars and a crossbar. It keeps the down view informative while the pad fills it.",
-    "bar_length": 0.5, "bar_width": 0.085, "bar_offset": 0.207, "cross_length": 0.33, "thickness_m": 0.06
+    "bar_length": 0.5, "bar_width": 0.085, "bar_offset": 0.207, "cross_length": 0.33, "thickness_m": 0.06,
+    "grid": {"description": "Thin lines over the whole top. A plain top looks the same from 0.3 m up as from the surface; the lines give both cameras a sense of height over the last metre.", "spacing_m": 0.4, "line_m": 0.03, "thickness_m": 0.02}
   }
 }

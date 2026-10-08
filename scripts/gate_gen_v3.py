@@ -37,7 +37,8 @@ def smoke_ids(config,plan):
 def records(directory,solvable=None):
     """Every flown episode of a run, read as the frozen tables read it. Starts the teacher did not finish are left out."""
     _,episodes,steps=load(directory);data=json.loads((Path(directory)/'results.json').read_text());landing=load_landing();geometries={};maps={}
-    kept=[episode for episode in episodes if solvable is None or episode['id'] in solvable]
+    # A start with forced pushes is a training device, not a test of a policy.
+    kept=[episode for episode in episodes if (solvable is None or episode['id'] in solvable) and not episode.get('pushes')]
     items=[{'episode':episode['id'],'kind':episode.get('kind'),**read(episode,steps[episode['id']],data['config']['success_radius_m'],landing,geometries,maps)} for episode in kept]
     return items,[episode['id'] for episode in data['episodes'] if episode.get('error')],[episode['id'] for episode in episodes if episode not in kept]
 
@@ -47,7 +48,7 @@ def teacher_solved(root):
     solved=set()
     for path in (Path(root)/'episodes').glob('*.json'):
         summary=json.loads(path.read_text())['summary']
-        if summary.get('success'):solved.add(summary['id'])
+        if summary.get('success') and not summary.get('pushes'):solved.add(summary['id'])
     return solved
 
 
@@ -64,9 +65,13 @@ def pilot(args,gates):
             'approach flights that stopped in the air within the radius':(sum(i['success'] for i in approach),'>=',gates['approach_hover_min']),
             'episodes with a runner error':(len(errors),'<=',0)}
     if args.probe:
-        probe=json.loads(Path(args.probe).read_text())['task_swap']
-        checks['near-pad frames where the landing sentence keeps going']=(round(probe['land_sentence_keeps_going'],2),'>=',gates['probe_min'])
-        checks['the same frames where the approach sentence stops']=(round(probe['approach_sentence_stops'],2),'>=',gates['probe_min'])
+        # The same frame with only the sentence changed. The frames are the ones the decision is made on: where a landing flies on
+        # or descends, and where an approach stops. (An approach sentence shown on frames from deep inside a landing, where an
+        # approach never is, is reported with the probe but is not a gate line; the first pilot mixed the two.)
+        probe=json.loads(Path(args.probe).read_text())
+        checks['landing frames near the pad where the landing sentence keeps going']=(round(probe['task_swap']['land_sentence_keeps_going'],2),'>=',gates['probe_min'])
+        checks['frames where an approach stopped, approach sentence: stops']=(round(probe['stop_frames']['approach_sentence_stops'],2),'>=',gates['probe_min'])
+        checks['the same frames, landing sentence: keeps going']=(round(probe['stop_frames']['land_sentence_keeps_going'],2),'>=',gates['probe_min'])
     return checks,{'flights':len(items),'landing_success':sum(i['success'] for i in land),'touchdown_errors_m':[i['touchdown_error_m'] for i in land if i['touchdown_on_target']],
                    'stopped_after_touchdown':sum(i['touchdown_on_target'] and i['self_stop'] for i in land)}
 

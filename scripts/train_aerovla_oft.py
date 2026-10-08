@@ -234,11 +234,27 @@ def probe(args):
     for sample in near[:args.probe_samples]:
         text=sample['instruction'].replace('<image>\n','',1);noun='the blue landing pad' if 'blue' in text else 'the red landing pad'
         land=first(sample,text);approach=first(sample,f'Approach {noun}.')
-        rows.append({'state':sample['meta']['teacher_state'],'land':behaviour(land,config),'approach':behaviour(approach,config),
-                     'difference':sum(abs(a-b) for a,b in zip(land,approach))/3})
-    result['task_swap']={'frames':len(rows),'land_sentence_keeps_going':sum(r['land'] in ('advance','descend') for r in rows)/max(1,len(rows)),
-                         'approach_sentence_stops':sum(r['approach']=='stop' for r in rows)/max(1,len(rows)),
-                         'mean_action_difference':sum(r['difference'] for r in rows)/max(1,len(rows))}
+        rows.append({'state':sample['meta']['teacher_state'],'distance_m':sample['meta']['distance_m'],'land':behaviour(land,config),'approach':behaviour(approach,config),
+                     'difference':sum(abs(a-b) for a,b in zip(land,approach))/3,'approach_forward':denormalize_action(approach,config)[0],
+                     'approach_down':denormalize_action(approach,config)[1]})
+    def part(chosen):
+        return {'frames':len(chosen),'land_sentence_keeps_going':sum(r['land'] in ('advance','descend') for r in chosen)/max(1,len(chosen)),
+                'approach_sentence_stops':sum(r['approach']=='stop' for r in chosen)/max(1,len(chosen)),
+                'approach_sentence_descends':sum(r['approach']=='descend' for r in chosen)/max(1,len(chosen)),
+                'approach_sentence_kinds':{kind:sum(r['approach']==kind for r in chosen) for kind in sorted({r['approach'] for r in chosen})},
+                'mean_action_difference':sum(r['difference'] for r in chosen)/max(1,len(chosen))}
+    # An approach flight is never closer than where it stops, so frames from deeper inside a landing are new to that sentence.
+    edge=9.
+    result['task_swap']={**part(rows),'by_state':{state:part([r for r in rows if r['state']==state]) for state in ('final','descend')},
+                         'where_an_approach_stops':part([r for r in rows if r['state']=='final' and r['distance_m']>=edge])}
+    # The other way round: frames where an approach flight stopped, shown with the landing sentence.
+    stops=[s for s in samples if s['meta'].get('task')=='approach' and s['meta']['teacher_state']=='stop' and 'landing pad' in s['instruction']]
+    rng.shuffle(stops);rows=[]
+    for sample in stops[:args.probe_samples]:
+        text=sample['instruction'].replace('<image>\n','',1);noun='the blue landing pad' if 'blue' in text else 'the red landing pad'
+        rows.append({'own':behaviour(first(sample,text),config),'land':behaviour(first(sample,f'Find {noun} and land on it.'),config)})
+    result['stop_frames']={'frames':len(rows),'approach_sentence_stops':sum(r['own']=='stop' for r in rows)/max(1,len(rows)),
+                           'land_sentence_keeps_going':sum(r['land'] in ('advance','descend') for r in rows)/max(1,len(rows))}
     rows=[]
     for sample in seen[:args.probe_samples]:
         text=sample['instruction'].replace('<image>\n','',1);other=text.replace('blue','\0').replace('red','blue').replace('\0','red')

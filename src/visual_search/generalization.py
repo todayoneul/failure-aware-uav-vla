@@ -88,14 +88,16 @@ class SearchTeacher:
         settings=self.settings;bearing=view['bearing_deg'];distance=view['distance_m']
         landing=view.get('task')=='land'
         if landing and view.get('landed'):return [0.,0.,0.],'landed'
-        if not landing and distance<=self.config['arrive_distance_m'] and (view['visible'] or view['below']):
+        # Over a pad the object is below the vehicle whether or not a camera's centre shows it.
+        if not landing and distance<=self.config['arrive_distance_m'] and (view['visible'] or view['below'] or (view.get('over') and view.get('surface_m'))):
             return [0.,0.,0.],'stop'
         can_climb=view['height_m']<self.ceiling-.25
         if landing and (view['visible'] or view['below'] or view.get('over')):
             land=self.landing;above=view['height_m']-view['surface_m']
             self.last_side=1. if bearing>=0 else -1.;self.swept=0.
-            if distance<=land['align_radius_m']:
-                # Over the middle of the pad: straight down, slower over the last metres.
+            committed=view.get('over') and above<=land['commit_height_m'] and distance<=land['commit_radius_m']
+            if distance<=land['align_radius_m'] or committed:
+                # Over the middle of the pad, or already low over it: straight down, slower over the last metres.
                 return [0.,self.down_max if above>land['slow_height_m'] else land['final_descent_m'],0.],'descend'
             yaw=max(-self.yaw_max,min(self.yaw_max,math.radians(bearing)))
             if view['visible'] and view['ahead_m']<settings['safety_m'] and can_climb:return [0.,-self.down_max,yaw],'climb'
@@ -124,6 +126,33 @@ class SearchTeacher:
         elif view['ahead_m']<settings['blocked_m'] and can_climb:
             return [0.,-self.down_max,0.],'climb'
         return [0.,0.,self._direction()*self.yaw_max],'search'
+
+
+class Pushes:
+    """Forced moves of an approach episode, flown but never a label.
+
+    An approach flight stops short of its target, so the sentence 'approach' is otherwise never seen from
+    closer than that. Once the teacher has stopped, the vehicle is pushed on toward the target (and
+    sometimes down); where that leaves it the teacher's label is again to stop. After the first push the
+    teacher holds its stop for `hold` ticks before the next one, so that label chunks without a forced
+    move in them exist."""
+    def __init__(self,episode):
+        self.queue=[dict(item) for item in episode.get('pushes',[])];self.hold=episode.get('push_hold',1);self.left=0;self.current=None;self.stopped=0;self.done=0
+
+    def pending(self):return bool(self.queue) or self.left>0
+
+    def step(self,state,view,yaw_max):
+        """The forced action for this tick, or None. `state` is the teacher's state at this tick."""
+        if self.left>0:self.left-=1
+        else:
+            self.stopped=self.stopped+1 if state in STOP_STATES else 0
+            if not self.queue or self.stopped<(1 if self.done==0 else self.hold):return None
+            self.current=self.queue.pop(0);self.left=self.current['ticks']-1;self.done+=1;self.stopped=0
+        # Not past the middle of the pad, and not lower than a safe height above its top.
+        if view['distance_m']<=self.current['until_m']:self.left=0;return None
+        yaw=max(-yaw_max,min(yaw_max,math.radians(view['bearing_deg'])))
+        down=min(self.current['down_m'],max(0.,view['height_m']-view['surface_m']-self.current['floor_m']))
+        return [self.current['forward_m']*max(0.,1-abs(view['bearing_deg'])/45.),down,yaw]
 
 
 def geometric_view(config,geometry,target,x,y,height_m,yaw_rad):
@@ -157,7 +186,7 @@ def rollout(config,oft,geometry,episode,ceiling_m):
     settings=config['generalization'];landing=load_landing();teacher=SearchTeacher(config,oft,episode['strategy'],ceiling_m,landing)
     x,y=episode['start_xy'];yaw=math.radians(episode['start_yaw_deg']);height=episode['start_height_m'];target=episode['target']
     kick_left=0.;stops=0;clearance=float('inf');states={};acquired=None;top=height;reason='max_steps';tick=0
-    yaw_max=oft['action_bounds']['yaw_rad'][1];task=episode.get('task','approach');landed=False
+    yaw_max=oft['action_bounds']['yaw_rad'][1];task=episode.get('task','approach');landed=False;pushes=Pushes(episode)
     # Heights are counted from where the vehicle rests on the ground, so standing on a pad reads as the pad's height.
     rest=geometry.objects[target]['size_m'][2]
     for tick in range(episode.get('max_ticks',settings['max_ticks'])):
@@ -169,9 +198,11 @@ def rollout(config,oft,geometry,episode,ceiling_m):
         if view['visible'] and acquired is None:acquired=tick
         turn,kick_left=kick_turn(episode,tick,kick_left,yaw_max)
         if turn is not None:action=[0.,0.,turn];state='kick'
+        forced=pushes.step(state,view,yaw_max)
+        if forced:action=forced;state='push'
         states[state]=states.get(state,0)+1
         stops=stops+1 if state in STOP_STATES else 0
-        if stops>=config['stop_ticks']:reason='teacher_stop';break
+        if stops>=config['stop_ticks'] and not pushes.pending():reason='teacher_stop';break
         if landed:continue
         yaw+=action[2];x+=action[0]*math.cos(yaw);y+=action[0]*math.sin(yaw);height-=action[1];top=max(top,height)
         if task=='land' and geometry.over(x,y,target):height=max(height,rest)
@@ -272,6 +303,11 @@ def make_start(config,oft,map_config,layout,target,kind,band,seed,split,strategy
                  'target_bearing_deg':round(bearing,2),'start_distance_m':round(distance,2),'start_direction_deg':round(direction%360.,2),
                  'instruction_id':instruction_id,'instruction':instruction_for_id(config,map_config,target,instruction_id)}
         if spec:episode['base']=kind
+        if spec.get('pushes'):
+            push=spec['pushes']
+            episode['pushes']=[{'ticks':rng.randint(*push['ticks']),'forward_m':push['forward_m'],'down_m':rng.choice(push['down_m']),
+                                'until_m':push['until_m'],'floor_m':push['floor_m']} for _ in range(rng.randint(*push['count']))]
+            episode['push_hold']=push['hold']
         if task!='approach' or max_ticks or shown is not None:
             episode['task']=task;episode['others_in_view']=shown or []
             if max_ticks:episode['max_ticks']=max_ticks
@@ -301,7 +337,7 @@ def variant(config,oft,map_config,episode,name,layout=None,target=None,task=None
     geometry=MapGeometry(map_config,layout);centre=geometry.objects[target]['centre'];x,y=episode['start_xy']
     to_target=math.degrees(math.atan2(centre[1]-y,centre[0]-x));bearing=(to_target-episode['start_yaw_deg']+180.)%360.-180.
     instruction_id=instruction_id or episode['instruction_id'];distance=math.hypot(centre[0]-x,centre[1]-y)
-    changed={k:v for k,v in episode.items() if k not in ('plan','kick','requested_kind','in_wedge')}
+    changed={k:v for k,v in episode.items() if k not in ('plan','kick','requested_kind','in_wedge','pushes','push_hold')}
     changed.update(id=name,layout=layout,target=target,task=task,split=split or episode['split'],target_bearing_deg=round(bearing,2),
                    start_distance_m=round(distance,2),start_direction_deg=round(math.degrees(math.atan2(y-centre[1],x-centre[0]))%360.,2),
                    sector=sector_of(bearing),instruction_id=instruction_id,instruction=instruction_for_id(config,map_config,target,instruction_id),
