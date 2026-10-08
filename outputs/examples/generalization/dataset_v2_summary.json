@@ -1,0 +1,214 @@
+{
+ "sources": {
+  "generalization_v1": 292,
+  "generalization_v2_added": 153
+ },
+ "episodes": 445,
+ "train_episodes": 395,
+ "val_episodes": 50,
+ "dropped_episodes": {
+  "max_steps": 1
+ },
+ "split_by": "seed range of the plan",
+ "samples": 16765,
+ "train_samples": 14975,
+ "val_samples": 1790,
+ "maps": {
+  "blocks": 445
+ },
+ "layouts": {
+  "a": 242,
+  "b": 203
+ },
+ "objects": {
+  "blue_cone": 112,
+  "green_cylinder": 111,
+  "orange_ball": 112,
+  "red_cube": 110
+ },
+ "instructions": {
+  "Approach the blue cone.": 58,
+  "Approach the green cylinder.": 51,
+  "Approach the orange ball.": 49,
+  "Approach the red cube.": 55,
+  "Find the blue cone.": 54,
+  "Find the green cylinder.": 60,
+  "Find the orange ball.": 63,
+  "Find the red cube.": 55
+ },
+ "by_case_episodes": {
+  "altitude": 40,
+  "climb_to_view": 39,
+  "high_approach": 32,
+  "near_edge": 28,
+  "near_hidden": 14,
+  "peripheral": 56,
+  "reacquire": 48,
+  "search": 104,
+  "stop_zone": 40,
+  "visible": 44
+ },
+ "by_target_episodes": {
+  "blue_cone": 112,
+  "green_cylinder": 111,
+  "orange_ball": 112,
+  "red_cube": 110
+ },
+ "start_distance_m": {
+  "0-12 m": 9,
+  "12-20 m": 144,
+  "20-30 m": 99,
+  "30-40 m": 53,
+  "40-50 m": 66,
+  "50-60 m": 36,
+  "60-70 m": 38
+ },
+ "start_bearing_sector": {
+  "behind": 33,
+  "behind_left": 29,
+  "behind_right": 29,
+  "front": 174,
+  "front_left": 61,
+  "front_right": 52,
+  "left": 32,
+  "right": 35
+ },
+ "start_height_m": {
+  "10-11 m": 13,
+  "11-12 m": 11,
+  "12-13 m": 9,
+  "13-14 m": 9,
+  "5-6 m": 83,
+  "6-7 m": 108,
+  "7-8 m": 100,
+  "8-9 m": 101,
+  "9-10 m": 11
+ },
+ "search_strategy_episodes": {
+  "right": 445
+ },
+ "search_episodes": {
+  "yaw_only": 165,
+  "yaw_and_altitude": 83
+ },
+ "forced_turns": {
+  "left": 27,
+  "right": 21
+ },
+ "seeds": {
+  "train": [
+   1000,
+   2135
+  ],
+  "val": [
+   5000,
+   5117
+  ]
+ },
+ "sample_distance_m": {
+  "0-12 m": 1844,
+  "12-20 m": 4391,
+  "20-30 m": 3436,
+  "30-40 m": 2630,
+  "40-50 m": 2480,
+  "50-60 m": 1056,
+  "60-70 m": 928
+ },
+ "sample_bearing_sector": {
+  "behind": 649,
+  "behind_left": 348,
+  "behind_right": 588,
+  "front": 13094,
+  "front_left": 291,
+  "front_right": 860,
+  "left": 212,
+  "right": 723
+ },
+ "by_teacher_state": {
+  "align": 296,
+  "approach": 11177,
+  "climb": 1038,
+  "search": 2474,
+  "stop": 1780
+ },
+ "target_visible": {
+  "not visible": 3453,
+  "visible": 13312
+ },
+ "labels_outside_action_bounds": 0,
+ "memory_strategy_samples": 0,
+ "leaks": {
+  "episodes": [],
+  "folders": [],
+  "seeds": 0,
+  "starts": 0
+ },
+ "chunk_size": 4,
+ "tick_s": 0.5,
+ "action_bounds": {
+  "forward_m": [
+   0.0,
+   1.0
+  ],
+  "down_m": [
+   -0.5,
+   0.5
+  ],
+  "yaw_rad": [
+   -0.21,
+   0.21
+  ]
+ },
+ "val_episode_ids": [
+  "val-5000-blue_cone-search",
+  "val-5001-orange_ball-search",
+  "val-5002-red_cube-search",
+  "val-5003-green_cylinder-search",
+  "val-5004-blue_cone-reacquire",
+  "val-5005-orange_ball-reacquire",
+  "val-5006-red_cube-reacquire",
+  "val-5007-green_cylinder-reacquire",
+  "val-5008-blue_cone-peripheral",
+  "val-5009-orange_ball-peripheral",
+  "val-5010-red_cube-peripheral",
+  "val-5011-green_cylinder-peripheral",
+  "val-5012-blue_cone-search",
+  "val-5013-orange_ball-search",
+  "val-5014-red_cube-search",
+  "val-5015-green_cylinder-search",
+  "val-5016-blue_cone-visible",
+  "val-5017-orange_ball-visible",
+  "val-5018-red_cube-visible",
+  "val-5019-green_cylinder-visible",
+  "val-5020-blue_cone-search",
+  "val-5021-orange_ball-search",
+  "val-5022-red_cube-search",
+  "val-5023-green_cylinder-search",
+  "val-5024-blue_cone-altitude",
+  "val-5025-orange_ball-altitude",
+  "val-5026-red_cube-altitude",
+  "val-5027-green_cylinder-altitude",
+  "val-5028-blue_cone-reacquire",
+  "val-5029-orange_ball-reacquire",
+  "val-5030-red_cube-reacquire",
+  "val-5031-green_cylinder-reacquire",
+  "val-5100-blue_cone-climb_to_view",
+  "val-5101-orange_ball-climb_to_view",
+  "val-5102-red_cube-climb_to_view",
+  "val-5103-green_cylinder-climb_to_view",
+  "val-5104-blue_cone-high_approach",
+  "val-5105-orange_ball-high_approach",
+  "val-5106-red_cube-high_approach",
+  "val-5107-green_cylinder-high_approach",
+  "val-5108-blue_cone-stop_zone",
+  "val-5109-orange_ball-stop_zone",
+  "val-5110-red_cube-stop_zone",
+  "val-5111-green_cylinder-stop_zone",
+  "val-5112-blue_cone-near_edge",
+  "val-5113-orange_ball-near_edge",
+  "val-5114-red_cube-near_edge",
+  "val-5115-green_cylinder-near_edge",
+  "val-5116-blue_cone-near_hidden",
+  "val-5117-orange_ball-near_hidden"
+ ]
+}

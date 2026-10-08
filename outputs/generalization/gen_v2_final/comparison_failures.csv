@@ -1,0 +1,11 @@
+category,name,OFT Gen-v1,OFT Gen-v2
+F1,search: the target never came into view,0,0
+F2,grounding: went to or stopped at another object,0,0
+F3,approach: found the target but did not get close,4,4
+F4,early stop: stopped by itself outside the radius,4,0
+F5,no stop: was near the target and did not stop there,1,1
+F6,altitude transition: kept climbing after the target was found,4,0
+F7,collision,0,0
+F8,language: fails only with the unseen wording,3,0
+F9,domain: repeated in the held-out scene only,0,0
+F10,other,0,0

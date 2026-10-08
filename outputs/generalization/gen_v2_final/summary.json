@@ -1,0 +1,2298 @@
+{
+ "runs": {
+  "OFT Gen-v1:G0": {
+   "directory": "outputs/visual_search/gen_v1_g0",
+   "stages": {
+    "episodes": 20,
+    "success": 20,
+    "collisions": 0,
+    "started_hidden": 8,
+    "acquired": 8,
+    "approached": 20,
+    "stopped": 20
+   },
+   "breakdown": {
+    "n": 20,
+    "success": 20,
+    "collisions": 0,
+    "reached": 20,
+    "stopped": 20,
+    "mean_initial_m": 36.37801099076249,
+    "mean_final_m": 10.872443716695363,
+    "mean_minimum_m": 10.872443716695363,
+    "mean_stop_distance_m": 10.872443716695363,
+    "started_unseen": 8,
+    "acquired": 8,
+    "mean_acquire_step": 24.625,
+    "mean_search_steps": 23.9,
+    "mean_yaw_swept_deg": 295.0298832345324,
+    "mean_climbed_m": 2.7836740493774412,
+    "mean_seconds": 32.20450394153595,
+    "by_kind": {
+     "altitude": "4/4",
+     "peripheral": "4/4",
+     "reacquire": "4/4",
+     "search": "4/4",
+     "visible": "4/4"
+    },
+    "by_target": {
+     "blue_cone": "5/5",
+     "green_cylinder": "5/5",
+     "orange_ball": "5/5",
+     "red_cube": "5/5"
+    },
+    "by_wedge": {},
+    "by_instruction": {
+     "approach": "9/9",
+     "find": "11/11"
+    },
+    "wrong_object_stops": 0,
+    "failures": {}
+   },
+   "failures": {},
+   "turns": {
+    "left": {
+     "right": 3,
+     "left": 0,
+     "none": 0,
+     "acquired": 3,
+     "n": 3
+    },
+    "behind": {
+     "right": 3,
+     "left": 0,
+     "none": 0,
+     "acquired": 3,
+     "n": 3
+    },
+    "right": {
+     "right": 2,
+     "left": 0,
+     "none": 0,
+     "acquired": 2,
+     "n": 2
+    }
+   },
+   "distractors": {
+    "episodes": 20,
+    "another_object_in_view": 5,
+    "before_the_named_one_was_seen": 2,
+    "stopped_at_another_object": 0
+   },
+   "motion": {
+    "model": "OFT Gen-v1",
+    "level": "G0",
+    "episodes": 20,
+    "success": 20,
+    "collisions": 0,
+    "decisions": 1227,
+    "seconds_per_decision": 0.534,
+    "inference_ms": 410.2,
+    "action_change_fraction_of_range": 0.0272,
+    "heading_change_deg_mean": 3.13,
+    "heading_change_deg_max": 14.5,
+    "mean_speed_mps": 0.805,
+    "clip_frequency": 0.631,
+    "clip_median_overshoot": 0.0312,
+    "clip_max_overshoot": 0.156
+   }
+  },
+  "OFT Gen-v2:G0": {
+   "directory": "outputs/visual_search/gen_v2_g0",
+   "stages": {
+    "episodes": 20,
+    "success": 20,
+    "collisions": 0,
+    "started_hidden": 8,
+    "acquired": 8,
+    "approached": 20,
+    "stopped": 20
+   },
+   "breakdown": {
+    "n": 20,
+    "success": 20,
+    "collisions": 0,
+    "reached": 20,
+    "stopped": 20,
+    "mean_initial_m": 36.37801099076249,
+    "mean_final_m": 10.822324113418714,
+    "mean_minimum_m": 10.822324113418714,
+    "mean_stop_distance_m": 10.822324113418714,
+    "started_unseen": 8,
+    "acquired": 8,
+    "mean_acquire_step": 24.5,
+    "mean_search_steps": 16.6,
+    "mean_yaw_swept_deg": 209.12506014671902,
+    "mean_climbed_m": 1.8418946266174316,
+    "mean_seconds": 26.88949191570282,
+    "by_kind": {
+     "altitude": "4/4",
+     "peripheral": "4/4",
+     "reacquire": "4/4",
+     "search": "4/4",
+     "visible": "4/4"
+    },
+    "by_target": {
+     "blue_cone": "5/5",
+     "green_cylinder": "5/5",
+     "orange_ball": "5/5",
+     "red_cube": "5/5"
+    },
+    "by_wedge": {},
+    "by_instruction": {
+     "approach": "9/9",
+     "find": "11/11"
+    },
+    "wrong_object_stops": 0,
+    "failures": {}
+   },
+   "failures": {},
+   "turns": {
+    "left": {
+     "right": 2,
+     "left": 1,
+     "none": 0,
+     "acquired": 3,
+     "n": 3
+    },
+    "behind": {
+     "right": 2,
+     "left": 1,
+     "none": 0,
+     "acquired": 3,
+     "n": 3
+    },
+    "right": {
+     "right": 2,
+     "left": 0,
+     "none": 0,
+     "acquired": 2,
+     "n": 2
+    }
+   },
+   "distractors": {
+    "episodes": 20,
+    "another_object_in_view": 3,
+    "before_the_named_one_was_seen": 2,
+    "stopped_at_another_object": 0
+   },
+   "motion": {
+    "model": "OFT Gen-v2",
+    "level": "G0",
+    "episodes": 20,
+    "success": 20,
+    "collisions": 0,
+    "decisions": 1059,
+    "seconds_per_decision": 0.518,
+    "inference_ms": 403.6,
+    "action_change_fraction_of_range": 0.022,
+    "heading_change_deg_mean": 2.6,
+    "heading_change_deg_max": 13.0,
+    "mean_speed_mps": 0.953,
+    "clip_frequency": 0.304,
+    "clip_median_overshoot": 0.0078,
+    "clip_max_overshoot": 0.062
+   }
+  },
+  "OFT Gen-v1:G1": {
+   "directory": "outputs/visual_search/gen_v1_g1",
+   "stages": {
+    "episodes": 32,
+    "success": 27,
+    "collisions": 0,
+    "started_hidden": 16,
+    "acquired": 16,
+    "approached": 32,
+    "stopped": 31
+   },
+   "breakdown": {
+    "n": 32,
+    "success": 27,
+    "collisions": 0,
+    "reached": 28,
+    "stopped": 31,
+    "mean_initial_m": 35.958634837252724,
+    "mean_final_m": 11.250012525848383,
+    "mean_minimum_m": 11.24696383043505,
+    "mean_stop_distance_m": 10.785079850390419,
+    "started_unseen": 16,
+    "acquired": 16,
+    "mean_acquire_step": 20.625,
+    "mean_search_steps": 35.4375,
+    "mean_yaw_swept_deg": 432.3690135851226,
+    "mean_climbed_m": 2.9040680676698685,
+    "mean_seconds": 39.860744185745716,
+    "by_kind": {
+     "altitude": "0/4",
+     "peripheral": "7/8",
+     "reacquire": "4/4",
+     "search": "12/12",
+     "visible": "4/4"
+    },
+    "by_target": {
+     "blue_cone": "6/8",
+     "green_cylinder": "7/8",
+     "orange_ball": "7/8",
+     "red_cube": "7/8"
+    },
+    "by_wedge": {
+     "inside the held-out wedge": "15/16",
+     "outside it": "12/16"
+    },
+    "by_instruction": {
+     "approach": "14/16",
+     "find": "13/16"
+    },
+    "wrong_object_stops": 0,
+    "failures": {
+     "reached the target but did not stop": 1,
+     "stopped away from the target": 4
+    }
+   },
+   "failures": {
+    "F4": {
+     "count": 3,
+     "episodes": [
+      "g1-0024-blue_cone-altitude",
+      "g1-0026-red_cube-altitude",
+      "g1-0027-green_cylinder-altitude"
+     ],
+     "representative": "g1-0024-blue_cone-altitude"
+    },
+    "F6": {
+     "count": 2,
+     "episodes": [
+      "g1-0008-blue_cone-peripheral",
+      "g1-0025-orange_ball-altitude"
+     ],
+     "representative": "g1-0008-blue_cone-peripheral"
+    }
+   },
+   "turns": {
+    "left": {
+     "right": 5,
+     "left": 0,
+     "none": 0,
+     "acquired": 5,
+     "n": 5
+    },
+    "right": {
+     "right": 6,
+     "left": 0,
+     "none": 0,
+     "acquired": 6,
+     "n": 6
+    },
+    "behind": {
+     "right": 5,
+     "left": 0,
+     "none": 0,
+     "acquired": 5,
+     "n": 5
+    }
+   },
+   "distractors": {
+    "episodes": 32,
+    "another_object_in_view": 8,
+    "before_the_named_one_was_seen": 3,
+    "stopped_at_another_object": 0
+   },
+   "motion": {
+    "model": "OFT Gen-v1",
+    "level": "G1",
+    "episodes": 32,
+    "success": 27,
+    "collisions": 0,
+    "decisions": 2455,
+    "seconds_per_decision": 0.526,
+    "inference_ms": 398.3,
+    "action_change_fraction_of_range": 0.0278,
+    "heading_change_deg_mean": 3.6,
+    "heading_change_deg_max": 15.1,
+    "mean_speed_mps": 0.63,
+    "clip_frequency": 0.536,
+    "clip_median_overshoot": 0.0312,
+    "clip_max_overshoot": 0.188
+   }
+  },
+  "OFT Gen-v2:G1": {
+   "directory": "outputs/visual_search/gen_v2_g1",
+   "stages": {
+    "episodes": 32,
+    "success": 32,
+    "collisions": 0,
+    "started_hidden": 16,
+    "acquired": 16,
+    "approached": 32,
+    "stopped": 32
+   },
+   "breakdown": {
+    "n": 32,
+    "success": 32,
+    "collisions": 0,
+    "reached": 32,
+    "stopped": 32,
+    "mean_initial_m": 35.958634837252724,
+    "mean_final_m": 10.822021456545833,
+    "mean_minimum_m": 10.822021456545833,
+    "mean_stop_distance_m": 10.822021456545833,
+    "started_unseen": 16,
+    "acquired": 16,
+    "mean_acquire_step": 21.375,
+    "mean_search_steps": 12.90625,
+    "mean_yaw_swept_deg": 189.64331527972269,
+    "mean_climbed_m": 1.142291784286499,
+    "mean_seconds": 25.542562320828438,
+    "by_kind": {
+     "altitude": "4/4",
+     "peripheral": "8/8",
+     "reacquire": "4/4",
+     "search": "12/12",
+     "visible": "4/4"
+    },
+    "by_target": {
+     "blue_cone": "8/8",
+     "green_cylinder": "8/8",
+     "orange_ball": "8/8",
+     "red_cube": "8/8"
+    },
+    "by_wedge": {
+     "inside the held-out wedge": "16/16",
+     "outside it": "16/16"
+    },
+    "by_instruction": {
+     "approach": "16/16",
+     "find": "16/16"
+    },
+    "wrong_object_stops": 0,
+    "failures": {}
+   },
+   "failures": {},
+   "turns": {
+    "left": {
+     "right": 5,
+     "left": 0,
+     "none": 0,
+     "acquired": 5,
+     "n": 5
+    },
+    "right": {
+     "right": 5,
+     "left": 1,
+     "none": 0,
+     "acquired": 6,
+     "n": 6
+    },
+    "behind": {
+     "right": 5,
+     "left": 0,
+     "none": 0,
+     "acquired": 5,
+     "n": 5
+    }
+   },
+   "distractors": {
+    "episodes": 32,
+    "another_object_in_view": 3,
+    "before_the_named_one_was_seen": 3,
+    "stopped_at_another_object": 0
+   },
+   "motion": {
+    "model": "OFT Gen-v2",
+    "level": "G1",
+    "episodes": 32,
+    "success": 32,
+    "collisions": 0,
+    "decisions": 1630,
+    "seconds_per_decision": 0.511,
+    "inference_ms": 395.7,
+    "action_change_fraction_of_range": 0.0332,
+    "heading_change_deg_mean": 2.6,
+    "heading_change_deg_max": 19.4,
+    "mean_speed_mps": 0.989,
+    "clip_frequency": 0.257,
+    "clip_median_overshoot": 0.0078,
+    "clip_max_overshoot": 0.07
+   }
+  },
+  "OFT Gen-v1:G2": {
+   "directory": "outputs/visual_search/gen_v1_g2",
+   "stages": {
+    "episodes": 12,
+    "success": 9,
+    "collisions": 0,
+    "started_hidden": 6,
+    "acquired": 6,
+    "approached": 11,
+    "stopped": 9
+   },
+   "breakdown": {
+    "n": 12,
+    "success": 9,
+    "collisions": 0,
+    "reached": 9,
+    "stopped": 9,
+    "mean_initial_m": 35.65374805426293,
+    "mean_final_m": 15.726735800882633,
+    "mean_minimum_m": 14.961078169952957,
+    "mean_stop_distance_m": 10.485523148370362,
+    "started_unseen": 6,
+    "acquired": 6,
+    "mean_acquire_step": 20.666666666666668,
+    "mean_search_steps": 90.83333333333333,
+    "mean_yaw_swept_deg": 1259.7740481453231,
+    "mean_climbed_m": 3.788494904836019,
+    "mean_seconds": 76.98538013299306,
+    "by_kind": {
+     "peripheral": "3/3",
+     "search": "4/6",
+     "visible": "2/3"
+    },
+    "by_target": {
+     "yellow_pyramid": "9/12"
+    },
+    "by_wedge": {},
+    "by_instruction": {
+     "approach": "6/6",
+     "find": "3/6"
+    },
+    "wrong_object_stops": 0,
+    "failures": {
+     "approached but did not arrive": 2,
+     "target in view but no approach": 1
+    }
+   },
+   "failures": {
+    "F3": {
+     "count": 1,
+     "episodes": [
+      "g2-0110-yellow_pyramid-search"
+     ],
+     "representative": "g2-0110-yellow_pyramid-search"
+    },
+    "F6": {
+     "count": 2,
+     "episodes": [
+      "g2-0102-yellow_pyramid-visible",
+      "g2-0108-yellow_pyramid-search"
+     ],
+     "representative": "g2-0102-yellow_pyramid-visible"
+    }
+   },
+   "turns": {
+    "left": {
+     "right": 2,
+     "left": 0,
+     "none": 0,
+     "acquired": 2,
+     "n": 2
+    },
+    "right": {
+     "right": 2,
+     "left": 0,
+     "none": 0,
+     "acquired": 2,
+     "n": 2
+    },
+    "behind": {
+     "right": 2,
+     "left": 0,
+     "none": 0,
+     "acquired": 2,
+     "n": 2
+    }
+   },
+   "distractors": {
+    "episodes": 12,
+    "another_object_in_view": 2,
+    "before_the_named_one_was_seen": 0,
+    "stopped_at_another_object": 0
+   },
+   "motion": {
+    "model": "OFT Gen-v1",
+    "level": "G2",
+    "episodes": 12,
+    "success": 9,
+    "collisions": 0,
+    "decisions": 1776,
+    "seconds_per_decision": 0.524,
+    "inference_ms": 398.1,
+    "action_change_fraction_of_range": 0.031,
+    "heading_change_deg_mean": 5.31,
+    "heading_change_deg_max": 14.1,
+    "mean_speed_mps": 0.309,
+    "clip_frequency": 0.555,
+    "clip_median_overshoot": 0.0234,
+    "clip_max_overshoot": 0.164
+   }
+  },
+  "OFT Gen-v2:G2": {
+   "directory": "outputs/visual_search/gen_v2_g2",
+   "stages": {
+    "episodes": 12,
+    "success": 11,
+    "collisions": 0,
+    "started_hidden": 6,
+    "acquired": 6,
+    "approached": 11,
+    "stopped": 11
+   },
+   "breakdown": {
+    "n": 12,
+    "success": 11,
+    "collisions": 0,
+    "reached": 11,
+    "stopped": 11,
+    "mean_initial_m": 35.65374805426293,
+    "mean_final_m": 16.110124585995436,
+    "mean_minimum_m": 13.12915871892225,
+    "mean_stop_distance_m": 9.926885958510008,
+    "started_unseen": 6,
+    "acquired": 6,
+    "mean_acquire_step": 21.833333333333332,
+    "mean_search_steps": 34.666666666666664,
+    "mean_yaw_swept_deg": 396.51791585087875,
+    "mean_climbed_m": 0.5797420342763265,
+    "mean_seconds": 36.44967540105184,
+    "by_kind": {
+     "peripheral": "3/3",
+     "search": "5/6",
+     "visible": "3/3"
+    },
+    "by_target": {
+     "yellow_pyramid": "11/12"
+    },
+    "by_wedge": {},
+    "by_instruction": {
+     "approach": "6/6",
+     "find": "5/6"
+    },
+    "wrong_object_stops": 0,
+    "failures": {
+     "target in view but no approach": 1
+    }
+   },
+   "failures": {
+    "F3": {
+     "count": 1,
+     "episodes": [
+      "g2-0110-yellow_pyramid-search"
+     ],
+     "representative": "g2-0110-yellow_pyramid-search"
+    }
+   },
+   "turns": {
+    "left": {
+     "right": 2,
+     "left": 0,
+     "none": 0,
+     "acquired": 2,
+     "n": 2
+    },
+    "right": {
+     "right": 2,
+     "left": 0,
+     "none": 0,
+     "acquired": 2,
+     "n": 2
+    },
+    "behind": {
+     "right": 2,
+     "left": 0,
+     "none": 0,
+     "acquired": 2,
+     "n": 2
+    }
+   },
+   "distractors": {
+    "episodes": 12,
+    "another_object_in_view": 1,
+    "before_the_named_one_was_seen": 0,
+    "stopped_at_another_object": 0
+   },
+   "motion": {
+    "model": "OFT Gen-v2",
+    "level": "G2",
+    "episodes": 12,
+    "success": 11,
+    "collisions": 0,
+    "decisions": 842,
+    "seconds_per_decision": 0.527,
+    "inference_ms": 412.4,
+    "action_change_fraction_of_range": 0.0478,
+    "heading_change_deg_mean": 3.94,
+    "heading_change_deg_max": 16.3,
+    "mean_speed_mps": 0.744,
+    "clip_frequency": 0.323,
+    "clip_median_overshoot": 0.0156,
+    "clip_max_overshoot": 0.094
+   }
+  },
+  "OFT Gen-v1:G3": {
+   "directory": "outputs/visual_search/gen_v1_g3",
+   "stages": {
+    "episodes": 20,
+    "success": 19,
+    "collisions": 0,
+    "started_hidden": 12,
+    "acquired": 12,
+    "approached": 19,
+    "stopped": 19
+   },
+   "breakdown": {
+    "n": 20,
+    "success": 19,
+    "collisions": 0,
+    "reached": 19,
+    "stopped": 19,
+    "mean_initial_m": 29.528402845641672,
+    "mean_final_m": 11.669402110962464,
+    "mean_minimum_m": 11.667625804911165,
+    "mean_stop_distance_m": 10.500448482928624,
+    "started_unseen": 12,
+    "acquired": 12,
+    "mean_acquire_step": 20.083333333333332,
+    "mean_search_steps": 23.85,
+    "mean_yaw_swept_deg": 354.1440687585059,
+    "mean_climbed_m": 0.3162278175354004,
+    "mean_seconds": 27.49996563196182,
+    "by_kind": {
+     "peripheral": "4/4",
+     "search": "11/12",
+     "visible": "4/4"
+    },
+    "by_target": {
+     "blue_cone": "5/5",
+     "green_cylinder": "5/5",
+     "orange_ball": "4/5",
+     "red_cube": "5/5"
+    },
+    "by_wedge": {},
+    "by_instruction": {
+     "approach": "9/10",
+     "find": "10/10"
+    },
+    "wrong_object_stops": 0,
+    "failures": {
+     "approached but did not arrive": 1
+    }
+   },
+   "failures": {
+    "F3": {
+     "count": 1,
+     "episodes": [
+      "g3-0137-orange_ball-search"
+     ],
+     "representative": "g3-0137-orange_ball-search"
+    }
+   },
+   "turns": {
+    "behind": {
+     "right": 7,
+     "left": 0,
+     "none": 0,
+     "acquired": 7,
+     "n": 7
+    },
+    "left": {
+     "right": 2,
+     "left": 0,
+     "none": 0,
+     "acquired": 2,
+     "n": 2
+    },
+    "right": {
+     "right": 3,
+     "left": 0,
+     "none": 0,
+     "acquired": 3,
+     "n": 3
+    }
+   },
+   "distractors": {
+    "episodes": 20,
+    "another_object_in_view": 8,
+    "before_the_named_one_was_seen": 7,
+    "stopped_at_another_object": 0
+   },
+   "motion": {
+    "model": "OFT Gen-v1",
+    "level": "G3",
+    "episodes": 20,
+    "success": 19,
+    "collisions": 0,
+    "decisions": 1087,
+    "seconds_per_decision": 0.515,
+    "inference_ms": 373.0,
+    "action_change_fraction_of_range": 0.0254,
+    "heading_change_deg_mean": 4.23,
+    "heading_change_deg_max": 12.8,
+    "mean_speed_mps": 0.658,
+    "clip_frequency": 0.552,
+    "clip_median_overshoot": 0.0234,
+    "clip_max_overshoot": 0.164
+   }
+  },
+  "OFT Gen-v2:G3": {
+   "directory": "outputs/visual_search/gen_v2_g3",
+   "stages": {
+    "episodes": 20,
+    "success": 18,
+    "collisions": 0,
+    "started_hidden": 12,
+    "acquired": 12,
+    "approached": 19,
+    "stopped": 19
+   },
+   "breakdown": {
+    "n": 20,
+    "success": 18,
+    "collisions": 0,
+    "reached": 19,
+    "stopped": 19,
+    "mean_initial_m": 29.528402845641672,
+    "mean_final_m": 13.482092359468846,
+    "mean_minimum_m": 13.406895215118189,
+    "mean_stop_distance_m": 11.189860979703491,
+    "started_unseen": 12,
+    "acquired": 12,
+    "mean_acquire_step": 20.666666666666668,
+    "mean_search_steps": 24.05,
+    "mean_yaw_swept_deg": 333.5160144582115,
+    "mean_climbed_m": 0.3172710657119751,
+    "mean_seconds": 30.83975530862808,
+    "by_kind": {
+     "peripheral": "4/4",
+     "search": "10/12",
+     "visible": "4/4"
+    },
+    "by_target": {
+     "blue_cone": "4/5",
+     "green_cylinder": "4/5",
+     "orange_ball": "5/5",
+     "red_cube": "5/5"
+    },
+    "by_wedge": {},
+    "by_instruction": {
+     "approach": "9/10",
+     "find": "9/10"
+    },
+    "wrong_object_stops": 0,
+    "failures": {
+     "stopped away from the target": 1,
+     "reached the target but did not stop": 1
+    }
+   },
+   "failures": {
+    "F3": {
+     "count": 1,
+     "episodes": [
+      "g3-0136-blue_cone-search"
+     ],
+     "representative": "g3-0136-blue_cone-search"
+    },
+    "F5": {
+     "count": 1,
+     "episodes": [
+      "g3-0139-green_cylinder-search"
+     ],
+     "representative": "g3-0139-green_cylinder-search"
+    }
+   },
+   "turns": {
+    "behind": {
+     "right": 7,
+     "left": 0,
+     "none": 0,
+     "acquired": 7,
+     "n": 7
+    },
+    "left": {
+     "right": 2,
+     "left": 0,
+     "none": 0,
+     "acquired": 2,
+     "n": 2
+    },
+    "right": {
+     "right": 3,
+     "left": 0,
+     "none": 0,
+     "acquired": 3,
+     "n": 3
+    }
+   },
+   "distractors": {
+    "episodes": 20,
+    "another_object_in_view": 7,
+    "before_the_named_one_was_seen": 7,
+    "stopped_at_another_object": 0
+   },
+   "motion": {
+    "model": "OFT Gen-v2",
+    "level": "G3",
+    "episodes": 20,
+    "success": 18,
+    "collisions": 0,
+    "decisions": 1237,
+    "seconds_per_decision": 0.507,
+    "inference_ms": 382.7,
+    "action_change_fraction_of_range": 0.0282,
+    "heading_change_deg_mean": 3.45,
+    "heading_change_deg_max": 15.4,
+    "mean_speed_mps": 0.53,
+    "clip_frequency": 0.304,
+    "clip_median_overshoot": 0.0078,
+    "clip_max_overshoot": 0.047
+   }
+  },
+  "OFT Gen-v1:G4": {
+   "directory": "outputs/visual_search/gen_v1_g4",
+   "stages": {
+    "episodes": 6,
+    "success": 2,
+    "collisions": 0,
+    "started_hidden": 3,
+    "acquired": 3,
+    "approached": 4,
+    "stopped": 3
+   },
+   "breakdown": {
+    "n": 6,
+    "success": 2,
+    "collisions": 0,
+    "reached": 3,
+    "stopped": 3,
+    "mean_initial_m": 36.5397676740964,
+    "mean_final_m": 24.84424305198519,
+    "mean_minimum_m": 24.635007420179363,
+    "mean_stop_distance_m": 12.091012321892471,
+    "started_unseen": 3,
+    "acquired": 3,
+    "mean_acquire_step": 18.333333333333332,
+    "mean_search_steps": 117.33333333333333,
+    "mean_yaw_swept_deg": 1740.6071041586229,
+    "mean_climbed_m": 1.5693094730377197,
+    "mean_seconds": 87.93266995747884,
+    "by_kind": {
+     "peripheral": "0/1",
+     "search": "1/3",
+     "visible": "1/2"
+    },
+    "by_target": {
+     "yellow_pyramid": "2/6"
+    },
+    "by_wedge": {},
+    "by_instruction": {
+     "approach": "1/3",
+     "find": "1/3"
+    },
+    "wrong_object_stops": 0,
+    "failures": {
+     "target in view but no approach": 2,
+     "reached the target but did not stop": 1,
+     "stopped away from the target": 1
+    }
+   },
+   "failures": {
+    "F3": {
+     "count": 2,
+     "episodes": [
+      "g4-0161-yellow_pyramid-visible",
+      "g4-0165-yellow_pyramid-search"
+     ],
+     "representative": "g4-0161-yellow_pyramid-visible"
+    },
+    "F4": {
+     "count": 1,
+     "episodes": [
+      "g4-0164-yellow_pyramid-search"
+     ],
+     "representative": "g4-0164-yellow_pyramid-search"
+    },
+    "F5": {
+     "count": 1,
+     "episodes": [
+      "g4-0162-yellow_pyramid-peripheral"
+     ],
+     "representative": "g4-0162-yellow_pyramid-peripheral"
+    }
+   },
+   "turns": {
+    "right": {
+     "right": 1,
+     "left": 0,
+     "none": 0,
+     "acquired": 1,
+     "n": 1
+    },
+    "left": {
+     "right": 1,
+     "left": 0,
+     "none": 0,
+     "acquired": 1,
+     "n": 1
+    },
+    "behind": {
+     "right": 1,
+     "left": 0,
+     "none": 0,
+     "acquired": 1,
+     "n": 1
+    }
+   },
+   "distractors": {
+    "episodes": 6,
+    "another_object_in_view": 3,
+    "before_the_named_one_was_seen": 2,
+    "stopped_at_another_object": 0
+   },
+   "motion": {
+    "model": "OFT Gen-v1",
+    "level": "G4",
+    "episodes": 6,
+    "success": 2,
+    "collisions": 0,
+    "decisions": 1015,
+    "seconds_per_decision": 0.523,
+    "inference_ms": 395.0,
+    "action_change_fraction_of_range": 0.0188,
+    "heading_change_deg_mean": 6.37,
+    "heading_change_deg_max": 12.7,
+    "mean_speed_mps": 0.15,
+    "clip_frequency": 0.617,
+    "clip_median_overshoot": 0.0234,
+    "clip_max_overshoot": 0.086
+   }
+  },
+  "OFT Gen-v2:G4": {
+   "directory": "outputs/visual_search/gen_v2_g4",
+   "stages": {
+    "episodes": 6,
+    "success": 4,
+    "collisions": 0,
+    "started_hidden": 3,
+    "acquired": 3,
+    "approached": 4,
+    "stopped": 4
+   },
+   "breakdown": {
+    "n": 6,
+    "success": 4,
+    "collisions": 0,
+    "reached": 4,
+    "stopped": 4,
+    "mean_initial_m": 36.5397676740964,
+    "mean_final_m": 21.719326409663463,
+    "mean_minimum_m": 21.505237879622477,
+    "mean_stop_distance_m": 10.897408484019074,
+    "started_unseen": 3,
+    "acquired": 3,
+    "mean_acquire_step": 19,
+    "mean_search_steps": 76.16666666666667,
+    "mean_yaw_swept_deg": 1061.7232033518187,
+    "mean_climbed_m": 0.23252320289611816,
+    "mean_seconds": 56.954822858174644,
+    "by_kind": {
+     "peripheral": "1/1",
+     "search": "2/3",
+     "visible": "1/2"
+    },
+    "by_target": {
+     "yellow_pyramid": "4/6"
+    },
+    "by_wedge": {},
+    "by_instruction": {
+     "approach": "1/3",
+     "find": "3/3"
+    },
+    "wrong_object_stops": 0,
+    "failures": {
+     "approached but did not arrive": 2
+    }
+   },
+   "failures": {
+    "F3": {
+     "count": 2,
+     "episodes": [
+      "g4-0161-yellow_pyramid-visible",
+      "g4-0165-yellow_pyramid-search"
+     ],
+     "representative": "g4-0161-yellow_pyramid-visible"
+    }
+   },
+   "turns": {
+    "right": {
+     "right": 1,
+     "left": 0,
+     "none": 0,
+     "acquired": 1,
+     "n": 1
+    },
+    "left": {
+     "right": 1,
+     "left": 0,
+     "none": 0,
+     "acquired": 1,
+     "n": 1
+    },
+    "behind": {
+     "right": 1,
+     "left": 0,
+     "none": 0,
+     "acquired": 1,
+     "n": 1
+    }
+   },
+   "distractors": {
+    "episodes": 6,
+    "another_object_in_view": 3,
+    "before_the_named_one_was_seen": 2,
+    "stopped_at_another_object": 0
+   },
+   "motion": {
+    "model": "OFT Gen-v2",
+    "level": "G4",
+    "episodes": 6,
+    "success": 4,
+    "collisions": 0,
+    "decisions": 681,
+    "seconds_per_decision": 0.506,
+    "inference_ms": 384.1,
+    "action_change_fraction_of_range": 0.0297,
+    "heading_change_deg_mean": 5.93,
+    "heading_change_deg_max": 14.0,
+    "mean_speed_mps": 0.286,
+    "clip_frequency": 0.443,
+    "clip_median_overshoot": 0.0156,
+    "clip_max_overshoot": 0.062
+   }
+  },
+  "OFT Gen-v1:P": {
+   "directory": "outputs/visual_search/gen_v1_p",
+   "stages": {
+    "episodes": 24,
+    "success": 21,
+    "collisions": 0,
+    "started_hidden": 12,
+    "acquired": 12,
+    "approached": 24,
+    "stopped": 23
+   },
+   "breakdown": {
+    "n": 24,
+    "success": 21,
+    "collisions": 0,
+    "reached": 21,
+    "stopped": 23,
+    "mean_initial_m": 47.16611449418254,
+    "mean_final_m": 11.479268190081438,
+    "mean_minimum_m": 11.479268190081438,
+    "mean_stop_distance_m": 10.861251780499382,
+    "started_unseen": 12,
+    "acquired": 12,
+    "mean_acquire_step": 7.916666666666667,
+    "mean_search_steps": 38.083333333333336,
+    "mean_yaw_swept_deg": 532.5590490310832,
+    "mean_climbed_m": 1.928878366947174,
+    "mean_seconds": 48.83852351705233,
+    "by_kind": {
+     "search": "12/12",
+     "visible": "9/12"
+    },
+    "by_target": {
+     "blue_cone": "5/6",
+     "green_cylinder": "6/6",
+     "orange_ball": "4/6",
+     "red_cube": "6/6"
+    },
+    "by_wedge": {
+     "inside the held-out wedge": "9/12",
+     "outside it": "12/12"
+    },
+    "by_instruction": {
+     "find_and_approach": "6/8",
+     "locate": "7/8",
+     "search_for": "8/8"
+    },
+    "wrong_object_stops": 0,
+    "failures": {
+     "stopped away from the target": 2,
+     "approached but did not arrive": 1
+    }
+   },
+   "failures": {
+    "F8": {
+     "count": 3,
+     "episodes": [
+      "p-0000-blue_cone-visible-find_and_approach",
+      "p-0001-orange_ball-visible-locate",
+      "p-0001-orange_ball-visible-find_and_approach"
+     ],
+     "representative": "p-0000-blue_cone-visible-find_and_approach"
+    }
+   },
+   "turns": {
+    "right": {
+     "right": 12,
+     "left": 0,
+     "none": 0,
+     "acquired": 12,
+     "n": 12
+    }
+   },
+   "distractors": {
+    "episodes": 24,
+    "another_object_in_view": 14,
+    "before_the_named_one_was_seen": 6,
+    "stopped_at_another_object": 0
+   },
+   "motion": {
+    "model": "OFT Gen-v1",
+    "level": "P",
+    "episodes": 24,
+    "success": 21,
+    "collisions": 0,
+    "decisions": 2174,
+    "seconds_per_decision": 0.545,
+    "inference_ms": 423.2,
+    "action_change_fraction_of_range": 0.0294,
+    "heading_change_deg_mean": 3.76,
+    "heading_change_deg_max": 13.9,
+    "mean_speed_mps": 0.741,
+    "clip_frequency": 0.483,
+    "clip_median_overshoot": 0.0312,
+    "clip_max_overshoot": 0.164
+   }
+  },
+  "OFT Gen-v2:P": {
+   "directory": "outputs/visual_search/gen_v2_p",
+   "stages": {
+    "episodes": 24,
+    "success": 24,
+    "collisions": 0,
+    "started_hidden": 12,
+    "acquired": 12,
+    "approached": 24,
+    "stopped": 24
+   },
+   "breakdown": {
+    "n": 24,
+    "success": 24,
+    "collisions": 0,
+    "reached": 24,
+    "stopped": 24,
+    "mean_initial_m": 47.16611449418254,
+    "mean_final_m": 10.743828561147772,
+    "mean_minimum_m": 10.743828561147772,
+    "mean_stop_distance_m": 10.743828561147772,
+    "started_unseen": 12,
+    "acquired": 12,
+    "mean_acquire_step": 10.75,
+    "mean_search_steps": 5.708333333333333,
+    "mean_yaw_swept_deg": 89.49303007408858,
+    "mean_climbed_m": 0.5292228062947592,
+    "mean_seconds": 26.821893999973934,
+    "by_kind": {
+     "search": "12/12",
+     "visible": "12/12"
+    },
+    "by_target": {
+     "blue_cone": "6/6",
+     "green_cylinder": "6/6",
+     "orange_ball": "6/6",
+     "red_cube": "6/6"
+    },
+    "by_wedge": {
+     "inside the held-out wedge": "12/12",
+     "outside it": "12/12"
+    },
+    "by_instruction": {
+     "find_and_approach": "8/8",
+     "locate": "8/8",
+     "search_for": "8/8"
+    },
+    "wrong_object_stops": 0,
+    "failures": {}
+   },
+   "failures": {},
+   "turns": {
+    "right": {
+     "right": 9,
+     "left": 3,
+     "none": 0,
+     "acquired": 12,
+     "n": 12
+    }
+   },
+   "distractors": {
+    "episodes": 24,
+    "another_object_in_view": 6,
+    "before_the_named_one_was_seen": 6,
+    "stopped_at_another_object": 0
+   },
+   "motion": {
+    "model": "OFT Gen-v2",
+    "level": "P",
+    "episodes": 24,
+    "success": 24,
+    "collisions": 0,
+    "decisions": 1249,
+    "seconds_per_decision": 0.525,
+    "inference_ms": 413.8,
+    "action_change_fraction_of_range": 0.0318,
+    "heading_change_deg_mean": 1.33,
+    "heading_change_deg_max": 14.2,
+    "mean_speed_mps": 1.363,
+    "clip_frequency": 0.114,
+    "clip_median_overshoot": 0.0078,
+    "clip_max_overshoot": 0.039
+   }
+  },
+  "OFT Gen-v1:S": {
+   "directory": "outputs/visual_search/gen_v1_s",
+   "stages": {
+    "episodes": 16,
+    "success": 16,
+    "collisions": 0,
+    "started_hidden": 16,
+    "acquired": 16,
+    "approached": 16,
+    "stopped": 16
+   },
+   "breakdown": {
+    "n": 16,
+    "success": 16,
+    "collisions": 0,
+    "reached": 16,
+    "stopped": 16,
+    "mean_initial_m": 40.80606880619574,
+    "mean_final_m": 9.68711792342188,
+    "mean_minimum_m": 9.68711792342188,
+    "mean_stop_distance_m": 9.68711792342188,
+    "started_unseen": 16,
+    "acquired": 16,
+    "mean_acquire_step": 20,
+    "mean_search_steps": 20,
+    "mean_yaw_swept_deg": 301.5981092359185,
+    "mean_climbed_m": 0.19917032122612,
+    "mean_seconds": 32.0751786082983,
+    "by_kind": {
+     "search": "16/16"
+    },
+    "by_target": {
+     "blue_cone": "4/4",
+     "green_cylinder": "4/4",
+     "orange_ball": "4/4",
+     "red_cube": "4/4"
+    },
+    "by_wedge": {},
+    "by_instruction": {
+     "find": "16/16"
+    },
+    "wrong_object_stops": 0,
+    "failures": {}
+   },
+   "failures": {},
+   "turns": {
+    "left": {
+     "right": 4,
+     "left": 0,
+     "none": 0,
+     "acquired": 4,
+     "n": 4
+    },
+    "right": {
+     "right": 4,
+     "left": 0,
+     "none": 0,
+     "acquired": 4,
+     "n": 4
+    },
+    "behind_left": {
+     "right": 4,
+     "left": 0,
+     "none": 0,
+     "acquired": 4,
+     "n": 4
+    },
+    "behind_right": {
+     "right": 4,
+     "left": 0,
+     "none": 0,
+     "acquired": 4,
+     "n": 4
+    }
+   },
+   "distractors": {
+    "episodes": 16,
+    "another_object_in_view": 5,
+    "before_the_named_one_was_seen": 5,
+    "stopped_at_another_object": 0
+   },
+   "motion": {
+    "model": "OFT Gen-v1",
+    "level": "S",
+    "episodes": 16,
+    "success": 16,
+    "collisions": 0,
+    "decisions": 932,
+    "seconds_per_decision": 0.56,
+    "inference_ms": 434.9,
+    "action_change_fraction_of_range": 0.0175,
+    "heading_change_deg_mean": 3.35,
+    "heading_change_deg_max": 13.7,
+    "mean_speed_mps": 0.972,
+    "clip_frequency": 0.805,
+    "clip_median_overshoot": 0.0391,
+    "clip_max_overshoot": 0.164
+   }
+  },
+  "OFT Gen-v2:S": {
+   "directory": "outputs/visual_search/gen_v2_s",
+   "stages": {
+    "episodes": 16,
+    "success": 16,
+    "collisions": 0,
+    "started_hidden": 16,
+    "acquired": 16,
+    "approached": 16,
+    "stopped": 16
+   },
+   "breakdown": {
+    "n": 16,
+    "success": 16,
+    "collisions": 0,
+    "reached": 16,
+    "stopped": 16,
+    "mean_initial_m": 40.80606880619574,
+    "mean_final_m": 10.232996455167317,
+    "mean_minimum_m": 10.232996455167317,
+    "mean_stop_distance_m": 10.232996455167317,
+    "started_unseen": 16,
+    "acquired": 16,
+    "mean_acquire_step": 20,
+    "mean_search_steps": 20.125,
+    "mean_yaw_swept_deg": 301.9595743215134,
+    "mean_climbed_m": 0.0047498345375061035,
+    "mean_seconds": 31.29761666059494,
+    "by_kind": {
+     "search": "16/16"
+    },
+    "by_target": {
+     "blue_cone": "4/4",
+     "green_cylinder": "4/4",
+     "orange_ball": "4/4",
+     "red_cube": "4/4"
+    },
+    "by_wedge": {},
+    "by_instruction": {
+     "find": "16/16"
+    },
+    "wrong_object_stops": 0,
+    "failures": {}
+   },
+   "failures": {},
+   "turns": {
+    "left": {
+     "right": 4,
+     "left": 0,
+     "none": 0,
+     "acquired": 4,
+     "n": 4
+    },
+    "right": {
+     "right": 4,
+     "left": 0,
+     "none": 0,
+     "acquired": 4,
+     "n": 4
+    },
+    "behind_left": {
+     "right": 4,
+     "left": 0,
+     "none": 0,
+     "acquired": 4,
+     "n": 4
+    },
+    "behind_right": {
+     "right": 4,
+     "left": 0,
+     "none": 0,
+     "acquired": 4,
+     "n": 4
+    }
+   },
+   "distractors": {
+    "episodes": 16,
+    "another_object_in_view": 5,
+    "before_the_named_one_was_seen": 5,
+    "stopped_at_another_object": 0
+   },
+   "motion": {
+    "model": "OFT Gen-v2",
+    "level": "S",
+    "episodes": 16,
+    "success": 16,
+    "collisions": 0,
+    "decisions": 945,
+    "seconds_per_decision": 0.539,
+    "inference_ms": 428.2,
+    "action_change_fraction_of_range": 0.0163,
+    "heading_change_deg_mean": 3.31,
+    "heading_change_deg_max": 13.6,
+    "mean_speed_mps": 0.979,
+    "clip_frequency": 0.303,
+    "clip_median_overshoot": 0.0078,
+    "clip_max_overshoot": 0.055
+   }
+  },
+  "OFT Pilot:G1": {
+   "directory": "outputs/visual_search/pilot_g1",
+   "stages": {
+    "episodes": 32,
+    "success": 4,
+    "collisions": 3,
+    "started_hidden": 16,
+    "acquired": 12,
+    "approached": 17,
+    "stopped": 6
+   },
+   "breakdown": {
+    "n": 32,
+    "success": 4,
+    "collisions": 3,
+    "reached": 16,
+    "stopped": 6,
+    "mean_initial_m": 35.958634837252724,
+    "mean_final_m": 26.471009822853816,
+    "mean_minimum_m": 23.757673020480958,
+    "mean_stop_distance_m": 11.218247966252953,
+    "started_unseen": 16,
+    "acquired": 12,
+    "mean_acquire_step": 31.666666666666668,
+    "mean_search_steps": 152.28125,
+    "mean_yaw_swept_deg": 1394.5886927730069,
+    "mean_climbed_m": 0.5191439390182495,
+    "mean_seconds": 112.24150638282299,
+    "by_kind": {
+     "altitude": "0/4",
+     "peripheral": "2/8",
+     "reacquire": "1/4",
+     "search": "1/12",
+     "visible": "0/4"
+    },
+    "by_target": {
+     "blue_cone": "1/8",
+     "green_cylinder": "0/8",
+     "orange_ball": "3/8",
+     "red_cube": "0/8"
+    },
+    "by_wedge": {
+     "inside the held-out wedge": "2/16",
+     "outside it": "2/16"
+    },
+    "by_instruction": {
+     "approach": "3/16",
+     "find": "1/16"
+    },
+    "wrong_object_stops": 0,
+    "failures": {
+     "approached but did not arrive": 6,
+     "stopped away from the target": 2,
+     "target in view but no approach": 5,
+     "reached the target but did not stop": 9,
+     "collision": 3,
+     "target never came into view": 3
+    }
+   },
+   "failures": {
+    "F1": {
+     "count": 3,
+     "episodes": [
+      "g1-0024-blue_cone-altitude",
+      "g1-0025-orange_ball-altitude",
+      "g1-0026-red_cube-altitude"
+     ],
+     "representative": "g1-0024-blue_cone-altitude"
+    },
+    "F3": {
+     "count": 11,
+     "episodes": [
+      "g1-0000-blue_cone-visible",
+      "g1-0001-orange_ball-visible",
+      "g1-0002-red_cube-visible",
+      "g1-0003-green_cylinder-visible",
+      "g1-0005-orange_ball-peripheral",
+      "g1-0006-red_cube-peripheral",
+      "g1-0007-green_cylinder-peripheral",
+      "g1-0010-red_cube-peripheral",
+      "g1-0017-orange_ball-search",
+      "g1-0019-green_cylinder-search",
+      "g1-0027-green_cylinder-altitude"
+     ],
+     "representative": "g1-0000-blue_cone-visible"
+    },
+    "F5": {
+     "count": 11,
+     "episodes": [
+      "g1-0008-blue_cone-peripheral",
+      "g1-0011-green_cylinder-peripheral",
+      "g1-0012-blue_cone-search",
+      "g1-0014-red_cube-search",
+      "g1-0016-blue_cone-search",
+      "g1-0018-red_cube-search",
+      "g1-0020-blue_cone-search",
+      "g1-0022-red_cube-search",
+      "g1-0023-green_cylinder-search",
+      "g1-0028-blue_cone-reacquire",
+      "g1-0030-red_cube-reacquire"
+     ],
+     "representative": "g1-0008-blue_cone-peripheral"
+    },
+    "F7": {
+     "count": 3,
+     "episodes": [
+      "g1-0013-orange_ball-search",
+      "g1-0015-green_cylinder-search",
+      "g1-0031-green_cylinder-reacquire"
+     ],
+     "representative": "g1-0013-orange_ball-search"
+    }
+   },
+   "turns": {
+    "left": {
+     "right": 5,
+     "left": 0,
+     "none": 0,
+     "acquired": 3,
+     "n": 5
+    },
+    "right": {
+     "right": 6,
+     "left": 0,
+     "none": 0,
+     "acquired": 5,
+     "n": 6
+    },
+    "behind": {
+     "right": 5,
+     "left": 0,
+     "none": 0,
+     "acquired": 4,
+     "n": 5
+    }
+   },
+   "distractors": {
+    "episodes": 32,
+    "another_object_in_view": 8,
+    "before_the_named_one_was_seen": 4,
+    "stopped_at_another_object": 0
+   },
+   "motion": {
+    "model": "OFT Pilot",
+    "level": "G1",
+    "episodes": 32,
+    "success": 4,
+    "collisions": 3,
+    "decisions": 6594,
+    "seconds_per_decision": 0.547,
+    "inference_ms": 425.2,
+    "action_change_fraction_of_range": 0.024,
+    "heading_change_deg_mean": 4.17,
+    "heading_change_deg_max": 14.0,
+    "mean_speed_mps": 0.223,
+    "clip_frequency": 0.178,
+    "clip_median_overshoot": 0.0234,
+    "clip_max_overshoot": 0.07
+   }
+  },
+  "AeroVLA Step:G1": {
+   "directory": "outputs/visual_search/aerovla_step_g1",
+   "stages": {
+    "episodes": 16,
+    "success": 1,
+    "collisions": 1,
+    "started_hidden": 8,
+    "acquired": 2,
+    "approached": 4,
+    "stopped": 9
+   },
+   "breakdown": {
+    "n": 16,
+    "success": 1,
+    "collisions": 1,
+    "reached": 2,
+    "stopped": 9,
+    "mean_initial_m": 43.156003704871694,
+    "mean_final_m": 72.39043150921373,
+    "mean_minimum_m": 31.078318806204678,
+    "mean_stop_distance_m": 10.221934969682788,
+    "started_unseen": 8,
+    "acquired": 2,
+    "mean_acquire_step": 2,
+    "mean_search_steps": 15.625,
+    "mean_yaw_swept_deg": 69.21534792964322,
+    "mean_climbed_m": 2.1414714753627777,
+    "mean_seconds": 115.13500265777111,
+    "by_kind": {
+     "altitude": "0/4",
+     "peripheral": "0/4",
+     "search": "0/4",
+     "visible": "1/4"
+    },
+    "by_target": {
+     "blue_cone": "0/4",
+     "green_cylinder": "0/4",
+     "orange_ball": "1/4",
+     "red_cube": "0/4"
+    },
+    "by_wedge": {
+     "inside the held-out wedge": "1/8",
+     "outside it": "0/8"
+    },
+    "by_instruction": {
+     "approach": "1/8",
+     "find": "0/8"
+    },
+    "wrong_object_stops": 1,
+    "failures": {
+     "target in view but no approach": 1,
+     "stopped away from the target": 7,
+     "approached but did not arrive": 2,
+     "reached the target but did not stop": 1,
+     "stopped at another object": 1,
+     "target never came into view": 2,
+     "collision": 1
+    }
+   },
+   "failures": {
+    "F1": {
+     "count": 5,
+     "episodes": [
+      "g1-0012-blue_cone-search",
+      "g1-0013-orange_ball-search",
+      "g1-0014-red_cube-search",
+      "g1-0015-green_cylinder-search",
+      "g1-0026-red_cube-altitude"
+     ],
+     "representative": "g1-0012-blue_cone-search"
+    },
+    "F2": {
+     "count": 2,
+     "episodes": [
+      "g1-0000-blue_cone-visible",
+      "g1-0005-orange_ball-peripheral"
+     ],
+     "representative": "g1-0000-blue_cone-visible"
+    },
+    "F3": {
+     "count": 3,
+     "episodes": [
+      "g1-0002-red_cube-visible",
+      "g1-0025-orange_ball-altitude",
+      "g1-0027-green_cylinder-altitude"
+     ],
+     "representative": "g1-0002-red_cube-visible"
+    },
+    "F4": {
+     "count": 1,
+     "episodes": [
+      "g1-0006-red_cube-peripheral"
+     ],
+     "representative": "g1-0006-red_cube-peripheral"
+    },
+    "F5": {
+     "count": 2,
+     "episodes": [
+      "g1-0004-blue_cone-peripheral",
+      "g1-0007-green_cylinder-peripheral"
+     ],
+     "representative": "g1-0004-blue_cone-peripheral"
+    },
+    "F6": {
+     "count": 1,
+     "episodes": [
+      "g1-0003-green_cylinder-visible"
+     ],
+     "representative": "g1-0003-green_cylinder-visible"
+    },
+    "F7": {
+     "count": 1,
+     "episodes": [
+      "g1-0024-blue_cone-altitude"
+     ],
+     "representative": "g1-0024-blue_cone-altitude"
+    }
+   },
+   "turns": {
+    "left": {
+     "right": 1,
+     "left": 4,
+     "none": 0,
+     "acquired": 0,
+     "n": 5
+    },
+    "right": {
+     "right": 1,
+     "left": 1,
+     "none": 0,
+     "acquired": 2,
+     "n": 2
+    },
+    "behind": {
+     "right": 0,
+     "left": 1,
+     "none": 0,
+     "acquired": 0,
+     "n": 1
+    }
+   },
+   "distractors": {
+    "episodes": 16,
+    "another_object_in_view": 4,
+    "before_the_named_one_was_seen": 1,
+    "stopped_at_another_object": 1
+   },
+   "motion": {
+    "model": "AeroVLA Step",
+    "level": "G1",
+    "episodes": 16,
+    "success": 1,
+    "collisions": 1,
+    "decisions": 303,
+    "seconds_per_decision": 6.419,
+    "inference_ms": 1110.2,
+    "action_change_fraction_of_range": 0.0685,
+    "heading_change_deg_mean": 4.15,
+    "heading_change_deg_max": 69.3,
+    "mean_speed_mps": 0.647,
+    "clip_frequency": null,
+    "clip_median_overshoot": null,
+    "clip_max_overshoot": null
+   }
+  },
+  "AeroVLA Continuous:G1": {
+   "directory": "outputs/visual_search/aerovla_continuous_g1",
+   "stages": {
+    "episodes": 16,
+    "success": 0,
+    "collisions": 0,
+    "started_hidden": 8,
+    "acquired": 1,
+    "approached": 4,
+    "stopped": 8
+   },
+   "breakdown": {
+    "n": 16,
+    "success": 0,
+    "collisions": 0,
+    "reached": 2,
+    "stopped": 8,
+    "mean_initial_m": 43.156003704871694,
+    "mean_final_m": 58.103697538609914,
+    "mean_minimum_m": 32.88213038847077,
+    "mean_stop_distance_m": null,
+    "started_unseen": 8,
+    "acquired": 1,
+    "mean_acquire_step": 3,
+    "mean_search_steps": 17.0625,
+    "mean_yaw_swept_deg": 61.819515165964745,
+    "mean_climbed_m": 2.0386126935482025,
+    "mean_seconds": 57.120924055576324,
+    "by_kind": {
+     "altitude": "0/4",
+     "peripheral": "0/4",
+     "search": "0/4",
+     "visible": "0/4"
+    },
+    "by_target": {
+     "blue_cone": "0/4",
+     "green_cylinder": "0/4",
+     "orange_ball": "0/4",
+     "red_cube": "0/4"
+    },
+    "by_wedge": {
+     "inside the held-out wedge": "0/8",
+     "outside it": "0/8"
+    },
+    "by_instruction": {
+     "approach": "0/8",
+     "find": "0/8"
+    },
+    "wrong_object_stops": 0,
+    "failures": {
+     "approached but did not arrive": 1,
+     "stopped away from the target": 8,
+     "reached the target but did not stop": 2,
+     "target never came into view": 5
+    }
+   },
+   "failures": {
+    "F1": {
+     "count": 7,
+     "episodes": [
+      "g1-0012-blue_cone-search",
+      "g1-0013-orange_ball-search",
+      "g1-0014-red_cube-search",
+      "g1-0015-green_cylinder-search",
+      "g1-0024-blue_cone-altitude",
+      "g1-0026-red_cube-altitude",
+      "g1-0027-green_cylinder-altitude"
+     ],
+     "representative": "g1-0012-blue_cone-search"
+    },
+    "F3": {
+     "count": 5,
+     "episodes": [
+      "g1-0000-blue_cone-visible",
+      "g1-0002-red_cube-visible",
+      "g1-0003-green_cylinder-visible",
+      "g1-0005-orange_ball-peripheral",
+      "g1-0025-orange_ball-altitude"
+     ],
+     "representative": "g1-0000-blue_cone-visible"
+    },
+    "F4": {
+     "count": 1,
+     "episodes": [
+      "g1-0006-red_cube-peripheral"
+     ],
+     "representative": "g1-0006-red_cube-peripheral"
+    },
+    "F5": {
+     "count": 2,
+     "episodes": [
+      "g1-0004-blue_cone-peripheral",
+      "g1-0007-green_cylinder-peripheral"
+     ],
+     "representative": "g1-0004-blue_cone-peripheral"
+    },
+    "F6": {
+     "count": 1,
+     "episodes": [
+      "g1-0001-orange_ball-visible"
+     ],
+     "representative": "g1-0001-orange_ball-visible"
+    }
+   },
+   "turns": {
+    "left": {
+     "right": 0,
+     "left": 4,
+     "none": 1,
+     "acquired": 0,
+     "n": 5
+    },
+    "right": {
+     "right": 0,
+     "left": 2,
+     "none": 0,
+     "acquired": 1,
+     "n": 2
+    },
+    "behind": {
+     "right": 0,
+     "left": 1,
+     "none": 0,
+     "acquired": 0,
+     "n": 1
+    }
+   },
+   "distractors": {
+    "episodes": 16,
+    "another_object_in_view": 4,
+    "before_the_named_one_was_seen": 2,
+    "stopped_at_another_object": 0
+   },
+   "motion": {
+    "model": "AeroVLA Continuous",
+    "level": "G1",
+    "episodes": 16,
+    "success": 0,
+    "collisions": 0,
+    "decisions": 324,
+    "seconds_per_decision": 2.967,
+    "inference_ms": 1157.1,
+    "action_change_fraction_of_range": 0.0463,
+    "heading_change_deg_mean": 3.07,
+    "heading_change_deg_max": 65.2,
+    "mean_speed_mps": 0.888,
+    "clip_frequency": null,
+    "clip_median_overshoot": null,
+    "clip_max_overshoot": null
+   }
+  },
+  "Teacher:G1": {
+   "directory": "outputs/visual_search/teacher_g1",
+   "stages": {
+    "episodes": 32,
+    "success": 32,
+    "collisions": 0,
+    "started_hidden": 16,
+    "acquired": 16,
+    "approached": 32,
+    "stopped": 32
+   },
+   "breakdown": {
+    "n": 32,
+    "success": 32,
+    "collisions": 0,
+    "reached": 32,
+    "stopped": 32,
+    "mean_initial_m": 35.958634837252724,
+    "mean_final_m": 10.63434946332021,
+    "mean_minimum_m": 10.63434946332021,
+    "mean_stop_distance_m": 10.63434946332021,
+    "started_unseen": 16,
+    "acquired": 16,
+    "mean_acquire_step": 11.4375,
+    "mean_search_steps": 7.75,
+    "mean_yaw_swept_deg": 119.17765516804988,
+    "mean_climbed_m": 0.7125061303377151,
+    "mean_seconds": 21.165975905954838,
+    "by_kind": {
+     "altitude": "4/4",
+     "peripheral": "8/8",
+     "reacquire": "4/4",
+     "search": "12/12",
+     "visible": "4/4"
+    },
+    "by_target": {
+     "blue_cone": "8/8",
+     "green_cylinder": "8/8",
+     "orange_ball": "8/8",
+     "red_cube": "8/8"
+    },
+    "by_wedge": {
+     "inside the held-out wedge": "16/16",
+     "outside it": "16/16"
+    },
+    "by_instruction": {
+     "approach": "16/16",
+     "find": "16/16"
+    },
+    "wrong_object_stops": 0,
+    "failures": {}
+   },
+   "failures": {},
+   "turns": {
+    "left": {
+     "right": 5,
+     "left": 0,
+     "none": 0,
+     "acquired": 5,
+     "n": 5
+    },
+    "right": {
+     "right": 6,
+     "left": 0,
+     "none": 0,
+     "acquired": 6,
+     "n": 6
+    },
+    "behind": {
+     "right": 5,
+     "left": 0,
+     "none": 0,
+     "acquired": 5,
+     "n": 5
+    }
+   },
+   "distractors": {
+    "episodes": 32,
+    "another_object_in_view": 3,
+    "before_the_named_one_was_seen": 3,
+    "stopped_at_another_object": 0
+   },
+   "motion": {
+    "model": "Teacher",
+    "level": "G1",
+    "episodes": 32,
+    "success": 32,
+    "collisions": 0,
+    "decisions": 1366,
+    "seconds_per_decision": 0.508,
+    "inference_ms": null,
+    "action_change_fraction_of_range": 0.0302,
+    "heading_change_deg_mean": 3.4,
+    "heading_change_deg_max": 16.4,
+    "mean_speed_mps": 1.196,
+    "clip_frequency": null,
+    "clip_median_overshoot": null,
+    "clip_max_overshoot": null
+   }
+  }
+ },
+ "categories": {
+  "F1": "search: the target never came into view",
+  "F2": "grounding: went to or stopped at another object",
+  "F3": "approach: found the target but did not get close",
+  "F4": "early stop: stopped by itself outside the radius",
+  "F5": "no stop: was near the target and did not stop there",
+  "F6": "altitude transition: kept climbing after the target was found",
+  "F7": "collision",
+  "F8": "language: fails only with the unseen wording",
+  "F9": "domain: repeated in the held-out scene only",
+  "F10": "other"
+ },
+ "definitions": {
+  "approach_m": 20.0,
+  "climb_after_sight_m": 5.0,
+  "success": "stopped by itself within the radius, no collision (unchanged)"
+ },
+ "training": {
+  "OFT Gen-v1": {
+   "checkpoint": "outputs/aerovla_oft/checkpoints/generalization_v1",
+   "dataset_episodes": 292,
+   "dataset_samples": 11745,
+   "train_samples_used": 10495,
+   "best_update": 1250,
+   "updates_run": 2251,
+   "stopped_early": true,
+   "train_l1_at_best": 0.11537120448803198,
+   "val_l1_at_best": 0.09155693571810844,
+   "peak_allocated_GiB": 9.800263404846191,
+   "validation_history": [
+    [
+     250,
+     0.2602478667162359
+    ],
+    [
+     500,
+     0.17720114561961964
+    ],
+    [
+     750,
+     0.15489102392166387
+    ],
+    [
+     1000,
+     0.12196938522392883
+    ],
+    [
+     1250,
+     0.09155693571810844
+    ],
+    [
+     1500,
+     0.14826325067551807
+    ],
+    [
+     1750,
+     0.11026617623865605
+    ],
+    [
+     2000,
+     0.10700787238019985
+    ],
+    [
+     2250,
+     0.09697975950839463
+    ]
+   ]
+  },
+  "OFT Gen-v2": {
+   "checkpoint": "outputs/aerovla_oft/checkpoints/generalization_v2",
+   "dataset_episodes": 445,
+   "dataset_samples": 16765,
+   "train_samples_used": 14975,
+   "best_update": 3999,
+   "updates_run": 4000,
+   "stopped_early": false,
+   "train_l1_at_best": 0.048963743783567805,
+   "val_l1_at_best": 0.06997038545487158,
+   "peak_allocated_GiB": 9.797147750854492,
+   "validation_history": [
+    [
+     250,
+     0.23461852801265196
+    ],
+    [
+     500,
+     0.16777655326295643
+    ],
+    [
+     750,
+     0.13278185899544043
+    ],
+    [
+     1000,
+     0.12586624028044752
+    ],
+    [
+     1250,
+     0.13390888733556494
+    ],
+    [
+     1500,
+     0.10374350602069171
+    ],
+    [
+     1750,
+     0.09354037728335243
+    ],
+    [
+     2000,
+     0.08728893235092983
+    ],
+    [
+     2250,
+     0.09427414529636735
+    ],
+    [
+     2500,
+     0.08240983605210203
+    ],
+    [
+     2750,
+     0.08070495024512639
+    ],
+    [
+     3000,
+     0.08406625109491869
+    ],
+    [
+     3250,
+     0.08141135665719049
+    ],
+    [
+     3500,
+     0.07413171351454366
+    ],
+    [
+     3750,
+     0.0721130780497333
+    ],
+    [
+     3999,
+     0.06997038545487158
+    ]
+   ]
+  }
+ },
+ "comparison": {
+  "levels": [
+   {
+    "level": "G0",
+    "OFT Gen-v1": "20/20",
+    "OFT Gen-v2": "20/20",
+    "OFT Gen-v1 acquired": "8/8",
+    "OFT Gen-v2 acquired": "8/8"
+   },
+   {
+    "level": "G1",
+    "OFT Gen-v1": "27/32",
+    "OFT Gen-v2": "32/32",
+    "OFT Gen-v1 acquired": "16/16",
+    "OFT Gen-v2 acquired": "16/16"
+   },
+   {
+    "level": "G2",
+    "OFT Gen-v1": "9/12",
+    "OFT Gen-v2": "11/12",
+    "OFT Gen-v1 acquired": "6/6",
+    "OFT Gen-v2 acquired": "6/6"
+   },
+   {
+    "level": "G3",
+    "OFT Gen-v1": "19/20",
+    "OFT Gen-v2": "18/20",
+    "OFT Gen-v1 acquired": "12/12",
+    "OFT Gen-v2 acquired": "12/12"
+   },
+   {
+    "level": "G4",
+    "OFT Gen-v1": "2/6",
+    "OFT Gen-v2": "4/6",
+    "OFT Gen-v1 acquired": "3/3",
+    "OFT Gen-v2 acquired": "3/3"
+   },
+   {
+    "level": "P",
+    "OFT Gen-v1": "21/24",
+    "OFT Gen-v2": "24/24",
+    "OFT Gen-v1 acquired": "12/12",
+    "OFT Gen-v2 acquired": "12/12"
+   },
+   {
+    "level": "S",
+    "OFT Gen-v1": "16/16",
+    "OFT Gen-v2": "16/16",
+    "OFT Gen-v1 acquired": "16/16",
+    "OFT Gen-v2 acquired": "16/16"
+   }
+  ],
+  "failures": [
+   {
+    "category": "F1",
+    "name": "search: the target never came into view",
+    "OFT Gen-v1": 0,
+    "OFT Gen-v2": 0
+   },
+   {
+    "category": "F2",
+    "name": "grounding: went to or stopped at another object",
+    "OFT Gen-v1": 0,
+    "OFT Gen-v2": 0
+   },
+   {
+    "category": "F3",
+    "name": "approach: found the target but did not get close",
+    "OFT Gen-v1": 4,
+    "OFT Gen-v2": 4
+   },
+   {
+    "category": "F4",
+    "name": "early stop: stopped by itself outside the radius",
+    "OFT Gen-v1": 4,
+    "OFT Gen-v2": 0
+   },
+   {
+    "category": "F5",
+    "name": "no stop: was near the target and did not stop there",
+    "OFT Gen-v1": 1,
+    "OFT Gen-v2": 1
+   },
+   {
+    "category": "F6",
+    "name": "altitude transition: kept climbing after the target was found",
+    "OFT Gen-v1": 4,
+    "OFT Gen-v2": 0
+   },
+   {
+    "category": "F7",
+    "name": "collision",
+    "OFT Gen-v1": 0,
+    "OFT Gen-v2": 0
+   },
+   {
+    "category": "F8",
+    "name": "language: fails only with the unseen wording",
+    "OFT Gen-v1": 3,
+    "OFT Gen-v2": 0
+   },
+   {
+    "category": "F9",
+    "name": "domain: repeated in the held-out scene only",
+    "OFT Gen-v1": 0,
+    "OFT Gen-v2": 0
+   },
+   {
+    "category": "F10",
+    "name": "other",
+    "OFT Gen-v1": 0,
+    "OFT Gen-v2": 0
+   }
+  ],
+  "levels_compared": [
+   "G0",
+   "G1",
+   "G2",
+   "G3",
+   "G4",
+   "P",
+   "S"
+  ]
+ }
+}

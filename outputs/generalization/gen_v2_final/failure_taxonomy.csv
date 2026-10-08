@@ -1,0 +1,30 @@
+model,level,category,name,count,percent_of_failures,percent_of_episodes,representative_episode
+OFT Gen-v1,G1,F4,early stop: stopped by itself outside the radius,3,60.0,9.4,g1-0024-blue_cone-altitude
+OFT Gen-v1,G1,F6,altitude transition: kept climbing after the target was found,2,40.0,6.2,g1-0008-blue_cone-peripheral
+OFT Gen-v1,G2,F3,approach: found the target but did not get close,1,33.3,8.3,g2-0110-yellow_pyramid-search
+OFT Gen-v1,G2,F6,altitude transition: kept climbing after the target was found,2,66.7,16.7,g2-0102-yellow_pyramid-visible
+OFT Gen-v2,G2,F3,approach: found the target but did not get close,1,100.0,8.3,g2-0110-yellow_pyramid-search
+OFT Gen-v1,G3,F3,approach: found the target but did not get close,1,100.0,5.0,g3-0137-orange_ball-search
+OFT Gen-v2,G3,F3,approach: found the target but did not get close,1,50.0,5.0,g3-0136-blue_cone-search
+OFT Gen-v2,G3,F5,no stop: was near the target and did not stop there,1,50.0,5.0,g3-0139-green_cylinder-search
+OFT Gen-v1,G4,F3,approach: found the target but did not get close,2,50.0,33.3,g4-0161-yellow_pyramid-visible
+OFT Gen-v1,G4,F4,early stop: stopped by itself outside the radius,1,25.0,16.7,g4-0164-yellow_pyramid-search
+OFT Gen-v1,G4,F5,no stop: was near the target and did not stop there,1,25.0,16.7,g4-0162-yellow_pyramid-peripheral
+OFT Gen-v2,G4,F3,approach: found the target but did not get close,2,100.0,33.3,g4-0161-yellow_pyramid-visible
+OFT Gen-v1,P,F8,language: fails only with the unseen wording,3,100.0,12.5,p-0000-blue_cone-visible-find_and_approach
+OFT Pilot,G1,F1,search: the target never came into view,3,10.7,9.4,g1-0024-blue_cone-altitude
+OFT Pilot,G1,F3,approach: found the target but did not get close,11,39.3,34.4,g1-0000-blue_cone-visible
+OFT Pilot,G1,F5,no stop: was near the target and did not stop there,11,39.3,34.4,g1-0008-blue_cone-peripheral
+OFT Pilot,G1,F7,collision,3,10.7,9.4,g1-0013-orange_ball-search
+AeroVLA Step,G1,F1,search: the target never came into view,5,33.3,31.2,g1-0012-blue_cone-search
+AeroVLA Step,G1,F2,grounding: went to or stopped at another object,2,13.3,12.5,g1-0000-blue_cone-visible
+AeroVLA Step,G1,F3,approach: found the target but did not get close,3,20.0,18.8,g1-0002-red_cube-visible
+AeroVLA Step,G1,F4,early stop: stopped by itself outside the radius,1,6.7,6.2,g1-0006-red_cube-peripheral
+AeroVLA Step,G1,F5,no stop: was near the target and did not stop there,2,13.3,12.5,g1-0004-blue_cone-peripheral
+AeroVLA Step,G1,F6,altitude transition: kept climbing after the target was found,1,6.7,6.2,g1-0003-green_cylinder-visible
+AeroVLA Step,G1,F7,collision,1,6.7,6.2,g1-0024-blue_cone-altitude
+AeroVLA Continuous,G1,F1,search: the target never came into view,7,43.8,43.8,g1-0012-blue_cone-search
+AeroVLA Continuous,G1,F3,approach: found the target but did not get close,5,31.2,31.2,g1-0000-blue_cone-visible
+AeroVLA Continuous,G1,F4,early stop: stopped by itself outside the radius,1,6.2,6.2,g1-0006-red_cube-peripheral
+AeroVLA Continuous,G1,F5,no stop: was near the target and did not stop there,2,12.5,12.5,g1-0004-blue_cone-peripheral
+AeroVLA Continuous,G1,F6,altitude transition: kept climbing after the target was found,1,6.2,6.2,g1-0001-orange_ball-visible

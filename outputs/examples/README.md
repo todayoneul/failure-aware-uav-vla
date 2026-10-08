@@ -23,6 +23,12 @@
 | [visual_search_oft.gif](visual_search_oft.gif) | `run_visual_search.ps1 -Policy oft -Record …`로 기록한 `C-blue_cone-0`을 `scripts/export_visual_search_media.py gif`로 그림 | AeroVLA-OFT의 실제 비행 44 tick, 2배속. 뒤돌아 시작 → 탐색 → 접근 → 11.3m에서 정지. 각 frame은 관찰 창과 같은 renderer |
 | [visual_search_oft_reacquire.gif](visual_search_oft_reacquire.gif) | 같은 기록의 `D-orange_ball-0` | 접근 중 강제 회전으로 목표를 놓친 뒤 다시 찾아 9.3m에서 정지, 50 tick |
 | [visual_search_trajectories.jpg](visual_search_trajectories.jpg) | `outputs/visual_search/baseline`, `oft_pilot`의 `steps.jsonl`을 `export_visual_search_media.py trajectories`로 그림 | 같은 시작 조건 A/B/C에서 기존 AeroVLA(위)와 AeroVLA-OFT(아래)의 실제 궤적. 배경은 simulator top-down 영상 |
+| [generalization/plan_blocks_a.jpg](generalization/plan_blocks_a.jpg), `plan_blocks_b.jpg`, `plan_yard.jpg` | `scripts/plan_generalization.py figure` | 맵의 box 위에 그린 시작 상태: 점은 학습, ×는 held-out, 선은 비워 둔 방향 |
+| [generalization/dataset_samples.jpg](generalization/dataset_samples.jpg), `dataset_samples.json`, `dataset_summary.json`, `dataset_plan.json` | `datasets/projectairsim_visual_search/generalization_v1` | Gen-v1 학습 데이터: 물체 × teacher 상태별 sample 20개, 전체 통계, 계획 파일(seed와 split 포함) |
+| `generalization/dataset_v2_summary.json`, `dataset_v2_added_plan.json` | `generalization_v2`, `generalization_v2_added` | Gen-v2: 병합한 dataset의 통계, 추가한 153 episode의 계획 |
+| [generalization/flown_g1.jpg](generalization/flown_g1.jpg), `flown_yard.jpg`, `flown_g1_v1_v2.jpg` | 평가 실행의 `steps.jsonl`을 `export_visual_search_media.py flown`으로 그림 | 같은 held-out 시작에서의 실제 궤적: pilot 대 Gen-v1, Yard의 Gen-v1, Gen-v1 대 Gen-v2 |
+| [generalization/search_g1.gif](generalization/search_g1.gif), `reacquire_g1.gif`, `yard_g3.gif`, `climb_g1_v1.gif` | Gen-v1을 `-Record`로 다시 비행한 `g1-0013`, `g1-0030`, `g3-0138`, `g1-0026` | 탐색 → 획득 → 접근, 놓친 뒤 다시 찾기, Yard에서의 성공, 벽을 넘어 올라가 찾기. 2 판단마다 한 장 |
+| [generalization/climb_g1_v2.gif](generalization/climb_g1_v2.gif), `fixed_g1_v2.gif`, `failure_g1_v1.gif` | Gen-v2와 Gen-v1을 같은 시작에서 `-Record`로 비행 | Gen-v2가 벽을 넘어 찾고 10.5m에서 정지. 같은 시작 `g1-0008`에서 Gen-v1은 목표 앞에서 계속 상승(실패), Gen-v2는 15 판단 만에 정지 |
 | [visual_search_dataset/](visual_search_dataset/) | `datasets/projectairsim_visual_search/pilot`에서 sample 3개 | 학습 데이터 예시: `samples.json`(search / approach / stop), `samples.jpg`(각 Front 위·Down 아래), `summary.json`(전체 통계) |
 | [mission_landmark.png](mission_landmark.png) | `outputs/mission_demo/` 대화형 세션의 `current_view.png` | Blue cone landmark 미션: 43 step, 모델 LAND, 착륙, 목표 3.59m |
 
