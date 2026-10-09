@@ -8,6 +8,7 @@
   score:   --score <checkpoint dir> --dataset <root>    validation L1 of a checkpoint on any dataset
   probe:   --probe <checkpoint dir> --dataset <root>    the same frames with the sentence changed: does the action follow the words?
   breakdown: --breakdown <checkpoint dir> --dataset <root>   the kind of the first action against the teacher's, by kind of episode
+  cost:    --cost <checkpoint dir> --dataset <root>     parameters, inference time and peak memory of a checkpoint
   negative probe: --negative-probe <checkpoint dir> --dataset <root of the hard-negative episodes>
            frames that show a related object and not the named one, told the episode's sentence and then one naming what is in view
 
@@ -28,6 +29,7 @@ import torch
 from PIL import Image
 from src.aerovla_oft.spec import load_config,normalize_action,denormalize_action,is_stop
 from src.aerovla_oft.model import AeroVLAOFT
+from src.visual_search.episodes import load_config as load_search_config
 
 MANIFEST=ROOT/'outputs/integration/model-downloads.json'
 AXES=('forward','down','yaw')
@@ -154,10 +156,19 @@ def train(args):
     if args.limit_samples:samples=samples[::max(1,len(samples)//args.limit_samples)][:args.limit_samples]
     validation=stratified(validation,args.eval_samples)
     torch.cuda.reset_peak_memory_stats()
+    grounding_rate=None
+    if args.grounding:
+        # A language-vision grounding module by its name in the experiment's configuration; the checkpoint started from has none.
+        experiment=load_search_config()['grounding_architecture'];config['grounding']=experiment['experiments'][args.grounding]['module']
+        grounding_rate=args.grounding_lr or experiment['training']['grounding_learning_rate']
     model=AeroVLAOFT(MANIFEST,config,checkpoint=args.init,trainable=True)
     learning_rate=args.lr or settings['learning_rate'];accumulation=args.accumulation or settings['gradient_accumulation']
     batch_size=args.batch or settings['batch_size']
-    optimizer=torch.optim.AdamW(model.trainable_parameters(),lr=learning_rate,weight_decay=settings['weight_decay'] if args.weight_decay is None else args.weight_decay)
+    # The LoRA and the head keep their rate; a new module, which starts as the identity, has its own.
+    new=model.grounding_parameters();known={id(parameter) for parameter in new}
+    groups=[{'params':[parameter for parameter in model.trainable_parameters() if id(parameter) not in known],'lr':learning_rate}]
+    if new:groups.append({'params':new,'lr':grounding_rate or learning_rate})
+    optimizer=torch.optim.AdamW(groups,lr=learning_rate,weight_decay=settings['weight_decay'] if args.weight_decay is None else args.weight_decay)
     updates=args.steps;warmup=min(settings['warmup_steps'],max(1,updates//10))
     schedule=torch.optim.lr_scheduler.LambdaLR(optimizer,lambda step:min(1.,(step+1)/warmup)*max(.1,1-step/max(1,updates)))
     history=[];started=time.time();running=None;best=None;stale=0;stopped_early=False
@@ -185,6 +196,8 @@ def train(args):
                 'samples_seen':(update+1)*batch_size*accumulation,'epochs':(update+1)*batch_size*accumulation/len(samples),
                 'learning_rate':learning_rate,'balance':args.balance,'train_state_counts':counts,'boost':boosts,'boosted_samples':boosted,
                 'share_of_draws':shares,'frames_by_source':share_frames,
+                'grounding':config.get('grounding'),'grounding_learning_rate':grounding_rate if new else None,
+                'parameters':{'lora':model.load_info['trainable_lora'],'head':model.load_info['head_parameters'],'grounding':model.load_info['grounding_parameters']},
                 'selection':{'band':args.select_band,'rule':'lowest validation L1; among evaluations within the band of it, the highest mean of grounding and terminal accuracy'},
                 'peak_allocated_GiB':torch.cuda.max_memory_allocated()/2**30,'peak_reserved_GiB':torch.cuda.max_memory_reserved()/2**30,
                 'train_seconds':time.time()-started,'final_train':final_train,'final_val':final_val,'best':best,
@@ -285,6 +298,26 @@ def probe(args):
     result['object_swap']={'frames':len(rows),'own_sentence_advances':sum(r['own']=='advance' for r in rows)/max(1,len(rows)),
                            'other_pad_named_still_advances':sum(r['other']=='advance' for r in rows)/max(1,len(rows)),
                            'mean_action_difference':sum(r['difference'] for r in rows)/max(1,len(rows))}
+    print(json.dumps(result,indent=1))
+    if args.output:Path(args.output).write_text(json.dumps(result,indent=1))
+
+
+@torch.no_grad()
+def cost(args):
+    """What a checkpoint costs to fly: parameters, time per decision and peak memory, over the same validation frames for every model."""
+    saved=json.loads((Path(args.cost)/'manifest.json').read_text());config=saved['config'];torch.cuda.reset_peak_memory_stats()
+    model=AeroVLAOFT(MANIFEST,config,checkpoint=args.cost);samples=stratified(load_samples(args.dataset,args.val_file),args.eval_samples);times=[]
+    for index,sample in enumerate(samples):
+        pixels,texts,_,proprio=batch_of(model,args.dataset,[sample],config);torch.cuda.synchronize();start=time.perf_counter()
+        with torch.inference_mode(),torch.autocast('cuda',dtype=torch.bfloat16):model.forward(pixels,texts,proprio)
+        torch.cuda.synchronize()
+        if index>=5:times.append((time.perf_counter()-start)*1000)
+    training=saved.get('training',{});added=model.load_info['grounding_parameters']
+    result={'checkpoint':str(args.cost),'grounding':config.get('grounding',{'type':'none'}),'frames':len(times),'inference_ms':sum(times)/len(times),
+            'inference_peak_GiB':round(torch.cuda.max_memory_allocated()/2**30,2),'training_peak_GiB':round(training['peak_allocated_GiB'],2) if training.get('peak_allocated_GiB') else None,
+            'added_parameters':added,'trainable_parameters':model.load_info['head_parameters']+added+sum(p.numel() for n,p in model.peft.named_parameters() if 'lora_' in n and '.oft.' in n),
+            'lora_parameters':sum(p.numel() for n,p in model.peft.named_parameters() if 'lora_' in n and '.oft.' in n),'head_parameters':model.load_info['head_parameters'],
+            'train_seconds':training.get('train_seconds')}
     print(json.dumps(result,indent=1))
     if args.output:Path(args.output).write_text(json.dumps(result,indent=1))
 
@@ -405,8 +438,12 @@ if __name__=='__main__':
     parser.add_argument('--source',help='with --breakdown: only frames of this source dataset')
     parser.add_argument('--negative-probe',help='checkpoint shown the hard-negative frames with two sentences; --dataset is the folder of those episodes; --output names a JSON file')
     parser.add_argument('--probe-steps',type=int,default=3,help='with --negative-probe: decisions taken from the start of an episode (or from the end of its forced turn)')
+    parser.add_argument('--grounding',choices=('film','cross_attention'),help='train with this language-vision grounding module (configs/visual_search.json, grounding_architecture.experiments)')
+    parser.add_argument('--grounding-lr',type=float,help='learning rate of the grounding module; by default the one in the configuration')
+    parser.add_argument('--cost',help='checkpoint whose parameters, inference time and peak memory are measured; --output then names a JSON file')
     arguments=parser.parse_args()
-    if arguments.breakdown:breakdown(arguments)
+    if arguments.cost:cost(arguments)
+    elif arguments.breakdown:breakdown(arguments)
     elif arguments.negative_probe:negative_probe(arguments)
     elif arguments.probe:probe(arguments)
     elif arguments.score:score(arguments)

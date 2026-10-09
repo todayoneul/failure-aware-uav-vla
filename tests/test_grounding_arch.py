@@ -122,4 +122,79 @@ class PilotLineTests(unittest.TestCase):
         self.assertEqual(ARCH['selection']['order'][:2],['passes the pilot','wrong_target'])
 
 
+class ModuleTests(unittest.TestCase):
+    """The two grounding modules on small tensors: no base model is loaded."""
+    @classmethod
+    def setUpClass(cls):
+        try:
+            import torch
+            from src.aerovla_oft import model
+        except ImportError as error:raise unittest.SkipTest(f'model dependencies not installed here: {error}')
+        cls.torch=torch;cls.model=model;torch.manual_seed(0)
+        cls.visual=torch.randn(2,12,10);cls.language=torch.randn(2,5,8);cls.mask=torch.tensor([[1.,1.,1.,0.,0.],[1.,1.,1.,1.,1.]])
+
+    def film(self):return self.model.VisualFiLM(8,10,6)
+    def attention(self):return self.model.LanguageVisionAttention(8,10,8,2)
+
+    def test_both_are_the_identity_until_trained(self):
+        for module in (self.film(),self.attention()):
+            self.assertTrue(self.torch.equal(module(self.visual,self.language,self.mask),self.visual))
+            # ... and the first gradient step can move them: the zeroed last layer receives a gradient.
+            module(self.visual,self.language,self.mask).square().sum().backward();last=module.net[-1] if hasattr(module,'net') else module.out
+            self.assertGreater(float(last.weight.grad.abs().sum()),0.)
+
+    def test_film_changes_every_patch_in_the_same_way_and_only_by_the_sentence(self):
+        torch=self.torch;module=self.film();torch.nn.init.normal_(module.net[-1].weight,std=.5);torch.nn.init.normal_(module.net[-1].bias,std=.5)
+        out=module(self.visual,self.language,self.mask);self.assertFalse(torch.allclose(out,self.visual))
+        # One gamma and one beta per channel: two patches of one sample differ after it exactly as gamma times their difference.
+        delta=module.net((self.language*self.mask.unsqueeze(-1)).sum(1)/self.mask.sum(1,keepdim=True));gamma=1+delta[:,:10]
+        self.assertTrue(torch.allclose(out[:,0]-out[:,1],gamma*(self.visual[:,0]-self.visual[:,1]),atol=1e-5))
+        # Padding is not read; another sentence gives another modulation; the image does not change gamma or beta.
+        noisy=self.language.clone();noisy[0,3:]=99.;self.assertTrue(torch.allclose(module(self.visual,noisy,self.mask),out,atol=1e-6))
+        self.assertFalse(torch.allclose(module(self.visual,self.language.flip(0),self.mask.flip(0))[0],out[0],atol=1e-4))
+        other=torch.randn_like(self.visual);self.assertTrue(torch.allclose(module(other,self.language,self.mask)-other*gamma.unsqueeze(1),out-self.visual*gamma.unsqueeze(1),atol=1e-5))
+
+    def test_attention_reads_the_patches_with_the_words_and_writes_back_where_it_read(self):
+        torch=self.torch;module=self.attention();torch.nn.init.normal_(module.out.weight,std=.5)
+        weights,_=module.attention(self.visual,self.language,self.mask)
+        self.assertEqual(tuple(weights.shape),(2,2,5,12));self.assertTrue(torch.allclose(weights[1].sum(-1),torch.ones(2,5),atol=1e-5))
+        self.assertTrue(torch.equal(weights[0,:,3:],torch.zeros(2,2,12)))
+        out=module(self.visual,self.language,self.mask);self.assertFalse(torch.allclose(out,self.visual))
+        noisy=self.language.clone();noisy[0,3:]=99.;self.assertTrue(torch.allclose(module(self.visual,noisy,self.mask),out,atol=1e-5))
+        # Unlike FiLM the change is not the same for every patch, and it depends on the image as well as on the sentence.
+        change=(out-self.visual)[1];self.assertGreater(float((change-change.mean(0,keepdim=True)).abs().max()),1e-3)
+        # A patch that no word attends to is left as it was.
+        with torch.no_grad():
+            module.query.weight.zero_();module.query.bias.zero_();module.key.weight.zero_();module.key.bias.zero_();module.key.bias[0]=0.  # uniform attention
+            uniform=module(self.visual,self.language,self.mask)
+        self.assertGreater(float((uniform-self.visual).abs().min()),0.)
+        sharp=self.attention();torch.nn.init.normal_(sharp.out.weight,std=.5)
+        with torch.no_grad():
+            # Every word looks at patch 0 only: its key is far along the queries' direction, the others are not.
+            sharp.query.weight.zero_();sharp.query.bias.fill_(1.);sharp.key.weight.zero_();sharp.key.bias.zero_()
+        visual=self.visual.clone();hook=sharp.key.register_forward_hook(lambda _,__,output:output+torch.cat([torch.full((2,1,8),40.),torch.zeros(2,11,8)],dim=1))
+        moved=(sharp(visual,self.language,self.mask)-visual).abs().sum(-1);hook.remove()
+        self.assertGreater(float(moved[:,0].min()),1e-3);self.assertLess(float(moved[:,1:].max()),1e-6)
+
+    def test_the_module_named_by_a_checkpoint(self):
+        build=self.model.grounding_module
+        self.assertIsNone(build(None,8,10));self.assertIsNone(build({'type':'none'},8,10))
+        film=build(ARCH['experiments']['film']['module'],4096,2176);cross=build(ARCH['experiments']['cross_attention']['module'],4096,2176)
+        self.assertIsInstance(film,self.model.VisualFiLM);self.assertIsInstance(cross,self.model.LanguageVisionAttention)
+        count=lambda module:sum(parameter.numel() for parameter in module.parameters())
+        self.assertEqual(count(film),2*4096+4096*512+512+512*2*2176+2*2176);self.assertEqual(count(cross),2*4096+2*2176+4096*256+256+2*(2176*256+256)+256*2176+2176)
+        self.assertLess(max(count(film),count(cross)),5_000_000)
+        self.assertRaises(ValueError,build,{'type':'gate'},8,10);self.assertRaises(ValueError,build,{'type':'film','position':'after_projector','hidden_dim':4},8,10)
+        self.assertRaises(ValueError,self.model.LanguageVisionAttention,8,10,9,2)
+
+    def test_neither_module_is_given_anything_but_the_patches_and_the_sentence(self):
+        import inspect
+        for module in (self.model.VisualFiLM,self.model.LanguageVisionAttention):
+            self.assertEqual(list(inspect.signature(module.forward).parameters),['self','visual','language','mask'])
+        source=inspect.getsource(self.model.AeroVLAOFT.patch_tokens)+inspect.getsource(self.model.AeroVLAOFT.language_tokens)
+        for word in ('target','distance','bearing','visible','position','privileged'):self.assertNotIn(word,source)
+        # The sentence alone is embedded, and the vision encoder is not trained.
+        self.assertIn('add_special_tokens=False',source);self.assertIn('torch.no_grad():features=self.core.vision_backbone',source)
+
+
 if __name__=='__main__':unittest.main()
