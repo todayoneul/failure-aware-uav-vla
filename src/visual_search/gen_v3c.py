@@ -83,15 +83,14 @@ def keep_away(points,map_id,radius):
 
 def plan_first(config,oft,scene,layout,target,other,label,span,task,instruction_id,seed,split,name,side,excluded,rule,tries=8):
     """A start that shows `other` (and, with `centred_deg`, shows it near the middle) while `target` is outside the view. Returns (episode, next seed)."""
-    distractor={'relation':[other],'within_m':rule['within_m']}
-    if rule.get('centred_deg') is not None:distractor['centred_deg']=rule['centred_deg']
+    distractor={'relation':[other],**{key:rule[key] for key in ('within_m','centred_deg','bearing_deg','beyond_m') if rule.get(key) is not None}}
     episode,seed=plan_one(config,oft,scene,layout,target,label,{'base':'search','distance_m':span,'distractor':distractor},task,instruction_id,seed,split,name,
                           side=side,excluded=excluded,tries=tries)
     if episode:episode.update(distractor=other,relation=relation_of(scene,target,other))
     return episode,seed
 
 
-def plan_lost(config,oft,scene,layout,target,other,label,span,task,instruction_id,seed,split,name,side,excluded,rule,tries=8):
+def plan_lost(config,oft,scene,layout,target,other,label,span,task,instruction_id,seed,split,name,side,excluded,rule,tries=8,turn=None):
     """A start with `target` in view whose approach is interrupted by a forced turn that leaves `other` in the middle of the view
     and `target` outside it. The teacher's answer after the turn is the one it always gives without the target: keep turning."""
     geometry=MapGeometry(scene,layout);ceiling=scene['altitude']['ceiling_m'];step=math.degrees(oft['action_bounds']['yaw_rad'][1]);view=config['generalization']['fov_half_deg']
@@ -107,6 +106,8 @@ def plan_lost(config,oft,scene,layout,target,other,label,span,task,instruction_i
             dx,dy=centre[0]-row['x'],centre[1]-row['y'];away=math.hypot(dx,dy)
             bearing=(math.degrees(math.atan2(dy,dx)-row['yaw_rad'])+180.)%360.-180.
             if abs(bearing)<rule['min_turn_deg'] or away>rule['within_m'] or not geometry.sees(row['x'],row['y'],row['height_m'],other):continue
+            # `turn` asks for a forced turn to one side: +1 to the right (the search then goes the long way round), -1 to the left.
+            if turn is not None and (bearing>0)!=(turn>0):continue
             degrees=round(bearing+rng.uniform(-rule['centred_deg'],rule['centred_deg']),1)
             episode={key:value for key,value in base.items() if key!='plan'};episode['kick']={'after_ticks':tick,'degrees':degrees}
             again=[];plan=rollout(config,oft,geometry,episode,ceiling,trace=again)
@@ -228,9 +229,11 @@ def build_pilot(config,oft):
     return episodes
 
 
-def build_validation(config,oft):
-    """The fresh validation set, in flying order: three bands of twelve starts, in four layouts of each scene that nothing else uses."""
-    settings=config['gen_v3c'];seed=settings['seeds']['validation'][0];points=earlier_points();episodes=[];counter=0
+def build_validation(config,oft,seed=None,points=None,split='validation',prefix='v3c'):
+    """The fresh validation set, in flying order: three bands of twelve starts, in four layouts of each scene that nothing else uses.
+    A later set with the same make-up gives its own first seed, the starts it keeps away from and the prefix of its ids."""
+    settings=config['gen_v3c'];seed=settings['seeds']['validation'][0] if seed is None else seed
+    points=earlier_points() if points is None else list(points);episodes=[];counter=0
     scenes={name:load_map(name) for name in SCENES};within=settings['validation']['past_within_m']
     order=[(name,settings['validation_layouts'][name][index]) for index in range(4) for name in SCENES]
     for number,(band,span) in enumerate(settings['bands_m'].items()):
@@ -242,11 +245,11 @@ def build_validation(config,oft):
                 if first=='pair':other=canonical.neighbour(scene,layout,target)
                 elif first:other=next(iter(neighbours(scene,layout,target,first,settings['reach_m'])),None)
                 if first and other is None:continue
-                excluded=keep_away(points,name,settings['separation_m']);label=f'v3c-{{seed:05d}}-{target}-{band}_{role}'
+                excluded=keep_away(points,name,settings['separation_m']);label=f'{prefix}-{{seed:05d}}-{target}-{band}_{role}'
                 if first and first!='pair':
-                    episode,seed=plan_first(config,oft,scene,layout,target,other,f'{band}_{role}',span,'land','land',seed,'validation',label,side,excluded,{'within_m':within},tries=4)
+                    episode,seed=plan_first(config,oft,scene,layout,target,other,f'{band}_{role}',span,'land','land',seed,split,label,side,excluded,{'within_m':within},tries=4)
                 else:
-                    episode,seed=plan_one(config,oft,scene,layout,target,f'{band}_{role}',{'base':base,'distance_m':span},'land','land',seed,'validation',label,
+                    episode,seed=plan_one(config,oft,scene,layout,target,f'{band}_{role}',{'base':base,'distance_m':span},'land','land',seed,split,label,
                                           side=side,excluded=excluded,tries=4)
                 if episode is None:continue
                 twins=[]

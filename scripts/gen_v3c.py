@@ -110,8 +110,8 @@ def val_mix(dataset,added,seed=0):
     return {'added_frames':len(new),'earlier_frames':len(chosen),'earlier_by_state':histogram(chosen,lambda s:s['meta']['teacher_state'])}
 
 
-def checks(name,config,items,errors):
-    """The lines of one gate: {label: (value, comparison, limit)}."""
+def checks(name,config,items,errors,validation=None):
+    """The lines of one gate: {label: (value, comparison, limit)}. `validation` names another validation file with the same make-up."""
     settings=config['gen_v3c'];m=measures(items);total=max(1,m['flights'])
     if name=='pilot':
         gates=settings['pilot']
@@ -119,7 +119,7 @@ def checks(name,config,items,errors):
                       'flights that ended at a wrong object':(m['wrong_target'],'<=',gates['wrong_target_max']),
                       'collisions':(m['collisions'],'<=',gates['collisions_max']),'episodes with a runner error':(len(errors),'<=',gates['errors_max'])}
     if name=='smoke':
-        gates=settings['gates']['smoke'];wanted=set(canonical.smoke_ids(config,json.loads(SETS['validation'].read_text(encoding='utf-8'))['episodes']))
+        gates=settings['gates']['smoke'];wanted=set(canonical.smoke_ids(config,json.loads(Path(validation or SETS['validation']).read_text(encoding='utf-8'))['episodes']))
         items=[i for i in items if i['episode'] in wanted];m=measures(items)
         return items,{'flights':(m['flights'],'>=',gates['episodes']),'successes':(m['success'],'>=',gates['success_min']),
                       'landing successes (system)':(m['landing_success'],'>=',gates['landing_success_min']),

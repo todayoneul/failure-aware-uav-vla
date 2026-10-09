@@ -219,5 +219,68 @@
                "L": ["configs/long_range_test_spawns.json", 9]},
       "rule": "a set lists its starts in cycles of objects or sentences, so the starts are taken at positions (k * step) mod n, with step the smallest number from n / count up that shares no factor with n; L takes three of each of L1, L2 and L3"
     }
+  },
+  "grounding_architecture": {
+    "description": "Two architecture experiments on the Gen-v3c data as it is (docs/language_vision_grounding_architecture.md): does language condition the visual representation too weakly? Experiment 1 is FiLM on the visual features; experiment 2, a language-to-vision cross-attention adapter, is run only if FiLM does not pass, and starts from the Gen-v3c checkpoint again, not from the FiLM one. Nothing else changes: the dataset, the sampling weights, the teacher, evaluator v2, the landing finalizer, the action space, the L1 head, chunk 4, execute 1, the 44 m range. No episode is added. The 48 canonical test starts and the Depot set stay sealed. Everything here was fixed before any architecture was trained or any pilot flight flown.",
+    "start_checkpoint": "outputs/aerovla_oft/checkpoints/generalization_v3c",
+    "dataset": "generalization_v3c: the Gen-v3c merge, with its validation mix (val_mix)",
+    "seeds": {"pilot": [23000, 23999], "validation": [24000, 24999]},
+    "separation_m": 6.0,
+    "layouts": {"field": ["t", "u", "p", "q", "r", "s"], "lot": ["t", "u", "p", "q", "r", "s"]},
+    "layouts_note": "the six layouts of each scene that no episode was recorded in; earlier evaluation sets flew in them from other starts",
+    "experiments": {
+      "film": {
+        "checkpoint": "outputs/aerovla_oft/checkpoints/grounding_film",
+        "module": {"type": "film", "position": "before_projector", "language": "mean_token_embedding", "hidden_dim": 512},
+        "what": "gamma(l) * x + beta(l) on the vision encoder's patch features, one gamma and one beta per feature channel, the same for every patch; l is the mean of the instruction's token embeddings (the language model's own embedding table, frozen) through a two-layer MLP whose last layer starts at zero, so the module is the identity at the start",
+        "why_here": "the first of the two places the plan names. The patch features are still purely visual there, so the sentence can turn channels up or down before the projector mixes them into the language model's space; the projector stays frozen and only carries the gradient"
+      },
+      "cross_attention": {
+        "checkpoint": "outputs/aerovla_oft/checkpoints/grounding_cross_attention",
+        "module": {"type": "cross_attention", "position": "before_projector", "language": "token_embeddings", "attention_dim": 256, "heads": 4},
+        "what": "one cross-attention layer in which the instruction's tokens are the queries and the patch features the keys and values; what each word reads from the patches is written back onto the patches it was read from, through an output projection that starts at zero, and added to the patch features as a residual",
+        "why": "FiLM changes every patch in the same way. Choosing the blue landing pad over the blue cube needs the sentence to pick out where in the view its object is; here each word attends over the patches and only the patches it attends to are changed"
+      }
+    },
+    "training": {
+      "description": "The Gen-v3c correction's schedule, from the Gen-v3c checkpoint, for both experiments: 2,000 updates of 4 frames, half of the draws from the hard-negative episodes, the same weights, the same validation mix, the same rule for the checkpoint that is kept. Trained: the new module, the correction LoRA and the action head. Not trained: the vision encoder, the projector, the language model, the AeroVLA adapter. The LoRA and the head keep the correction's learning rate; the new module, which starts as the identity, gets ten times that.",
+      "updates": 2000, "learning_rate": 5e-05, "grounding_learning_rate": 0.0005, "batch_size": 1, "gradient_accumulation": 4, "eval_every": 250, "eval_samples": 600,
+      "hard_negative_share": 0.5, "boost": {"small_visible": 2, "selection": 3}, "balance": 3.0, "select_band": 0.02, "val_file": "val_mix"
+    },
+    "pilot": {
+      "description": "Sixteen starts of the kind the Gen-v3c checkpoints went wrong on, each flown twice by every model: the Gen-v3c checkpoint first, as the baseline. Nine starts put a related object in the first view where it stays longest (on the side the search turns to, or straight ahead and close) with the named object outside the view; four show it elsewhere in the view; three lose the named pad to a forced turn that leaves a related object in view.",
+      "repeats": 2,
+      "hard_zone": {"right_deg": [8.0, 35.0], "centre_deg": 10.0, "centre_within_m": 25.0, "within_m": 48.0},
+      "hard_zone_from": "the 36 Gen-v3b and Gen-v3c flights with a related object in the first view: 8 of the 18 with it at +10 degrees or more, or within 10 degrees and 20 m, ended at a wrong object; none of the other 18 did",
+      "pass": {
+        "description": "An architecture passes the pilot only if every line holds. A flight is `correct` when it ends at the named object. Lines that compare with the baseline use the Gen-v3c checkpoint's two flights of the same sixteen starts.",
+        "wrong_target_max": 2,
+        "wrong_target_drop_min": 2,
+        "wrong_target_halved": true,
+        "drop_from": "one flight is the spread seen when the same start was flown again; a drop of one is not a difference",
+        "starts_never_correct_max": 1,
+        "collisions_above_baseline_max": 0,
+        "terminal_as_asked_below_baseline_max": 0,
+        "approach_touchdowns_max": 0,
+        "success_below_baseline_max": 0,
+        "landing_rate_min": 0.9,
+        "landing_rate_of": "landing missions that went to the named pad: stable physical landing, latched and disarmed",
+        "acquired_below_baseline_max": 1,
+        "errors_max": 0,
+        "regression": {"what": "the 33 starts of the earlier sets named in gen_v3c.regression, flown only when the lines above hold", "success_below_gen_v3c_max": 2, "collisions_max": 0}
+      }
+    },
+    "control": {
+      "description": "The LoRA and the head are trained on with the module, so a pass could come from the 2,000 further updates and not from the module. If an architecture passes the pilot, the same schedule without any module is run from the Gen-v3c checkpoint and flown over the same 32 flights. The architecture is credited with the improvement only if this control does not pass the pilot as well.",
+      "checkpoint": "outputs/aerovla_oft/checkpoints/grounding_control"
+    },
+    "selection": {
+      "description": "If both experiments are run, the model that goes on is chosen in this order, by rules fixed here: it must pass the pilot; then fewer flights at a wrong object; then more starts correct in both flights; then more successes; then the smaller regression; then the lower inference time and memory.",
+      "order": ["passes the pilot", "wrong_target", "starts_always_correct", "success", "regression", "cost"]
+    },
+    "validation": {
+      "description": "Only for an architecture that passed the pilot (and whose control did not): 36 fresh starts with the Gen-v3c validation make-up, behind the canonical gates with the same numbers, read by canonical_evaluator_v2. The gates are judged on the first flight of every start. The starts that ask about target selection are flown a second time and reported beside the gate; that second flight judges nothing.",
+      "gates": "gen_v3c.gates"
+    }
   }
 }

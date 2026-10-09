@@ -269,6 +269,9 @@ def distractor_ok(rule,map_config,target,distance,shown):
     """Does the start show a distractor the way a rule asks: in view, near the middle of it, or nearer than the target."""
     fits=[item for item in shown if related(map_config,target,item['name'],rule.get('relation','any')) and item['distance_m']<=rule.get('within_m',float('inf'))]
     if rule.get('centred_deg') is not None:fits=[item for item in fits if abs(item['bearing_deg'])<=rule['centred_deg']]
+    # A side of the view (right is positive), and a range of distance.
+    if rule.get('bearing_deg') is not None:fits=[item for item in fits if rule['bearing_deg'][0]<=item['bearing_deg']<=rule['bearing_deg'][1]]
+    if rule.get('beyond_m') is not None:fits=[item for item in fits if item['distance_m']>=rule['beyond_m']]
     if rule.get('nearer_by_m') is not None:fits=[item for item in fits if item['distance_m']<=distance-rule['nearer_by_m']]
     # Side by side: about as far away as the target, so neither stands out by its size in the view.
     if rule.get('max_gap_m') is not None:fits=[item for item in fits if abs(item['distance_m']-distance)<=rule['max_gap_m']]

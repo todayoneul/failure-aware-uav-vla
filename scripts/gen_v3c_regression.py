@@ -1,6 +1,8 @@
 """Gen-v3c regression: the starts of the earlier sets flown again, beside what earlier checkpoints did on the same starts.
 
-  gen_v3c_regression.py --output DIR [--runs outputs/visual_search]
+  gen_v3c_regression.py --output DIR [--runs outputs/visual_search] [--model NAME=FOLDER_PATTERN]
+
+`--model` adds a later model as the last column, e.g. FiLM=arch_film_reg_{} (the braces stand for the set's name).
 
 Reads the run folders gen_v2_<set>, gen_v3b_<set> and gen_v3c_reg_<set> for G1, G3, P, L1, L2, L3 and keeps only the
 starts named by `scripts/gen_v3c.py regression`. No simulator, no model.
@@ -22,7 +24,9 @@ GROUPS=(('G1 - unseen start (Blocks)',('G1',)),('G3 - held-out scene (Yard)',('G
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--output',required=True);parser.add_argument('--runs',default='outputs/visual_search')
+    parser.add_argument('--model',action='append',default=[],help='NAME=FOLDER_PATTERN of a later model, shown after the three')
     args=parser.parse_args();config=load_config();landing=load_landing();chosen=regression_ids(config);geometries={};maps={};records={};missing=[]
+    MODELS=globals()['MODELS']+tuple(tuple(item.split('=',1)) for item in args.model)
     for model,pattern in MODELS:
         for name,ids in chosen.items():
             folder=ROOT/args.runs/pattern.format(name.lower())
@@ -46,11 +50,11 @@ def main():
     changed=[]
     for name,ids in chosen.items():
         for episode_id in ids:
-            before=records.get((MODELS[1][0],name,episode_id));after=records.get((MODELS[2][0],name,episode_id))
+            before=records.get((MODELS[-2][0],name,episode_id));after=records.get((MODELS[-1][0],name,episode_id))
             if before and after and before['success']!=after['success']:
                 changed.append((episode_id,'lost' if before['success'] else 'gained',f'{after["failure"]} ({after["mechanism"]})' if after['failure'] else f'was {before["failure"]} ({before["mechanism"]})'))
-    markdown('Starts where Gen-v3c and the checkpoint it started from differ',('Start','Gen-v3c','How'),changed)
-    summary['changed']=[dict(zip(('start','gen_v3c','how'),row)) for row in changed]
+    markdown(f'Starts where {MODELS[-1][0]} and the checkpoint it started from ({MODELS[-2][0]}) differ',('Start',MODELS[-1][0],'How'),changed)
+    summary['changed']=[dict(zip(('start','last_model','how'),row)) for row in changed]
     detail=[]
     for (model,name,episode_id),record in records.items():
         detail.append({'model':model,'set':name,'episode':episode_id,**{key:record[key] for key in ('success','acquired','grounded','approached','self_stop','collision','failure','mechanism','steps','final_distance_m')}})

@@ -1,0 +1,1158 @@
+{
+ "description": "Language-vision grounding architectures, pilot set: sixteen adversarial starts, each flown twice by every model compared (Gen-v3c, FiLM, and the cross-attention adapter if FiLM does not pass). Written before any architecture was trained. Flown in layouts no episode was recorded in. Seeds and starts are disjoint from every earlier plan and set.",
+ "mission": "Find the blue landing pad and land on it.",
+ "evaluator": "canonical_evaluator_v2",
+ "max_start_m": 44.0,
+ "bands_m": {
+  "near": [
+   12.0,
+   20.0
+  ],
+  "mid": [
+   20.0,
+   32.0
+  ],
+  "far": [
+   32.0,
+   44.0
+  ]
+ },
+ "seeds": [
+  23000,
+  23999
+ ],
+ "layouts": {
+  "field": [
+   "t",
+   "u",
+   "p",
+   "q",
+   "r",
+   "s"
+  ],
+  "lot": [
+   "t",
+   "u",
+   "p",
+   "q",
+   "r",
+   "s"
+  ]
+ },
+ "repeats": 2,
+ "episodes": [
+  {
+   "id": "ap-23001-blue_pad-same_color",
+   "split": "pilot",
+   "seed": 23001,
+   "map": "field",
+   "layout": "t",
+   "target": "blue_pad",
+   "kind": "same_color",
+   "case": "same_color",
+   "band": "far",
+   "sector": "front_left",
+   "strategy": "right",
+   "start_xy": [
+    -3107.38,
+    2965.81
+   ],
+   "start_yaw_deg": 17.87,
+   "start_height_m": 5.06,
+   "target_bearing_deg": -61.17,
+   "start_distance_m": 37.63,
+   "start_direction_deg": 136.69,
+   "instruction_id": "land",
+   "instruction": "Find the blue landing pad and land on it.",
+   "base": "search",
+   "task": "land",
+   "others_in_view": [
+    {
+     "name": "blue_cube",
+     "bearing_deg": 12.7,
+     "distance_m": 31.8
+    },
+    {
+     "name": "red_cube",
+     "bearing_deg": 23.7,
+     "distance_m": 157.0
+    },
+    {
+     "name": "blue_cylinder",
+     "bearing_deg": -29.9,
+     "distance_m": 171.2
+    },
+    {
+     "name": "blue_cone",
+     "bearing_deg": -19.0,
+     "distance_m": 195.4
+    },
+    {
+     "name": "red_pad",
+     "bearing_deg": 36.6,
+     "distance_m": 115.8
+    },
+    {
+     "name": "orange_ball",
+     "bearing_deg": -15.6,
+     "distance_m": 107.5
+    }
+   ],
+   "max_ticks": 320,
+   "plan": {
+    "ticks": 73,
+    "clearance_m": 24.94,
+    "climbed_m": 0.0,
+    "acquired_tick": 22,
+    "states": {
+     "search": 22,
+     "align": 1,
+     "approach": 27,
+     "final": 9,
+     "descend": 10,
+     "landed": 4
+    }
+   },
+   "distractor": "blue_cube",
+   "relation": "same_color",
+   "role": "same_color",
+   "set": "architecture_pilot",
+   "band_m": [
+    32.0,
+    44.0
+   ],
+   "where": "right",
+   "planned_place": [
+    "field",
+    "t",
+    "far"
+   ]
+  },
+  {
+   "id": "ap-23004-blue_pad-same_color",
+   "split": "pilot",
+   "seed": 23004,
+   "map": "field",
+   "layout": "r",
+   "target": "blue_pad",
+   "kind": "same_color",
+   "case": "same_color",
+   "band": "mid",
+   "sector": "right",
+   "strategy": "right",
+   "start_xy": [
+    -2913.36,
+    2916.75
+   ],
+   "start_yaw_deg": 76.08,
+   "start_height_m": 6.48,
+   "target_bearing_deg": 77.48,
+   "start_distance_m": 29.75,
+   "start_direction_deg": 333.56,
+   "instruction_id": "land",
+   "instruction": "Find the blue landing pad and land on it.",
+   "base": "search",
+   "task": "land",
+   "others_in_view": [
+    {
+     "name": "green_cylinder",
+     "bearing_deg": 26.7,
+     "distance_m": 157.1
+    },
+    {
+     "name": "blue_cube",
+     "bearing_deg": 12.2,
+     "distance_m": 45.3
+    }
+   ],
+   "max_ticks": 320,
+   "plan": {
+    "ticks": 54,
+    "clearance_m": 35.75,
+    "climbed_m": 0.0,
+    "acquired_tick": 4,
+    "states": {
+     "search": 4,
+     "align": 1,
+     "approach": 19,
+     "final": 13,
+     "descend": 13,
+     "landed": 4
+    }
+   },
+   "distractor": "blue_cube",
+   "relation": "same_color",
+   "role": "same_color",
+   "set": "architecture_pilot",
+   "band_m": [
+    20.0,
+    32.0
+   ],
+   "where": "right",
+   "planned_place": [
+    "field",
+    "r",
+    "mid"
+   ]
+  },
+  {
+   "id": "ap-23013-blue_pad-same_color",
+   "split": "pilot",
+   "seed": 23013,
+   "map": "lot",
+   "layout": "t",
+   "target": "blue_pad",
+   "kind": "same_color",
+   "case": "same_color",
+   "band": "near",
+   "sector": "left",
+   "strategy": "right",
+   "start_xy": [
+    2989.68,
+    -3067.34
+   ],
+   "start_yaw_deg": -42.34,
+   "start_height_m": 8.24,
+   "target_bearing_deg": -85.05,
+   "start_distance_m": 15.93,
+   "start_direction_deg": 52.61,
+   "instruction_id": "land",
+   "instruction": "Find the blue landing pad and land on it.",
+   "base": "search",
+   "task": "land",
+   "others_in_view": [
+    {
+     "name": "blue_cone",
+     "bearing_deg": 21.0,
+     "distance_m": 34.7
+    }
+   ],
+   "max_ticks": 320,
+   "plan": {
+    "ticks": 59,
+    "clearance_m": 28.37,
+    "climbed_m": 0.0,
+    "acquired_tick": 20,
+    "states": {
+     "search": 20,
+     "align": 1,
+     "approach": 6,
+     "final": 12,
+     "descend": 16,
+     "landed": 4
+    }
+   },
+   "distractor": "blue_cone",
+   "relation": "same_color",
+   "role": "same_color",
+   "set": "architecture_pilot",
+   "band_m": [
+    12.0,
+    20.0
+   ],
+   "where": "right",
+   "planned_place": [
+    "lot",
+    "t",
+    "near"
+   ]
+  },
+  {
+   "id": "ap-23047-blue_pad-same_color",
+   "split": "pilot",
+   "seed": 23047,
+   "map": "field",
+   "layout": "p",
+   "target": "blue_pad",
+   "kind": "same_color",
+   "case": "same_color",
+   "band": "far",
+   "sector": "right",
+   "strategy": "right",
+   "start_xy": [
+    -2952.85,
+    3048.63
+   ],
+   "start_yaw_deg": 79.41,
+   "start_height_m": 5.63,
+   "target_bearing_deg": 70.69,
+   "start_distance_m": 42.86,
+   "start_direction_deg": 330.1,
+   "instruction_id": "land",
+   "instruction": "Find the blue landing pad and land on it.",
+   "base": "search",
+   "task": "land",
+   "others_in_view": [
+    {
+     "name": "blue_cone",
+     "bearing_deg": -2.2,
+     "distance_m": 21.9
+    }
+   ],
+   "max_ticks": 320,
+   "plan": {
+    "ticks": 64,
+    "clearance_m": 14.08,
+    "climbed_m": 0.0,
+    "acquired_tick": 3,
+    "states": {
+     "search": 3,
+     "align": 1,
+     "approach": 32,
+     "final": 13,
+     "descend": 11,
+     "landed": 4
+    }
+   },
+   "distractor": "blue_cone",
+   "relation": "same_color",
+   "role": "same_color",
+   "set": "architecture_pilot",
+   "band_m": [
+    32.0,
+    44.0
+   ],
+   "where": "centre",
+   "planned_place": [
+    "field",
+    "p",
+    "far"
+   ]
+  },
+  {
+   "id": "ap-23108-red_pad-same_color",
+   "split": "pilot",
+   "seed": 23108,
+   "map": "field",
+   "layout": "t",
+   "target": "red_pad",
+   "kind": "same_color",
+   "case": "same_color",
+   "band": "mid",
+   "sector": "left",
+   "strategy": "right",
+   "start_xy": [
+    -3027.84,
+    3080.08
+   ],
+   "start_yaw_deg": -35.14,
+   "start_height_m": 7.28,
+   "target_bearing_deg": -86.06,
+   "start_distance_m": 23.48,
+   "start_direction_deg": 58.81,
+   "instruction_id": "land",
+   "instruction": "Find the red landing pad and land on it.",
+   "base": "search",
+   "task": "land",
+   "others_in_view": [
+    {
+     "name": "red_cube",
+     "bearing_deg": 20.2,
+     "distance_m": 39.2
+    },
+    {
+     "name": "green_cylinder",
+     "bearing_deg": 27.9,
+     "distance_m": 80.5
+    },
+    {
+     "name": "blue_cone",
+     "bearing_deg": -10.4,
+     "distance_m": 165.4
+    }
+   ],
+   "max_ticks": 320,
+   "plan": {
+    "ticks": 66,
+    "clearance_m": 23.05,
+    "climbed_m": 0.0,
+    "acquired_tick": 20,
+    "states": {
+     "search": 20,
+     "align": 1,
+     "approach": 13,
+     "final": 13,
+     "descend": 15,
+     "landed": 4
+    }
+   },
+   "distractor": "red_cube",
+   "relation": "same_color",
+   "role": "same_color",
+   "set": "architecture_pilot",
+   "band_m": [
+    20.0,
+    32.0
+   ],
+   "where": "right",
+   "planned_place": [
+    "field",
+    "s",
+    "mid"
+   ]
+  },
+  {
+   "id": "ap-23109-red_pad-same_color",
+   "split": "pilot",
+   "seed": 23109,
+   "map": "lot",
+   "layout": "r",
+   "target": "red_pad",
+   "kind": "same_color",
+   "case": "same_color",
+   "band": "far",
+   "sector": "behind_left",
+   "strategy": "right",
+   "start_xy": [
+    2946.26,
+    -2986.92
+   ],
+   "start_yaw_deg": 322.62,
+   "start_height_m": 6.69,
+   "target_bearing_deg": -155.11,
+   "start_distance_m": 32.02,
+   "start_direction_deg": 347.51,
+   "instruction_id": "land",
+   "instruction": "Find the red landing pad and land on it.",
+   "base": "search",
+   "task": "land",
+   "others_in_view": [
+    {
+     "name": "blue_cylinder",
+     "bearing_deg": -32.7,
+     "distance_m": 99.0
+    },
+    {
+     "name": "orange_ball",
+     "bearing_deg": -13.5,
+     "distance_m": 120.0
+    },
+    {
+     "name": "red_cube",
+     "bearing_deg": 18.6,
+     "distance_m": 25.1
+    }
+   ],
+   "max_ticks": 320,
+   "plan": {
+    "ticks": 67,
+    "clearance_m": 10.08,
+    "climbed_m": 0.0,
+    "acquired_tick": 14,
+    "states": {
+     "search": 14,
+     "align": 1,
+     "approach": 22,
+     "final": 13,
+     "descend": 13,
+     "landed": 4
+    }
+   },
+   "distractor": "red_cube",
+   "relation": "same_color",
+   "role": "same_color",
+   "set": "architecture_pilot",
+   "band_m": [
+    32.0,
+    44.0
+   ],
+   "where": "right",
+   "planned_place": [
+    "lot",
+    "r",
+    "far"
+   ]
+  },
+  {
+   "id": "ap-23110-blue_pad-same_shape",
+   "split": "pilot",
+   "seed": 23110,
+   "map": "lot",
+   "layout": "p",
+   "target": "blue_pad",
+   "kind": "same_shape",
+   "case": "same_shape",
+   "band": "mid",
+   "sector": "right",
+   "strategy": "right",
+   "start_xy": [
+    3019.96,
+    -3055.6
+   ],
+   "start_yaw_deg": -173.51,
+   "start_height_m": 6.21,
+   "target_bearing_deg": 88.29,
+   "start_distance_m": 24.48,
+   "start_direction_deg": 94.78,
+   "instruction_id": "land",
+   "instruction": "Find the blue landing pad and land on it.",
+   "base": "search",
+   "task": "land",
+   "others_in_view": [
+    {
+     "name": "red_pad",
+     "bearing_deg": 24.9,
+     "distance_m": 46.8
+    }
+   ],
+   "max_ticks": 320,
+   "plan": {
+    "ticks": 48,
+    "clearance_m": 30.6,
+    "climbed_m": 0.0,
+    "acquired_tick": 5,
+    "states": {
+     "search": 5,
+     "approach": 15,
+     "final": 12,
+     "descend": 12,
+     "landed": 4
+    }
+   },
+   "distractor": "red_pad",
+   "relation": "same_shape",
+   "role": "same_shape",
+   "set": "architecture_pilot",
+   "band_m": [
+    20.0,
+    32.0
+   ],
+   "where": "right",
+   "planned_place": [
+    "lot",
+    "p",
+    "mid"
+   ]
+  },
+  {
+   "id": "ap-23111-blue_pad-same_shape",
+   "split": "pilot",
+   "seed": 23111,
+   "map": "field",
+   "layout": "p",
+   "target": "blue_pad",
+   "kind": "same_shape",
+   "case": "same_shape",
+   "band": "far",
+   "sector": "behind_left",
+   "strategy": "right",
+   "start_xy": [
+    -3021.21,
+    3050.91
+   ],
+   "start_yaw_deg": 156.04,
+   "start_height_m": 5.23,
+   "target_bearing_deg": -124.58,
+   "start_distance_m": 36.58,
+   "start_direction_deg": 211.46,
+   "instruction_id": "land",
+   "instruction": "Find the blue landing pad and land on it.",
+   "base": "search",
+   "task": "land",
+   "others_in_view": [
+    {
+     "name": "red_pad",
+     "bearing_deg": -1.9,
+     "distance_m": 20.9
+    }
+   ],
+   "max_ticks": 320,
+   "plan": {
+    "ticks": 67,
+    "clearance_m": 35.72,
+    "climbed_m": 0.0,
+    "acquired_tick": 17,
+    "states": {
+     "search": 17,
+     "align": 1,
+     "approach": 26,
+     "final": 9,
+     "descend": 10,
+     "landed": 4
+    }
+   },
+   "distractor": "red_pad",
+   "relation": "same_shape",
+   "role": "same_shape",
+   "set": "architecture_pilot",
+   "band_m": [
+    32.0,
+    44.0
+   ],
+   "where": "centre",
+   "planned_place": [
+    "field",
+    "p",
+    "far"
+   ]
+  },
+  {
+   "id": "ap-23113-blue_cube-same_shape",
+   "split": "pilot",
+   "seed": 23113,
+   "map": "lot",
+   "layout": "u",
+   "target": "blue_cube",
+   "kind": "same_shape",
+   "case": "same_shape",
+   "band": "mid",
+   "sector": "right",
+   "strategy": "right",
+   "start_xy": [
+    3030.42,
+    -2961.09
+   ],
+   "start_yaw_deg": -41.66,
+   "start_height_m": 7.58,
+   "target_bearing_deg": 107.22,
+   "start_distance_m": 23.17,
+   "start_direction_deg": 245.56,
+   "instruction_id": "find",
+   "instruction": "Find the blue cube.",
+   "base": "search",
+   "task": "approach",
+   "others_in_view": [
+    {
+     "name": "red_cube",
+     "bearing_deg": 29.0,
+     "distance_m": 40.6
+    },
+    {
+     "name": "orange_ball",
+     "bearing_deg": -19.2,
+     "distance_m": 101.8
+    }
+   ],
+   "max_ticks": 320,
+   "plan": {
+    "ticks": 29,
+    "clearance_m": 34.4,
+    "climbed_m": 0.0,
+    "acquired_tick": 6,
+    "states": {
+     "search": 6,
+     "align": 1,
+     "approach": 18,
+     "stop": 4
+    }
+   },
+   "distractor": "red_cube",
+   "relation": "same_shape",
+   "role": "same_shape",
+   "set": "architecture_pilot",
+   "band_m": [
+    20.0,
+    32.0
+   ],
+   "where": "right",
+   "planned_place": [
+    "lot",
+    "u",
+    "mid"
+   ]
+  },
+  {
+   "id": "ap-23118-blue_cube-first_view",
+   "split": "pilot",
+   "seed": 23118,
+   "map": "field",
+   "layout": "u",
+   "target": "blue_cube",
+   "kind": "first_view",
+   "case": "first_view",
+   "band": "mid",
+   "sector": "left",
+   "strategy": "right",
+   "start_xy": [
+    -3102.01,
+    2941.65
+   ],
+   "start_yaw_deg": 77.33,
+   "start_height_m": 7.08,
+   "target_bearing_deg": -81.6,
+   "start_distance_m": 22.07,
+   "start_direction_deg": 175.72,
+   "instruction_id": "find",
+   "instruction": "Find the blue cube.",
+   "base": "search",
+   "task": "approach",
+   "others_in_view": [
+    {
+     "name": "blue_pad",
+     "bearing_deg": -15.9,
+     "distance_m": 46.0
+    },
+    {
+     "name": "green_cylinder",
+     "bearing_deg": -28.4,
+     "distance_m": 170.4
+    },
+    {
+     "name": "red_cube",
+     "bearing_deg": -37.5,
+     "distance_m": 200.5
+    },
+    {
+     "name": "red_pad",
+     "bearing_deg": -15.0,
+     "distance_m": 133.6
+    }
+   ],
+   "max_ticks": 320,
+   "plan": {
+    "ticks": 43,
+    "clearance_m": 60.35,
+    "climbed_m": 0.0,
+    "acquired_tick": 20,
+    "states": {
+     "search": 20,
+     "align": 1,
+     "approach": 18,
+     "stop": 4
+    }
+   },
+   "distractor": "blue_pad",
+   "relation": "same_color",
+   "role": "first_view",
+   "set": "architecture_pilot",
+   "band_m": [
+    20.0,
+    32.0
+   ],
+   "where": "any",
+   "planned_place": [
+    "field",
+    "u",
+    "mid"
+   ]
+  },
+  {
+   "id": "ap-23119-blue_cone-first_view",
+   "split": "pilot",
+   "seed": 23119,
+   "map": "lot",
+   "layout": "u",
+   "target": "blue_cone",
+   "kind": "first_view",
+   "case": "first_view",
+   "band": "far",
+   "sector": "behind_left",
+   "strategy": "right",
+   "start_xy": [
+    3021.08,
+    -3065.33
+   ],
+   "start_yaw_deg": -47.08,
+   "start_height_m": 5.4,
+   "target_bearing_deg": -113.26,
+   "start_distance_m": 43.63,
+   "start_direction_deg": 19.66,
+   "instruction_id": "find",
+   "instruction": "Find the blue cone.",
+   "base": "search",
+   "task": "approach",
+   "others_in_view": [
+    {
+     "name": "blue_pad",
+     "bearing_deg": -39.3,
+     "distance_m": 14.7
+    }
+   ],
+   "max_ticks": 320,
+   "plan": {
+    "ticks": 62,
+    "clearance_m": 40.33,
+    "climbed_m": 0.0,
+    "acquired_tick": 18,
+    "states": {
+     "search": 18,
+     "align": 1,
+     "approach": 39,
+     "stop": 4
+    }
+   },
+   "distractor": "blue_pad",
+   "relation": "same_color",
+   "role": "first_view",
+   "set": "architecture_pilot",
+   "band_m": [
+    32.0,
+    44.0
+   ],
+   "where": "any",
+   "planned_place": [
+    "lot",
+    "u",
+    "far"
+   ]
+  },
+  {
+   "id": "ap-23124-blue_pad-first_view",
+   "split": "pilot",
+   "seed": 23124,
+   "map": "field",
+   "layout": "s",
+   "target": "blue_pad",
+   "kind": "first_view",
+   "case": "first_view",
+   "band": "near",
+   "sector": "behind_right",
+   "strategy": "right",
+   "start_xy": [
+    -2927.23,
+    2955.3
+   ],
+   "start_yaw_deg": -90.38,
+   "start_height_m": 7.93,
+   "target_bearing_deg": 114.13,
+   "start_distance_m": 16.64,
+   "start_direction_deg": 203.75,
+   "instruction_id": "land",
+   "instruction": "Find the blue landing pad and land on it.",
+   "base": "search",
+   "task": "land",
+   "others_in_view": [
+    {
+     "name": "blue_cube",
+     "bearing_deg": -26.4,
+     "distance_m": 28.3
+    }
+   ],
+   "max_ticks": 320,
+   "plan": {
+    "ticks": 47,
+    "clearance_m": 23.03,
+    "climbed_m": 0.0,
+    "acquired_tick": 7,
+    "states": {
+     "search": 7,
+     "align": 1,
+     "approach": 6,
+     "final": 13,
+     "descend": 16,
+     "landed": 4
+    }
+   },
+   "distractor": "blue_cube",
+   "relation": "same_color",
+   "role": "first_view",
+   "set": "architecture_pilot",
+   "band_m": [
+    12.0,
+    20.0
+   ],
+   "where": "left",
+   "planned_place": [
+    "field",
+    "s",
+    "near"
+   ]
+  },
+  {
+   "id": "ap-23138-red_pad-first_view",
+   "split": "pilot",
+   "seed": 23138,
+   "map": "lot",
+   "layout": "q",
+   "target": "red_pad",
+   "kind": "first_view",
+   "case": "first_view",
+   "band": "far",
+   "sector": "left",
+   "strategy": "right",
+   "start_xy": [
+    2990.97,
+    -3104.6
+   ],
+   "start_yaw_deg": 134.69,
+   "start_height_m": 7.96,
+   "target_bearing_deg": -96.28,
+   "start_distance_m": 39.6,
+   "start_direction_deg": 218.41,
+   "instruction_id": "land",
+   "instruction": "Find the red landing pad and land on it.",
+   "base": "search",
+   "task": "land",
+   "others_in_view": [
+    {
+     "name": "blue_pad",
+     "bearing_deg": -20.7,
+     "distance_m": 26.9
+    },
+    {
+     "name": "orange_ball",
+     "bearing_deg": -33.9,
+     "distance_m": 111.6
+    }
+   ],
+   "max_ticks": 320,
+   "plan": {
+    "ticks": 82,
+    "clearance_m": 33.75,
+    "climbed_m": 0.0,
+    "acquired_tick": 19,
+    "states": {
+     "search": 19,
+     "align": 1,
+     "approach": 29,
+     "final": 13,
+     "descend": 16,
+     "landed": 4
+    }
+   },
+   "distractor": "blue_pad",
+   "relation": "same_shape",
+   "role": "first_view",
+   "set": "architecture_pilot",
+   "band_m": [
+    32.0,
+    44.0
+   ],
+   "where": "left",
+   "planned_place": [
+    "lot",
+    "q",
+    "far"
+   ]
+  },
+  {
+   "id": "ap-23143-blue_pad-lost",
+   "split": "pilot",
+   "seed": 23143,
+   "map": "field",
+   "layout": "t",
+   "target": "blue_pad",
+   "kind": "lost",
+   "case": "lost",
+   "band": "far",
+   "sector": "front",
+   "strategy": "right",
+   "start_xy": [
+    -3118.53,
+    2941.56
+   ],
+   "start_yaw_deg": -0.2,
+   "start_height_m": 7.95,
+   "target_bearing_deg": -2.12,
+   "start_distance_m": 38.57,
+   "start_direction_deg": 177.68,
+   "instruction_id": "land",
+   "instruction": "Find the blue landing pad and land on it.",
+   "base": "visible",
+   "task": "land",
+   "others_in_view": [
+    {
+     "name": "green_cylinder",
+     "bearing_deg": 37.2,
+     "distance_m": 213.5
+    },
+    {
+     "name": "blue_cone",
+     "bearing_deg": 5.9,
+     "distance_m": 207.5
+    },
+    {
+     "name": "orange_ball",
+     "bearing_deg": 13.7,
+     "distance_m": 121.9
+    }
+   ],
+   "max_ticks": 320,
+   "kick": {
+    "after_ticks": 11,
+    "degrees": 68.1
+   },
+   "plan": {
+    "ticks": 89,
+    "clearance_m": 37.82,
+    "climbed_m": 0.0,
+    "acquired_tick": 0,
+    "states": {
+     "approach": 29,
+     "kick": 6,
+     "search": 21,
+     "align": 1,
+     "final": 12,
+     "descend": 16,
+     "landed": 4
+    }
+   },
+   "distractor": "blue_cube",
+   "relation": "same_color",
+   "lost": {
+    "turn_ends_tick": 17,
+    "target_again_tick": 38,
+    "distractor_bearing_deg": -9.8,
+    "distractor_distance_m": 49.3
+   },
+   "role": "lost",
+   "set": "architecture_pilot",
+   "band_m": [
+    32.0,
+    44.0
+   ],
+   "where": 1,
+   "planned_place": [
+    "field",
+    "t",
+    "far"
+   ]
+  },
+  {
+   "id": "ap-23146-blue_pad-lost",
+   "split": "pilot",
+   "seed": 23146,
+   "map": "lot",
+   "layout": "r",
+   "target": "blue_pad",
+   "kind": "lost",
+   "case": "lost",
+   "band": "mid",
+   "sector": "front",
+   "strategy": "right",
+   "start_xy": [
+    3093.77,
+    -2951.22
+   ],
+   "start_yaw_deg": -147.27,
+   "start_height_m": 7.79,
+   "target_bearing_deg": 5.58,
+   "start_distance_m": 30.3,
+   "start_direction_deg": 38.31,
+   "instruction_id": "land",
+   "instruction": "Find the blue landing pad and land on it.",
+   "base": "visible",
+   "task": "land",
+   "others_in_view": [
+    {
+     "name": "red_pad",
+     "bearing_deg": -23.6,
+     "distance_m": 181.1
+    },
+    {
+     "name": "green_cylinder",
+     "bearing_deg": -37.0,
+     "distance_m": 179.3
+    },
+    {
+     "name": "red_cube",
+     "bearing_deg": -13.3,
+     "distance_m": 131.3
+    }
+   ],
+   "max_ticks": 320,
+   "kick": {
+    "after_ticks": 11,
+    "degrees": -68.6
+   },
+   "plan": {
+    "ticks": 63,
+    "clearance_m": 29.05,
+    "climbed_m": 0.0,
+    "acquired_tick": 0,
+    "states": {
+     "approach": 20,
+     "kick": 6,
+     "search": 3,
+     "align": 1,
+     "final": 13,
+     "descend": 16,
+     "landed": 4
+    }
+   },
+   "distractor": "blue_cone",
+   "relation": "same_color",
+   "lost": {
+    "turn_ends_tick": 17,
+    "target_again_tick": 20,
+    "distractor_bearing_deg": 8.7,
+    "distractor_distance_m": 48.7
+   },
+   "role": "lost",
+   "set": "architecture_pilot",
+   "band_m": [
+    20.0,
+    32.0
+   ],
+   "where": -1,
+   "planned_place": [
+    "lot",
+    "r",
+    "mid"
+   ]
+  },
+  {
+   "id": "ap-23209-blue_pad-lost",
+   "split": "pilot",
+   "seed": 23209,
+   "map": "field",
+   "layout": "p",
+   "target": "blue_pad",
+   "kind": "lost",
+   "case": "lost",
+   "band": "far",
+   "sector": "front",
+   "strategy": "right",
+   "start_xy": [
+    -3026.55,
+    3058.54
+   ],
+   "start_yaw_deg": 20.64,
+   "start_height_m": 6.83,
+   "target_bearing_deg": -3.22,
+   "start_distance_m": 38.3,
+   "start_direction_deg": 197.42,
+   "instruction_id": "land",
+   "instruction": "Find the blue landing pad and land on it.",
+   "base": "visible",
+   "task": "land",
+   "others_in_view": [
+    {
+     "name": "blue_cone",
+     "bearing_deg": -12.3,
+     "distance_m": 79.4
+    }
+   ],
+   "max_ticks": 320,
+   "kick": {
+    "after_ticks": 10,
+    "degrees": 173.8
+   },
+   "plan": {
+    "ticks": 87,
+    "clearance_m": 38.66,
+    "climbed_m": 0.0,
+    "acquired_tick": 0,
+    "states": {
+     "approach": 28,
+     "kick": 15,
+     "search": 13,
+     "align": 1,
+     "final": 12,
+     "descend": 14,
+     "landed": 4
+    }
+   },
+   "distractor": "red_pad",
+   "relation": "same_shape",
+   "lost": {
+    "turn_ends_tick": 25,
+    "target_again_tick": 38,
+    "distractor_bearing_deg": -7.5,
+    "distractor_distance_m": 22.9
+   },
+   "role": "lost",
+   "set": "architecture_pilot",
+   "band_m": [
+    32.0,
+    44.0
+   ],
+   "where": 1,
+   "planned_place": [
+    "lot",
+    "q",
+    "far"
+   ]
+  }
+ ]
+}
