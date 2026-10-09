@@ -160,3 +160,19 @@ step마다 멈추는 대신 도착 2초 전에 다음 판단을 시작해 명령
 - **남은 병목:** 54m 이상에서 파란 물체 넷 중 지시한 것을 확정하지 못함. 그다음은 touchdown 뒤의 0 행동(2/18).
 - **Tests:** Python 189/189.
 - **다음:** canonical mission의 범위(44m 이하 권장)를 먼저 정함. Blur는 gate를 통과한 뒤.
+
+## Gen-v3 canonical clean baseline (44m 이하, Landing Finalizer) — 2026-10-09
+
+브랜치 `exp/aerovla-oft-gen-v3-canonical-baseline`. 상세: [Canonical clean baseline](canonical_clean_baseline.md), [Long-range same-color grounding](long_range_same_color_grounding.md). 표: `outputs/generalization/canonical_baseline/`. **학습 없음. Gate를 통과하지 못해 동결하지 않았고 canonical test set 48개는 비행하지 않았다.**
+
+- **정의:** canonical mission "Find the blue landing pad and land on it.", 시작 44m 이하. 44m 초과는 지우지 않고 long-range 과제로 따로 둠. Depot의 156개는 계속 봉인.
+- **Landing Finalizer:** 실행기 안의 상태 기계(FLYING → LANDING_DESCENT → CONTACT_CANDIDATE → STABLE_CONTACT → LANDED_LATCHED → DISARMED). 착륙을 시키는 문장에서만 켜짐. 하강 중의 접촉 + 3 판단 정지면 latch, 그 뒤 동작 명령을 넘기지 않고 disarm. 목표의 좌표·거리·방위나 "맞는 pad인가"는 받지 않음. 숫자는 비행 전에 config에 고정.
+- **착륙을 읽는 세 가지:** touchdown / stable physical landing / strict policy zero-action. Mission의 성공은 system landing(VLA + finalizer). Gen-v3의 기존 숫자는 다시 세지 않음.
+- **새 시작 set:** 검증 36(seed 8500–8525, 학습 배치·안 쓴 시작), test 48(seed 9500–9530, Field·Lot의 새 배치 g–j). band 10–20 / 20–32 / 32–44m. approach·swap·query twin 포함. Teacher 36/36, 48/48(착륙 63회 전부 latch·disarm).
+- **Gate (Gen-v3 두 번째 checkpoint 그대로 + finalizer):** smoke 9/10 통과. Representative 30/36: 성공률 0.83, 착륙 21/27, 접근 시작 32/34, 시킨 대로 끝남 33/36, 충돌 0은 기준을 넘었고, 다른 물체에서 끝난 비행 3회(기준 2회 이하)로 통과 못 함.
+- **실패 6회:** 목표 선택 3(blue pad → blue cube, red pad → red cube, blue pad → red pad), 조기 공중 정지 1, 평가의 읽기 문제 2.
+- **가장 큰 병목:** 목표 선택. 색이나 형태가 같은 다른 물체를 목표로 삼음. 2회는 그 물체가 먼저 보이고 지시한 pad는 안 보이는 시작(그런 시작 9개 중 2회). 44m 안에서도 남.
+- **Finalizer:** 접촉 24회 모두 latch·disarm, approach 9회에서 켜진 적 없음. 결과를 바꾼 비행은 1회(정책이 23회 중 22회 스스로 멈춤).
+- **찾은 결함:** 평가의 "서 있음" 판정이 simulator가 보고한 수직 속도에 기대는데, 서 있는 기체에 0이 아닌 값이 보고된 착륙 2회가 실패로 기록됨(위치 변화 0.0004m 이하). 숫자는 고치지 않음. 고쳐 읽어도 gate는 통과 못 함.
+- **Tests:** Python 207/207.
+- **다음:** Blur는 아직 아님. 목표 선택 병목을 어떻게 다룰지 먼저 정함. 다음 gate 전에 "서 있음" 판정을 위치 차이로 고치고 검증 시작을 새 seed로 다시 뽑음.

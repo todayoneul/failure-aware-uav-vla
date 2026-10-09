@@ -1,0 +1,425 @@
+{
+ "models": {
+  "OFT Gen-v3:validation": {
+   "measures": {
+    "flights": 36,
+    "success": 30,
+    "landings": 27,
+    "landing_success": 21,
+    "approaches": 9,
+    "approach_success": 9,
+    "grounded": 32,
+    "in_view": 34,
+    "terminal_as_asked": 33,
+    "wrong_target": 3,
+    "collisions": 0
+   },
+   "landings": [
+    {
+     "band": "near",
+     "correct_target": "8/9",
+     "approach": "8/9",
+     "alignment": "7/9",
+     "touchdown": "8/9",
+     "stable_physical_landing": "8/9",
+     "system_landing": "8/9",
+     "strict_zero_action": "7/9"
+    },
+    {
+     "band": "mid",
+     "correct_target": "9/9",
+     "approach": "9/9",
+     "alignment": "9/9",
+     "touchdown": "9/9",
+     "stable_physical_landing": "8/9",
+     "system_landing": "8/9",
+     "strict_zero_action": "9/9"
+    },
+    {
+     "band": "far",
+     "correct_target": "6/9",
+     "approach": "6/9",
+     "alignment": "6/9",
+     "touchdown": "6/9",
+     "stable_physical_landing": "5/9",
+     "system_landing": "5/9",
+     "strict_zero_action": "6/9"
+    },
+    {
+     "band": "all",
+     "correct_target": "23/27",
+     "approach": "23/27",
+     "alignment": "22/27",
+     "touchdown": "23/27",
+     "stable_physical_landing": "21/27",
+     "system_landing": "21/27",
+     "strict_zero_action": "22/27"
+    }
+   ],
+   "by_role": {
+    "visible": "3/3",
+    "approach": "6/6",
+    "search": "2/3",
+    "red_visible": "2/3",
+    "edge": "3/3",
+    "pair": "3/3",
+    "swap": "2/3",
+    "query": "3/3",
+    "past": "2/3",
+    "behind": "2/3",
+    "red_search": "2/3"
+   },
+   "by_band": [
+    {
+     "band": "near",
+     "all": "11/12",
+     "landing": "8/9",
+     "approach": "3/3"
+    },
+    {
+     "band": "mid",
+     "all": "11/12",
+     "landing": "8/9",
+     "approach": "3/3"
+    },
+    {
+     "band": "far",
+     "all": "8/12",
+     "landing": "5/9",
+     "approach": "3/3"
+    }
+   ],
+   "failures": {
+    "SEARCH": {
+     "count": 2,
+     "how": "stopped by itself",
+     "episodes": [
+      "cv-8504-blue_pad-near_pair-swapped",
+      "cv-8522-blue_pad-far_past"
+     ]
+    },
+    "GROUNDING": {
+     "count": 1,
+     "how": "stopped by itself",
+     "episodes": [
+      "cv-8523-blue_pad-far_behind"
+     ]
+    },
+    "WRONG_TARGET": {
+     "count": 1,
+     "how": "at red_cube",
+     "episodes": [
+      "cv-8524-red_pad-far_red_visible"
+     ]
+    },
+    "PHYSICAL_LANDING": {
+     "count": 2,
+     "how": "did not stay on the pad",
+     "episodes": [
+      "cv-8510-blue_pad-mid_search",
+      "cv-8525-red_pad-far_red_search"
+     ]
+    }
+   },
+   "touchdown": {
+    "touchdowns_on_the_named_pad": 23,
+    "horizontal_error_m": {
+     "median": 2.4,
+     "p90": 3.37,
+     "max": 4.03
+    },
+    "vertical_speed_mps": {
+     "median": 0.58,
+     "max": 0.62
+    },
+    "stable_duration_s": {
+     "median": 1.5460007190704346
+    }
+   },
+   "latched_but_not_read_as_stable": [
+    {
+     "episode": "cv-8510-blue_pad-mid_search",
+     "strict_policy_zero_action": true,
+     "decisions_in_contact": 4,
+     "height_span_m": 0.0004,
+     "horizontal_span_m": 0.0,
+     "reported_vertical_mps": [
+      0.095,
+      0.074,
+      0.052,
+      0.041
+     ],
+     "decisions_read_as_standing": 1
+    },
+    {
+     "episode": "cv-8525-red_pad-far_red_search",
+     "strict_policy_zero_action": true,
+     "decisions_in_contact": 4,
+     "height_span_m": 0.0002,
+     "horizontal_span_m": 0.0,
+     "reported_vertical_mps": [
+      0.085,
+      0.08,
+      0.08,
+      0.063
+     ],
+     "decisions_read_as_standing": 0
+    }
+   ],
+   "episodes_with_errors": [],
+   "rates": {
+    "correct_target": "32/36",
+    "approach": "32/36",
+    "touchdown": "23/27",
+    "stable_physical_landing": "21/27",
+    "system_landing": "21/27",
+    "strict_policy_zero_action": "22/27",
+    "wrong_target": 3,
+    "collisions": 0
+   }
+  },
+  "Teacher:validation": {
+   "measures": {
+    "flights": 36,
+    "success": 36,
+    "landings": 27,
+    "landing_success": 27,
+    "approaches": 9,
+    "approach_success": 9,
+    "grounded": 36,
+    "in_view": 36,
+    "terminal_as_asked": 36,
+    "wrong_target": 0,
+    "collisions": 0
+   },
+   "landings": [
+    {
+     "band": "near",
+     "correct_target": "9/9",
+     "approach": "9/9",
+     "alignment": "9/9",
+     "touchdown": "9/9",
+     "stable_physical_landing": "9/9",
+     "system_landing": "9/9",
+     "strict_zero_action": "9/9"
+    },
+    {
+     "band": "mid",
+     "correct_target": "9/9",
+     "approach": "9/9",
+     "alignment": "9/9",
+     "touchdown": "9/9",
+     "stable_physical_landing": "9/9",
+     "system_landing": "9/9",
+     "strict_zero_action": "9/9"
+    },
+    {
+     "band": "far",
+     "correct_target": "9/9",
+     "approach": "9/9",
+     "alignment": "9/9",
+     "touchdown": "9/9",
+     "stable_physical_landing": "9/9",
+     "system_landing": "9/9",
+     "strict_zero_action": "9/9"
+    },
+    {
+     "band": "all",
+     "correct_target": "27/27",
+     "approach": "27/27",
+     "alignment": "27/27",
+     "touchdown": "27/27",
+     "stable_physical_landing": "27/27",
+     "system_landing": "27/27",
+     "strict_zero_action": "27/27"
+    }
+   ],
+   "by_role": {
+    "visible": "3/3",
+    "approach": "6/6",
+    "search": "3/3",
+    "edge": "3/3",
+    "pair": "3/3",
+    "swap": "3/3",
+    "query": "3/3",
+    "past": "3/3",
+    "behind": "3/3",
+    "red_visible": "3/3",
+    "red_search": "3/3"
+   },
+   "by_band": [
+    {
+     "band": "near",
+     "all": "12/12",
+     "landing": "9/9",
+     "approach": "3/3"
+    },
+    {
+     "band": "mid",
+     "all": "12/12",
+     "landing": "9/9",
+     "approach": "3/3"
+    },
+    {
+     "band": "far",
+     "all": "12/12",
+     "landing": "9/9",
+     "approach": "3/3"
+    }
+   ],
+   "failures": {},
+   "touchdown": {
+    "touchdowns_on_the_named_pad": 27,
+    "horizontal_error_m": {
+     "median": 0.62,
+     "p90": 0.94,
+     "max": 0.98
+    },
+    "vertical_speed_mps": {
+     "median": 0.36,
+     "max": 0.37
+    },
+    "stable_duration_s": {
+     "median": 1.505357265472412
+    }
+   },
+   "latched_but_not_read_as_stable": [],
+   "episodes_with_errors": [],
+   "rates": {
+    "correct_target": "36/36",
+    "approach": "36/36",
+    "touchdown": "27/27",
+    "stable_physical_landing": "27/27",
+    "system_landing": "27/27",
+    "strict_policy_zero_action": "27/27",
+    "wrong_target": 0,
+    "collisions": 0
+   }
+  },
+  "Teacher:test": {
+   "measures": {
+    "flights": 48,
+    "success": 48,
+    "landings": 36,
+    "landing_success": 36,
+    "approaches": 12,
+    "approach_success": 12,
+    "grounded": 47,
+    "in_view": 48,
+    "terminal_as_asked": 48,
+    "wrong_target": 0,
+    "collisions": 0
+   },
+   "landings": [
+    {
+     "band": "near",
+     "correct_target": "12/12",
+     "approach": "12/12",
+     "alignment": "12/12",
+     "touchdown": "12/12",
+     "stable_physical_landing": "12/12",
+     "system_landing": "12/12",
+     "strict_zero_action": "12/12"
+    },
+    {
+     "band": "mid",
+     "correct_target": "12/12",
+     "approach": "12/12",
+     "alignment": "12/12",
+     "touchdown": "12/12",
+     "stable_physical_landing": "12/12",
+     "system_landing": "12/12",
+     "strict_zero_action": "12/12"
+    },
+    {
+     "band": "far",
+     "correct_target": "12/12",
+     "approach": "12/12",
+     "alignment": "12/12",
+     "touchdown": "12/12",
+     "stable_physical_landing": "12/12",
+     "system_landing": "12/12",
+     "strict_zero_action": "12/12"
+    },
+    {
+     "band": "all",
+     "correct_target": "36/36",
+     "approach": "36/36",
+     "alignment": "36/36",
+     "touchdown": "36/36",
+     "stable_physical_landing": "36/36",
+     "system_landing": "36/36",
+     "strict_zero_action": "36/36"
+    }
+   ],
+   "by_role": {
+    "visible": "3/3",
+    "approach": "6/6",
+    "search": "3/3",
+    "edge": "3/3",
+    "pair": "3/3",
+    "swap": "6/6",
+    "query": "6/6",
+    "past": "3/3",
+    "visible2": "3/3",
+    "behind": "3/3",
+    "pair2": "3/3",
+    "red_visible": "3/3",
+    "red_search": "3/3"
+   },
+   "by_band": [
+    {
+     "band": "near",
+     "all": "16/16",
+     "landing": "12/12",
+     "approach": "4/4"
+    },
+    {
+     "band": "mid",
+     "all": "16/16",
+     "landing": "12/12",
+     "approach": "4/4"
+    },
+    {
+     "band": "far",
+     "all": "16/16",
+     "landing": "12/12",
+     "approach": "4/4"
+    }
+   ],
+   "failures": {},
+   "touchdown": {
+    "touchdowns_on_the_named_pad": 36,
+    "horizontal_error_m": {
+     "median": 0.7,
+     "p90": 0.93,
+     "max": 1.16
+    },
+    "vertical_speed_mps": {
+     "median": 0.36,
+     "max": 0.37
+    },
+    "stable_duration_s": {
+     "median": 1.5027318000793457
+    }
+   },
+   "latched_but_not_read_as_stable": [],
+   "episodes_with_errors": [],
+   "rates": {
+    "correct_target": "48/48",
+    "approach": "48/48",
+    "touchdown": "36/36",
+    "stable_physical_landing": "36/36",
+    "system_landing": "36/36",
+    "strict_policy_zero_action": "36/36",
+    "wrong_target": 0,
+    "collisions": 0
+   }
+  }
+ },
+ "left_out": {
+  "OFT Gen-v3:validation": [],
+  "Teacher:validation": [],
+  "Teacher:test": []
+ }
+}

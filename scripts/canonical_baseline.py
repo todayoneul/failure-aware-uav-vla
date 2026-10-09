@@ -21,6 +21,7 @@ A start the teacher did not finish in the simulator is left out of every model.
 import argparse
 import csv
 import json
+import math
 import statistics
 import sys
 from pathlib import Path
@@ -86,13 +87,35 @@ def landing_rows(items):
     return rows
 
 
+def standing(rows):
+    """What the log itself shows about the end of a landing, apart from both readings: over the decisions from the first
+    contact the finalizer saw, how far the vehicle moved and what vertical speed the simulator reported for it."""
+    contact=[row for row in rows if row.get('finalizer') in ('CONTACT_CANDIDATE','STABLE_CONTACT','LANDED_LATCHED')]
+    if len(contact)<2:return None
+    heights=[row['position'][2] for row in contact];first=contact[0]['position']
+    return {'decisions_in_contact':len(contact),'height_span_m':round(max(heights)-min(heights),4),
+            'horizontal_span_m':round(max(math.hypot(row['position'][0]-first[0],row['position'][1]-first[1]) for row in contact),4),
+            'reported_vertical_mps':[round(abs(row['velocity'][2]),3) for row in contact],
+            'decisions_read_as_standing':sum(bool(row.get('landed')) for row in contact)}
+
+
+def disagreements(items,steps):
+    """Landings on the named pad that the finalizer latched and disarmed on and the stable-landing reading did not count.
+    Listed with what the log shows; the readings and the gates are left as they were recorded."""
+    rows=[]
+    for i in items:
+        if i['task']=='land' and i['touchdown_success'] and i['finalizer_triggered'] and i['disarm_triggered'] and not i['stable_physical_landing']:
+            rows.append({'episode':i['episode'],'strict_policy_zero_action':i['strict_policy_zero_action'],**(standing(steps[i['episode']]) or {})})
+    return rows
+
+
 def report(args,config):
     output=Path(args.output);(output/'failures').mkdir(parents=True,exist_ok=True);summary={'models':{},'left_out':{}};rows_out=[]
     teacher={item.split('=',1)[0]:solved(item.split('=',1)[1]) for item in args.teacher}
     for item in args.runs:
         label,directory=item.split('=',1);model,level=label.rsplit(':',1);items,errors,left,(episodes,steps)=flown(directory,teacher.get(level))
         summary['left_out'][label]=left;m=measures(items);land=[i for i in items if i['task']=='land'];touched=[i for i in land if i['touchdown_on_target']]
-        print(f'\\n# {model}, {level}');print(json.dumps(m))
+        print();print(f'# {model}, {level}');print(json.dumps(m))
         markdown('Landings by start distance',('Band','Correct target','Approach','Alignment','Touchdown','Stable physical landing','System landing','Strict zero-action'),landing_rows(items))
         by_role=[(role,rate([i for i in items if i['role']==role],'success')) for role in dict.fromkeys(i['role'] for i in items)]
         markdown('By kind of start',('Start','Success'),by_role)
@@ -108,11 +131,15 @@ def report(args,config):
                    'horizontal_error_m':{'median':statistics.median(errors_m) if errors_m else None,'p90':percentile(errors_m,.9),'max':max(errors_m,default=None)},
                    'vertical_speed_mps':{'median':statistics.median(i['touchdown_vertical_mps'] for i in touched) if touched else None,'max':max((i['touchdown_vertical_mps'] for i in touched),default=None)},
                    'stable_duration_s':{'median':statistics.median(i['stable_duration_s'] for i in touched if i['stable_duration_s'] is not None) if any(i['stable_duration_s'] is not None for i in touched) else None}}
-        print('\\nTouchdown:',json.dumps(precision))
+        print();print('Touchdown:',json.dumps(precision))
+        apart=disagreements(items,steps)
+        if apart:
+            markdown('Latched and disarmed on the named pad, not counted as a stable landing',('Episode','Decisions in contact','Height span m','Horizontal span m','Reported vertical m/s','Read as standing','Policy zero action'),
+                     [(row['episode'],row.get('decisions_in_contact'),row.get('height_span_m'),row.get('horizontal_span_m'),row.get('reported_vertical_mps'),row.get('decisions_read_as_standing'),row['strict_policy_zero_action']) for row in apart])
         summary['models'][label]={'measures':m,'landings':[dict(zip(('band','correct_target','approach','alignment','touchdown','stable_physical_landing','system_landing','strict_zero_action'),row)) for row in landing_rows(items)],
                                   'by_role':dict(by_role),'by_band':[dict(zip(('band','all','landing','approach'),row)) for row in by_band],
                                   'failures':{stage:{'count':count,'how':how,'episodes':names.split()} for stage,count,how,names in stages if count},
-                                  'touchdown':precision,'episodes_with_errors':errors,
+                                  'touchdown':precision,'latched_but_not_read_as_stable':apart,'episodes_with_errors':errors,
                                   'rates':{'correct_target':rate(items,'correct_target'),'approach':rate(items,'approached'),'touchdown':rate(land,'touchdown_success'),
                                            'stable_physical_landing':rate(land,'stable_physical_landing'),'system_landing':rate(land,'system_landing'),
                                            'strict_policy_zero_action':rate(land,'strict_policy_zero_action'),'wrong_target':m['wrong_target'],'collisions':m['collisions']}}
@@ -121,7 +148,7 @@ def report(args,config):
             rows_out.append({'model':model,'set':level,**{k:v for k,v in record.items()}})
             if record['failure'] and model!='Teacher':
                 name=f'{model}_{level}_{record["failure"]}_{record["episode"]}'.replace(' ','_');trace_rows=steps[record['episode']]
-                trace=[{key:row.get(key) for key in ('step','distance_m','bearing_deg','height_m','front_seen','down_seen','over','landed','finalizer','action','executed')} for row in trace_rows]
+                trace=[{key:row.get(key) for key in ('step','distance_m','bearing_deg','height_m','front_seen','down_seen','over','landed','finalizer','velocity','action','executed')} for row in trace_rows]
                 (output/'failures'/f'{name}.json').write_text(json.dumps({**record,'trace':trace},indent=1))
                 picture(by_id[record['episode']],trace_rows,output/'failures'/f'{name}.jpg',f'{model} {level} {record["failure"]}: {record["episode"]}')
     with (output/'episodes.csv').open('w',newline='',encoding='utf-8') as file:

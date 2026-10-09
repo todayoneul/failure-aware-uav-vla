@@ -11,6 +11,8 @@
 - **그다음 것:** 내려앉은 뒤 0 행동을 내지 못한 착륙이 2/18이다. pad 위에 가만히 서서 약한 하강 명령을 계속 낸다.
 - **다음에 정할 것은 모델이 아니라 과제의 범위다.** 권장: canonical clean mission을 시작 44m 이하로 정하고(두 checkpoint 모두 19/22), 먼 거리의 같은 색 구분은 한계로 남긴다. 세 번째 재학습은 그 결정 뒤의 일이다.
 
+> **이후 (2026-10-09):** 범위를 44m 이하로 정하고 착륙의 끝을 저수준 Landing Finalizer로 옮긴 canonical system을 따로 정의했다. 두 번째 checkpoint를 그대로 새 검증 set에서 비행했고, gate는 통과하지 못했다(30/36, 다른 물체에서 끝난 비행 3회). → [Canonical clean baseline](canonical_clean_baseline.md), [Long-range same-color grounding](long_range_same_color_grounding.md). 이 문서의 숫자와 판정은 그대로 두었다.
+
 ## 왜 Gen-v3인가
 
 - **Gen-v2에 남은 한계는 "보이는데 가지 않는 것"이었다.** 새 장거리 평가 36회에서 목표는 매번 시야에 들어왔고(36/36), 20m 안에 들어온 27회는 전부 제대로 멈췄다. 실패 9회 중 8회는 목표가 시야를 4–12번 지나가는 동안 회전만 했다. 학습한 장면에서는 70–90m도 6/6이었고 실패는 학습하지 않은 장면의 56m 이상에 몰렸다.
@@ -355,6 +357,8 @@ Gen-v2의 445 episode(Gen-v1 292 + Gen-v2 보강 153)는 그대로 쓰고, 그 �
 - **찾고, 다가가고, 위에서 맞추고, 내려앉는 것까지는 된다.** touchdown은 모두 착륙 구역(중심 6.6m) 안이고 수직 속도는 기준(0.75m/s) 아래다. 충돌 0.
 - **남은 것은 내려앉은 뒤의 0 행동이다.** 두 번째 checkpoint의 2회는 pad 위에 가만히 서서 하강 명령 0.04–0.19m를 계속 냈다(정지 기준 0.08m). 기체는 움직이지 않지만 "스스로 정지"로는 판정되지 않는다. 첫 번째 checkpoint에서는 반대로 약한 상승 명령이 나와 떴다 내렸다를 반복한 경우가 있었고, 두 번째 보강 뒤 그 형태는 나오지 않았다.
 - **모델은 teacher보다 중심에서 멀리 내려앉는다**(teacher 중앙값 0.75m). 접근 마지막의 감속이 teacher만큼 정확하지 않다.
+
+> **New canonical system definition introduced after Gen-v3 development.** 위의 `touchdown 16/18`, `규칙 전체 14/18`은 이 단계의 정의(정책이 스스로 0 행동을 4번 내야 착륙 성공)로 잰 것이고, 그대로 둔다. 이후에 도입한 정의(touchdown / stable physical landing / strict policy zero-action을 나눠 보고, mission의 성공은 VLA + Landing Finalizer의 system landing)는 [Canonical clean baseline](canonical_clean_baseline.md#착륙을-읽는-세-가지)에 있고, 그 뒤의 비행에만 쓴다. 이 표의 비행을 새 정의로 다시 세지 않았다.
 
 ## Fresh Scene C 평가
 

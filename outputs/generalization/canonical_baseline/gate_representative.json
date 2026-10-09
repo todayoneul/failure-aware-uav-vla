@@ -1,0 +1,75 @@
+{
+ "gate": "representative",
+ "run": "outputs/visual_search/canonical_gate",
+ "passed": false,
+ "checks": [
+  {
+   "check": "flights",
+   "value": 36,
+   "needs": ">= 30",
+   "passed": true
+  },
+  {
+   "check": "success rate",
+   "value": 0.833,
+   "needs": ">= 0.8",
+   "passed": true
+  },
+  {
+   "check": "landing success rate (system: stable physical landing on the named pad, latched and disarmed)",
+   "value": 0.778,
+   "needs": ">= 0.75",
+   "passed": true
+  },
+  {
+   "check": "grounded when the target came into view",
+   "value": 0.941,
+   "needs": ">= 0.9",
+   "passed": true
+  },
+  {
+   "check": "end of flight as the sentence asked",
+   "value": 0.917,
+   "needs": ">= 0.9",
+   "passed": true
+  },
+  {
+   "check": "flights that ended at a wrong object",
+   "value": 3,
+   "needs": "<= 2",
+   "passed": false
+  },
+  {
+   "check": "collisions",
+   "value": 0,
+   "needs": "<= 1",
+   "passed": true
+  },
+  {
+   "check": "episodes with a runner error",
+   "value": 0,
+   "needs": "<= 0",
+   "passed": true
+  }
+ ],
+ "flights": 36,
+ "success": 30,
+ "landings": 27,
+ "landing_success": 21,
+ "approaches": 9,
+ "approach_success": 9,
+ "grounded": 32,
+ "in_view": 34,
+ "terminal_as_asked": 33,
+ "wrong_target": 3,
+ "collisions": 0,
+ "left_out_because_the_teacher_did_not_finish": [],
+ "failures": {
+  "cv-8510-blue_pad-mid_search": "PHYSICAL_LANDING (did not stay on the pad)",
+  "cv-8504-blue_pad-near_pair-swapped": "SEARCH (stopped by itself)",
+  "cv-8522-blue_pad-far_past": "SEARCH (stopped by itself)",
+  "cv-8523-blue_pad-far_behind": "GROUNDING (stopped by itself)",
+  "cv-8524-red_pad-far_red_visible": "WRONG_TARGET (at red_cube)",
+  "cv-8525-red_pad-far_red_search": "PHYSICAL_LANDING (did not stay on the pad)"
+ }
+}

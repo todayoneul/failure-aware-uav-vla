@@ -247,5 +247,26 @@ class CanonicalSetTests(unittest.TestCase):
         _,lines=checks('representative',now['representative'],bad,[],CONFIG);value,how,limit=lines['success rate'];self.assertLess(value,limit)
         self.assertEqual(measures(good)['landing_success'],27)
 
+    def test_a_latched_landing_the_stable_reading_missed_is_listed_and_not_recounted(self):
+        try:
+            from scripts.canonical_baseline import standing,disagreements,measures
+        except ImportError as error:raise unittest.SkipTest(f'report dependencies not installed here: {error}')
+        # The vehicle does not move after the contact, the simulator's reported vertical speed has not settled, and the
+        # reading that asks for a settled speed counts only the last decision as standing.
+        rest=lambda speed,flag,state:{'position':[5.,6.,-3.732],'velocity':[0.,0.,speed],'landed':flag,'finalizer':state}
+        rows=[{'position':[5.,6.,-3.9],'velocity':[0.,0.,.6],'landed':False,'finalizer':'LANDING_DESCENT'}]+\
+             [rest(.095,False,'CONTACT_CANDIDATE'),rest(.074,False,'CONTACT_CANDIDATE'),rest(.052,False,'CONTACT_CANDIDATE'),rest(.041,True,'LANDED_LATCHED')]
+        shown=standing(rows)
+        self.assertEqual((shown['decisions_in_contact'],shown['height_span_m'],shown['horizontal_span_m'],shown['decisions_read_as_standing']),(4,0.,0.,1))
+        self.assertEqual(shown['reported_vertical_mps'],[.095,.074,.052,.041])
+        self.assertIsNone(standing(rows[:2]))
+        item=lambda **changes:dict({'episode':'a','task':'land','success':False,'acquired':True,'grounded':True,'terminal_as_asked':True,'wrong_target':False,'collision':False,
+                                    'touchdown_success':True,'finalizer_triggered':True,'disarm_triggered':True,'stable_physical_landing':False,'strict_policy_zero_action':True},**changes)
+        items=[item(),item(episode='b',stable_physical_landing=True,success=True),item(episode='c',touchdown_success=False),item(episode='d',task='approach')]
+        listed=disagreements(items,{name:rows for name in 'abcd'})
+        self.assertEqual([row['episode'] for row in listed],['a']);self.assertEqual(listed[0]['decisions_read_as_standing'],1)
+        # Listing it changes nothing that is counted.
+        self.assertEqual(measures(items)['landing_success'],1)
+
 
 if __name__=='__main__':unittest.main()
