@@ -1,0 +1,17 @@
+{
+ "checkpoint": "/mnt/c/Users/leegy/Desktop/drone/outputs/aerovla_oft/checkpoints/generalization_v3c",
+ "frames": 8,
+ "modules": {
+  "film": {
+   "max_abs_difference": 0.0,
+   "grounding_parameters": 4338432,
+   "module_loaded_from_checkpoint": false
+  },
+  "cross_attention": {
+   "max_abs_difference": 0.0,
+   "grounding_parameters": 2735232,
+   "module_loaded_from_checkpoint": false
+  }
+ },
+ "identity": true
+}

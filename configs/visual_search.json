@@ -281,6 +281,12 @@
     "validation": {
       "description": "Only for an architecture that passed the pilot (and whose control did not): 36 fresh starts with the Gen-v3c validation make-up, behind the canonical gates with the same numbers, read by canonical_evaluator_v2. The gates are judged on the first flight of every start. The starts that ask about target selection are flown a second time and reported beside the gate; that second flight judges nothing.",
       "gates": "gen_v3c.gates"
+    },
+    "outcome": {
+      "description": "Written after the pilot flights of the three models and before any flight on the validation set. Nothing above was changed.",
+      "pilot": "FiLM passed every line (32/32, no flight at a wrong object, all sixteen starts correct twice, regression 26 of 33). Experiment 2 is not run.",
+      "control": "The same schedule without a module held the pilot's lines as well (30/32, two flights at a wrong object against the baseline's four, no start wrong twice). By the rule fixed above, the improvement is therefore not credited to FiLM: it came with 2,000 further updates on the same data.",
+      "what_goes_on": "The plan asks for the pilot's winner to go behind the gates. By the selection order fixed above (pass the pilot, then fewer flights at a wrong object, then more starts correct twice) that is the FiLM checkpoint, also against the control. It is flown on the fresh validation set as the best checkpoint of the pilot, not as evidence for the architecture; the sentence above that reserves the validation for an architecture whose control did not pass is set aside for this one purpose, and the gates' numbers are unchanged."
     }
   }
 }

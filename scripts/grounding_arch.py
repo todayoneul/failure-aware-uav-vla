@@ -1,6 +1,7 @@
 """Language-vision grounding architectures: start sets, the pilot's verdict and the comparison; no simulator, no model.
 
   plan pilot|validation     write configs/grounding_architecture_<set>.json once
+  ids                       the ten smoke starts of the architecture validation set
   critical                  the validation starts that are flown a second time (target selection)
   judge NAME --runs DIR DIR --baseline DIR DIR --teacher DIR [--regression JSON] [--output JSON]
                             the pilot's lines for one model against the Gen-v3c flights of the same starts; exit 0 when
@@ -114,7 +115,7 @@ def compare(args,config):
 
 def main():
     parser=argparse.ArgumentParser();commands=parser.add_subparsers(dest='command',required=True)
-    commands.add_parser('plan').add_argument('which',choices=('pilot','validation'));commands.add_parser('critical')
+    commands.add_parser('plan').add_argument('which',choices=('pilot','validation'));commands.add_parser('critical');commands.add_parser('ids')
     one=commands.add_parser('judge');one.add_argument('name');one.add_argument('--runs',nargs='+',required=True);one.add_argument('--baseline',nargs='+',required=True)
     one.add_argument('--teacher',required=True);one.add_argument('--regression');one.add_argument('--output')
     many=commands.add_parser('compare');many.add_argument('models',nargs='+',help='NAME=DIR,DIR');many.add_argument('--teacher',required=True);many.add_argument('--output',required=True)
@@ -131,6 +132,9 @@ def main():
         print(args.which,len(episodes),json.dumps({'by_role':gen_v3c_tool.histogram(episodes,lambda e:e['role']),'by_band':gen_v3c_tool.histogram(episodes,lambda e:e['band']),
                                                    'by_layout':gen_v3c_tool.histogram(episodes,lambda e:f'{e["map"]}/{e["layout"]}'),'landings':sum(e['task']=='land' for e in episodes),
                                                    'seeds':[min(e['seed'] for e in episodes),max(e['seed'] for e in episodes)]}));return
+    if args.command=='ids':
+        from src.visual_search import canonical
+        print(' '.join(canonical.smoke_ids(config,json.loads(grounding_arch.FILES['validation'].read_text(encoding='utf-8'))['episodes'])));return
     if args.command=='critical':
         print(' '.join(grounding_arch.critical_ids(json.loads(grounding_arch.FILES['validation'].read_text(encoding='utf-8'))['episodes'])));return
     if args.command=='compare':compare(args,config);return

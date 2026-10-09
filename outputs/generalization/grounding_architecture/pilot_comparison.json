@@ -1,0 +1,334 @@
+{
+ "models": {
+  "Gen-v3c": {
+   "runs": [
+    "outputs/visual_search/arch_gen_v3c_run1",
+    "outputs/visual_search/arch_gen_v3c_run2"
+   ],
+   "flights": 32,
+   "starts": 16,
+   "errors": 0,
+   "success": 28,
+   "correct_target": 28,
+   "wrong_target": 4,
+   "collisions": 2,
+   "acquired": 28,
+   "terminal_as_asked": 28,
+   "approach_touchdowns": 0,
+   "same_color": [
+    18,
+    22
+   ],
+   "same_shape": [
+    10,
+    10
+   ],
+   "first_view_rejected": [
+    22,
+    26
+   ],
+   "first_view_correct": [
+    22,
+    26
+   ],
+   "lost_reacquired": [
+    6,
+    6
+   ],
+   "landings_at_named_pad": 22,
+   "system_landings": 22,
+   "landing_rate": 1.0,
+   "strict_zero_action": 20,
+   "finalizer_rescued": 2,
+   "by_start": {
+    "ap-23001-blue_pad-same_color": 2,
+    "ap-23004-blue_pad-same_color": 2,
+    "ap-23013-blue_pad-same_color": 2,
+    "ap-23047-blue_pad-same_color": 2,
+    "ap-23108-red_pad-same_color": 0,
+    "ap-23109-red_pad-same_color": 0,
+    "ap-23110-blue_pad-same_shape": 2,
+    "ap-23111-blue_pad-same_shape": 2,
+    "ap-23113-blue_cube-same_shape": 2,
+    "ap-23118-blue_cube-first_view": 2,
+    "ap-23119-blue_cone-first_view": 2,
+    "ap-23124-blue_pad-first_view": 2,
+    "ap-23138-red_pad-first_view": 2,
+    "ap-23143-blue_pad-lost": 2,
+    "ap-23146-blue_pad-lost": 2,
+    "ap-23209-blue_pad-lost": 2
+   },
+   "consistency": {
+    "2/2": 14,
+    "1/2": 0,
+    "0/2": 2
+   },
+   "starts_always_correct": 14,
+   "starts_never_correct": 2,
+   "by_group": {
+    "same_color": [
+     8,
+     12
+    ],
+    "same_shape": [
+     6,
+     6
+    ],
+    "first_view": [
+     8,
+     8
+    ],
+    "lost": [
+     6,
+     6
+    ]
+   },
+   "wrong_objects": [
+    "ap-23108-red_pad-same_color#1: red_cube",
+    "ap-23108-red_pad-same_color#2: red_cube",
+    "ap-23109-red_pad-same_color#1: red_cube",
+    "ap-23109-red_pad-same_color#2: red_cube"
+   ],
+   "failures": [
+    "ap-23108-red_pad-same_color#1: COLLISION (collision)",
+    "ap-23108-red_pad-same_color#2: COLLISION (collision)",
+    "ap-23109-red_pad-same_color#1: SEARCH (stopped by itself)",
+    "ap-23109-red_pad-same_color#2: SEARCH (stopped by itself)"
+   ],
+   "inference_ms": 395.61951826726335,
+   "decision_s": 0.5082877401887858
+  },
+  "FiLM": {
+   "runs": [
+    "outputs/visual_search/arch_film_run1",
+    "outputs/visual_search/arch_film_run2"
+   ],
+   "flights": 32,
+   "starts": 16,
+   "errors": 0,
+   "success": 32,
+   "correct_target": 32,
+   "wrong_target": 0,
+   "collisions": 0,
+   "acquired": 32,
+   "terminal_as_asked": 32,
+   "approach_touchdowns": 0,
+   "same_color": [
+    22,
+    22
+   ],
+   "same_shape": [
+    10,
+    10
+   ],
+   "first_view_rejected": [
+    26,
+    26
+   ],
+   "first_view_correct": [
+    26,
+    26
+   ],
+   "lost_reacquired": [
+    6,
+    6
+   ],
+   "landings_at_named_pad": 26,
+   "system_landings": 26,
+   "landing_rate": 1.0,
+   "strict_zero_action": 26,
+   "finalizer_rescued": 0,
+   "by_start": {
+    "ap-23001-blue_pad-same_color": 2,
+    "ap-23004-blue_pad-same_color": 2,
+    "ap-23013-blue_pad-same_color": 2,
+    "ap-23047-blue_pad-same_color": 2,
+    "ap-23108-red_pad-same_color": 2,
+    "ap-23109-red_pad-same_color": 2,
+    "ap-23110-blue_pad-same_shape": 2,
+    "ap-23111-blue_pad-same_shape": 2,
+    "ap-23113-blue_cube-same_shape": 2,
+    "ap-23118-blue_cube-first_view": 2,
+    "ap-23119-blue_cone-first_view": 2,
+    "ap-23124-blue_pad-first_view": 2,
+    "ap-23138-red_pad-first_view": 2,
+    "ap-23143-blue_pad-lost": 2,
+    "ap-23146-blue_pad-lost": 2,
+    "ap-23209-blue_pad-lost": 2
+   },
+   "consistency": {
+    "2/2": 16,
+    "1/2": 0,
+    "0/2": 0
+   },
+   "starts_always_correct": 16,
+   "starts_never_correct": 0,
+   "by_group": {
+    "same_color": [
+     12,
+     12
+    ],
+    "same_shape": [
+     6,
+     6
+    ],
+    "first_view": [
+     8,
+     8
+    ],
+    "lost": [
+     6,
+     6
+    ]
+   },
+   "wrong_objects": [],
+   "failures": [],
+   "inference_ms": 401.35013489163026,
+   "decision_s": 0.5088723174060439
+  },
+  "Control (no module, +2000)": {
+   "runs": [
+    "outputs/visual_search/arch_control_run1",
+    "outputs/visual_search/arch_control_run2"
+   ],
+   "flights": 32,
+   "starts": 16,
+   "errors": 0,
+   "success": 30,
+   "correct_target": 30,
+   "wrong_target": 2,
+   "collisions": 0,
+   "acquired": 31,
+   "terminal_as_asked": 30,
+   "approach_touchdowns": 0,
+   "same_color": [
+    20,
+    22
+   ],
+   "same_shape": [
+    10,
+    10
+   ],
+   "first_view_rejected": [
+    24,
+    26
+   ],
+   "first_view_correct": [
+    24,
+    26
+   ],
+   "lost_reacquired": [
+    6,
+    6
+   ],
+   "landings_at_named_pad": 25,
+   "system_landings": 25,
+   "landing_rate": 1.0,
+   "strict_zero_action": 25,
+   "finalizer_rescued": 0,
+   "by_start": {
+    "ap-23001-blue_pad-same_color": 2,
+    "ap-23004-blue_pad-same_color": 1,
+    "ap-23013-blue_pad-same_color": 2,
+    "ap-23047-blue_pad-same_color": 2,
+    "ap-23108-red_pad-same_color": 2,
+    "ap-23109-red_pad-same_color": 2,
+    "ap-23110-blue_pad-same_shape": 2,
+    "ap-23111-blue_pad-same_shape": 2,
+    "ap-23113-blue_cube-same_shape": 2,
+    "ap-23118-blue_cube-first_view": 2,
+    "ap-23119-blue_cone-first_view": 1,
+    "ap-23124-blue_pad-first_view": 2,
+    "ap-23138-red_pad-first_view": 2,
+    "ap-23143-blue_pad-lost": 2,
+    "ap-23146-blue_pad-lost": 2,
+    "ap-23209-blue_pad-lost": 2
+   },
+   "consistency": {
+    "2/2": 14,
+    "1/2": 2,
+    "0/2": 0
+   },
+   "starts_always_correct": 14,
+   "starts_never_correct": 0,
+   "by_group": {
+    "same_color": [
+     11,
+     12
+    ],
+    "same_shape": [
+     6,
+     6
+    ],
+    "first_view": [
+     7,
+     8
+    ],
+    "lost": [
+     6,
+     6
+    ]
+   },
+   "wrong_objects": [
+    "ap-23004-blue_pad-same_color#2: blue_cube",
+    "ap-23119-blue_cone-first_view#2: blue_pad"
+   ],
+   "failures": [
+    "ap-23004-blue_pad-same_color#2: SEARCH (stopped by itself)",
+    "ap-23119-blue_cone-first_view#2: WRONG_TARGET (at blue_pad)"
+   ],
+   "inference_ms": 406.12971381593513,
+   "decision_s": 0.5119824142348469
+  }
+ },
+ "costs": {
+  "Gen-v3c": {
+   "checkpoint": "/mnt/c/Users/leegy/Desktop/drone/outputs/aerovla_oft/checkpoints/generalization_v3c",
+   "grounding": {
+    "type": "none"
+   },
+   "frames": 59,
+   "inference_ms": 216.35096598302587,
+   "inference_peak_GiB": 6.94,
+   "training_peak_GiB": 9.82,
+   "added_parameters": 0,
+   "trainable_parameters": 54693891,
+   "lora_parameters": 39976960,
+   "head_parameters": 14716931,
+   "train_seconds": 5062.3914794921875
+  },
+  "FiLM": {
+   "checkpoint": "/mnt/c/Users/leegy/Desktop/drone/outputs/aerovla_oft/checkpoints/grounding_film",
+   "grounding": {
+    "type": "film",
+    "position": "before_projector",
+    "language": "mean_token_embedding",
+    "hidden_dim": 512
+   },
+   "frames": 59,
+   "inference_ms": 225.48308808482187,
+   "inference_peak_GiB": 6.94,
+   "training_peak_GiB": 9.88,
+   "added_parameters": 4338432,
+   "trainable_parameters": 59032323,
+   "lora_parameters": 39976960,
+   "head_parameters": 14716931,
+   "train_seconds": 5229.278831243515
+  },
+  "Control (no module, +2000)": {
+   "checkpoint": "/mnt/c/Users/leegy/Desktop/drone/outputs/aerovla_oft/checkpoints/grounding_control",
+   "grounding": {
+    "type": "none"
+   },
+   "frames": 59,
+   "inference_ms": 215.6775055595124,
+   "inference_peak_GiB": 6.94,
+   "training_peak_GiB": 9.82,
+   "added_parameters": 0,
+   "trainable_parameters": 54693891,
+   "lora_parameters": 39976960,
+   "head_parameters": 14716931,
+   "train_seconds": 5042.442087173462
+  }
+ }
+}

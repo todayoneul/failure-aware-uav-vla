@@ -1,0 +1,267 @@
+{
+ "model": "control",
+ "verdict": "HOLDS SO FAR, REGRESSION NOT FLOWN",
+ "passed": false,
+ "lines_hold": true,
+ "regression_flown": false,
+ "checks": [
+  {
+   "check": "flights",
+   "value": 32,
+   "needs": ">= 32",
+   "passed": true
+  },
+  {
+   "check": "flights that ended at a wrong object",
+   "value": 2,
+   "needs": "<= 2",
+   "passed": true
+  },
+  {
+   "check": "flights at a wrong object, against the baseline (at least two fewer and at most half)",
+   "value": 2,
+   "needs": "<= 2",
+   "passed": true
+  },
+  {
+   "check": "starts never correct",
+   "value": 0,
+   "needs": "<= 1",
+   "passed": true
+  },
+  {
+   "check": "collisions",
+   "value": 0,
+   "needs": "<= 2",
+   "passed": true
+  },
+  {
+   "check": "end of flight as the sentence asked",
+   "value": 30,
+   "needs": ">= 28",
+   "passed": true
+  },
+  {
+   "check": "approach flights that touched down",
+   "value": 0,
+   "needs": "<= 0",
+   "passed": true
+  },
+  {
+   "check": "successes",
+   "value": 30,
+   "needs": ">= 28",
+   "passed": true
+  },
+  {
+   "check": "landings completed among flights that went to the named pad",
+   "value": 1.0,
+   "needs": ">= 0.9",
+   "passed": true
+  },
+  {
+   "check": "flights in which the named object came into view",
+   "value": 31,
+   "needs": ">= 27",
+   "passed": true
+  },
+  {
+   "check": "episodes with a runner error",
+   "value": 0,
+   "needs": "<= 0",
+   "passed": true
+  }
+ ],
+ "model_metrics": {
+  "runs": [
+   "outputs/visual_search/arch_control_run1",
+   "outputs/visual_search/arch_control_run2"
+  ],
+  "flights": 32,
+  "starts": 16,
+  "errors": 0,
+  "success": 30,
+  "correct_target": 30,
+  "wrong_target": 2,
+  "collisions": 0,
+  "acquired": 31,
+  "terminal_as_asked": 30,
+  "approach_touchdowns": 0,
+  "same_color": [
+   20,
+   22
+  ],
+  "same_shape": [
+   10,
+   10
+  ],
+  "first_view_rejected": [
+   24,
+   26
+  ],
+  "first_view_correct": [
+   24,
+   26
+  ],
+  "lost_reacquired": [
+   6,
+   6
+  ],
+  "landings_at_named_pad": 25,
+  "system_landings": 25,
+  "landing_rate": 1.0,
+  "strict_zero_action": 25,
+  "finalizer_rescued": 0,
+  "by_start": {
+   "ap-23001-blue_pad-same_color": 2,
+   "ap-23004-blue_pad-same_color": 1,
+   "ap-23013-blue_pad-same_color": 2,
+   "ap-23047-blue_pad-same_color": 2,
+   "ap-23108-red_pad-same_color": 2,
+   "ap-23109-red_pad-same_color": 2,
+   "ap-23110-blue_pad-same_shape": 2,
+   "ap-23111-blue_pad-same_shape": 2,
+   "ap-23113-blue_cube-same_shape": 2,
+   "ap-23118-blue_cube-first_view": 2,
+   "ap-23119-blue_cone-first_view": 1,
+   "ap-23124-blue_pad-first_view": 2,
+   "ap-23138-red_pad-first_view": 2,
+   "ap-23143-blue_pad-lost": 2,
+   "ap-23146-blue_pad-lost": 2,
+   "ap-23209-blue_pad-lost": 2
+  },
+  "consistency": {
+   "2/2": 14,
+   "1/2": 2,
+   "0/2": 0
+  },
+  "starts_always_correct": 14,
+  "starts_never_correct": 0,
+  "by_group": {
+   "same_color": [
+    11,
+    12
+   ],
+   "same_shape": [
+    6,
+    6
+   ],
+   "first_view": [
+    7,
+    8
+   ],
+   "lost": [
+    6,
+    6
+   ]
+  },
+  "wrong_objects": [
+   "ap-23004-blue_pad-same_color#2: blue_cube",
+   "ap-23119-blue_cone-first_view#2: blue_pad"
+  ],
+  "failures": [
+   "ap-23004-blue_pad-same_color#2: SEARCH (stopped by itself)",
+   "ap-23119-blue_cone-first_view#2: WRONG_TARGET (at blue_pad)"
+  ],
+  "inference_ms": 406.12971381593513,
+  "decision_s": 0.5119824142348469
+ },
+ "baseline_metrics": {
+  "runs": [
+   "outputs/visual_search/arch_gen_v3c_run1",
+   "outputs/visual_search/arch_gen_v3c_run2"
+  ],
+  "flights": 32,
+  "starts": 16,
+  "errors": 0,
+  "success": 28,
+  "correct_target": 28,
+  "wrong_target": 4,
+  "collisions": 2,
+  "acquired": 28,
+  "terminal_as_asked": 28,
+  "approach_touchdowns": 0,
+  "same_color": [
+   18,
+   22
+  ],
+  "same_shape": [
+   10,
+   10
+  ],
+  "first_view_rejected": [
+   22,
+   26
+  ],
+  "first_view_correct": [
+   22,
+   26
+  ],
+  "lost_reacquired": [
+   6,
+   6
+  ],
+  "landings_at_named_pad": 22,
+  "system_landings": 22,
+  "landing_rate": 1.0,
+  "strict_zero_action": 20,
+  "finalizer_rescued": 2,
+  "by_start": {
+   "ap-23001-blue_pad-same_color": 2,
+   "ap-23004-blue_pad-same_color": 2,
+   "ap-23013-blue_pad-same_color": 2,
+   "ap-23047-blue_pad-same_color": 2,
+   "ap-23108-red_pad-same_color": 0,
+   "ap-23109-red_pad-same_color": 0,
+   "ap-23110-blue_pad-same_shape": 2,
+   "ap-23111-blue_pad-same_shape": 2,
+   "ap-23113-blue_cube-same_shape": 2,
+   "ap-23118-blue_cube-first_view": 2,
+   "ap-23119-blue_cone-first_view": 2,
+   "ap-23124-blue_pad-first_view": 2,
+   "ap-23138-red_pad-first_view": 2,
+   "ap-23143-blue_pad-lost": 2,
+   "ap-23146-blue_pad-lost": 2,
+   "ap-23209-blue_pad-lost": 2
+  },
+  "consistency": {
+   "2/2": 14,
+   "1/2": 0,
+   "0/2": 2
+  },
+  "starts_always_correct": 14,
+  "starts_never_correct": 2,
+  "by_group": {
+   "same_color": [
+    8,
+    12
+   ],
+   "same_shape": [
+    6,
+    6
+   ],
+   "first_view": [
+    8,
+    8
+   ],
+   "lost": [
+    6,
+    6
+   ]
+  },
+  "wrong_objects": [
+   "ap-23108-red_pad-same_color#1: red_cube",
+   "ap-23108-red_pad-same_color#2: red_cube",
+   "ap-23109-red_pad-same_color#1: red_cube",
+   "ap-23109-red_pad-same_color#2: red_cube"
+  ],
+  "failures": [
+   "ap-23108-red_pad-same_color#1: COLLISION (collision)",
+   "ap-23108-red_pad-same_color#2: COLLISION (collision)",
+   "ap-23109-red_pad-same_color#1: SEARCH (stopped by itself)",
+   "ap-23109-red_pad-same_color#2: SEARCH (stopped by itself)"
+  ],
+  "inference_ms": 395.61951826726335,
+  "decision_s": 0.5082877401887858
+ }
+}

@@ -1,0 +1,75 @@
+{
+ "checkpoint": "outputs/aerovla_oft/checkpoints/grounding_film",
+ "visual_dim": 2176,
+ "sentences": 15,
+ "gamma_minus_one": {
+  "mean_abs": 0.04227225482463837,
+  "max_abs": 0.6690042018890381
+ },
+ "beta": {
+  "mean_abs": 0.03646165505051613,
+  "max_abs": 0.5633704662322998
+ },
+ "by_encoder": {
+  "dinov2_first_1024": {
+   "gamma": 0.042059075087308884,
+   "beta": 0.03713037073612213
+  },
+  "siglip_rest": {
+   "gamma": 0.04246174171566963,
+   "beta": 0.03586724027991295
+  }
+ },
+ "share_that_depends_on_the_sentence": 0.7117425203323364,
+ "pairs": {
+  "blue pad land / red pad land": {
+   "cosine": 1.0,
+   "distance_over_size": 0.017
+  },
+  "blue pad land / blue pad land (other words)": {
+   "cosine": 1.0,
+   "distance_over_size": 0.025
+  },
+  "blue pad land / blue pad approach": {
+   "cosine": 0.591,
+   "distance_over_size": 1.313
+  },
+  "blue pad find / blue cube find": {
+   "cosine": 0.989,
+   "distance_over_size": 0.151
+  },
+  "red pad find / red cube find": {
+   "cosine": 0.559,
+   "distance_over_size": 1.713
+  },
+  "blue cube find / red cube find": {
+   "cosine": 0.464,
+   "distance_over_size": 1.742
+  },
+  "blue cube find / blue cube approach": {
+   "cosine": 0.462,
+   "distance_over_size": 1.725
+  },
+  "blue pad find / orange ball find": {
+   "cosine": 0.281,
+   "distance_over_size": 1.635
+  }
+ },
+ "norm_by_sentence": {
+  "Find the blue landing pad and land on it.": 0.786,
+  "Find the red landing pad and land on it.": 0.791,
+  "Land on the blue landing pad.": 0.78,
+  "Land on the red landing pad.": 0.791,
+  "Approach the blue landing pad.": 2.587,
+  "Find the blue landing pad.": 0.79,
+  "Find the red landing pad.": 0.791,
+  "Find the blue cube.": 0.757,
+  "Find the red cube.": 7.595,
+  "Find the blue cylinder.": 4.846,
+  "Find the blue cone.": 1.232,
+  "Find the green cylinder.": 4.719,
+  "Find the orange ball.": 4.371,
+  "Approach the blue cube.": 7.052,
+  "Approach the red cube.": 11.04
+ }
+}
