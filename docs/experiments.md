@@ -195,3 +195,23 @@ step마다 멈추는 대신 도착 2초 전에 다음 판단을 시작해 명령
 - **판정:** 데이터 보정으로는 부족(질문의 답 NO). 같은 데이터를 더 넣지 않음. 다음 후보는 FiLM 등 더 강한 language–vision 결합(구현하지 않음). 44m 초과는 계속 별도.
 - **Tests:** Python 241/241, PowerShell 4/4. Gen-v2 지문 그대로.
 - **다음:** Blur는 아직 아님.
+
+## Language–vision grounding architecture (FiLM, 대조 실험, canonical test) — 2026-10-10
+
+브랜치 `exp/aerovla-oft-grounding-architecture`. 상세: [Language–vision grounding architecture](language_vision_grounding_architecture.md). 표: `outputs/generalization/grounding_architecture/`. **Canonical clean baseline이 gate와 test를 통과했다.**
+
+- **질문:** wrong-target 실패가 문장이 시각 표현을 약하게 조건화해서 생기는가. Data는 Gen-v3c 그대로(episode 추가 없음), teacher·finalizer·evaluator v2·action·44m 범위 고정. 구조 실험은 둘까지: FiLM, 실패 시에만 cross-attention.
+- **평가:** 새 pilot set 16개(seed 23000번대, 녹화한 적 없는 배치)를 모델마다 두 번씩 비행. 9개는 관련 물체가 "어려운 자리"(탐색이 도는 쪽, 또는 정면 가까이)에 있고 지시한 것은 화면 밖. 통과 기준(다른 물체 32회 중 2 이하, baseline보다 2 이상 적고 절반 이하, 두 번 다 틀린 시작 1 이하, 그 밖은 baseline보다 나쁘지 않음, 회귀 26/33 이상)은 학습 전에 commit.
+- **구조:** 두 모듈 모두 vision encoder와 projector 사이(patch feature 256×2176). FiLM은 문장 token embedding의 평균으로 채널마다 γ·β(4.34M parameter). Cross-attention은 단어가 patch를 읽고 읽은 자리에 되돌려 씀(2.74M, 구현만 하고 학습 안 함). 학습 전에는 예측을 바꾸지 않음(차이 0.0). Vision encoder·projector·LLM·AeroVLA adapter는 고정.
+- **Baseline (Gen-v3c):** 28/32, 다른 물체 4, 충돌 2. 실패는 `red pad ← red cube` 두 시작에서 두 번씩.
+- **FiLM (Gen-v3c에서 2,000 update, 모듈 lr 5e-4·LoRA lr 5e-5, 87분, 남긴 checkpoint update 1,750):** pilot 32/32, 다른 물체 0, 16개 시작 모두 두 번 다 맞음, 회귀 26/33. Pilot PASS. Experiment 2는 실행하지 않음.
+- **대조 (모듈 없이 같은 2,000 update):** 30/32, 다른 물체 2, 두 번 다 틀린 시작 0. Pilot의 줄을 지킴. 같은 두 red pad 시작을 고침. 회귀 27/33. 미리 정한 규칙대로 개선을 FiLM의 효과로 인정하지 않음.
+- **FiLM을 들여다보면:** blue pad 문장과 red pad 문장의 γ·β가 사실상 같음(차이 1.7%). 문장에 따라 달라지긴 하지만(조절 에너지의 71%) 고쳐진 실패의 색 구분을 실어 준 것은 아님.
+- **다음 단계로 간 것:** 미리 정한 선택 순서로 pilot에서 가장 좋은 FiLM checkpoint. 구조의 증거가 아니라 baseline 후보로서. 이 결정은 검증 비행 전에 config에 적음.
+- **새 검증 gate (seed 24000번대 36개, 첫 비행으로 판정):** smoke 10/10. Representative 34/36(0.94), 착륙 25/27, 접근 시작 34/34, 시킨 대로 끝남 35/36, 다른 물체 2(기준 2 이하), 충돌 0. PASS. 목표 선택 시작 17개의 두 번째 비행(판정 아님)에서는 13/17, 다른 물체 3.
+- **동결:** checkpoint(FiLM 포함), 착륙 규칙(finalizer·evaluator), config, 지도, test 시작, 비행·판정 code의 지문을 `outputs/generalization/grounding_film_frozen.json`에.
+- **Canonical test 48개 (한 번):** **47/48(0.979)**. 착륙 36/36(touchdown·안정 착륙·system·strict 모두), 다른 물체 1, 접근 시작 46/47, 시킨 대로 끝남 48/48, 충돌 0. 12–20m 15/16, 20–32m 16/16, 32–44m 16/16. 실패 하나는 "Find the blue cube."에서 먼저 보이는 blue pad 곁에 멈춤.
+- **읽는 법:** Gen-v3c의 "데이터로는 부족하다"는 판정은 검증 L1이 고른 update 1,250의 checkpoint에 대한 것이었다. 같은 data를 더 학습하면 그 실패는 고쳐지고, 검증 L1은 그 차이를 보여 주지 못한다. 목표 선택은 여전히 가장 약한 곳이다.
+- **비용:** FiLM은 추론 시간 +4%(216 → 225ms), VRAM 차이 없음(추론 6.94 GiB, 학습 9.88 GiB).
+- **Tests:** Python 260/260, PowerShell 4/4. Gen-v2 지문 그대로.
+- **다음:** Gaussian Blur 준비 완료(실행하지 않음). Depot의 156개와 44m 초과는 계속 별도.

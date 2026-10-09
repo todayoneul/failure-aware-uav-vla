@@ -43,6 +43,13 @@
 - **회귀로 본 장거리 시작의 숫자는 canonical baseline에 섞지 않는다.** 올랐든 내렸든 이 문제가 풀렸다는 근거가 아니다.
 - **후보 가운데 FiLM 등 더 강한 language–vision 결합이 이제 첫 번째다.** 44m 안의 gate가 같은 병목으로 두 번 걸렸기 때문이다.
 
+### Canonical baseline이 선 뒤에도 따로 둔다 (2026-10-10 추가)
+
+44m 이하의 canonical baseline은 [구조 실험](language_vision_grounding_architecture.md)에서 gate와 test를 통과했다. 그 실험은 44m를 넘는 시작을 학습에도 판정에도 넣지 않았고, 회귀로 본 장거리 시작 9개의 숫자(7 → 6)로 무엇을 주장하지도 않는다. 이 문서의 문제는 그대로 열려 있다.
+
+- **FiLM은 이제 구현돼 있다**(projector 직전, 4.34M parameter). 다만 44m 안에서 그 효과는 대조 실험과 가려지지 않았다. 먼 거리에서 시험한 적은 없다.
+- **Cross-attention adapter도 구현돼 있고 학습한 적은 없다.**
+
 ## 왜 canonical 범위에서 뺐는가
 
 - **Failure-Aware 실험의 기준은 clean에서 안정적이어야 한다.** 먼 거리의 작은 형태 구분은 Gaussian Blur가 가장 먼저 무너뜨릴 부분이라, clean에서도 불안정한 구간을 기준에 넣으면 Blur의 영향을 가려낼 수 없다.

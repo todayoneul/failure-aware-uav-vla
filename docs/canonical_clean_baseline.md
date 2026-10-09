@@ -3,6 +3,8 @@
 2026-10-09 실행. 브랜치 `exp/aerovla-oft-gen-v3-canonical-baseline`(`exp/aerovla-oft-gen-v3-grounding-landing`에서 분기). 새 학습은 없다. [Gen-v3](aerovla_oft_gen_v3.md)의 두 번째 checkpoint(`generalization_v3b`)를 그대로 쓴다. Gen-v3의 checkpoint, dataset, 결과, 그리고 Depot의 156개 test set은 그대로 있다.
 
 > **이후 (Gen-v3c, 2026-10-09):** 이 문서의 숫자는 **legacy evaluator result**다. 그 뒤 "서 있음" 판정을 접촉과 위치로 읽는 `canonical_evaluator_v2`를 넣었고, 목표 선택 병목을 겨냥한 hard-negative 보정(Gen-v3c)을 새 검증 set에서 비행했다. 결과: 33/36, 다른 물체에서 끝난 비행 3회로 gate를 다시 통과하지 못했다. Canonical test 48개는 여전히 비행하지 않았다. → [Gen-v3c](gen_v3c_hard_negative_grounding.md). 아래의 30/36과 착륙 21/27은 새 판정으로 다시 계산하지 않았다.
+>
+> **이후 (구조 실험, 2026-10-10):** Canonical clean baseline이 섰다. Gen-v3c에서 같은 data로 더 학습하고 FiLM을 넣은 checkpoint가 새 검증 gate(34/36)를 넘었고, 이 문서에서 만들어 봉인해 둔 test 시작 48개를 한 번 비행해 47/48(착륙 36/36, 다른 물체 1회, 충돌 0)을 냈다. → [Language–vision grounding architecture](language_vision_grounding_architecture.md)
 
 **요약**
 

@@ -1,0 +1,1582 @@
+{
+ "description": "Language-vision grounding architecture experiment (docs/language_vision_grounding_architecture.md): the FiLM run and the control without a module, both 2,000 updates from the Gen-v3c checkpoint on the Gen-v3c data. The checkpoints are not in Git.",
+ "start_checkpoint": {
+  "checkpoint": "outputs/aerovla_oft/checkpoints/generalization_v3c",
+  "cost": {
+   "checkpoint": "/mnt/c/Users/leegy/Desktop/drone/outputs/aerovla_oft/checkpoints/generalization_v3c",
+   "grounding": {
+    "type": "none"
+   },
+   "frames": 59,
+   "inference_ms": 216.35096598302587,
+   "inference_peak_GiB": 6.94,
+   "training_peak_GiB": 9.82,
+   "added_parameters": 0,
+   "trainable_parameters": 54693891,
+   "lora_parameters": 39976960,
+   "head_parameters": 14716931,
+   "train_seconds": 5062.3914794921875
+  },
+  "negative_probe": {
+   "checkpoint": "/mnt/c/Users/leegy/Desktop/drone/outputs/aerovla_oft/checkpoints/generalization_v3c",
+   "dataset": "/home/gyuhan/uav-vla-smoke/datasets/generalization_v3c_added",
+   "val": {
+    "related_object_in_view_named_one_not": {
+     "color_first": {
+      "first_decision": {
+       "frames": 4,
+       "own_sentence_turn": 1.0,
+       "other_sentence_advance": 0.0,
+       "own_sentence_kinds": {
+        "turn": 4
+       },
+       "other_sentence_kinds": {
+        "turn": 4
+       },
+       "both_right": 0.0,
+       "mean_action_difference": 0.003407796223958333
+      },
+      "first_decisions": {
+       "frames": 12,
+       "own_sentence_turn": 0.9166666666666666,
+       "other_sentence_advance": 0.0,
+       "own_sentence_kinds": {
+        "stop": 1,
+        "turn": 11
+       },
+       "other_sentence_kinds": {
+        "turn": 12
+       },
+       "both_right": 0.0,
+       "mean_action_difference": 0.08531104193793403
+      }
+     },
+     "shape_first": {
+      "first_decision": {
+       "frames": 2,
+       "own_sentence_turn": 1.0,
+       "other_sentence_advance": 0.5,
+       "own_sentence_kinds": {
+        "turn": 2
+       },
+       "other_sentence_kinds": {
+        "advance": 1,
+        "turn": 1
+       },
+       "both_right": 0.5,
+       "mean_action_difference": 0.5022735595703125
+      },
+      "first_decisions": {
+       "frames": 6,
+       "own_sentence_turn": 1.0,
+       "other_sentence_advance": 0.3333333333333333,
+       "own_sentence_kinds": {
+        "turn": 6
+       },
+       "other_sentence_kinds": {
+        "advance": 2,
+        "turn": 4
+       },
+       "both_right": 0.3333333333333333,
+       "mean_action_difference": 0.33652411566840285
+      }
+     },
+     "lost": {
+      "first_decision": {
+       "frames": 2,
+       "own_sentence_turn": 1.0,
+       "other_sentence_advance": 0.5,
+       "own_sentence_kinds": {
+        "turn": 2
+       },
+       "other_sentence_kinds": {
+        "advance": 1,
+        "turn": 1
+       },
+       "both_right": 0.5,
+       "mean_action_difference": 0.5054880777994791
+      },
+      "first_decisions": {
+       "frames": 6,
+       "own_sentence_turn": 1.0,
+       "other_sentence_advance": 0.3333333333333333,
+       "own_sentence_kinds": {
+        "turn": 6
+       },
+       "other_sentence_kinds": {
+        "advance": 2,
+        "turn": 4
+       },
+       "both_right": 0.3333333333333333,
+       "mean_action_difference": 0.3401421440972223
+      }
+     },
+     "all": {
+      "first_decision": {
+       "frames": 8,
+       "own_sentence_turn": 1.0,
+       "other_sentence_advance": 0.25,
+       "own_sentence_kinds": {
+        "turn": 8
+       },
+       "other_sentence_kinds": {
+        "advance": 2,
+        "turn": 6
+       },
+       "both_right": 0.25,
+       "mean_action_difference": 0.25364430745442706
+      },
+      "first_decisions": {
+       "frames": 24,
+       "own_sentence_turn": 0.9583333333333334,
+       "other_sentence_advance": 0.16666666666666666,
+       "own_sentence_kinds": {
+        "stop": 1,
+        "turn": 23
+       },
+       "other_sentence_kinds": {
+        "advance": 4,
+        "turn": 20
+       },
+       "both_right": 0.16666666666666666,
+       "mean_action_difference": 0.21182208591037324
+      }
+     }
+    },
+    "named_object_in_view": {
+     "first_decision": {
+      "frames": 3,
+      "own_sentence_advance": 0.0,
+      "other_sentence_turn": 1.0,
+      "own_sentence_kinds": {
+       "turn": 3
+      },
+      "other_sentence_kinds": {
+       "turn": 3
+      },
+      "both_right": 0.0,
+      "mean_action_difference": 0.004869249131944445
+     },
+     "first_decisions": {
+      "frames": 10,
+      "own_sentence_advance": 0.5,
+      "other_sentence_turn": 0.8,
+      "own_sentence_kinds": {
+       "advance": 5,
+       "turn": 5
+      },
+      "other_sentence_kinds": {
+       "advance": 2,
+       "turn": 8
+      },
+      "both_right": 0.3,
+      "mean_action_difference": 0.22528076171875006
+     }
+    }
+   },
+   "train": {
+    "related_object_in_view_named_one_not": {
+     "color_first": {
+      "first_decision": {
+       "frames": 30,
+       "own_sentence_turn": 0.7666666666666667,
+       "other_sentence_advance": 0.43333333333333335,
+       "own_sentence_kinds": {
+        "advance": 7,
+        "turn": 23
+       },
+       "other_sentence_kinds": {
+        "advance": 13,
+        "turn": 17
+       },
+       "both_right": 0.23333333333333334,
+       "mean_action_difference": 0.2551283094618056
+      },
+      "first_decisions": {
+       "frames": 87,
+       "own_sentence_turn": 0.7931034482758621,
+       "other_sentence_advance": 0.40229885057471265,
+       "own_sentence_kinds": {
+        "advance": 18,
+        "turn": 69
+       },
+       "other_sentence_kinds": {
+        "advance": 35,
+        "turn": 52
+       },
+       "both_right": 0.20689655172413793,
+       "mean_action_difference": 0.22378592655576504
+      }
+     },
+     "shape_first": {
+      "first_decision": {
+       "frames": 14,
+       "own_sentence_turn": 0.9285714285714286,
+       "other_sentence_advance": 0.5,
+       "own_sentence_kinds": {
+        "advance": 1,
+        "turn": 13
+       },
+       "other_sentence_kinds": {
+        "advance": 7,
+        "stop": 1,
+        "turn": 6
+       },
+       "both_right": 0.5,
+       "mean_action_difference": 0.4409586588541668
+      },
+      "first_decisions": {
+       "frames": 42,
+       "own_sentence_turn": 0.9285714285714286,
+       "other_sentence_advance": 0.40476190476190477,
+       "own_sentence_kinds": {
+        "advance": 3,
+        "turn": 39
+       },
+       "other_sentence_kinds": {
+        "advance": 17,
+        "stop": 2,
+        "turn": 23
+       },
+       "both_right": 0.40476190476190477,
+       "mean_action_difference": 0.4219864133804563
+      }
+     },
+     "lost": {
+      "first_decision": {
+       "frames": 20,
+       "own_sentence_turn": 0.95,
+       "other_sentence_advance": 0.25,
+       "own_sentence_kinds": {
+        "advance": 1,
+        "turn": 19
+       },
+       "other_sentence_kinds": {
+        "advance": 5,
+        "turn": 15
+       },
+       "both_right": 0.2,
+       "mean_action_difference": 0.16230061848958333
+      },
+      "first_decisions": {
+       "frames": 57,
+       "own_sentence_turn": 0.9473684210526315,
+       "other_sentence_advance": 0.22807017543859648,
+       "own_sentence_kinds": {
+        "advance": 3,
+        "turn": 54
+       },
+       "other_sentence_kinds": {
+        "advance": 13,
+        "stop": 1,
+        "turn": 43
+       },
+       "both_right": 0.17543859649122806,
+       "mean_action_difference": 0.18816942359968927
+      }
+     },
+     "all": {
+      "first_decision": {
+       "frames": 64,
+       "own_sentence_turn": 0.859375,
+       "other_sentence_advance": 0.390625,
+       "own_sentence_kinds": {
+        "advance": 9,
+        "turn": 55
+       },
+       "other_sentence_kinds": {
+        "advance": 25,
+        "stop": 1,
+        "turn": 38
+       },
+       "both_right": 0.28125,
+       "mean_action_difference": 0.2667700449625651
+      },
+      "first_decisions": {
+       "frames": 186,
+       "own_sentence_turn": 0.8709677419354839,
+       "other_sentence_advance": 0.34946236559139787,
+       "own_sentence_kinds": {
+        "advance": 24,
+        "turn": 162
+       },
+       "other_sentence_kinds": {
+        "advance": 65,
+        "stop": 3,
+        "turn": 118
+       },
+       "both_right": 0.24193548387096775,
+       "mean_action_difference": 0.25762614041673665
+      }
+     }
+    },
+    "named_object_in_view": {
+     "first_decision": {
+      "frames": 31,
+      "own_sentence_advance": 0.5806451612903226,
+      "other_sentence_turn": 0.7741935483870968,
+      "own_sentence_kinds": {
+       "advance": 18,
+       "turn": 13
+      },
+      "other_sentence_kinds": {
+       "advance": 6,
+       "stop": 1,
+       "turn": 24
+      },
+      "both_right": 0.3870967741935484,
+      "mean_action_difference": 0.384997788295951
+     },
+     "first_decisions": {
+      "frames": 94,
+      "own_sentence_advance": 0.8404255319148937,
+      "other_sentence_turn": 0.6808510638297872,
+      "own_sentence_kinds": {
+       "advance": 79,
+       "turn": 15
+      },
+      "other_sentence_kinds": {
+       "advance": 28,
+       "stop": 2,
+       "turn": 64
+      },
+      "both_right": 0.5425531914893617,
+      "mean_action_difference": 0.5325283835120235
+     }
+    }
+   }
+  },
+  "earlier_validation_400_frames": {
+   "l1": 0.05805112340953201,
+   "first_action_l1": 0.05225371743174037,
+   "behaviour": {
+    "grounding_accuracy": 0.9020771513353115,
+    "terminal_accuracy": 0.9629629629629629,
+    "all": 0.9125,
+    "terminal_accuracy_land": 0.967741935483871,
+    "terminal_accuracy_approach": 0.9565217391304348,
+    "score": 0.9325200571491372
+   }
+  }
+ },
+ "film": {
+  "checkpoint": "outputs/aerovla_oft/checkpoints/grounding_film",
+  "settings": {
+   "init": "/mnt/c/Users/leegy/Desktop/drone/outputs/aerovla_oft/checkpoints/generalization_v3c",
+   "planned_updates": 2000,
+   "updates_run": 2000,
+   "learning_rate": 5e-05,
+   "grounding_learning_rate": 0.0005,
+   "grounding": {
+    "type": "film",
+    "position": "before_projector",
+    "language": "mean_token_embedding",
+    "hidden_dim": 512
+   },
+   "parameters": {
+    "lora": 39976960,
+    "head": 14716931,
+    "grounding": 4338432
+   },
+   "batch_size": 1,
+   "gradient_accumulation": 4,
+   "balance": 3.0,
+   "boost": {
+    "small_visible": 2.0,
+    "selection": 3.0
+   },
+   "share_of_draws": {
+    "generalization_v3c_added": 0.5
+   },
+   "val_file": "val_mix",
+   "eval_samples": 600,
+   "selection": {
+    "band": 0.02,
+    "rule": "lowest validation L1; among evaluations within the band of it, the highest mean of grounding and terminal accuracy"
+   },
+   "train_seconds": 5229.278831243515,
+   "peak_allocated_GiB": 9.88300895690918,
+   "gpu": "NVIDIA GeForce RTX 5070"
+  },
+  "kept": {
+   "update": 1750,
+   "val_l1": 0.06085389547537488,
+   "val_first_action_l1": 0.05914603386518744,
+   "train_l1_ema": 0.033499988478018376,
+   "score": 0.9387059197288997,
+   "behaviour": {
+    "grounding_accuracy": 0.9195171026156942,
+    "terminal_accuracy": 0.9578947368421052,
+    "all": 0.925,
+    "terminal_accuracy_land": 0.9811320754716981,
+    "terminal_accuracy_approach": 0.9285714285714286,
+    "score": 0.9387059197288997
+   }
+  },
+  "validation_history": [
+   {
+    "update": 250,
+    "train_l1_ema": 0.026932931796578647,
+    "val_l1": 0.0649467625420463,
+    "behaviour": {
+     "grounding_accuracy": 0.9094567404426559,
+     "terminal_accuracy": 0.968421052631579,
+     "all": 0.9183333333333333,
+     "terminal_accuracy_land": 0.9622641509433962,
+     "terminal_accuracy_approach": 0.9761904761904762,
+     "score": 0.9389388965371175
+    },
+    "first_action_l1_by_state": {
+     "align": 0.009322819678345695,
+     "approach": 0.08228766213822353,
+     "climb": 0.0915330225834623,
+     "descend": 0.021056880828038586,
+     "final": 0.03532965912017971,
+     "landed": 0.0033213297695814012,
+     "search": 0.03739030253640268,
+     "stop": 0.010371616904324452
+    },
+    "kept_update": 250
+   },
+   {
+    "update": 500,
+    "train_l1_ema": 0.045806569383207735,
+    "val_l1": 0.16578437878769667,
+    "behaviour": {
+     "grounding_accuracy": 0.7806841046277666,
+     "terminal_accuracy": 0.9789473684210527,
+     "all": 0.8133333333333334,
+     "terminal_accuracy_land": 0.9811320754716981,
+     "terminal_accuracy_approach": 0.9761904761904762,
+     "score": 0.8798157365244097
+    },
+    "first_action_l1_by_state": {
+     "align": 0.006464339734520763,
+     "approach": 0.2609569521275094,
+     "climb": 0.09285227215150371,
+     "descend": 0.020692282515328106,
+     "final": 0.03248646756743684,
+     "landed": 0.00299919976775224,
+     "search": 0.013392958734013603,
+     "stop": 0.009244403905800678
+    },
+    "kept_update": 250
+   },
+   {
+    "update": 750,
+    "train_l1_ema": 0.031314431383006755,
+    "val_l1": 0.0749466978290487,
+    "behaviour": {
+     "grounding_accuracy": 0.9054325955734407,
+     "terminal_accuracy": 0.968421052631579,
+     "all": 0.915,
+     "terminal_accuracy_land": 0.9811320754716981,
+     "terminal_accuracy_approach": 0.9523809523809523,
+     "score": 0.9369268241025098
+    },
+    "first_action_l1_by_state": {
+     "align": 0.009170231729513034,
+     "approach": 0.09784643253492763,
+     "climb": 0.0923983256216161,
+     "descend": 0.016975465119907225,
+     "final": 0.04541377254131743,
+     "landed": 0.003047095388562108,
+     "search": 0.040339506883715646,
+     "stop": 0.014156038731536163
+    },
+    "kept_update": 250
+   },
+   {
+    "update": 1000,
+    "train_l1_ema": 0.04866378389860702,
+    "val_l1": 0.06996453190421259,
+    "behaviour": {
+     "grounding_accuracy": 0.8893360160965795,
+     "terminal_accuracy": 0.968421052631579,
+     "all": 0.9016666666666666,
+     "terminal_accuracy_land": 0.9811320754716981,
+     "terminal_accuracy_approach": 0.9523809523809523,
+     "score": 0.9288785343640793
+    },
+    "first_action_l1_by_state": {
+     "align": 0.009460148750804365,
+     "approach": 0.09218454697470024,
+     "climb": 0.088846844737418,
+     "descend": 0.012050473448187226,
+     "final": 0.04444933733183836,
+     "landed": 0.0037375555839389563,
+     "search": 0.04675955394562808,
+     "stop": 0.011067829194092025
+    },
+    "kept_update": 250
+   },
+   {
+    "update": 1250,
+    "train_l1_ema": 0.032727554453364456,
+    "val_l1": 0.07299641734192847,
+    "behaviour": {
+     "grounding_accuracy": 0.9175050301810865,
+     "terminal_accuracy": 0.9368421052631579,
+     "all": 0.92,
+     "terminal_accuracy_land": 0.9811320754716981,
+     "terminal_accuracy_approach": 0.8809523809523809,
+     "score": 0.9271735677221222
+    },
+    "first_action_l1_by_state": {
+     "align": 0.004862166912062094,
+     "approach": 0.09307911077708,
+     "climb": 0.09430694323964417,
+     "descend": 0.012991804151125707,
+     "final": 0.04896033797687029,
+     "landed": 0.004625956314460685,
+     "search": 0.03532066639943582,
+     "stop": 0.023162962523721426
+    },
+    "kept_update": 250
+   },
+   {
+    "update": 1500,
+    "train_l1_ema": 0.021365728777841958,
+    "val_l1": 0.06839673244786051,
+    "behaviour": {
+     "grounding_accuracy": 0.9114688128772636,
+     "terminal_accuracy": 0.968421052631579,
+     "all": 0.92,
+     "terminal_accuracy_land": 0.9811320754716981,
+     "terminal_accuracy_approach": 0.9523809523809523,
+     "score": 0.9399449327544213
+    },
+    "first_action_l1_by_state": {
+     "align": 0.00590993718651589,
+     "approach": 0.08642037547739893,
+     "climb": 0.0903027877502609,
+     "descend": 0.011556237552324048,
+     "final": 0.0485969215806108,
+     "landed": 0.005419413294778981,
+     "search": 0.0318116178637273,
+     "stop": 0.011712573733044943
+    },
+    "kept_update": 250
+   },
+   {
+    "update": 1750,
+    "train_l1_ema": 0.033499988478018376,
+    "val_l1": 0.06085389547537488,
+    "behaviour": {
+     "grounding_accuracy": 0.9195171026156942,
+     "terminal_accuracy": 0.9578947368421052,
+     "all": 0.925,
+     "terminal_accuracy_land": 0.9811320754716981,
+     "terminal_accuracy_approach": 0.9285714285714286,
+     "score": 0.9387059197288997
+    },
+    "first_action_l1_by_state": {
+     "align": 0.004892684431979433,
+     "approach": 0.0790644971605155,
+     "climb": 0.0885022455768194,
+     "descend": 0.013031874516433695,
+     "final": 0.04441602521418484,
+     "landed": 0.003749423563325157,
+     "search": 0.03416300917469502,
+     "stop": 0.012814234346955172
+    },
+    "kept_update": 1750
+   },
+   {
+    "update": 1999,
+    "train_l1_ema": 0.038987819744787655,
+    "val_l1": 0.060474438664520375,
+    "behaviour": {
+     "grounding_accuracy": 0.9175050301810865,
+     "terminal_accuracy": 0.9578947368421052,
+     "all": 0.9233333333333333,
+     "terminal_accuracy_land": 0.9811320754716981,
+     "terminal_accuracy_approach": 0.9285714285714286,
+     "score": 0.9376998835115959
+    },
+    "first_action_l1_by_state": {
+     "align": 0.004694320319686085,
+     "approach": 0.07879842215767863,
+     "climb": 0.08751932533050422,
+     "descend": 0.013003341314376995,
+     "final": 0.04689527003210969,
+     "landed": 0.002901713019430948,
+     "search": 0.03129826036075788,
+     "stop": 0.012047419215031411
+    },
+    "kept_update": 1750
+   }
+  ],
+  "reload_check": true,
+  "cost": {
+   "checkpoint": "/mnt/c/Users/leegy/Desktop/drone/outputs/aerovla_oft/checkpoints/grounding_film",
+   "grounding": {
+    "type": "film",
+    "position": "before_projector",
+    "language": "mean_token_embedding",
+    "hidden_dim": 512
+   },
+   "frames": 59,
+   "inference_ms": 225.48308808482187,
+   "inference_peak_GiB": 6.94,
+   "training_peak_GiB": 9.88,
+   "added_parameters": 4338432,
+   "trainable_parameters": 59032323,
+   "lora_parameters": 39976960,
+   "head_parameters": 14716931,
+   "train_seconds": 5229.278831243515
+  },
+  "negative_probe": {
+   "checkpoint": "/mnt/c/Users/leegy/Desktop/drone/outputs/aerovla_oft/checkpoints/grounding_film",
+   "dataset": "/home/gyuhan/uav-vla-smoke/datasets/generalization_v3c_added",
+   "val": {
+    "related_object_in_view_named_one_not": {
+     "color_first": {
+      "first_decision": {
+       "frames": 4,
+       "own_sentence_turn": 1.0,
+       "other_sentence_advance": 0.0,
+       "own_sentence_kinds": {
+        "turn": 4
+       },
+       "other_sentence_kinds": {
+        "turn": 4
+       },
+       "both_right": 0.0,
+       "mean_action_difference": 0.0029296875
+      },
+      "first_decisions": {
+       "frames": 12,
+       "own_sentence_turn": 1.0,
+       "other_sentence_advance": 0.0,
+       "own_sentence_kinds": {
+        "turn": 12
+       },
+       "other_sentence_kinds": {
+        "turn": 12
+       },
+       "both_right": 0.0,
+       "mean_action_difference": 0.05239189995659722
+      }
+     },
+     "shape_first": {
+      "first_decision": {
+       "frames": 2,
+       "own_sentence_turn": 1.0,
+       "other_sentence_advance": 0.5,
+       "own_sentence_kinds": {
+        "turn": 2
+       },
+       "other_sentence_kinds": {
+        "advance": 1,
+        "turn": 1
+       },
+       "both_right": 0.5,
+       "mean_action_difference": 0.4308675130208333
+      },
+      "first_decisions": {
+       "frames": 6,
+       "own_sentence_turn": 1.0,
+       "other_sentence_advance": 0.3333333333333333,
+       "own_sentence_kinds": {
+        "turn": 6
+       },
+       "other_sentence_kinds": {
+        "advance": 2,
+        "turn": 4
+       },
+       "both_right": 0.3333333333333333,
+       "mean_action_difference": 0.3108164469401042
+      }
+     },
+     "lost": {
+      "first_decision": {
+       "frames": 2,
+       "own_sentence_turn": 1.0,
+       "other_sentence_advance": 0.5,
+       "own_sentence_kinds": {
+        "turn": 2
+       },
+       "other_sentence_kinds": {
+        "advance": 1,
+        "turn": 1
+       },
+       "both_right": 0.5,
+       "mean_action_difference": 0.5026295979817709
+      },
+      "first_decisions": {
+       "frames": 6,
+       "own_sentence_turn": 0.8333333333333334,
+       "other_sentence_advance": 0.3333333333333333,
+       "own_sentence_kinds": {
+        "advance": 1,
+        "turn": 5
+       },
+       "other_sentence_kinds": {
+        "advance": 2,
+        "turn": 4
+       },
+       "both_right": 0.16666666666666666,
+       "mean_action_difference": 0.17477925618489584
+      }
+     },
+     "all": {
+      "first_decision": {
+       "frames": 8,
+       "own_sentence_turn": 1.0,
+       "other_sentence_advance": 0.25,
+       "own_sentence_kinds": {
+        "turn": 8
+       },
+       "other_sentence_kinds": {
+        "advance": 2,
+        "turn": 6
+       },
+       "both_right": 0.25,
+       "mean_action_difference": 0.23483912150065106
+      },
+      "first_decisions": {
+       "frames": 24,
+       "own_sentence_turn": 0.9583333333333334,
+       "other_sentence_advance": 0.16666666666666666,
+       "own_sentence_kinds": {
+        "advance": 1,
+        "turn": 23
+       },
+       "other_sentence_kinds": {
+        "advance": 4,
+        "turn": 20
+       },
+       "both_right": 0.125,
+       "mean_action_difference": 0.1475948757595486
+      }
+     }
+    },
+    "named_object_in_view": {
+     "first_decision": {
+      "frames": 3,
+      "own_sentence_advance": 0.0,
+      "other_sentence_turn": 1.0,
+      "own_sentence_kinds": {
+       "turn": 3
+      },
+      "other_sentence_kinds": {
+       "turn": 3
+      },
+      "both_right": 0.0,
+      "mean_action_difference": 0.0035129123263888886
+     },
+     "first_decisions": {
+      "frames": 10,
+      "own_sentence_advance": 0.4,
+      "other_sentence_turn": 1.0,
+      "own_sentence_kinds": {
+       "advance": 4,
+       "turn": 6
+      },
+      "other_sentence_kinds": {
+       "turn": 10
+      },
+      "both_right": 0.4,
+      "mean_action_difference": 0.32635396321614585
+     }
+    }
+   },
+   "train": {
+    "related_object_in_view_named_one_not": {
+     "color_first": {
+      "first_decision": {
+       "frames": 30,
+       "own_sentence_turn": 0.9333333333333333,
+       "other_sentence_advance": 0.36666666666666664,
+       "own_sentence_kinds": {
+        "advance": 2,
+        "turn": 28
+       },
+       "other_sentence_kinds": {
+        "advance": 11,
+        "turn": 19
+       },
+       "both_right": 0.3333333333333333,
+       "mean_action_difference": 0.31028544108072903
+      },
+      "first_decisions": {
+       "frames": 87,
+       "own_sentence_turn": 0.9425287356321839,
+       "other_sentence_advance": 0.3793103448275862,
+       "own_sentence_kinds": {
+        "advance": 5,
+        "turn": 82
+       },
+       "other_sentence_kinds": {
+        "advance": 33,
+        "turn": 54
+       },
+       "both_right": 0.3333333333333333,
+       "mean_action_difference": 0.31809792938817055
+      }
+     },
+     "shape_first": {
+      "first_decision": {
+       "frames": 14,
+       "own_sentence_turn": 0.9285714285714286,
+       "other_sentence_advance": 0.35714285714285715,
+       "own_sentence_kinds": {
+        "advance": 1,
+        "turn": 13
+       },
+       "other_sentence_kinds": {
+        "advance": 5,
+        "stop": 1,
+        "turn": 8
+       },
+       "both_right": 0.35714285714285715,
+       "mean_action_difference": 0.28616768973214285
+      },
+      "first_decisions": {
+       "frames": 42,
+       "own_sentence_turn": 0.9523809523809523,
+       "other_sentence_advance": 0.35714285714285715,
+       "own_sentence_kinds": {
+        "advance": 2,
+        "turn": 40
+       },
+       "other_sentence_kinds": {
+        "advance": 15,
+        "stop": 2,
+        "turn": 25
+       },
+       "both_right": 0.35714285714285715,
+       "mean_action_difference": 0.3375142415364583
+      }
+     },
+     "lost": {
+      "first_decision": {
+       "frames": 20,
+       "own_sentence_turn": 1.0,
+       "other_sentence_advance": 0.2,
+       "own_sentence_kinds": {
+        "turn": 20
+       },
+       "other_sentence_kinds": {
+        "advance": 4,
+        "turn": 16
+       },
+       "both_right": 0.2,
+       "mean_action_difference": 0.17985382080078122
+      },
+      "first_decisions": {
+       "frames": 57,
+       "own_sentence_turn": 1.0,
+       "other_sentence_advance": 0.22807017543859648,
+       "own_sentence_kinds": {
+        "turn": 57
+       },
+       "other_sentence_kinds": {
+        "advance": 13,
+        "turn": 44
+       },
+       "both_right": 0.22807017543859648,
+       "mean_action_difference": 0.22678433245385599
+      }
+     },
+     "all": {
+      "first_decision": {
+       "frames": 64,
+       "own_sentence_turn": 0.953125,
+       "other_sentence_advance": 0.3125,
+       "own_sentence_kinds": {
+        "advance": 3,
+        "turn": 61
+       },
+       "other_sentence_kinds": {
+        "advance": 20,
+        "stop": 1,
+        "turn": 43
+       },
+       "both_right": 0.296875,
+       "mean_action_difference": 0.26424980163574213
+      },
+      "first_decisions": {
+       "frames": 186,
+       "own_sentence_turn": 0.9623655913978495,
+       "other_sentence_advance": 0.3279569892473118,
+       "own_sentence_kinds": {
+        "advance": 7,
+        "turn": 179
+       },
+       "other_sentence_kinds": {
+        "advance": 61,
+        "stop": 2,
+        "turn": 123
+       },
+       "both_right": 0.3064516129032258,
+       "mean_action_difference": 0.2944990588772682
+      }
+     }
+    },
+    "named_object_in_view": {
+     "first_decision": {
+      "frames": 31,
+      "own_sentence_advance": 0.6129032258064516,
+      "other_sentence_turn": 0.8387096774193549,
+      "own_sentence_kinds": {
+       "advance": 19,
+       "turn": 12
+      },
+      "other_sentence_kinds": {
+       "advance": 4,
+       "stop": 1,
+       "turn": 26
+      },
+      "both_right": 0.45161290322580644,
+      "mean_action_difference": 0.4047644830519153
+     },
+     "first_decisions": {
+      "frames": 94,
+      "own_sentence_advance": 0.8404255319148937,
+      "other_sentence_turn": 0.7340425531914894,
+      "own_sentence_kinds": {
+       "advance": 79,
+       "turn": 15
+      },
+      "other_sentence_kinds": {
+       "advance": 24,
+       "stop": 1,
+       "turn": 69
+      },
+      "both_right": 0.5851063829787234,
+      "mean_action_difference": 0.5691138193116965
+     }
+    }
+   }
+  },
+  "earlier_validation_400_frames": {
+   "l1": 0.058756658457423325,
+   "first_action_l1": 0.05191603868846869,
+   "behaviour": {
+    "grounding_accuracy": 0.9228486646884273,
+    "terminal_accuracy": 0.9259259259259259,
+    "all": 0.925,
+    "terminal_accuracy_land": 0.967741935483871,
+    "terminal_accuracy_approach": 0.8695652173913043,
+    "score": 0.9243872953071766
+   }
+  }
+ },
+ "control": {
+  "checkpoint": "outputs/aerovla_oft/checkpoints/grounding_control",
+  "settings": {
+   "init": "/mnt/c/Users/leegy/Desktop/drone/outputs/aerovla_oft/checkpoints/generalization_v3c",
+   "planned_updates": 2000,
+   "updates_run": 2000,
+   "learning_rate": 5e-05,
+   "grounding_learning_rate": null,
+   "grounding": null,
+   "parameters": {
+    "lora": 39976960,
+    "head": 14716931,
+    "grounding": 0
+   },
+   "batch_size": 1,
+   "gradient_accumulation": 4,
+   "balance": 3.0,
+   "boost": {
+    "small_visible": 2.0,
+    "selection": 3.0
+   },
+   "share_of_draws": {
+    "generalization_v3c_added": 0.5
+   },
+   "val_file": "val_mix",
+   "eval_samples": 600,
+   "selection": {
+    "band": 0.02,
+    "rule": "lowest validation L1; among evaluations within the band of it, the highest mean of grounding and terminal accuracy"
+   },
+   "train_seconds": 5042.442087173462,
+   "peak_allocated_GiB": 9.821118354797363,
+   "gpu": "NVIDIA GeForce RTX 5070"
+  },
+  "kept": {
+   "update": 1999,
+   "val_l1": 0.05850321713885933,
+   "val_first_action_l1": 0.061573291476897794,
+   "train_l1_ema": 0.03502577540048751,
+   "score": 0.9462141268664619,
+   "behaviour": {
+    "grounding_accuracy": 0.9134808853118712,
+    "terminal_accuracy": 0.9789473684210527,
+    "all": 0.9233333333333333,
+    "terminal_accuracy_land": 0.9811320754716981,
+    "terminal_accuracy_approach": 0.9761904761904762,
+    "score": 0.9462141268664619
+   }
+  },
+  "validation_history": [
+   {
+    "update": 250,
+    "train_l1_ema": 0.02354368883808103,
+    "val_l1": 0.06366736614368468,
+    "behaviour": {
+     "grounding_accuracy": 0.9275653923541247,
+     "terminal_accuracy": 0.9578947368421052,
+     "all": 0.9333333333333333,
+     "terminal_accuracy_land": 0.9622641509433962,
+     "terminal_accuracy_approach": 0.9523809523809523,
+     "score": 0.9427300645981149
+    },
+    "first_action_l1_by_state": {
+     "align": 0.006866154591989471,
+     "approach": 0.07595942145474394,
+     "climb": 0.010381062573287636,
+     "descend": 0.020476426415304404,
+     "final": 0.03206440379247343,
+     "landed": 0.010399712404857079,
+     "search": 0.045784529477227914,
+     "stop": 0.014471629556889335
+    },
+    "kept_update": 250
+   },
+   {
+    "update": 500,
+    "train_l1_ema": 0.044121899869128116,
+    "val_l1": 0.06244463334244453,
+    "behaviour": {
+     "grounding_accuracy": 0.9014084507042254,
+     "terminal_accuracy": 0.968421052631579,
+     "all": 0.9116666666666666,
+     "terminal_accuracy_land": 0.9622641509433962,
+     "terminal_accuracy_approach": 0.9761904761904762,
+     "score": 0.9349147516679022
+    },
+    "first_action_l1_by_state": {
+     "align": 0.006595653938347823,
+     "approach": 0.08329282099694053,
+     "climb": 0.09159088408341631,
+     "descend": 0.024619001403973415,
+     "final": 0.035428809412919426,
+     "landed": 0.002116733148189572,
+     "search": 0.039969629447516,
+     "stop": 0.007977076941945901
+    },
+    "kept_update": 250
+   },
+   {
+    "update": 750,
+    "train_l1_ema": 0.025851662780407646,
+    "val_l1": 0.06590904345891128,
+    "behaviour": {
+     "grounding_accuracy": 0.9215291750503019,
+     "terminal_accuracy": 0.9789473684210527,
+     "all": 0.93,
+     "terminal_accuracy_land": 0.9811320754716981,
+     "terminal_accuracy_approach": 0.9761904761904762,
+     "score": 0.9502382717356772
+    },
+    "first_action_l1_by_state": {
+     "align": 0.011982935247942805,
+     "approach": 0.09131361408519424,
+     "climb": 0.09129587811185047,
+     "descend": 0.0206479947565396,
+     "final": 0.04341519880793331,
+     "landed": 0.004062228731830449,
+     "search": 0.0339002980347073,
+     "stop": 0.009145101131122959
+    },
+    "kept_update": 250
+   },
+   {
+    "update": 1000,
+    "train_l1_ema": 0.041198754225274886,
+    "val_l1": 0.05812431968588498,
+    "behaviour": {
+     "grounding_accuracy": 0.9074446680080482,
+     "terminal_accuracy": 0.9789473684210527,
+     "all": 0.9183333333333333,
+     "terminal_accuracy_land": 0.9811320754716981,
+     "terminal_accuracy_approach": 0.9761904761904762,
+     "score": 0.9431960182145505
+    },
+    "first_action_l1_by_state": {
+     "align": 0.007461247325409204,
+     "approach": 0.07631324213858647,
+     "climb": 0.0939954097266309,
+     "descend": 0.012342995890166337,
+     "final": 0.04255773246918312,
+     "landed": 0.0032704670690388107,
+     "search": 0.04668929227028817,
+     "stop": 0.00837332104856614
+    },
+    "kept_update": 1000
+   },
+   {
+    "update": 1250,
+    "train_l1_ema": 0.02559235973083845,
+    "val_l1": 0.059714155531740594,
+    "behaviour": {
+     "grounding_accuracy": 0.9175050301810865,
+     "terminal_accuracy": 0.9789473684210527,
+     "all": 0.9266666666666666,
+     "terminal_accuracy_land": 0.9811320754716981,
+     "terminal_accuracy_approach": 0.9761904761904762,
+     "score": 0.9482261993010697
+    },
+    "first_action_l1_by_state": {
+     "align": 0.006260889203986153,
+     "approach": 0.07690885999501205,
+     "climb": 0.1078898140694946,
+     "descend": 0.012470524567860837,
+     "final": 0.052596642587826974,
+     "landed": 0.005660586718780299,
+     "search": 0.0406314346147092,
+     "stop": 0.010995289629569189
+    },
+    "kept_update": 1000
+   },
+   {
+    "update": 1500,
+    "train_l1_ema": 0.02132929006166737,
+    "val_l1": 0.05799325643408035,
+    "behaviour": {
+     "grounding_accuracy": 0.9114688128772636,
+     "terminal_accuracy": 0.968421052631579,
+     "all": 0.92,
+     "terminal_accuracy_land": 0.9811320754716981,
+     "terminal_accuracy_approach": 0.9523809523809523,
+     "score": 0.9399449327544213
+    },
+    "first_action_l1_by_state": {
+     "align": 0.007115381537005305,
+     "approach": 0.07586647345379076,
+     "climb": 0.08765792845224496,
+     "descend": 0.012024918403590053,
+     "final": 0.046380662797566724,
+     "landed": 0.00660875119016661,
+     "search": 0.03962293453903755,
+     "stop": 0.012258499339666395
+    },
+    "kept_update": 1000
+   },
+   {
+    "update": 1750,
+    "train_l1_ema": 0.028821765364286822,
+    "val_l1": 0.059835460535808425,
+    "behaviour": {
+     "grounding_accuracy": 0.9134808853118712,
+     "terminal_accuracy": 0.968421052631579,
+     "all": 0.9216666666666666,
+     "terminal_accuracy_land": 0.9811320754716981,
+     "terminal_accuracy_approach": 0.9523809523809523,
+     "score": 0.940950968971725
+    },
+    "first_action_l1_by_state": {
+     "align": 0.005116480057040462,
+     "approach": 0.08515863113118233,
+     "climb": 0.08991813904140145,
+     "descend": 0.009784977406436555,
+     "final": 0.043834275340058786,
+     "landed": 0.00693766265855326,
+     "search": 0.03510727970400652,
+     "stop": 0.011827499368033992
+    },
+    "kept_update": 1000
+   },
+   {
+    "update": 1999,
+    "train_l1_ema": 0.03502577540048751,
+    "val_l1": 0.05850321713885933,
+    "behaviour": {
+     "grounding_accuracy": 0.9134808853118712,
+     "terminal_accuracy": 0.9789473684210527,
+     "all": 0.9233333333333333,
+     "terminal_accuracy_land": 0.9811320754716981,
+     "terminal_accuracy_approach": 0.9761904761904762,
+     "score": 0.9462141268664619
+    },
+    "first_action_l1_by_state": {
+     "align": 0.005152084031578852,
+     "approach": 0.08247606304750543,
+     "climb": 0.0905443802184891,
+     "descend": 0.011958921148728156,
+     "final": 0.047268143430461776,
+     "landed": 0.005449930855926747,
+     "search": 0.035913925785364904,
+     "stop": 0.011745392287204075
+    },
+    "kept_update": 1999
+   }
+  ],
+  "reload_check": true,
+  "cost": {
+   "checkpoint": "/mnt/c/Users/leegy/Desktop/drone/outputs/aerovla_oft/checkpoints/grounding_control",
+   "grounding": {
+    "type": "none"
+   },
+   "frames": 59,
+   "inference_ms": 215.6775055595124,
+   "inference_peak_GiB": 6.94,
+   "training_peak_GiB": 9.82,
+   "added_parameters": 0,
+   "trainable_parameters": 54693891,
+   "lora_parameters": 39976960,
+   "head_parameters": 14716931,
+   "train_seconds": 5042.442087173462
+  },
+  "negative_probe": {
+   "checkpoint": "/mnt/c/Users/leegy/Desktop/drone/outputs/aerovla_oft/checkpoints/grounding_control",
+   "dataset": "/home/gyuhan/uav-vla-smoke/datasets/generalization_v3c_added",
+   "val": {
+    "related_object_in_view_named_one_not": {
+     "color_first": {
+      "first_decision": {
+       "frames": 4,
+       "own_sentence_turn": 1.0,
+       "other_sentence_advance": 0.0,
+       "own_sentence_kinds": {
+        "turn": 4
+       },
+       "other_sentence_kinds": {
+        "turn": 4
+       },
+       "both_right": 0.0,
+       "mean_action_difference": 0.006418863932291666
+      },
+      "first_decisions": {
+       "frames": 12,
+       "own_sentence_turn": 1.0,
+       "other_sentence_advance": 0.0,
+       "own_sentence_kinds": {
+        "turn": 12
+       },
+       "other_sentence_kinds": {
+        "stop": 1,
+        "turn": 11
+       },
+       "both_right": 0.0,
+       "mean_action_difference": 0.03112114800347222
+      }
+     },
+     "shape_first": {
+      "first_decision": {
+       "frames": 2,
+       "own_sentence_turn": 1.0,
+       "other_sentence_advance": 0.5,
+       "own_sentence_kinds": {
+        "turn": 2
+       },
+       "other_sentence_kinds": {
+        "advance": 1,
+        "turn": 1
+       },
+       "both_right": 0.5,
+       "mean_action_difference": 0.49473063151041663
+      },
+      "first_decisions": {
+       "frames": 6,
+       "own_sentence_turn": 1.0,
+       "other_sentence_advance": 0.5,
+       "own_sentence_kinds": {
+        "turn": 6
+       },
+       "other_sentence_kinds": {
+        "advance": 3,
+        "turn": 3
+       },
+       "both_right": 0.5,
+       "mean_action_difference": 0.37187872992621523
+      }
+     },
+     "lost": {
+      "first_decision": {
+       "frames": 2,
+       "own_sentence_turn": 1.0,
+       "other_sentence_advance": 0.5,
+       "own_sentence_kinds": {
+        "turn": 2
+       },
+       "other_sentence_kinds": {
+        "advance": 1,
+        "turn": 1
+       },
+       "both_right": 0.5,
+       "mean_action_difference": 0.4985198974609375
+      },
+      "first_decisions": {
+       "frames": 6,
+       "own_sentence_turn": 1.0,
+       "other_sentence_advance": 0.3333333333333333,
+       "own_sentence_kinds": {
+        "turn": 6
+       },
+       "other_sentence_kinds": {
+        "advance": 2,
+        "turn": 4
+       },
+       "both_right": 0.3333333333333333,
+       "mean_action_difference": 0.3348490397135417
+      }
+     },
+     "all": {
+      "first_decision": {
+       "frames": 8,
+       "own_sentence_turn": 1.0,
+       "other_sentence_advance": 0.25,
+       "own_sentence_kinds": {
+        "turn": 8
+       },
+       "other_sentence_kinds": {
+        "advance": 2,
+        "turn": 6
+       },
+       "both_right": 0.25,
+       "mean_action_difference": 0.2515220642089844
+      },
+      "first_decisions": {
+       "frames": 24,
+       "own_sentence_turn": 1.0,
+       "other_sentence_advance": 0.20833333333333334,
+       "own_sentence_kinds": {
+        "turn": 24
+       },
+       "other_sentence_kinds": {
+        "advance": 5,
+        "stop": 1,
+        "turn": 18
+       },
+       "both_right": 0.20833333333333334,
+       "mean_action_difference": 0.19224251641167533
+      }
+     }
+    },
+    "named_object_in_view": {
+     "first_decision": {
+      "frames": 3,
+      "own_sentence_advance": 0.0,
+      "other_sentence_turn": 1.0,
+      "own_sentence_kinds": {
+       "turn": 3
+      },
+      "other_sentence_kinds": {
+       "turn": 3
+      },
+      "both_right": 0.0,
+      "mean_action_difference": 0.0037434895833333335
+     },
+     "first_decisions": {
+      "frames": 10,
+      "own_sentence_advance": 0.3,
+      "other_sentence_turn": 1.0,
+      "own_sentence_kinds": {
+       "advance": 3,
+       "turn": 7
+      },
+      "other_sentence_kinds": {
+       "turn": 10
+      },
+      "both_right": 0.3,
+      "mean_action_difference": 0.31387329101562506
+     }
+    }
+   },
+   "train": {
+    "related_object_in_view_named_one_not": {
+     "color_first": {
+      "first_decision": {
+       "frames": 30,
+       "own_sentence_turn": 0.9666666666666667,
+       "other_sentence_advance": 0.4666666666666667,
+       "own_sentence_kinds": {
+        "advance": 1,
+        "turn": 29
+       },
+       "other_sentence_kinds": {
+        "advance": 14,
+        "turn": 16
+       },
+       "both_right": 0.43333333333333335,
+       "mean_action_difference": 0.3547729492187501
+      },
+      "first_decisions": {
+       "frames": 87,
+       "own_sentence_turn": 0.9655172413793104,
+       "other_sentence_advance": 0.40229885057471265,
+       "own_sentence_kinds": {
+        "advance": 3,
+        "turn": 84
+       },
+       "other_sentence_kinds": {
+        "advance": 35,
+        "turn": 52
+       },
+       "both_right": 0.367816091954023,
+       "mean_action_difference": 0.32880281762601743
+      }
+     },
+     "shape_first": {
+      "first_decision": {
+       "frames": 14,
+       "own_sentence_turn": 0.8571428571428571,
+       "other_sentence_advance": 0.42857142857142855,
+       "own_sentence_kinds": {
+        "advance": 2,
+        "turn": 12
+       },
+       "other_sentence_kinds": {
+        "advance": 6,
+        "stop": 1,
+        "turn": 7
+       },
+       "both_right": 0.35714285714285715,
+       "mean_action_difference": 0.3487490699404762
+      },
+      "first_decisions": {
+       "frames": 42,
+       "own_sentence_turn": 0.9285714285714286,
+       "other_sentence_advance": 0.4523809523809524,
+       "own_sentence_kinds": {
+        "advance": 3,
+        "turn": 39
+       },
+       "other_sentence_kinds": {
+        "advance": 19,
+        "stop": 3,
+        "turn": 20
+       },
+       "both_right": 0.42857142857142855,
+       "mean_action_difference": 0.3942992195250496
+      }
+     },
+     "lost": {
+      "first_decision": {
+       "frames": 20,
+       "own_sentence_turn": 1.0,
+       "other_sentence_advance": 0.25,
+       "own_sentence_kinds": {
+        "turn": 20
+       },
+       "other_sentence_kinds": {
+        "advance": 5,
+        "turn": 15
+       },
+       "both_right": 0.25,
+       "mean_action_difference": 0.24686737060546876
+      },
+      "first_decisions": {
+       "frames": 57,
+       "own_sentence_turn": 1.0,
+       "other_sentence_advance": 0.2631578947368421,
+       "own_sentence_kinds": {
+        "turn": 57
+       },
+       "other_sentence_kinds": {
+        "advance": 15,
+        "stop": 1,
+        "turn": 41
+       },
+       "both_right": 0.2631578947368421,
+       "mean_action_difference": 0.24917798850968567
+      }
+     },
+     "all": {
+      "first_decision": {
+       "frames": 64,
+       "own_sentence_turn": 0.953125,
+       "other_sentence_advance": 0.390625,
+       "own_sentence_kinds": {
+        "advance": 3,
+        "turn": 61
+       },
+       "other_sentence_kinds": {
+        "advance": 25,
+        "stop": 1,
+        "turn": 38
+       },
+       "both_right": 0.359375,
+       "mean_action_difference": 0.3197347323099772
+      },
+      "first_decisions": {
+       "frames": 186,
+       "own_sentence_turn": 0.967741935483871,
+       "other_sentence_advance": 0.3709677419354839,
+       "own_sentence_kinds": {
+        "advance": 6,
+        "turn": 180
+       },
+       "other_sentence_kinds": {
+        "advance": 69,
+        "stop": 4,
+        "turn": 113
+       },
+       "both_right": 0.34946236559139787,
+       "mean_action_difference": 0.319191170422407
+      }
+     }
+    },
+    "named_object_in_view": {
+     "first_decision": {
+      "frames": 31,
+      "own_sentence_advance": 0.5806451612903226,
+      "other_sentence_turn": 0.9032258064516129,
+      "own_sentence_kinds": {
+       "advance": 18,
+       "turn": 13
+      },
+      "other_sentence_kinds": {
+       "advance": 3,
+       "turn": 28
+      },
+      "both_right": 0.5161290322580645,
+      "mean_action_difference": 0.45970957766297044
+     },
+     "first_decisions": {
+      "frames": 94,
+      "own_sentence_advance": 0.851063829787234,
+      "other_sentence_turn": 0.8404255319148937,
+      "own_sentence_kinds": {
+       "advance": 80,
+       "turn": 14
+      },
+      "other_sentence_kinds": {
+       "advance": 15,
+       "turn": 79
+      },
+      "both_right": 0.7021276595744681,
+      "mean_action_difference": 0.692465274891955
+     }
+    }
+   }
+  },
+  "earlier_validation_400_frames": {
+   "l1": 0.05821538266063726,
+   "first_action_l1": 0.056114435979668545,
+   "behaviour": {
+    "grounding_accuracy": 0.9169139465875371,
+    "terminal_accuracy": 0.9629629629629629,
+    "all": 0.925,
+    "terminal_accuracy_land": 0.967741935483871,
+    "terminal_accuracy_approach": 0.9565217391304348,
+    "score": 0.9399384547752501
+   }
+  }
+ },
+ "smoke": {
+  "identity": {
+   "checkpoint": "/mnt/c/Users/leegy/Desktop/drone/outputs/aerovla_oft/checkpoints/generalization_v3c",
+   "frames": 8,
+   "modules": {
+    "film": {
+     "max_abs_difference": 0.0,
+     "grounding_parameters": 4338432,
+     "module_loaded_from_checkpoint": false
+    },
+    "cross_attention": {
+     "max_abs_difference": 0.0,
+     "grounding_parameters": 2735232,
+     "module_loaded_from_checkpoint": false
+    }
+   },
+   "identity": true
+  }
+ }
+}

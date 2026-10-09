@@ -2,6 +2,8 @@
 
 2026-10-09 실행. 브랜치 `exp/aerovla-oft-gen-v3c-hard-negative`(`exp/aerovla-oft-gen-v3-canonical-baseline`에서 분기). [Gen-v3](aerovla_oft_gen_v3.md)의 두 번째 checkpoint(`generalization_v3b`), [canonical 검증 결과](canonical_clean_baseline.md)(30/36), canonical test set 48개, Depot의 156개, Gen-v2의 동결 파일은 그대로 있다.
 
+> **이후 (구조 실험, 2026-10-10):** 이 문서의 checkpoint에서 같은 data로 2,000 update를 더 학습하자 pilot의 실패가 사라졌다(FiLM을 넣은 쪽 32/32, 넣지 않은 대조 30/32). FiLM을 넣은 checkpoint는 새 검증 gate(34/36)와 canonical test 48개(47/48)를 통과했다. 아래의 "데이터 보정으로는 부족하다"는 판정은 검증 L1 규칙이 남긴 update 1,250의 checkpoint에 대한 것으로 읽어야 한다. → [Language–vision grounding architecture](language_vision_grounding_architecture.md). 이 문서의 숫자는 그대로 두었다.
+
 **요약**
 
 - **Gate를 다시 통과하지 못했다.** 새 검증 36회에서 smoke 10/10, representative 33/36(0.92). 성공률, 착륙, 접근 시작, 끝맺음, 충돌은 기준을 넘었고, **다른 물체에서 끝난 비행이 3회**(기준 2회 이하)였다. 이전과 같은 줄이다.

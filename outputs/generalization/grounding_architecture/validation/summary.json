@@ -1,0 +1,633 @@
+{
+ "models": {
+  "OFT FiLM:validation": {
+   "measures": {
+    "flights": 36,
+    "success": 34,
+    "landings": 27,
+    "landing_success": 25,
+    "approaches": 9,
+    "approach_success": 9,
+    "grounded": 34,
+    "in_view": 34,
+    "terminal_as_asked": 35,
+    "wrong_target": 2,
+    "collisions": 0
+   },
+   "landings": [
+    {
+     "band": "near",
+     "correct_target": "8/9",
+     "approach": "8/9",
+     "alignment": "8/9",
+     "touchdown": "8/9",
+     "stable_physical_landing": "8/9",
+     "system_landing": "8/9",
+     "strict_zero_action": "6/9"
+    },
+    {
+     "band": "mid",
+     "correct_target": "9/9",
+     "approach": "9/9",
+     "alignment": "9/9",
+     "touchdown": "9/9",
+     "stable_physical_landing": "9/9",
+     "system_landing": "9/9",
+     "strict_zero_action": "9/9"
+    },
+    {
+     "band": "far",
+     "correct_target": "8/9",
+     "approach": "8/9",
+     "alignment": "8/9",
+     "touchdown": "8/9",
+     "stable_physical_landing": "8/9",
+     "system_landing": "8/9",
+     "strict_zero_action": "8/9"
+    },
+    {
+     "band": "all",
+     "correct_target": "25/27",
+     "approach": "25/27",
+     "alignment": "25/27",
+     "touchdown": "25/27",
+     "stable_physical_landing": "25/27",
+     "system_landing": "25/27",
+     "strict_zero_action": "23/27"
+    }
+   ],
+   "by_role": {
+    "visible": "3/3",
+    "approach": "6/6",
+    "search": "3/3",
+    "red_visible": "3/3",
+    "edge": "3/3",
+    "past_color": "3/3",
+    "past_shape": "3/3",
+    "pair": "3/3",
+    "swap": "2/3",
+    "query": "3/3",
+    "red_past": "2/3"
+   },
+   "by_band": [
+    {
+     "band": "near",
+     "all": "11/12",
+     "landing": "8/9",
+     "approach": "3/3"
+    },
+    {
+     "band": "mid",
+     "all": "12/12",
+     "landing": "9/9",
+     "approach": "3/3"
+    },
+    {
+     "band": "far",
+     "all": "11/12",
+     "landing": "8/9",
+     "approach": "3/3"
+    }
+   ],
+   "target_selection": [
+    {
+     "start_holds": "an object of the same colour and another shape beside the named one or in the first view",
+     "flights": 16,
+     "success": 15,
+     "named_object": 15,
+     "wrong_object": 1
+    },
+    {
+     "start_holds": "an object of the same shape and another colour beside the named one or in the first view",
+     "flights": 4,
+     "success": 3,
+     "named_object": 3,
+     "wrong_object": 1
+    },
+    {
+     "start_holds": "a related object in the first view, the named one outside it",
+     "flights": 17,
+     "success": 15,
+     "named_object": 15,
+     "wrong_object": 2
+    },
+    {
+     "start_holds": "... of the same colour",
+     "flights": 13,
+     "success": 12,
+     "named_object": 12,
+     "wrong_object": 1
+    },
+    {
+     "start_holds": "... of the same shape",
+     "flights": 4,
+     "success": 3,
+     "named_object": 3,
+     "wrong_object": 1
+    },
+    {
+     "start_holds": "the two objects exchanged (position swap)",
+     "flights": 3,
+     "success": 2,
+     "named_object": 2,
+     "wrong_object": 1
+    },
+    {
+     "start_holds": "the neighbour named instead (query)",
+     "flights": 3,
+     "success": 3,
+     "named_object": 3,
+     "wrong_object": 0
+    },
+    {
+     "start_holds": "the named object outside the first view",
+     "flights": 21,
+     "success": 19,
+     "named_object": 19,
+     "wrong_object": 2
+    },
+    {
+     "start_holds": "the named object in the first view",
+     "flights": 15,
+     "success": 15,
+     "named_object": 15,
+     "wrong_object": 0
+    },
+    {
+     "start_holds": "named object lost on the way without a forced turn",
+     "flights": 1,
+     "success": 1,
+     "named_object": 1,
+     "wrong_object": 0
+    },
+    {
+     "start_holds": "... and seen again",
+     "flights": 1,
+     "success": 1,
+     "named_object": 1,
+     "wrong_object": 0
+    }
+   ],
+   "failures": {
+    "SEARCH": {
+     "count": 2,
+     "how": "stopped by itself",
+     "episodes": [
+      "av-24172-blue_pad-near_pair-swapped",
+      "av-24267-red_pad-far_red_past"
+     ]
+    }
+   },
+   "finalizer": {
+    "landing_missions": 27,
+    "contacts": 26,
+    "triggered": 26,
+    "disarmed": 26,
+    "rescued_success": 2,
+    "approach_missions": 9,
+    "active_in_approach_missions": 0,
+    "evaluator": [
+     "canonical_evaluator_v2"
+    ],
+    "legacy_reading_disagrees": []
+   },
+   "touchdown": {
+    "touchdowns_on_the_named_pad": 25,
+    "horizontal_error_m": {
+     "median": 1.92,
+     "max": 3.86
+    },
+    "vertical_speed_mps": {
+     "median": 0.6,
+     "max": 0.62
+    }
+   },
+   "latched_but_not_read_as_stable": [],
+   "episodes_with_errors": [],
+   "rates": {
+    "correct_target": "34/36",
+    "approach": "34/36",
+    "touchdown": "25/27",
+    "stable_physical_landing": "25/27",
+    "system_landing": "25/27",
+    "strict_policy_zero_action": "23/27",
+    "terminal_as_asked": "35/36",
+    "wrong_target": 2,
+    "collisions": 0
+   }
+  },
+  "OFT FiLM:second_flight": {
+   "measures": {
+    "flights": 17,
+    "success": 13,
+    "landings": 13,
+    "landing_success": 10,
+    "approaches": 4,
+    "approach_success": 3,
+    "grounded": 14,
+    "in_view": 14,
+    "terminal_as_asked": 16,
+    "wrong_target": 3,
+    "collisions": 0
+   },
+   "landings": [
+    {
+     "band": "near",
+     "correct_target": "3/4",
+     "approach": "3/4",
+     "alignment": "3/4",
+     "touchdown": "3/4",
+     "stable_physical_landing": "3/4",
+     "system_landing": "3/4",
+     "strict_zero_action": "3/4"
+    },
+    {
+     "band": "mid",
+     "correct_target": "4/4",
+     "approach": "4/4",
+     "alignment": "4/4",
+     "touchdown": "4/4",
+     "stable_physical_landing": "4/4",
+     "system_landing": "4/4",
+     "strict_zero_action": "4/4"
+    },
+    {
+     "band": "far",
+     "correct_target": "4/5",
+     "approach": "4/5",
+     "alignment": "4/5",
+     "touchdown": "4/5",
+     "stable_physical_landing": "4/5",
+     "system_landing": "3/5",
+     "strict_zero_action": "4/5"
+    },
+    {
+     "band": "all",
+     "correct_target": "11/13",
+     "approach": "11/13",
+     "alignment": "11/13",
+     "touchdown": "11/13",
+     "stable_physical_landing": "11/13",
+     "system_landing": "10/13",
+     "strict_zero_action": "11/13"
+    }
+   ],
+   "by_role": {
+    "past_color": "2/3",
+    "past_shape": "3/3",
+    "swap": "2/3",
+    "query": "2/3",
+    "red_past": "2/3",
+    "search": "1/1",
+    "approach": "1/1"
+   },
+   "by_band": [
+    {
+     "band": "near",
+     "all": "3/5",
+     "landing": "3/4",
+     "approach": "0/1"
+    },
+    {
+     "band": "mid",
+     "all": "5/5",
+     "landing": "4/4",
+     "approach": "1/1"
+    },
+    {
+     "band": "far",
+     "all": "5/7",
+     "landing": "3/5",
+     "approach": "2/2"
+    }
+   ],
+   "target_selection": [
+    {
+     "start_holds": "an object of the same colour and another shape beside the named one or in the first view",
+     "flights": 13,
+     "success": 10,
+     "named_object": 11,
+     "wrong_object": 2
+    },
+    {
+     "start_holds": "an object of the same shape and another colour beside the named one or in the first view",
+     "flights": 4,
+     "success": 3,
+     "named_object": 3,
+     "wrong_object": 1
+    },
+    {
+     "start_holds": "a related object in the first view, the named one outside it",
+     "flights": 17,
+     "success": 13,
+     "named_object": 14,
+     "wrong_object": 3
+    },
+    {
+     "start_holds": "... of the same colour",
+     "flights": 13,
+     "success": 10,
+     "named_object": 11,
+     "wrong_object": 2
+    },
+    {
+     "start_holds": "... of the same shape",
+     "flights": 4,
+     "success": 3,
+     "named_object": 3,
+     "wrong_object": 1
+    },
+    {
+     "start_holds": "the two objects exchanged (position swap)",
+     "flights": 3,
+     "success": 2,
+     "named_object": 2,
+     "wrong_object": 1
+    },
+    {
+     "start_holds": "the neighbour named instead (query)",
+     "flights": 3,
+     "success": 2,
+     "named_object": 2,
+     "wrong_object": 1
+    },
+    {
+     "start_holds": "the named object outside the first view",
+     "flights": 17,
+     "success": 13,
+     "named_object": 14,
+     "wrong_object": 3
+    },
+    {
+     "start_holds": "named object lost on the way without a forced turn",
+     "flights": 1,
+     "success": 1,
+     "named_object": 1,
+     "wrong_object": 0
+    },
+    {
+     "start_holds": "... and seen again",
+     "flights": 1,
+     "success": 1,
+     "named_object": 1,
+     "wrong_object": 0
+    }
+   ],
+   "failures": {
+    "SEARCH": {
+     "count": 3,
+     "how": "stopped by itself",
+     "episodes": [
+      "av-24172-blue_pad-near_pair-swapped",
+      "av-24172-blue_pad-near_pair-find-blue_cone",
+      "av-24267-red_pad-far_red_past"
+     ]
+    },
+    "FINALIZER": {
+     "count": 1,
+     "how": "did not disarm",
+     "episodes": [
+      "av-24219-blue_pad-far_past_color"
+     ]
+    }
+   },
+   "finalizer": {
+    "landing_missions": 13,
+    "contacts": 12,
+    "triggered": 12,
+    "disarmed": 11,
+    "rescued_success": 0,
+    "approach_missions": 4,
+    "active_in_approach_missions": 0,
+    "evaluator": [
+     "canonical_evaluator_v2"
+    ],
+    "legacy_reading_disagrees": [
+     "av-24003-blue_pad-near_past_color"
+    ]
+   },
+   "touchdown": {
+    "touchdowns_on_the_named_pad": 11,
+    "horizontal_error_m": {
+     "median": 2.36,
+     "max": 4.04
+    },
+    "vertical_speed_mps": {
+     "median": 0.6,
+     "max": 0.62
+    }
+   },
+   "latched_but_not_read_as_stable": [],
+   "episodes_with_errors": [],
+   "rates": {
+    "correct_target": "14/17",
+    "approach": "14/17",
+    "touchdown": "11/13",
+    "stable_physical_landing": "11/13",
+    "system_landing": "10/13",
+    "strict_policy_zero_action": "11/13",
+    "terminal_as_asked": "16/17",
+    "wrong_target": 3,
+    "collisions": 0
+   }
+  },
+  "Teacher:validation": {
+   "measures": {
+    "flights": 36,
+    "success": 36,
+    "landings": 27,
+    "landing_success": 27,
+    "approaches": 9,
+    "approach_success": 9,
+    "grounded": 36,
+    "in_view": 36,
+    "terminal_as_asked": 36,
+    "wrong_target": 0,
+    "collisions": 0
+   },
+   "landings": [
+    {
+     "band": "near",
+     "correct_target": "9/9",
+     "approach": "9/9",
+     "alignment": "9/9",
+     "touchdown": "9/9",
+     "stable_physical_landing": "9/9",
+     "system_landing": "9/9",
+     "strict_zero_action": "9/9"
+    },
+    {
+     "band": "mid",
+     "correct_target": "9/9",
+     "approach": "9/9",
+     "alignment": "9/9",
+     "touchdown": "9/9",
+     "stable_physical_landing": "9/9",
+     "system_landing": "9/9",
+     "strict_zero_action": "9/9"
+    },
+    {
+     "band": "far",
+     "correct_target": "9/9",
+     "approach": "9/9",
+     "alignment": "9/9",
+     "touchdown": "9/9",
+     "stable_physical_landing": "9/9",
+     "system_landing": "9/9",
+     "strict_zero_action": "9/9"
+    },
+    {
+     "band": "all",
+     "correct_target": "27/27",
+     "approach": "27/27",
+     "alignment": "27/27",
+     "touchdown": "27/27",
+     "stable_physical_landing": "27/27",
+     "system_landing": "27/27",
+     "strict_zero_action": "27/27"
+    }
+   ],
+   "by_role": {
+    "visible": "3/3",
+    "approach": "6/6",
+    "search": "3/3",
+    "edge": "3/3",
+    "past_color": "3/3",
+    "past_shape": "3/3",
+    "pair": "3/3",
+    "swap": "3/3",
+    "query": "3/3",
+    "red_past": "3/3",
+    "red_visible": "3/3"
+   },
+   "by_band": [
+    {
+     "band": "near",
+     "all": "12/12",
+     "landing": "9/9",
+     "approach": "3/3"
+    },
+    {
+     "band": "mid",
+     "all": "12/12",
+     "landing": "9/9",
+     "approach": "3/3"
+    },
+    {
+     "band": "far",
+     "all": "12/12",
+     "landing": "9/9",
+     "approach": "3/3"
+    }
+   ],
+   "target_selection": [
+    {
+     "start_holds": "an object of the same colour and another shape beside the named one or in the first view",
+     "flights": 16,
+     "success": 16,
+     "named_object": 16,
+     "wrong_object": 0
+    },
+    {
+     "start_holds": "an object of the same shape and another colour beside the named one or in the first view",
+     "flights": 4,
+     "success": 4,
+     "named_object": 4,
+     "wrong_object": 0
+    },
+    {
+     "start_holds": "a related object in the first view, the named one outside it",
+     "flights": 17,
+     "success": 17,
+     "named_object": 17,
+     "wrong_object": 0
+    },
+    {
+     "start_holds": "... of the same colour",
+     "flights": 13,
+     "success": 13,
+     "named_object": 13,
+     "wrong_object": 0
+    },
+    {
+     "start_holds": "... of the same shape",
+     "flights": 4,
+     "success": 4,
+     "named_object": 4,
+     "wrong_object": 0
+    },
+    {
+     "start_holds": "the two objects exchanged (position swap)",
+     "flights": 3,
+     "success": 3,
+     "named_object": 3,
+     "wrong_object": 0
+    },
+    {
+     "start_holds": "the neighbour named instead (query)",
+     "flights": 3,
+     "success": 3,
+     "named_object": 3,
+     "wrong_object": 0
+    },
+    {
+     "start_holds": "the named object outside the first view",
+     "flights": 21,
+     "success": 21,
+     "named_object": 21,
+     "wrong_object": 0
+    },
+    {
+     "start_holds": "the named object in the first view",
+     "flights": 15,
+     "success": 15,
+     "named_object": 15,
+     "wrong_object": 0
+    }
+   ],
+   "failures": {},
+   "finalizer": {
+    "landing_missions": 27,
+    "contacts": 27,
+    "triggered": 27,
+    "disarmed": 27,
+    "rescued_success": 0,
+    "approach_missions": 9,
+    "active_in_approach_missions": 0,
+    "evaluator": [
+     "canonical_evaluator_v2"
+    ],
+    "legacy_reading_disagrees": []
+   },
+   "touchdown": {
+    "touchdowns_on_the_named_pad": 27,
+    "horizontal_error_m": {
+     "median": 0.64,
+     "max": 1.04
+    },
+    "vertical_speed_mps": {
+     "median": 0.36,
+     "max": 0.39
+    }
+   },
+   "latched_but_not_read_as_stable": [],
+   "episodes_with_errors": [],
+   "rates": {
+    "correct_target": "36/36",
+    "approach": "36/36",
+    "touchdown": "27/27",
+    "stable_physical_landing": "27/27",
+    "system_landing": "27/27",
+    "strict_policy_zero_action": "27/27",
+    "terminal_as_asked": "36/36",
+    "wrong_target": 0,
+    "collisions": 0
+   }
+  }
+ },
+ "left_out": {
+  "OFT FiLM:validation": [],
+  "OFT FiLM:second_flight": [],
+  "Teacher:validation": []
+ }
+}

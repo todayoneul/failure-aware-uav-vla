@@ -26,6 +26,7 @@
 !/outputs/examples/generalization/
 !/outputs/examples/gen_v3/
 !/outputs/examples/gen_v3c/
+!/outputs/examples/grounding_architecture/
 # Frozen result tables of the generalisation runs (small files; the raw run folders stay local).
 !/outputs/generalization/
 

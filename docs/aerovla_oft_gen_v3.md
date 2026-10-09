@@ -14,6 +14,8 @@
 > **이후 (2026-10-09):** 범위를 44m 이하로 정하고 착륙의 끝을 저수준 Landing Finalizer로 옮긴 canonical system을 따로 정의했다. 두 번째 checkpoint를 그대로 새 검증 set에서 비행했고, gate는 통과하지 못했다(30/36, 다른 물체에서 끝난 비행 3회). → [Canonical clean baseline](canonical_clean_baseline.md), [Long-range same-color grounding](long_range_same_color_grounding.md). 이 문서의 숫자와 판정은 그대로 두었다.
 >
 > **Gen-v3c (2026-10-09):** 그 병목(색이나 형태가 같은 물체를 목표로 삼음)을 겨냥해 hard-negative 96 episode로 두 번째 checkpoint를 짧게 보정했다. Pilot은 통과했고(11/12), 새 검증 set에서는 33/36, 다른 물체에서 끝난 비행 3회로 gate를 다시 통과하지 못했다. 데이터 보정의 한계로 판정하고 다음 후보로 FiLM 등 더 강한 language–vision 결합을 적었다. → [Gen-v3c](gen_v3c_hard_negative_grounding.md)
+>
+> **구조 실험 (2026-10-10):** FiLM을 넣어 같은 data로 더 학습한 checkpoint가 새 검증 gate와 canonical test 48개(47/48)를 통과했다. FiLM 없이 같은 만큼 더 학습한 대조도 pilot 기준을 지켜, 개선을 구조의 효과로 인정하지는 않았다. → [Language–vision grounding architecture](language_vision_grounding_architecture.md)
 
 ## 왜 Gen-v3인가
 

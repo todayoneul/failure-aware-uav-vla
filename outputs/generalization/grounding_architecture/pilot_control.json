@@ -1,9 +1,9 @@
 {
  "model": "control",
- "verdict": "HOLDS SO FAR, REGRESSION NOT FLOWN",
- "passed": false,
+ "verdict": "PASSED",
+ "passed": true,
  "lines_hold": true,
- "regression_flown": false,
+ "regression_flown": true,
  "checks": [
   {
    "check": "flights",
@@ -67,6 +67,18 @@
   },
   {
    "check": "episodes with a runner error",
+   "value": 0,
+   "needs": "<= 0",
+   "passed": true
+  },
+  {
+   "check": "regression starts: successes",
+   "value": 27,
+   "needs": ">= 26",
+   "passed": true
+  },
+  {
+   "check": "regression starts: collisions",
    "value": 0,
    "needs": "<= 0",
    "passed": true
