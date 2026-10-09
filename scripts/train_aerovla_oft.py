@@ -321,7 +321,11 @@ def negative_probe(args):
     With the episode's own sentence the teacher turns on; with a sentence naming the object in view the right answer is to
     go to it. The frames are the first decisions of the `first` episodes and the decisions after the forced turn of the
     `lost` ones. The second half is the reverse: the first frames of the swap and query twins, which show the named object,
-    told their own sentence (advance) and one naming the related object that is not in view (turn on)."""
+    told their own sentence (advance) and one naming the related object that is not in view (turn on).
+
+    `first_decision` is the one frame per episode in which the planner put the related object near the middle of the view;
+    by the next decisions the teacher has turned and that object is near the edge, where going to it would begin with a
+    turn as well, so `first_decisions` (all of them) is the weaker reading."""
     saved=json.loads((Path(args.negative_probe)/'manifest.json').read_text());config=saved['config'];model=AeroVLAOFT(MANIFEST,config,checkpoint=args.negative_probe)
     root=Path(args.dataset);plan=json.loads((root/'plan.json').read_text());catalogue=json.loads((ROOT/'configs/targets/objects.json').read_text(encoding='utf-8'))['objects']
     episodes={episode['id']:episode for split in ('train','val') for episode in plan[split]};result={'checkpoint':str(args.negative_probe),'dataset':str(root)}
@@ -343,20 +347,21 @@ def negative_probe(args):
             if episode.get('distractor') and meta['teacher_state']=='search' and not meta['target_visible']:
                 # The first decisions of a `first` episode; the decisions right after the forced turn of a `lost` one.
                 start=episode['lost']['turn_ends_tick'] if 'lost' in episode else 0
-                if episode['kind'] in ('color_first','shape_first','lost') and start<=meta['step']<start+args.probe_steps:hidden.append((sample,episode))
-            if episode['kind'] in ('swap','query') and meta['step']<args.probe_steps and meta['target_visible']:shown.append((sample,episode))
+                if episode['kind'] in ('color_first','shape_first','lost') and start<=meta['step']<start+args.probe_steps:hidden.append((sample,episode,meta['step']-start))
+            if episode['kind'] in ('swap','query') and meta['step']<args.probe_steps and meta['target_visible']:shown.append((sample,episode,meta['step']))
         rows={'color_first':[],'shape_first':[],'lost':[]}
-        for sample,episode in hidden:
+        for sample,episode,offset in hidden:
             text=sample['instruction'].replace('<image>'+chr(10),'',1);own=first(sample,text);other=first(sample,f'Find {catalogue[episode["distractor"]]["noun"]}.')
-            rows[episode['kind']].append({'own':behaviour(own,config),'other':behaviour(other,config),'difference':sum(abs(a-b) for a,b in zip(own,other))/3})
+            rows[episode['kind']].append({'offset':offset,'own':behaviour(own,config),'other':behaviour(other,config),'difference':sum(abs(a-b) for a,b in zip(own,other))/3})
         twins=[]
-        for sample,episode in shown:
+        for sample,episode,offset in shown:
             base=episodes[episode['twin_of']];unseen=base['target'] if episode['kind']=='query' else base['distractor']
             text=sample['instruction'].replace('<image>'+chr(10),'',1);own=first(sample,text);other=first(sample,f'Find {catalogue[unseen]["noun"]}.')
-            twins.append({'own':behaviour(own,config),'other':behaviour(other,config),'difference':sum(abs(a-b) for a,b in zip(own,other))/3})
-        result[split]={'related_object_in_view_named_one_not':{**{kind:part(items,'turn','advance') for kind,items in rows.items()},
-                                                               'all':part([r for items in rows.values() for r in items],'turn','advance')},
-                       'named_object_in_view':part(twins,'advance','turn')}
+            twins.append({'offset':offset,'own':behaviour(own,config),'other':behaviour(other,config),'difference':sum(abs(a-b) for a,b in zip(own,other))/3})
+        def both(items,own,other):return {'first_decision':part([r for r in items if r['offset']==0],own,other),'first_decisions':part(items,own,other)}
+        result[split]={'related_object_in_view_named_one_not':{**{kind:both(items,'turn','advance') for kind,items in rows.items()},
+                                                               'all':both([r for items in rows.values() for r in items],'turn','advance')},
+                       'named_object_in_view':both(twins,'advance','turn')}
     print(json.dumps(result,indent=1))
     if args.output:Path(args.output).write_text(json.dumps(result,indent=1))
 

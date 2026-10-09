@@ -1,0 +1,56 @@
+{
+ "gate": "smoke",
+ "run": "outputs/visual_search/gen_v3c_gate",
+ "passed": true,
+ "checks": [
+  {
+   "check": "flights",
+   "value": 10,
+   "needs": ">= 10",
+   "passed": true
+  },
+  {
+   "check": "successes",
+   "value": 10,
+   "needs": ">= 7",
+   "passed": true
+  },
+  {
+   "check": "landing successes (system)",
+   "value": 7,
+   "needs": ">= 1",
+   "passed": true
+  },
+  {
+   "check": "successes from 32-44 m",
+   "value": 3,
+   "needs": ">= 1",
+   "passed": true
+  },
+  {
+   "check": "collisions",
+   "value": 0,
+   "needs": "<= 1",
+   "passed": true
+  },
+  {
+   "check": "episodes with a runner error",
+   "value": 0,
+   "needs": "<= 0",
+   "passed": true
+  }
+ ],
+ "flights": 10,
+ "success": 10,
+ "landings": 7,
+ "landing_success": 7,
+ "approaches": 3,
+ "approach_success": 3,
+ "grounded": 10,
+ "in_view": 10,
+ "terminal_as_asked": 10,
+ "wrong_target": 0,
+ "collisions": 0,
+ "left_out_because_the_teacher_did_not_finish": [],
+ "failures": {}
+}

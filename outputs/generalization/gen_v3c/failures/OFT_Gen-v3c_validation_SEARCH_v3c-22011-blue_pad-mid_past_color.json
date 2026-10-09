@@ -1,0 +1,818 @@
+{
+ "episode": "v3c-22011-blue_pad-mid_past_color",
+ "map": "lot",
+ "layout": "r",
+ "band": "mid",
+ "role": "past_color",
+ "twin_of": "",
+ "instruction": "Find the blue landing pad and land on it.",
+ "task": "land",
+ "target": "blue_pad",
+ "success": false,
+ "acquired": false,
+ "initially_visible": false,
+ "views": 0,
+ "decisions_in_view": 0,
+ "grounded": false,
+ "grounded_on_first_view": false,
+ "views_before_grounding": null,
+ "turns_deg": 30,
+ "approached": false,
+ "selected": "blue_cone",
+ "selected_relation": "same colour",
+ "correct_target": false,
+ "wrong_target": true,
+ "wrong_object": "blue_cone",
+ "aligned": false,
+ "descent_started": false,
+ "landed": false,
+ "landed_on": null,
+ "touchdown_on_target": false,
+ "self_stop": true,
+ "hovered": true,
+ "terminal": "hovered",
+ "terminal_as_asked": false,
+ "collision": false,
+ "timeout": false,
+ "reason": "model_stop",
+ "steps": 28,
+ "initial_distance_m": 24.2,
+ "minimum_distance_m": 24.2,
+ "final_distance_m": 37.1,
+ "final_height_m": 8.5,
+ "nearest_other_m": 6.6,
+ "nearest_other": "blue_cone",
+ "touchdown_error_m": null,
+ "touchdown_vertical_mps": null,
+ "touchdown_horizontal_mps": null,
+ "touchdown_inside": null,
+ "touchdown_soft": null,
+ "finalizer_active": true,
+ "touchdown_success": false,
+ "stable_physical_landing": false,
+ "system_landing": false,
+ "physical_landing": false,
+ "evaluator": "canonical_evaluator_v2",
+ "finalizer_rescued_success": false,
+ "strict_policy_zero_action": false,
+ "finalizer_triggered": false,
+ "disarm_triggered": false,
+ "stable_duration_s": null,
+ "finalizer_state": "FLYING",
+ "failure": "SEARCH",
+ "mechanism": "stopped by itself",
+ "trace": [
+  {
+   "step": 0,
+   "distance_m": 24.201427353387956,
+   "bearing_deg": 149.78235226380986,
+   "height_m": 8.504481673240662,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    9.432198453396268e-07,
+    1.203556735163147e-06,
+    0.0010429613757878542
+   ],
+   "action": [
+    0.0,
+    -0.00128173828125,
+    0.21
+   ],
+   "executed": [
+    0.0,
+    -0.00128173828125,
+    0.21
+   ]
+  },
+  {
+   "step": 1,
+   "distance_m": 24.201427353387956,
+   "bearing_deg": 149.23834851503392,
+   "height_m": 8.505339980125427,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    1.0955956213365425e-06,
+    1.1275233191554435e-06,
+    0.011109741404652596
+   ],
+   "action": [
+    0.0,
+    -0.00128173828125,
+    0.21
+   ],
+   "executed": [
+    0.0,
+    -0.00128173828125,
+    0.21
+   ]
+  },
+  {
+   "step": 2,
+   "distance_m": 24.201427353387956,
+   "bearing_deg": 137.17945269832978,
+   "height_m": 8.501277327537537,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    9.85790279628418e-07,
+    8.31738589113229e-07,
+    0.0016876300796866417
+   ],
+   "action": [
+    0.875,
+    -0.000244140625,
+    0.042451171875
+   ],
+   "executed": [
+    0.875,
+    -0.000244140625,
+    0.042451171875
+   ]
+  },
+  {
+   "step": 3,
+   "distance_m": 24.201427353387956,
+   "bearing_deg": 132.16045112972074,
+   "height_m": 8.501587271690369,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -0.028484346345067024,
+    0.013139000162482262,
+    -0.0008628882933408022
+   ],
+   "action": [
+    0.953125,
+    -0.000244140625,
+    0.018559570312499996
+   ],
+   "executed": [
+    0.953125,
+    -0.000244140625,
+    0.018559570312499996
+   ]
+  },
+  {
+   "step": 4,
+   "distance_m": 24.28312321535234,
+   "bearing_deg": 134.85892614305834,
+   "height_m": 8.495360732078552,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -0.3962942361831665,
+    0.17808382213115692,
+    0.022390376776456833
+   ],
+   "action": [
+    0.935546875,
+    0.00048828125,
+    0.015175781249999992
+   ],
+   "executed": [
+    0.935546875,
+    0.00048828125,
+    0.015175781249999992
+   ]
+  },
+  {
+   "step": 5,
+   "distance_m": 24.50177831059077,
+   "bearing_deg": 132.65796899170647,
+   "height_m": 8.483530402183533,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -0.7349118590354919,
+    0.30436965823173523,
+    0.019615372642874718
+   ],
+   "action": [
+    0.98828125,
+    0.0006103515625,
+    -6.40869140625111e-06
+   ],
+   "executed": [
+    0.98828125,
+    0.0006103515625,
+    -6.40869140625111e-06
+   ]
+  },
+  {
+   "step": 6,
+   "distance_m": 24.84044252127769,
+   "bearing_deg": 133.9310973285576,
+   "height_m": 8.47670590877533,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -0.9822079539299011,
+    0.4155784547328949,
+    0.01041717641055584
+   ],
+   "action": [
+    0.986328125,
+    -0.0001220703125,
+    0.00013458251953124556
+   ],
+   "executed": [
+    0.986328125,
+    -0.0001220703125,
+    0.00013458251953124556
+   ]
+  },
+  {
+   "step": 7,
+   "distance_m": 25.29918172402625,
+   "bearing_deg": 135.26471224174145,
+   "height_m": 8.472566962242126,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -1.2030246257781982,
+    0.49909359216690063,
+    0.0018394080689176917
+   ],
+   "action": [
+    0.97265625,
+    6.103515625e-05,
+    0.00018585205078125444
+   ],
+   "executed": [
+    0.97265625,
+    6.103515625e-05,
+    0.00018585205078125444
+   ]
+  },
+  {
+   "step": 8,
+   "distance_m": 25.80632123935001,
+   "bearing_deg": 135.8191505361673,
+   "height_m": 8.473657965660095,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -1.3543095588684082,
+    0.55970698595047,
+    -0.005784942768514156
+   ],
+   "action": [
+    0.986328125,
+    -0.00054931640625,
+    0.0002563476562499889
+   ],
+   "executed": [
+    0.986328125,
+    -0.00054931640625,
+    0.0002563476562499889
+   ]
+  },
+  {
+   "step": 9,
+   "distance_m": 26.382379177557517,
+   "bearing_deg": 137.47029345207633,
+   "height_m": 8.477868437767029,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -1.4639328718185425,
+    0.6056222319602966,
+    -0.008358661085367203
+   ],
+   "action": [
+    0.921875,
+    0.0008544921875,
+    0.0245068359375
+   ],
+   "executed": [
+    0.921875,
+    0.0008544921875,
+    0.0245068359375
+   ]
+  },
+  {
+   "step": 10,
+   "distance_m": 27.036239028013785,
+   "bearing_deg": 138.36849603442045,
+   "height_m": 8.482011198997498,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -1.5515179634094238,
+    0.6369075775146484,
+    -0.012148941867053509
+   ],
+   "action": [
+    0.9765625,
+    0.0001220703125,
+    0.0005703735351562378
+   ],
+   "executed": [
+    0.9765625,
+    0.0001220703125,
+    0.0005703735351562378
+   ]
+  },
+  {
+   "step": 11,
+   "distance_m": 27.690569211298566,
+   "bearing_deg": 138.23275958694228,
+   "height_m": 8.4892076253891,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -1.5925090312957764,
+    0.6439908146858215,
+    -0.0066569349728524685
+   ],
+   "action": [
+    0.9921875,
+    0.00030517578125,
+    -0.00026275634765624
+   ],
+   "executed": [
+    0.9921875,
+    0.00030517578125,
+    -0.00026275634765624
+   ]
+  },
+  {
+   "step": 12,
+   "distance_m": 28.41798154955179,
+   "bearing_deg": 140.45056596831083,
+   "height_m": 8.490237593650818,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -1.64564847946167,
+    0.6651918292045593,
+    -0.0012644159141927958
+   ],
+   "action": [
+    0.96875,
+    0.000732421875,
+    -0.0005255126953125078
+   ],
+   "executed": [
+    0.96875,
+    0.000732421875,
+    -0.0005255126953125078
+   ]
+  },
+  {
+   "step": 13,
+   "distance_m": 29.183837388198185,
+   "bearing_deg": 141.19334063878276,
+   "height_m": 8.49108636379242,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -1.6954585313796997,
+    0.6749653816223145,
+    -0.003984420094639063
+   ],
+   "action": [
+    0.94921875,
+    -6.103515625e-05,
+    -0.0009484863281249978
+   ],
+   "executed": [
+    0.94921875,
+    -6.103515625e-05,
+    -0.0009484863281249978
+   ]
+  },
+  {
+   "step": 14,
+   "distance_m": 29.925039107154525,
+   "bearing_deg": 142.488610470828,
+   "height_m": 8.494113326072693,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -1.7172354459762573,
+    0.6841228008270264,
+    -0.006647518370300531
+   ],
+   "action": [
+    0.94921875,
+    -0.0006103515625,
+    -0.0008523559570312589
+   ],
+   "executed": [
+    0.94921875,
+    -0.0006103515625,
+    -0.0008523559570312589
+   ]
+  },
+  {
+   "step": 15,
+   "distance_m": 30.642654792319668,
+   "bearing_deg": 143.68886386451976,
+   "height_m": 8.49749219417572,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -1.7259149551391602,
+    0.6844943165779114,
+    -0.005743424873799086
+   ],
+   "action": [
+    0.92578125,
+    -0.00103759765625,
+    -0.00106384277343749
+   ],
+   "executed": [
+    0.92578125,
+    -0.00103759765625,
+    -0.00106384277343749
+   ]
+  },
+  {
+   "step": 16,
+   "distance_m": 31.396601509124906,
+   "bearing_deg": 144.58018628459482,
+   "height_m": 8.499810576438904,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -1.7311629056930542,
+    0.6852667331695557,
+    -0.006198900751769543
+   ],
+   "action": [
+    0.830078125,
+    -0.0010986328125,
+    -0.0007690429687499944
+   ],
+   "executed": [
+    0.830078125,
+    -0.0010986328125,
+    -0.0007690429687499944
+   ]
+  },
+  {
+   "step": 17,
+   "distance_m": 32.17372227942381,
+   "bearing_deg": 145.74810155408647,
+   "height_m": 8.503353476524353,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -1.721661925315857,
+    0.681795597076416,
+    -0.012762719765305519
+   ],
+   "action": [
+    0.755859375,
+    0.00067138671875,
+    0.00035247802734375555
+   ],
+   "executed": [
+    0.755859375,
+    0.00067138671875,
+    0.00035247802734375555
+   ]
+  },
+  {
+   "step": 18,
+   "distance_m": 32.95108069657719,
+   "bearing_deg": 146.64603191060434,
+   "height_m": 8.51136338710785,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -1.6722369194030762,
+    0.6613851189613342,
+    -0.013433224521577358
+   ],
+   "action": [
+    0.462646484375,
+    0.0,
+    6.40869140625111e-06
+   ],
+   "executed": [
+    0.462646484375,
+    0.0,
+    6.40869140625111e-06
+   ]
+  },
+  {
+   "step": 19,
+   "distance_m": 33.704669785235176,
+   "bearing_deg": 147.44935585667278,
+   "height_m": 8.517902731895447,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -1.5935144424438477,
+    0.6303408741950989,
+    -0.025555970147252083
+   ],
+   "action": [
+    0.3515625,
+    6.103515625e-05,
+    0.0006472778320312511
+   ],
+   "executed": [
+    0.3515625,
+    6.103515625e-05,
+    0.0006472778320312511
+   ]
+  },
+  {
+   "step": 20,
+   "distance_m": 34.384816077340794,
+   "bearing_deg": 148.20950795550993,
+   "height_m": 8.534003615379333,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -1.4134056568145752,
+    0.55902099609375,
+    -0.020165428519248962
+   ],
+   "action": [
+    0.3583984375,
+    0.0003662109375,
+    0.0012496948242187444
+   ],
+   "executed": [
+    0.3583984375,
+    0.0003662109375,
+    0.0012496948242187444
+   ]
+  },
+  {
+   "step": 21,
+   "distance_m": 34.981920690344964,
+   "bearing_deg": 148.74930688885885,
+   "height_m": 8.53920304775238,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -1.2308919429779053,
+    0.4866153597831726,
+    0.003998513799160719
+   ],
+   "action": [
+    0.166015625,
+    0.0001220703125,
+    0.0008651733398437611
+   ],
+   "executed": [
+    0.166015625,
+    0.0001220703125,
+    0.0008651733398437611
+   ]
+  },
+  {
+   "step": 22,
+   "distance_m": 35.52842851925711,
+   "bearing_deg": 149.237592069821,
+   "height_m": 8.53407609462738,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -1.0833280086517334,
+    0.42805102467536926,
+    0.004512711428105831
+   ],
+   "action": [
+    0.140625,
+    0.00018310546875,
+    0.0006857299804687578
+   ],
+   "executed": [
+    0.140625,
+    0.00018310546875,
+    0.0006857299804687578
+   ]
+  },
+  {
+   "step": 23,
+   "distance_m": 35.99393122237101,
+   "bearing_deg": 149.66148665747647,
+   "height_m": 8.53361165523529,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -0.8925972580909729,
+    0.35247066617012024,
+    0.007282801903784275
+   ],
+   "action": [
+    0.09375,
+    6.103515625e-05,
+    0.0008139038085937522
+   ],
+   "executed": [
+    0.09375,
+    6.103515625e-05,
+    0.0008139038085937522
+   ]
+  },
+  {
+   "step": 24,
+   "distance_m": 36.37444764222582,
+   "bearing_deg": 149.9740203847363,
+   "height_m": 8.528435111045837,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -0.7370851039886475,
+    0.2909127473831177,
+    0.011230729520320892
+   ],
+   "action": [
+    0.01953125,
+    -0.000732421875,
+    7.049560546876221e-05
+   ],
+   "executed": [
+    0.01953125,
+    -0.000732421875,
+    7.049560546876221e-05
+   ]
+  },
+  {
+   "step": 25,
+   "distance_m": 36.68583502963734,
+   "bearing_deg": 150.2365246445358,
+   "height_m": 8.523151755332947,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -0.5962283611297607,
+    0.2352238893508911,
+    0.00816845241934061
+   ],
+   "action": [
+    0.01953125,
+    -0.00018310546875,
+    8.972167968748779e-05
+   ],
+   "executed": [
+    0.01953125,
+    -0.00018310546875,
+    8.972167968748779e-05
+   ]
+  },
+  {
+   "step": 26,
+   "distance_m": 36.9380520918133,
+   "bearing_deg": 150.4752779880203,
+   "height_m": 8.519444823265076,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -0.4578668773174286,
+    0.18062043190002441,
+    0.008109132759273052
+   ],
+   "action": [
+    0.021484375,
+    -0.000244140625,
+    0.0007754516601562456
+   ],
+   "executed": [
+    0.021484375,
+    -0.000244140625,
+    0.0007754516601562456
+   ]
+  },
+  {
+   "step": 27,
+   "distance_m": 37.13617816490265,
+   "bearing_deg": 150.62812272168702,
+   "height_m": 8.515275359153748,
+   "front_seen": false,
+   "down_seen": false,
+   "over": false,
+   "landed": false,
+   "on_surface": false,
+   "finalizer": "FLYING",
+   "velocity": [
+    -0.3515637516975403,
+    0.1385589838027954,
+    0.007126501761376858
+   ],
+   "action": [
+    0.025390625,
+    0.0001220703125,
+    0.00045501708984374556
+   ],
+   "executed": null
+  }
+ ]
+}

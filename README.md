@@ -60,17 +60,20 @@ G1의 실제 궤적입니다. 위는 Gen-v1, 아래는 Gen-v2이고, 채운 점�
 
 **Canonical clean baseline (44m 이하, 아직 서지 않음)** — Failure-Aware 실험의 clean 기준을 "Find the blue landing pad and land on it.", 시작 44m 이하로 정하고, 착륙의 끝(안정 접촉 확인, latch, disarm)을 저수준 Landing Finalizer로 옮겼습니다. 학습은 하지 않고 Gen-v3의 두 번째 checkpoint를 그대로 새 검증 시작 36개에서 비행했습니다. Gate는 통과하지 못했습니다(30/36, 다른 물체에서 끝난 비행 3회·기준 2회 이하). 그래서 모델·실행기·설정을 동결하지 않았고, 따로 만든 test 시작 48개는 비행하지 않았습니다.
 
+**Gen-v3c (hard-negative 보정, gate 미통과)** — 위 검증에서 남은 병목은 하나였습니다: 지시한 것과 색이나 형태가 같은 물체가 먼저 보이면 그쪽으로 가는 것. 그 장면을 일부러 만든 96 episode를 더해 Gen-v3의 두 번째 checkpoint를 짧게 보정하고(구조는 그대로), 착륙의 "서 있음" 판정을 접촉과 위치로 읽게 고쳤습니다(evaluator v2). Pilot 12회는 통과했지만(11/12), 새 검증 36회에서는 33/36에 다른 물체에서 끝난 비행이 다시 3회(기준 2회 이하)여서 gate를 통과하지 못했습니다. Test 시작 48개는 여전히 비행하지 않았습니다.
+
 - ✅ 문장으로 지시한 물체 찾기(visual search) — Gen-v1·v2에서 held-out으로 확인
-- ◻ 문장에 따라 접근 또는 착륙 — 검증 시작에서 approach 9/9 공중 정지(내려앉음 0), 착륙을 시킨 27회 중 23회 지시한 pad에 touchdown. held-out 미측정
-- ◻ Finalizer를 포함한 물리적 착륙 — 검증 시작에서 접촉 24회 모두 latch·disarm, system 착륙 성공 21/27. approach에서는 한 번도 켜지지 않음. held-out 미측정
-- ✗ 44m 이하 canonical clean baseline — gate 미통과
-- ⚠️ 같은 색·같은 형태 물체 사이의 선택 — 열린 한계. 44m를 넘으면 뚜렷하고(54m 이상 파란 목표 3/9), 44m 안에서도 관련 물체가 먼저 보이면 납니다(검증 36회 중 3회)
+- ◻ 문장으로 목표 고르기 — 부분적. 새 검증에서 관련 물체가 먼저 보이지 않으면 21/21, 먼저 보이면 12/15(다섯 번에 한 번은 그 물체로 감). 보정 전후로 이 비율은 구별될 만큼 달라지지 않음
+- ◻ 문장에 따라 접근 또는 착륙 — 새 검증에서 approach 9/9 공중 정지(내려앉음 0), 시킨 대로 끝남 34/36. held-out 미측정
+- ◻ 안정 접촉 finalizer를 포함한 물리적 착륙 — 새 검증에서 지시한 pad로 간 24회 전부 안정 착륙·latch·disarm. approach에서는 한 번도 켜지지 않음. held-out 미측정
+- ✗ 44m 이하 canonical clean baseline — gate를 두 번 통과하지 못함(두 번 다 "다른 물체에서 끝남" 3회)
+- ⚠️ 같은 색·같은 형태 물체 사이의 선택 — 열린 한계. 데이터 보강으로는 풀리지 않았고, 다음 후보는 FiLM 등 더 강한 language–vision 결합. 44m를 넘는 시작은 따로 둔 장거리 과제
 
 같은 자세에서 문장만 바꾸면 끝이 달라집니다: [착륙](outputs/examples/gen_v3/land.gif) · [접근 후 공중 정지](outputs/examples/gen_v3/approach.gif) · [60m 밖에서 찾아 착륙](outputs/examples/gen_v3/mission_land.gif) · [실패: 먼 파란 목표 앞에서 망설임](outputs/examples/gen_v3/failure_far_blue.gif)
 
 GIF: [탐색](outputs/examples/generalization/search_g1.gif) · [놓친 뒤 다시 찾기](outputs/examples/generalization/reacquire_g1.gif) · [Yard](outputs/examples/generalization/yard_g3.gif) · [Gen-v1의 실패](outputs/examples/generalization/failure_g1_v1.gif)와 [같은 시작에서의 Gen-v2](outputs/examples/generalization/fixed_g1_v2.gif) · [pilot 단계의 비행](outputs/examples/visual_search_oft.gif)
 
-문서: [pilot — 구조와 학습 가능성](docs/aerovla_oft.md) · [Gen-v1 — 시작 위치·물체·장면 일반화](docs/aerovla_oft_generalization.md) · [Gen-v2 — 실패 분류와 전환 데이터 보강](docs/aerovla_oft_gen_v2.md) · [장거리 held-out 평가](docs/aerovla_oft_long_range.md) · [Gen-v3 — grounding과 착륙(진행 중)](docs/aerovla_oft_gen_v3.md) · [Canonical clean baseline — 44m 이하와 Landing Finalizer](docs/canonical_clean_baseline.md) · [먼 거리의 같은 색 구분(열린 문제)](docs/long_range_same_color_grounding.md)
+문서: [pilot — 구조와 학습 가능성](docs/aerovla_oft.md) · [Gen-v1 — 시작 위치·물체·장면 일반화](docs/aerovla_oft_generalization.md) · [Gen-v2 — 실패 분류와 전환 데이터 보강](docs/aerovla_oft_gen_v2.md) · [장거리 held-out 평가](docs/aerovla_oft_long_range.md) · [Gen-v3 — grounding과 착륙(진행 중)](docs/aerovla_oft_gen_v3.md) · [Canonical clean baseline — 44m 이하와 Landing Finalizer](docs/canonical_clean_baseline.md) · [Gen-v3c — hard-negative 보정과 evaluator v2](docs/gen_v3c_hard_negative_grounding.md) · [먼 거리의 같은 색 구분(열린 문제)](docs/long_range_same_color_grounding.md)
 
 ### 2. 맵에서 목표를 골라 보내기 — Coordinate Goal Mode
 
@@ -134,6 +137,7 @@ GIF: [탐색](outputs/examples/generalization/search_g1.gif) · [놓친 뒤 다�
 | 남은 실패는 못 찾아서인가, 찾은 뒤인가 | 찾은 뒤. 찾기는 73/73. 전환 데이터를 더한 Gen-v2는 32/32 | [Gen-v2](docs/aerovla_oft_gen_v2.md) |
 | 문장으로 착륙까지 시킬 수 있는가 | 검증 시작에서는 지시한 pad에 16/18 touchdown, approach를 시키면 내려앉지 않음(0/18). held-out은 아직 | [Gen-v3](docs/aerovla_oft_gen_v3.md) |
 | 범위를 44m 이하로 줄이고 착륙의 끝을 실행기로 옮기면 clean 기준이 서는가 | 아직 아니다. 검증 30/36으로 gate 미통과. 남은 것은 착륙이 아니라 목표 선택(다른 물체에서 끝남 3회) | [Canonical clean baseline](docs/canonical_clean_baseline.md) |
+| "먼저 보이는 비슷한 물체"를 데이터로 가르치면 목표 선택이 안정되는가 | 아니다. Hard-negative 96 episode 보정 뒤 pilot 11/12, 새 검증 33/36. 그 조건의 오류는 15회 중 3회로 gate 미통과 | [Gen-v3c](docs/gen_v3c_hard_negative_grounding.md) |
 | 탐색 방향을 섞어 가르치면 | 탐색이 사라짐(탐색 frame의 yaw 예측 +0.88 → +0.07). 영상 한 장만 보는 정책이라서 | [해당 절](docs/aerovla_oft_generalization.md#teacher) |
 
 ## System Architecture
@@ -192,6 +196,7 @@ outputs/generalization/  동결한 결과 표와 실패 분류 (원자료는 로
 | [aerovla_oft_long_range](docs/aerovla_oft_long_range.md) | 새 장거리 held-out set, 단계별 결과, 장면·물체별 분리, 다음 변경 |
 | [aerovla_oft_gen_v3](docs/aerovla_oft_gen_v3.md) | distractor가 있는 장면, 착륙 teacher와 착륙 규칙, 평가 gate, 두 차례 학습, 검증·회귀 결과, 남은 병목 |
 | [canonical_clean_baseline](docs/canonical_clean_baseline.md) | 44m 이하 canonical mission, Landing Finalizer, VLA·실행기·평가의 책임 구분, 착륙을 읽는 세 가지, 새 검증·test set, gate 결과와 실패 분류 |
+| [gen_v3c_hard_negative_grounding](docs/gen_v3c_hard_negative_grounding.md) | Evaluator v2(위치로 읽는 안정 착륙), hard-negative data와 배치, 보정 학습, pilot, 새 검증 set의 gate 결과, 목표 선택 진단, 다음 후보 |
 | [long_range_same_color_grounding](docs/long_range_same_color_grounding.md) | 44m를 넘는 시작에서 같은 색 물체를 고르는 문제: 관측, canonical 범위에서 뺀 이유, 나중에 시도할 후보 |
 | [experiments](docs/experiments.md) | 날짜별 실험 요약 |
 | [failure_plan](docs/failure_plan.md) | 이후 넣을 장애 후보 |

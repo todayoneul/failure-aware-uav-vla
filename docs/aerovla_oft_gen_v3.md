@@ -12,6 +12,8 @@
 - **다음에 정할 것은 모델이 아니라 과제의 범위다.** 권장: canonical clean mission을 시작 44m 이하로 정하고(두 checkpoint 모두 19/22), 먼 거리의 같은 색 구분은 한계로 남긴다. 세 번째 재학습은 그 결정 뒤의 일이다.
 
 > **이후 (2026-10-09):** 범위를 44m 이하로 정하고 착륙의 끝을 저수준 Landing Finalizer로 옮긴 canonical system을 따로 정의했다. 두 번째 checkpoint를 그대로 새 검증 set에서 비행했고, gate는 통과하지 못했다(30/36, 다른 물체에서 끝난 비행 3회). → [Canonical clean baseline](canonical_clean_baseline.md), [Long-range same-color grounding](long_range_same_color_grounding.md). 이 문서의 숫자와 판정은 그대로 두었다.
+>
+> **Gen-v3c (2026-10-09):** 그 병목(색이나 형태가 같은 물체를 목표로 삼음)을 겨냥해 hard-negative 96 episode로 두 번째 checkpoint를 짧게 보정했다. Pilot은 통과했고(11/12), 새 검증 set에서는 33/36, 다른 물체에서 끝난 비행 3회로 gate를 다시 통과하지 못했다. 데이터 보정의 한계로 판정하고 다음 후보로 FiLM 등 더 강한 language–vision 결합을 적었다. → [Gen-v3c](gen_v3c_hard_negative_grounding.md)
 
 ## 왜 Gen-v3인가
 

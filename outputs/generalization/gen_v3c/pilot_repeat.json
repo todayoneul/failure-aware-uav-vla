@@ -1,0 +1,61 @@
+{
+ "gate": "pilot",
+ "run": "outputs/visual_search/gen_v3c_pilot_repeat",
+ "passed": true,
+ "checks": [
+  {
+   "check": "flights",
+   "value": 12,
+   "needs": ">= 12",
+   "passed": true
+  },
+  {
+   "check": "successes",
+   "value": 11,
+   "needs": ">= 9",
+   "passed": true
+  },
+  {
+   "check": "flights that ended at a wrong object",
+   "value": 1,
+   "needs": "<= 1",
+   "passed": true
+  },
+  {
+   "check": "collisions",
+   "value": 0,
+   "needs": "<= 1",
+   "passed": true
+  },
+  {
+   "check": "episodes with a runner error",
+   "value": 0,
+   "needs": "<= 0",
+   "passed": true
+  }
+ ],
+ "flights": 12,
+ "success": 11,
+ "landings": 9,
+ "landing_success": 8,
+ "approaches": 3,
+ "approach_success": 3,
+ "grounded": 11,
+ "in_view": 11,
+ "terminal_as_asked": 11,
+ "wrong_target": 1,
+ "collisions": 0,
+ "left_out_because_the_teacher_did_not_finish": [],
+ "failures": {
+  "pilot-21501-red_pad-color_first": "SEARCH (stopped by itself)"
+ },
+ "note": "A second flight of the twelve pilot starts with the same checkpoint, flown after the gates to see how much a repeat changes. It is not the pilot check: that was judged on the first flight (pilot.json).",
+ "single_extra_flight": {
+  "episode": "pilot-21502-blue_pad-color_first",
+  "reason": "collision",
+  "success": false,
+  "hit": "SceneBlueCone",
+  "steps": 37,
+  "what": "the same start flown once more on its own, for an example recording"
+ }
+}

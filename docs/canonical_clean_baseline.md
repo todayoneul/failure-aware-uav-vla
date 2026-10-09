@@ -2,6 +2,8 @@
 
 2026-10-09 실행. 브랜치 `exp/aerovla-oft-gen-v3-canonical-baseline`(`exp/aerovla-oft-gen-v3-grounding-landing`에서 분기). 새 학습은 없다. [Gen-v3](aerovla_oft_gen_v3.md)의 두 번째 checkpoint(`generalization_v3b`)를 그대로 쓴다. Gen-v3의 checkpoint, dataset, 결과, 그리고 Depot의 156개 test set은 그대로 있다.
 
+> **이후 (Gen-v3c, 2026-10-09):** 이 문서의 숫자는 **legacy evaluator result**다. 그 뒤 "서 있음" 판정을 접촉과 위치로 읽는 `canonical_evaluator_v2`를 넣었고, 목표 선택 병목을 겨냥한 hard-negative 보정(Gen-v3c)을 새 검증 set에서 비행했다. 결과: 33/36, 다른 물체에서 끝난 비행 3회로 gate를 다시 통과하지 못했다. Canonical test 48개는 여전히 비행하지 않았다. → [Gen-v3c](gen_v3c_hard_negative_grounding.md). 아래의 30/36과 착륙 21/27은 새 판정으로 다시 계산하지 않았다.
+
 **요약**
 
 - **Canonical clean baseline은 아직 서지 않았다.** Gate를 통과하지 못했다. Smoke는 9/10으로 통과했고, representative는 30/36(0.83)에서 한 줄로 멈췄다: 다른 물체에서 끝난 비행이 3회였다(기준 2회 이하). 기준은 비행 전에 고정한 그대로다.
@@ -240,6 +242,7 @@ FLYING → LANDING_DESCENT → CONTACT_CANDIDATE → STABLE_CONTACT → LANDED_L
 - **Gate의 숫자는 고치지 않았다.** 이 둘은 기록대로 실패다(30/36, 착륙 21/27). 결과를 본 뒤 판정 방식을 바꾸지 않는다는 원칙대로다.
 - **고쳐 읽어도 gate는 통과하지 못한다.** 위치로 읽으면 32/36, 착륙 23/27이 되지만 "다른 물체에서 끝남 3회"는 그대로다.
 - **다음 gate 전에 고칠 것:** "서 있음"을 판단 사이의 높이 변화로 읽는다(finalizer와 같은 방식). 이번에는 적용하지 않았다. 고친 뒤에는 검증 시작도 새 seed로 다시 뽑는다. 이 36개는 이미 봤다.
+- **그렇게 했다:** [Gen-v3c](gen_v3c_hard_negative_grounding.md#evaluator-v2)의 `canonical_evaluator_v2`와 seed 22000번대의 새 검증 set. 이 문서의 run에는 소급하지 않았다.
 
 ## 하지 않은 것
 
@@ -259,6 +262,8 @@ FLYING → LANDING_DESCENT → CONTACT_CANDIDATE → STABLE_CONTACT → LANDED_L
 **Gaussian Blur는 아직 아니다.** Clean에서 100회 중 8회꼴로 다른 물체로 가는 기준 위에서는, Blur가 더한 선택 오류를 가려낼 수 없다.
 
 먼저 정할 것은 하나다: **목표 선택 병목을 어떻게 다룰 것인가.** 이번 작업의 범위(재학습 없음, 데이터 추가 없음, 구조 변경 없음) 안에는 모델 쪽에서 이것을 고칠 수단이 없다. 그와 별개로, 다음 gate 전에는 평가의 "서 있음" 판정을 고치고 검증 시작을 새 seed로 다시 뽑아야 한다.
+
+**그 뒤 (Gen-v3c):** 데이터로 고쳐 보았다. Hard-negative 96 episode를 더한 짧은 보정 학습은 pilot 12회를 통과했지만(11/12), 새 검증 36회에서 다시 다른 물체 3회로 gate를 통과하지 못했다. 관련 물체가 먼저 보이는 시작에서의 오류는 다섯 번에 한 번꼴 그대로다. 다음 후보는 FiLM 등 더 강한 language–vision 결합이다. → [Gen-v3c](gen_v3c_hard_negative_grounding.md)
 
 ## 재현
 

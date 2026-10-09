@@ -147,29 +147,41 @@ def lost_and_found(rows,stage):
     return False,False
 
 
-def selection(items,episodes,steps,landing):
-    """Target selection by what a start holds: [name, flights, went to the named object, ended at a wrong object]."""
-    by_id={episode['id']:episode for episode in episodes};rows=[]
-    def line(name,chosen,good=lambda i:i['success']):
-        if chosen:rows.append((name,len(chosen),sum(bool(good(i)) for i in chosen),sum(i['wrong_target'] for i in chosen)))
-    plan=lambda i:by_id[i['episode']];role=lambda i:plan(i).get('role') or plan(i).get('kind','')
-    first=lambda i:role(i).startswith(('past','red_past')) or role(i).endswith('_first')
-    line('an object of the same colour, another shape, within reach',[i for i in items if plan(i).get('relation')=='same_color'])
-    line('an object of the same shape, another colour, within reach',[i for i in items if plan(i).get('relation')=='same_shape'])
-    line('the related object in the first view, the named one outside it',[i for i in items if first(i)],lambda i:not i['wrong_target'])
-    line('... of the same colour',[i for i in items if first(i) and plan(i).get('relation')=='same_color'],lambda i:not i['wrong_target'])
-    line('... of the same shape',[i for i in items if first(i) and plan(i).get('relation')=='same_shape'],lambda i:not i['wrong_target'])
-    line('the two objects exchanged (position swap)',[i for i in items if role(i)=='swap'])
-    line('the neighbour named instead (query)',[i for i in items if role(i)=='query'])
-    line('the named object outside the first view',[i for i in items if not i['initially_visible']])
-    forced=[i for i in items if plan(i).get('kick')]
-    line('named object lost to a forced turn, a related object in view',forced,lambda i:i['correct_target'] or i['success'])
+def selection(items,episodes,steps,landing,within_m=60.):
+    """Target selection by what a start holds: [what, flights, successes, ended at the named object, ended at a wrong object].
+
+    Read from the plan itself, so that any set can be broken down the same way: the object beside the named one (the
+    `distractor` or `neighbour` of the start) and the objects the first view shows within `within_m`."""
+    by_id={episode['id']:episode for episode in episodes};scenes={};rows=[]
+    def facts(i):
+        plan=by_id[i['episode']];scene=scenes.setdefault(plan['map'],load_map(plan['map']));target=plan['target']
+        beside=plan.get('distractor') or plan.get('neighbour')
+        shown={gen_v3c.relation_of(scene,target,item['name']) for item in plan.get('others_in_view',[]) if item['distance_m']<=within_m}-{None}
+        hidden=plan['plan']['acquired_tick']!=0
+        return {'beside':gen_v3c.relation_of(scene,target,beside) if beside else None,'first':shown if hidden else set(),'role':plan.get('role') or plan.get('kind',''),
+                'hidden':hidden,'kick':bool(plan.get('kick'))}
+    known={i['episode']:facts(i) for i in items}
+    def line(name,chosen):
+        if chosen:rows.append((name,len(chosen),sum(bool(i['success']) for i in chosen),sum(bool(i['correct_target']) for i in chosen),sum(i['wrong_target'] for i in chosen)))
+    of=lambda i:known[i['episode']]
+    line('an object of the same colour and another shape beside the named one or in the first view',[i for i in items if of(i)['beside']=='same_color' or 'same_color' in of(i)['first']])
+    line('an object of the same shape and another colour beside the named one or in the first view',[i for i in items if of(i)['beside']=='same_shape' or 'same_shape' in of(i)['first']])
+    line('a related object in the first view, the named one outside it',[i for i in items if of(i)['first']])
+    line('... of the same colour',[i for i in items if 'same_color' in of(i)['first']])
+    line('... of the same shape',[i for i in items if 'same_shape' in of(i)['first']])
+    line('the two objects exchanged (position swap)',[i for i in items if of(i)['role']=='swap'])
+    line('the neighbour named instead (query)',[i for i in items if of(i)['role']=='query'])
+    line('the named object outside the first view',[i for i in items if of(i)['hidden']])
+    line('the named object in the first view',[i for i in items if not of(i)['hidden']])
+    line('named object lost to a forced turn, a related object in view',[i for i in items if of(i)['kick']])
     natural=[];again=[]
     for i in items:
-        if plan(i).get('kick'):continue
+        if of(i)['kick']:continue
         lost,found=lost_and_found(steps[i['episode']],landing['stages'])
-        if lost:natural.append(i);again+=[i] if found and not i['wrong_target'] else []
-    if natural:rows.append(('named object lost on the way without a forced turn',len(natural),len(again),sum(i['wrong_target'] for i in natural)))
+        if lost:natural.append(i);again+=[i] if found else []
+    if natural:
+        rows.append(('named object lost on the way without a forced turn',len(natural),sum(bool(i['success']) for i in natural),sum(bool(i['correct_target']) for i in natural),sum(i['wrong_target'] for i in natural)))
+        rows.append(('... and seen again',len(again),sum(bool(i['success']) for i in again),sum(bool(i['correct_target']) for i in again),sum(i['wrong_target'] for i in again)))
     return rows
 
 
@@ -188,7 +200,7 @@ def report(args,config):
                   rate([i for i in items if i['band']==band and i['task']=='approach'],'success')) for band in ('near','mid','far')]
         markdown('By band',('Band','All','Landing','Approach'),by_band)
         chosen=selection(items,episodes,steps,landing)
-        markdown('Target selection',('Start holds','Flights','Went to the named object','Ended at a wrong object'),chosen)
+        markdown('Target selection',('Start holds','Flights','Success','Ended at the named object','Ended at a wrong object'),chosen)
         failed=[i for i in items if i['failure']]
         stages=[(stage,sum(i['failure']==stage for i in failed),', '.join(sorted({i['mechanism'] for i in failed if i['failure']==stage})),
                  ' '.join(i['episode'] for i in failed if i['failure']==stage)) for stage in STAGES]
@@ -209,7 +221,7 @@ def report(args,config):
         apart=disagreements(items,steps)
         summary['models'][label]={'measures':m,'landings':[dict(zip(('band','correct_target','approach','alignment','touchdown','stable_physical_landing','system_landing','strict_zero_action'),row)) for row in landing_rows(items)],
                                   'by_role':dict(by_role),'by_band':[dict(zip(('band','all','landing','approach'),row)) for row in by_band],
-                                  'target_selection':[dict(zip(('start_holds','flights','named_object','wrong_object'),row)) for row in chosen],
+                                  'target_selection':[dict(zip(('start_holds','flights','success','named_object','wrong_object'),row)) for row in chosen],
                                   'failures':{stage:{'count':count,'how':how,'episodes':names.split()} for stage,count,how,names in stages if count},
                                   'finalizer':finalizer,'touchdown':precision,'latched_but_not_read_as_stable':apart,'episodes_with_errors':errors,
                                   'rates':{'correct_target':rate(items,'correct_target'),'approach':rate(items,'approached'),'touchdown':rate(land,'touchdown_success'),

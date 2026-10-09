@@ -1,0 +1,52 @@
+{
+ "gate": "pilot",
+ "run": "outputs/visual_search/gen_v3c_pilot",
+ "passed": true,
+ "checks": [
+  {
+   "check": "flights",
+   "value": 12,
+   "needs": ">= 12",
+   "passed": true
+  },
+  {
+   "check": "successes",
+   "value": 11,
+   "needs": ">= 9",
+   "passed": true
+  },
+  {
+   "check": "flights that ended at a wrong object",
+   "value": 1,
+   "needs": "<= 1",
+   "passed": true
+  },
+  {
+   "check": "collisions",
+   "value": 0,
+   "needs": "<= 1",
+   "passed": true
+  },
+  {
+   "check": "episodes with a runner error",
+   "value": 0,
+   "needs": "<= 0",
+   "passed": true
+  }
+ ],
+ "flights": 12,
+ "success": 11,
+ "landings": 9,
+ "landing_success": 8,
+ "approaches": 3,
+ "approach_success": 3,
+ "grounded": 11,
+ "in_view": 11,
+ "terminal_as_asked": 11,
+ "wrong_target": 1,
+ "collisions": 0,
+ "left_out_because_the_teacher_did_not_finish": [],
+ "failures": {
+  "pilot-21501-red_pad-color_first": "SEARCH (stopped by itself)"
+ }
+}
