@@ -157,5 +157,67 @@
       "representative": {"what": "every validation start; also the standard the test is read by", "episodes_min": 30, "success_rate_min": 0.8, "landing_success_rate_min": 0.75,
                          "grounded_rate_min": 0.9, "terminal_as_asked_rate_min": 0.9, "wrong_target_max": 2, "collisions_max": 1, "errors_max": 0}
     }
+  },
+  "gen_v3c": {
+    "description": "Gen-v3c: a small correction of the second Gen-v3 checkpoint for one failure, target selection when an object that shares the named object's colour or shape is what the view shows (docs/gen_v3c_hard_negative_grounding.md). Nothing about the model changes: same inputs, same LoRA and head, chunk 4, FiLM and proprio off. About a hundred added episodes, a short fine-tune from generalization_v3b with half of the drawn frames from the earlier data, a pilot check of a dozen flights, and a fresh validation set behind the canonical gates. Everything here was fixed before any episode was recorded.",
+    "start_checkpoint": "outputs/aerovla_oft/checkpoints/generalization_v3b",
+    "checkpoint": "outputs/aerovla_oft/checkpoints/generalization_v3c",
+    "evaluator": "canonical_evaluator_v2",
+    "max_start_m": 44.0,
+    "bands_m": {"near": [12.0, 20.0], "mid": [20.0, 32.0], "far": [32.0, 44.0]},
+    "seeds": {"train": [20000, 20999], "val": [21000, 21199], "pilot": [21500, 21599], "validation": [22000, 22999]},
+    "seed_note": "10000-15999 belong to the second round of Gen-v3 additions, so the new ranges start at 20000.",
+    "separation_m": 6.0,
+    "max_ticks": 320,
+    "reach_m": 66.0,
+    "reach_from": "two sites count as neighbours when a start inside the 44 m range of one can have the other in view: the 42 m pairs and the three longer ones (51, 57, 65 m)",
+    "train_layouts": {"field": ["k", "l", "m", "n"], "lot": ["k", "l", "m", "n"]},
+    "pilot_layouts": {"field": ["t", "u"], "lot": ["t", "u"]},
+    "validation_layouts": {"field": ["p", "q", "r", "s"], "lot": ["p", "q", "r", "s"]},
+    "hard_negative": {
+      "description": "What the added episodes show. `first`: the first view holds an object of the named one's colour (or shape) near its middle, and the named object is outside the view; the teacher keeps turning and goes to the named one. `lost`: the named object is in view and the approach has begun, then a forced turn (flown, never a label) puts a related object in the middle of the view and the named one outside it; the teacher keeps turning until it has the named one again. `swap`: a `first` pose flown again in the layout that exchanges the two objects, so the same view now holds the named one. `query`: a `first` pose told to go to the object in view instead. Rows are [named object, object in view]; counts are [train, val].",
+      "first_view": {"within_m": 48.0, "centred_deg": 20.0},
+      "lost": {"after_ticks": [3, 12], "min_remaining_m": 16.0, "min_turn_deg": 55.0, "centred_deg": 12.0, "within_m": 60.0},
+      "twin_max_start_m": 44.0,
+      "band_cycle": ["far", "mid", "near", "far", "mid"],
+      "pad_tasks": ["land", "land", "approach"],
+      "kinds": {
+        "color_first": {"relation": "same_color", "count": [30, 4],
+                        "rows": [["blue_pad", "blue_cube"], ["red_pad", "red_cube"], ["blue_cube", "blue_pad"], ["blue_cylinder", "blue_pad"], ["blue_cone", "blue_pad"],
+                                 ["red_cube", "red_pad"], ["blue_pad", "blue_cylinder"], ["blue_cube", "blue_cylinder"], ["blue_cylinder", "blue_cone"], ["blue_cone", "blue_cylinder"],
+                                 ["blue_pad", "blue_cone"], ["red_pad", "red_cube"], ["red_cube", "red_pad"], ["blue_cylinder", "blue_cube"], ["blue_cone", "blue_cube"]]},
+        "shape_first": {"relation": "same_shape", "count": [14, 2],
+                        "rows": [["blue_pad", "red_pad"], ["red_pad", "blue_pad"], ["blue_cube", "red_cube"], ["red_cube", "blue_cube"], ["blue_pad", "red_pad"],
+                                 ["blue_cylinder", "green_cylinder"], ["red_pad", "blue_pad"]]},
+        "lost": {"count": [20, 2],
+                 "rows": [["blue_pad", "blue_cube"], ["red_pad", "red_cube"], ["blue_pad", "red_pad"], ["blue_cube", "blue_pad"], ["blue_cone", "blue_pad"],
+                          ["red_pad", "blue_pad"], ["blue_pad", "blue_cone"], ["blue_cylinder", "blue_pad"], ["red_cube", "red_pad"], ["blue_pad", "blue_cylinder"]]},
+        "swap": {"count": [16, 2], "of": {"color_first": 5, "shape_first": 3}, "of_note": "of every eight swap twins, five are of colour poses and three of shape poses"},
+        "query": {"count": [16, 2], "of": {"color_first": 5, "shape_first": 3}}
+      }
+    },
+    "fine_tune": {
+      "description": "Fixed before the run. A correction, not a retraining: the second Gen-v3 checkpoint goes on at a quarter of its learning rate (its own run ended at 2.5e-5 after decaying from 2e-4), for 2,000 updates of 4 frames. Half of the drawn frames come from the added episodes and half from everything the checkpoint was trained on, so that search, plain grounding, approach, landing and the approach-or-land pairs stay in front of it. The checkpoint kept is chosen by the same rule as before, on validation frames that are half new and half old.",
+      "updates": 2000, "learning_rate": 5e-05, "batch_size": 1, "gradient_accumulation": 4, "eval_every": 250, "eval_samples": 600,
+      "hard_negative_share": 0.5, "boost": {"small_visible": 2}, "balance": 3.0, "select_band": 0.02,
+      "validation_mix": "every validation frame of the added episodes and as many frames of the earlier validation episodes, drawn in proportion to the teacher's states"
+    },
+    "pilot": {
+      "description": "A dozen flights in two layouts no episode was recorded in, before any flight on the fresh validation set: four with an object of the named one's colour in the first view and the named one outside it, two the same with an object of its shape, two with the named pad lost to a forced turn that leaves a related object in view, two position swaps, two with nothing related in the first view. The second Gen-v3 checkpoint flies the same twelve for reference. If the check is not passed the answer of this stage is DATA CORRECTION INSUFFICIENT; no more episodes are added.",
+      "episodes": 12, "success_min": 9, "wrong_target_max": 1, "collisions_max": 1, "errors_max": 0
+    },
+    "gates": {
+      "description": "The canonical gates with the same numbers, on the fresh validation set (configs/gen_v3c_canonical_validation.json) read by canonical_evaluator_v2. Smoke first; the other validation starts only if it is passed; the 48 canonical test starts once, only after both are passed and the model, the finalizer, the evaluator and the configuration are fingerprinted.",
+      "smoke": {"what": "ten validation starts: in every band a landing with the pad in view, one with it out of view and the first one's approach twin, and one landing on the red pad", "episodes": 10, "success_min": 7, "landing_success_min": 1, "far_band_success_min": 1, "collisions_max": 1, "errors_max": 0},
+      "representative": {"what": "every validation start; also the standard the test is read by", "episodes_min": 30, "success_rate_min": 0.8, "landing_success_rate_min": 0.75,
+                         "grounded_rate_min": 0.9, "terminal_as_asked_rate_min": 0.9, "wrong_target_max": 2, "collisions_max": 1, "errors_max": 0}
+    },
+    "validation": {"past_within_m": 60.0, "past_from": "as in the canonical sets: the related object anywhere in the first view, within 60 m"},
+    "regression": {
+      "description": "Has the correction cost anything it could do before? Eight starts of each earlier set, chosen by position in the file before any Gen-v3c flight, compared with what the second Gen-v3 checkpoint did on the same starts. The long-range starts are farther than 44 m and stay outside the canonical baseline.",
+      "sets": {"G1": ["configs/generalization_test_spawns.json", 8], "G3": ["configs/generalization_test_spawns.json", 8], "P": ["configs/generalization_test_spawns.json", 8],
+               "L": ["configs/long_range_test_spawns.json", 9]},
+      "rule": "a set lists its starts in cycles of objects or sentences, so the starts are taken at positions (k * step) mod n, with step the smallest number from n / count up that shares no factor with n; L takes three of each of L1, L2 and L3"
+    }
   }
 }

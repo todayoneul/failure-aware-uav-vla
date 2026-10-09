@@ -153,6 +153,13 @@ class SearchEnv:
         still=abs(state['position'][2]-self.touchdown['position'][2])<=.03 and abs(state['velocity'][2])<=.05
         return self.touchdown['object'] if still else None
 
+    def on_surface(self,state):
+        """Evaluator v2: is the vehicle at the height it touched down at? Read from its position alone; the simulator's reported
+        speed can stay above zero for a few decisions while the vehicle stands still."""
+        rule=self.landing.get('evaluator')
+        if self.touchdown is None or not rule:return False
+        return abs(state['position'][2]-self.touchdown['position'][2])<=rule['surface_height_tolerance_m']
+
     def apparent(self,meta):
         """Size of the target's bounding box in one camera's image, in pixels and as a share of the image. Occlusion is ignored;
         this is how large the object could look, kept with the log and never shown to a policy."""
@@ -219,13 +226,33 @@ class SearchEnv:
         except Exception:return False
 
 
+def standing(steps,level,rule):
+    """Evaluator v2: does the flight end with the vehicle standing still on the surface it touched down on?
+
+    Read from positions alone. The last `stable_position_window_steps` decisions must all be at the touchdown height, and
+    between them the vehicle must not have moved more than the two displacement limits. `level` is the height of the
+    contact (None when nothing was touched)."""
+    count=rule['stable_position_window_steps'];window=steps[-count:]
+    if level is None or len(window)<count:return {'decisions':len(window),'on_surface':False,'horizontal_m':None,'vertical_m':None,'stable':False}
+    heights=[s['position'][2] for s in window]
+    on=all(abs(height-level)<=rule['surface_height_tolerance_m'] for height in heights)
+    horizontal=max(math.hypot(a['position'][0]-b['position'][0],a['position'][1]-b['position'][1]) for a in window for b in window)
+    vertical=max(heights)-min(heights)
+    return {'decisions':count,'on_surface':on,'horizontal_m':horizontal,'vertical_m':vertical,
+            'stable':bool(on and horizontal<=rule['stable_horizontal_displacement_m'] and vertical<=rule['stable_vertical_displacement_m'])}
+
+
 def landing_summary(episode,steps,config,landing,stopped,touchdown,hit,others,finalizer=None):
     """What an episode did about its target and, for a landing, how far through the landing it got.
 
     A landing is read three ways, kept apart: touchdown (the named pad, inside its landing region, a soft contact),
-    stable physical landing (and standing still on it for the finalizer's duration), and strict policy zero-action
-    (and the policy gave the zero action by itself). With the finalizer in use the result of the mission is the
-    system's: a stable physical landing on the named pad that the finalizer latched and disarmed on."""
+    stable physical landing (and standing still on it), and strict policy zero-action (and the policy gave the zero
+    action by itself). With the finalizer in use the result of the mission is the system's: a stable physical landing
+    on the named pad that the finalizer latched and disarmed on.
+
+    Evaluator v2 (landing['evaluator'], used when the contact's position is known) reads "standing" from the vehicle's
+    positions; the legacy reading, which asked for a settled reported vertical speed, is computed as before and kept
+    under `legacy_evaluator`. The strict rule Gen-v3 was judged by (`land_success`) is the legacy one in both cases."""
     radius=config['success_radius_m'];stage=landing['stages'];rule=landing['touchdown'];task=episode.get('task','approach');last=steps[-1]
     distances=[s['distance_m'] for s in steps];seen=[bool(s['front_seen'] or s['down_seen']) for s in steps]
     # The object the vehicle ended at: the one it stands on, or else the nearest one within the success radius.
@@ -238,37 +265,57 @@ def landing_summary(episode,steps,config,landing,stopped,touchdown,hit,others,fi
             'stages':{'target_acquired':any(seen),'correct_target':selected==episode['target'],'approached':min(distances)<=stage['approach_m'],
                       'down_camera_aligned':any(s.get('over') and s['distance_m']<=stage['aligned_m'] for s in steps),
                       'descent_started':descent,'touchdown':bool(touchdown and touchdown['object']==episode['target']),'self_stop':bool(stopped)}}
+    evaluator=landing.get('evaluator');level=(touchdown or {}).get('position',[None,None,None])[2]
+    # A run whose contact has no recorded position (older logs) keeps the legacy reading.
+    second=bool(evaluator and (touchdown is None or level is not None));old=None
     if touchdown:
-        # The speed of the first touchdown: what the vehicle was doing at the last decision before it.
-        first=next((index for index,s in enumerate(steps) if s.get('landed')),len(steps)-1)
-        velocity=steps[max(0,first-1)].get('velocity',[0.,0.,0.])
-        error=math.hypot(*touchdown['offset_m'])
-        result['touchdown']={'object':touchdown['object'],'offset_m':touchdown['offset_m'],'horizontal_error_m':error,
-                             'inside_region':max(abs(v) for v in touchdown['offset_m'])<=rule['landing_region_half_width_m'],
-                             'vertical_speed_mps':velocity[2],'horizontal_speed_mps':math.hypot(velocity[0],velocity[1]),
-                             'step':first,'left_the_pad_again':any(not s.get('landed') for s in steps[first:])}
-        result['touchdown']['soft']=(abs(velocity[2])<=rule['max_vertical_speed_mps'] and result['touchdown']['horizontal_speed_mps']<=rule['max_horizontal_speed_mps'])
+        def met(on):
+            # The speed of the first touchdown: what the vehicle was doing at the last decision before it.
+            first=next((index for index,flag in enumerate(on) if flag),len(steps)-1)
+            velocity=steps[max(0,first-1)].get('velocity',[0.,0.,0.])
+            record={'object':touchdown['object'],'offset_m':touchdown['offset_m'],'horizontal_error_m':math.hypot(*touchdown['offset_m']),
+                    'inside_region':max(abs(v) for v in touchdown['offset_m'])<=rule['landing_region_half_width_m'],
+                    'vertical_speed_mps':velocity[2],'horizontal_speed_mps':math.hypot(velocity[0],velocity[1]),
+                    'step':first,'left_the_pad_again':any(not flag for flag in on[first:])}
+            record['soft']=(abs(velocity[2])<=rule['max_vertical_speed_mps'] and record['horizontal_speed_mps']<=rule['max_horizontal_speed_mps'])
+            return record
+        # Legacy: a decision counts as on the pad once the simulator's reported vertical speed has settled.
+        old=met([bool(s.get('landed')) for s in steps])
+        result['touchdown']=met([abs(s['position'][2]-level)<=evaluator['surface_height_tolerance_m'] for s in steps]) if second else old
     if task=='land':
-        down=result.get('touchdown')
-        # ... and still standing on it when the flight ends (a vehicle that hopped off and stopped in the air has not landed).
-        result['land_success']=bool(down and down['object']==episode['target'] and down['inside_region'] and down['soft'] and stopped and not hit
+        down=result.get('touchdown');soft_limit=landing['touchdown']['max_vertical_speed_mps']
+        # The strict rule: ... and still standing on it when the flight ends (a vehicle that hopped off and stopped in the air has not landed).
+        result['land_success']=bool(old and old['object']==episode['target'] and old['inside_region'] and old['soft'] and stopped and not hit
                                     and last.get('landed'))
         result['stages']['land_success']=result['land_success']
         rule=landing['finalizer'];on_target=bool(down and down['object']==episode['target'])
-        # Longest stretch of decisions standing still on the pad, from the log alone (not from what the finalizer said).
+        # Legacy: the longest stretch of decisions standing still on the pad, counted by the reported-speed flag.
         still=best=0
         for before,after in zip(steps,steps[1:]):
             dt=max(1e-6,after['epoch']-before['epoch'])
             slow=math.hypot(after['position'][0]-before['position'][0],after['position'][1]-before['position'][1])/dt<=rule['max_horizontal_mps']
             still=still+1 if before.get('landed') and after.get('landed') and slow else 0;best=max(best,still)
-        result['touchdown_success']=bool(on_target and down['inside_region'] and abs(down['vertical_speed_mps'])<=landing['touchdown']['max_vertical_speed_mps'])
-        result['stable_physical_landing']=bool(result['touchdown_success'] and best+1>=rule['stable_decisions'] and last.get('landed'))
+        legacy={'touchdown_success':bool(on_target and old['inside_region'] and abs(old['vertical_speed_mps'])<=soft_limit)}
+        legacy['stable_physical_landing']=bool(legacy['touchdown_success'] and best+1>=rule['stable_decisions'] and last.get('landed'))
+        latched=bool(finalizer and finalizer['active'] and finalizer['finalizer_triggered'] and finalizer['disarm_triggered'] and not hit)
+        if second:
+            # v2: the named pad's landing region, a soft contact, and the flight ends standing still at the contact's height.
+            window=standing(steps,level,evaluator)
+            result['evaluator']=evaluator['version'];result['standing']=window
+            # Standing still on a pad, whichever pad it is; which pad is a separate question.
+            result['physical_landing']=window['stable']
+            result['touchdown_success']=bool(on_target and down['inside_region'] and abs(down['vertical_speed_mps'])<=soft_limit)
+            result['stable_physical_landing']=bool(result['touchdown_success'] and window['stable'] and not hit)
+            result['legacy_evaluator']={**legacy,'system_land_success':bool(legacy['stable_physical_landing'] and latched)} if finalizer and finalizer['active'] else legacy
+        else:result.update(legacy)
         result['strict_policy_zero_action']=bool(on_target and stopped)
         result['strict_land_success']=result['land_success']
         if finalizer and finalizer['active']:
             result['finalizer']=finalizer
-            result['system_land_success']=bool(result['stable_physical_landing'] and finalizer['finalizer_triggered'] and finalizer['disarm_triggered'] and not hit)
+            result['system_land_success']=bool(result['stable_physical_landing'] and latched)
             result['stages']['system_land_success']=result['system_land_success']
+            # A landing the system completed that the strict rule would not have counted: the policy did not stop by itself.
+            result['finalizer_rescued_success']=bool(result['system_land_success'] and not result['strict_policy_zero_action'])
     return result
 
 
@@ -338,7 +385,7 @@ async def run_episode(env,episode,policy,args,record):
               'height_m':private['height_m'],'bearing_deg':private['bearing_deg'],'distance_m':private['distance_m'],
               'front_seen':private['front']['seen'],'front_in_fov':private['front']['in_fov'],'down_seen':private['down']['seen'],
               'front_pixel':private['front']['pixel'],'down_pixel':private['down']['pixel'],'ahead_m':private['ahead_m'],
-              'over':private['over'],'landed':on_pad,'velocity':state['velocity'],'target_size':private['size'],'finalizer':finalizer.state,
+              'over':private['over'],'landed':on_pad,'on_surface':env.on_surface(state),'velocity':state['velocity'],'target_size':private['size'],'finalizer':finalizer.state,
               'input_sha256':{name:digest(inputs[name]) for name in ('front','down')},'proprio':proprio}
         perturbed=False
         if args.policy=='baseline':

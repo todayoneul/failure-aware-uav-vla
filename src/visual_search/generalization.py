@@ -196,8 +196,10 @@ def kick_turn(episode,index,left,yaw_max):
     return turn,left-turn
 
 
-def rollout(config,oft,geometry,episode,ceiling_m):
-    """Fly the teacher through an episode on the map's boxes: kinematics only, no simulator."""
+def rollout(config,oft,geometry,episode,ceiling_m,trace=None):
+    """Fly the teacher through an episode on the map's boxes: kinematics only, no simulator.
+
+    `trace`, when a list is given, receives the pose and the teacher's state at every tick (before the tick's move)."""
     settings=config['generalization'];landing=load_landing();teacher=SearchTeacher(config,oft,episode['strategy'],ceiling_m,landing)
     x,y=episode['start_xy'];yaw=math.radians(episode['start_yaw_deg']);height=episode['start_height_m'];target=episode['target']
     kick_left=0.;stops=0;clearance=float('inf');states={};acquired=None;top=height;reason='max_steps';tick=0
@@ -216,6 +218,7 @@ def rollout(config,oft,geometry,episode,ceiling_m):
         forced=pushes.step(state,view,yaw_max)
         if forced:action=forced;state='push'
         states[state]=states.get(state,0)+1
+        if trace is not None:trace.append({'tick':tick,'x':x,'y':y,'height_m':height,'yaw_rad':yaw,'visible':view['visible'],'distance_m':view['distance_m'],'state':state})
         stops=stops+1 if state in STOP_STATES else 0
         if stops>=config['stop_ticks'] and not pushes.pending():reason='teacher_stop';break
         if landed and action[1]>=0:continue

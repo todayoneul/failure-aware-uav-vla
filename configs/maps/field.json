@@ -1,7 +1,7 @@
 {
   "id": "field",
   "name": "Field",
-  "description": "A training scene assembled at run time far from the Blocks geometry, inside the same simulator binary: grass, hedges, a barn, a silo. Eight object sites, three of them 42 m pairs so that two candidates can share one view. Layouts a-d are trained on and differ in where every object stands, in the colour of the ground and in the time of day; layout e is kept for the sealed Gen-v3 test, and g-j (two pairs that exchange the blue pad with the red pad, and with the blue cylinder) for the canonical test.",
+  "description": "A training scene assembled at run time far from the Blocks geometry, inside the same simulator binary: grass, hedges, a barn, a silo. Eight object sites, three of them 42 m pairs so that two candidates can share one view. Layouts a-d are trained on and differ in where every object stands, in the colour of the ground and in the time of day; layout e is kept for the sealed Gen-v3 test, and g-j (two pairs that exchange the blue pad with the red pad, and with the blue cylinder) for the canonical test. Layouts k-n (two pairs of exchanged layouts) hold the Gen-v3c hard-negative episodes; t and u are flown only in its pilot check and p-s only in its fresh validation set (docs/gen_v3c_hard_negative_grounding.md). No pair of neighbouring objects stands on the same two sites as in a test layout.",
   "scene": "scene_basic_drone.jsonc",
   "obstacles": null,
   "catalogue": "../targets/objects.json",
@@ -10,10 +10,10 @@
   "area": {"x": [-135.0, 135.0], "y": [-135.0, 135.0]},
   "altitude": {"start_m": [5.0, 9.0], "ceiling_m": 14.0},
   "lighting": {"time_of_day": "2024-06-21 10:00:00"},
-  "layout_lighting": {"c": {"time_of_day": "2024-06-21 15:30:00"}, "d": {"time_of_day": "2024-06-21 15:30:00"}, "i": {"time_of_day": "2024-06-21 15:30:00"}, "j": {"time_of_day": "2024-06-21 15:30:00"}},
+  "layout_lighting": {"c": {"time_of_day": "2024-06-21 15:30:00"}, "d": {"time_of_day": "2024-06-21 15:30:00"}, "i": {"time_of_day": "2024-06-21 15:30:00"}, "j": {"time_of_day": "2024-06-21 15:30:00"}, "m": {"time_of_day": "2024-06-21 15:30:00"}, "n": {"time_of_day": "2024-06-21 15:30:00"}, "r": {"time_of_day": "2024-06-21 15:30:00"}, "s": {"time_of_day": "2024-06-21 15:30:00"}},
   "structures": [
-    {"name": "FieldGrass", "shape": "box", "size_m": [560.0, 560.0, 0.3], "position": [0.0, 0.0], "color": [0.33, 0.42, 0.27], "obstacle": false, "lift_m": -0.25, "layouts": ["a", "b", "e", "g", "h"]},
-    {"name": "FieldDryGrass", "shape": "box", "size_m": [560.0, 560.0, 0.3], "position": [0.0, 0.0], "color": [0.5, 0.52, 0.4], "obstacle": false, "lift_m": -0.25, "layouts": ["c", "d", "i", "j"]},
+    {"name": "FieldGrass", "shape": "box", "size_m": [560.0, 560.0, 0.3], "position": [0.0, 0.0], "color": [0.33, 0.42, 0.27], "obstacle": false, "lift_m": -0.25, "layouts": ["a", "b", "e", "g", "h", "k", "l", "t", "p", "q", "u"]},
+    {"name": "FieldDryGrass", "shape": "box", "size_m": [560.0, 560.0, 0.3], "position": [0.0, 0.0], "color": [0.5, 0.52, 0.4], "obstacle": false, "lift_m": -0.25, "layouts": ["c", "d", "i", "j", "m", "n", "r", "s"]},
     {"name": "FieldHedge1", "shape": "box", "size_m": [3.0, 36.0, 4.0], "position": [-45.0, 5.0], "color": [0.1, 0.28, 0.1]},
     {"name": "FieldHedge2", "shape": "box", "size_m": [36.0, 3.0, 4.0], "position": [30.0, 25.0], "color": [0.1, 0.28, 0.1]},
     {"name": "FieldBarn", "shape": "box", "size_m": [18.0, 12.0, 9.0], "position": [-100.0, 40.0], "color": [0.42, 0.3, 0.2]},
@@ -35,9 +35,19 @@
     "g": {"red_cube": "S1", "green_cylinder": "S2", "red_pad": "S3", "blue_pad": "S4", "blue_cube": "S5", "blue_cylinder": "S6", "blue_cone": "S7", "orange_ball": "S8"},
     "h": {"red_cube": "S1", "green_cylinder": "S2", "blue_pad": "S3", "red_pad": "S4", "blue_cube": "S5", "blue_cylinder": "S6", "blue_cone": "S7", "orange_ball": "S8"},
     "i": {"blue_cube": "S1", "orange_ball": "S2", "red_pad": "S3", "red_cube": "S4", "blue_pad": "S5", "blue_cylinder": "S6", "green_cylinder": "S7", "blue_cone": "S8"},
-    "j": {"blue_cube": "S1", "orange_ball": "S2", "red_pad": "S3", "red_cube": "S4", "blue_cylinder": "S5", "blue_pad": "S6", "green_cylinder": "S7", "blue_cone": "S8"}
+    "j": {"blue_cube": "S1", "orange_ball": "S2", "red_pad": "S3", "red_cube": "S4", "blue_cylinder": "S5", "blue_pad": "S6", "green_cylinder": "S7", "blue_cone": "S8"},
+    "k": {"blue_pad": "S1", "blue_cone": "S2", "blue_cube": "S3", "blue_cylinder": "S4", "red_pad": "S5", "red_cube": "S6", "green_cylinder": "S7", "orange_ball": "S8"},
+    "l": {"blue_cone": "S1", "blue_pad": "S2", "blue_cylinder": "S3", "blue_cube": "S4", "red_cube": "S5", "red_pad": "S6", "green_cylinder": "S7", "orange_ball": "S8"},
+    "m": {"blue_cube": "S1", "red_cube": "S2", "blue_cylinder": "S3", "blue_cone": "S4", "blue_pad": "S5", "red_pad": "S6", "green_cylinder": "S7", "orange_ball": "S8"},
+    "n": {"red_cube": "S1", "blue_cube": "S2", "blue_cone": "S3", "blue_cylinder": "S4", "red_pad": "S5", "blue_pad": "S6", "green_cylinder": "S7", "orange_ball": "S8"},
+    "t": {"blue_pad": "S1", "blue_cube": "S2", "red_cube": "S3", "green_cylinder": "S4", "blue_cylinder": "S5", "blue_cone": "S6", "red_pad": "S7", "orange_ball": "S8"},
+    "u": {"blue_cube": "S1", "blue_pad": "S2", "green_cylinder": "S3", "red_cube": "S4", "blue_cone": "S5", "blue_cylinder": "S6", "red_pad": "S7", "orange_ball": "S8"},
+    "p": {"blue_cylinder": "S1", "green_cylinder": "S2", "blue_pad": "S3", "blue_cone": "S4", "blue_cube": "S5", "orange_ball": "S6", "red_pad": "S7", "red_cube": "S8"},
+    "q": {"green_cylinder": "S1", "blue_cylinder": "S2", "blue_cone": "S3", "blue_pad": "S4", "orange_ball": "S5", "blue_cube": "S6", "red_pad": "S7", "red_cube": "S8"},
+    "r": {"red_pad": "S1", "red_cube": "S2", "blue_cone": "S3", "green_cylinder": "S4", "blue_pad": "S5", "blue_cube": "S6", "blue_cylinder": "S7", "orange_ball": "S8"},
+    "s": {"red_cube": "S1", "red_pad": "S2", "green_cylinder": "S3", "blue_cone": "S4", "blue_cube": "S5", "blue_pad": "S6", "blue_cylinder": "S7", "orange_ball": "S8"}
   },
-  "swaps": {"g": "h", "h": "g", "i": "j", "j": "i", "a": "b", "b": "a"},
+  "swaps": {"g": "h", "h": "g", "i": "j", "j": "i", "a": "b", "b": "a", "k": "l", "l": "k", "m": "n", "n": "m", "t": "u", "u": "t", "p": "q", "q": "p", "r": "s", "s": "r"},
   "train_layouts": ["a", "b", "c", "d"],
   "held_out_layouts": ["e", "g", "h", "i", "j"]
 }

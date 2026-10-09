@@ -7,6 +7,9 @@
            compares its predictions with the ones stored at save time
   score:   --score <checkpoint dir> --dataset <root>    validation L1 of a checkpoint on any dataset
   probe:   --probe <checkpoint dir> --dataset <root>    the same frames with the sentence changed: does the action follow the words?
+  breakdown: --breakdown <checkpoint dir> --dataset <root>   the kind of the first action against the teacher's, by kind of episode
+  negative probe: --negative-probe <checkpoint dir> --dataset <root of the hard-negative episodes>
+           frames that show a related object and not the named one, told the episode's sentence and then one naming what is in view
 
 Which checkpoint is kept is decided by a rule given before training starts (--select-band): the lowest
 validation L1, and among evaluations within the band of it the one whose first action most often has the
@@ -41,6 +44,17 @@ def behaviour(normalised,config):
     if down>=.1 and forward<.15:return 'descend'
     if down<=-.1:return 'climb'
     return 'advance' if forward>=.15 else 'turn'
+
+
+def apply_shares(samples,weights,shares):
+    """Rescale drawing weights so that the frames of each named source dataset (folder beside the dataset) make up the given
+    share of the draws; the rest share what is left in the proportions they had. Returns (weights, frames per source)."""
+    weights=list(weights);owner=[next((name for name in shares if sample['traj_rel_dir'].startswith(f'../{name}/')),None) for sample in samples]
+    if sum(shares.values())>=1:raise ValueError('the shares must leave something for the other frames')
+    sums={name:sum(weight for weight,mine in zip(weights,owner) if mine==name) for name in list(shares)+[None]};total=sum(sums.values())
+    if any(value<=0 for value in sums.values()):raise ValueError(f'a source has no frames: { {str(key):value for key,value in sums.items()} }')
+    wanted={**shares,None:1-sum(shares.values())}
+    return [weight*wanted[mine]*total/sums[mine] for weight,mine in zip(weights,owner)],{str(name):owner.count(name) for name in sums}
 
 
 def select(kept,lowest,entry,band):
@@ -154,6 +168,8 @@ def train(args):
         for index,sample in enumerate(samples):
             for name,factor in boosts.items():
                 if BOOSTS[name](sample['meta']):weights[index]*=factor;boosted[name]=boosted.get(name,0)+1
+    shares={name:float(share) for name,share in (item.split('=') for item in args.share)};share_frames=None
+    if shares:weights,share_frames=apply_shares(samples,weights or [1.]*len(samples),shares)
     lowest=float('inf')
 
     def record(update,final_train=None,final_val=None,stored=None):
@@ -163,6 +179,7 @@ def train(args):
                 'batch_size':batch_size,'gradient_accumulation':accumulation,
                 'samples_seen':(update+1)*batch_size*accumulation,'epochs':(update+1)*batch_size*accumulation/len(samples),
                 'learning_rate':learning_rate,'balance':args.balance,'train_state_counts':counts,'boost':boosts,'boosted_samples':boosted,
+                'share_of_draws':shares,'frames_by_source':share_frames,
                 'selection':{'band':args.select_band,'rule':'lowest validation L1; among evaluations within the band of it, the highest mean of grounding and terminal accuracy'},
                 'peak_allocated_GiB':torch.cuda.max_memory_allocated()/2**30,'peak_reserved_GiB':torch.cuda.max_memory_reserved()/2**30,
                 'train_seconds':time.time()-started,'final_train':final_train,'final_val':final_val,'best':best,
@@ -267,6 +284,78 @@ def probe(args):
     if args.output:Path(args.output).write_text(json.dumps(result,indent=1))
 
 
+@torch.no_grad()
+def breakdown(args):
+    """The kind of the first action against the teacher's, by kind of episode and by the teacher's state.
+
+    `search` rows are the ones that matter for target selection: the named object is not in view and the teacher turns.
+    A model that advances there is going for something else it sees."""
+    saved=json.loads((Path(args.breakdown)/'manifest.json').read_text());config=saved['config'];model=AeroVLAOFT(MANIFEST,config,checkpoint=args.breakdown)
+    samples=load_samples(args.dataset,args.val_file)
+    if args.source:samples=[s for s in samples if s['traj_rel_dir'].startswith(f'../{args.source}/')]
+    if args.limit_samples:samples=stratified(samples,args.limit_samples)
+    rows={}
+    for sample in samples:
+        pixels,texts,targets,proprio=batch_of(model,args.dataset,[sample],config)
+        with torch.autocast('cuda',dtype=torch.bfloat16):predicted=model.forward(pixels,texts,proprio).float().cpu()
+        label=behaviour(targets[0,0].tolist(),config);got=behaviour(predicted[0,0].tolist(),config)
+        for key in ((sample['meta']['case'],sample['meta']['teacher_state']),(sample['meta']['case'],'all'),('all',sample['meta']['teacher_state']),('all','all')):
+            row=rows.setdefault(key,{'frames':0,'same_kind':0,'l1':0.,'got':{}})
+            row['frames']+=1;row['same_kind']+=label==got;row['l1']+=(predicted[0,0]-targets[0,0]).abs().mean().item();row['got'][got]=row['got'].get(got,0)+1
+    table=[{'case':case,'teacher_state':state,'frames':row['frames'],'same_kind':row['same_kind']/row['frames'],'first_action_l1':row['l1']/row['frames'],'predicted':row['got']}
+           for (case,state),row in sorted(rows.items())]
+    result={'checkpoint':str(args.breakdown),'dataset':str(args.dataset),'val_file':args.val_file,'source':args.source,'frames':len(samples),'rows':table}
+    print(json.dumps(result,indent=1))
+    if args.output:Path(args.output).write_text(json.dumps(result,indent=1))
+
+
+@torch.no_grad()
+def negative_probe(args):
+    """Frames of the hard-negative episodes that show a related object and not the named one, told two sentences.
+
+    With the episode's own sentence the teacher turns on; with a sentence naming the object in view the right answer is to
+    go to it. The frames are the first decisions of the `first` episodes and the decisions after the forced turn of the
+    `lost` ones. The second half is the reverse: the first frames of the swap and query twins, which show the named object,
+    told their own sentence (advance) and one naming the related object that is not in view (turn on)."""
+    saved=json.loads((Path(args.negative_probe)/'manifest.json').read_text());config=saved['config'];model=AeroVLAOFT(MANIFEST,config,checkpoint=args.negative_probe)
+    root=Path(args.dataset);plan=json.loads((root/'plan.json').read_text());catalogue=json.loads((ROOT/'configs/targets/objects.json').read_text(encoding='utf-8'))['objects']
+    episodes={episode['id']:episode for split in ('train','val') for episode in plan[split]};result={'checkpoint':str(args.negative_probe),'dataset':str(root)}
+    def first(sample,text):
+        pixels,_,_,proprio=batch_of(model,root,[sample],config)
+        with torch.autocast('cuda',dtype=torch.bfloat16):return model.forward(pixels,[text],proprio).float().cpu()[0,0].tolist()
+    def part(rows,own,other):
+        count=max(1,len(rows))
+        return {'frames':len(rows),f'own_sentence_{own}':sum(r['own']==own for r in rows)/count,f'other_sentence_{other}':sum(r['other']==other for r in rows)/count,
+                'own_sentence_kinds':{kind:sum(r['own']==kind for r in rows) for kind in sorted({r['own'] for r in rows})},
+                'other_sentence_kinds':{kind:sum(r['other']==kind for r in rows) for kind in sorted({r['other'] for r in rows})},
+                'both_right':sum(r['own']==own and r['other']==other for r in rows)/count,
+                'mean_action_difference':sum(r['difference'] for r in rows)/count}
+    for split in ('val','train'):
+        samples=load_samples(root,split);hidden=[];shown=[]
+        for sample in samples:
+            meta=sample['meta'];episode=episodes.get(meta['episode_id'])
+            if episode is None:continue
+            if episode.get('distractor') and meta['teacher_state']=='search' and not meta['target_visible']:
+                # The first decisions of a `first` episode; the decisions right after the forced turn of a `lost` one.
+                start=episode['lost']['turn_ends_tick'] if 'lost' in episode else 0
+                if episode['kind'] in ('color_first','shape_first','lost') and start<=meta['step']<start+args.probe_steps:hidden.append((sample,episode))
+            if episode['kind'] in ('swap','query') and meta['step']<args.probe_steps and meta['target_visible']:shown.append((sample,episode))
+        rows={'color_first':[],'shape_first':[],'lost':[]}
+        for sample,episode in hidden:
+            text=sample['instruction'].replace('<image>'+chr(10),'',1);own=first(sample,text);other=first(sample,f'Find {catalogue[episode["distractor"]]["noun"]}.')
+            rows[episode['kind']].append({'own':behaviour(own,config),'other':behaviour(other,config),'difference':sum(abs(a-b) for a,b in zip(own,other))/3})
+        twins=[]
+        for sample,episode in shown:
+            base=episodes[episode['twin_of']];unseen=base['target'] if episode['kind']=='query' else base['distractor']
+            text=sample['instruction'].replace('<image>'+chr(10),'',1);own=first(sample,text);other=first(sample,f'Find {catalogue[unseen]["noun"]}.')
+            twins.append({'own':behaviour(own,config),'other':behaviour(other,config),'difference':sum(abs(a-b) for a,b in zip(own,other))/3})
+        result[split]={'related_object_in_view_named_one_not':{**{kind:part(items,'turn','advance') for kind,items in rows.items()},
+                                                               'all':part([r for items in rows.values() for r in items],'turn','advance')},
+                       'named_object_in_view':part(twins,'advance','turn')}
+    print(json.dumps(result,indent=1))
+    if args.output:Path(args.output).write_text(json.dumps(result,indent=1))
+
+
 def verify(args):
     saved=json.loads((Path(args.verify)/'manifest.json').read_text())
     config=saved['config'];model=AeroVLAOFT(MANIFEST,config,checkpoint=args.verify)
@@ -301,8 +390,15 @@ if __name__=='__main__':
     parser.add_argument('--probe-samples',type=int,default=60)
     parser.add_argument('--boost',nargs='*',default=[],help='NAME=FACTOR: draw these frames more often (small_visible, landing)')
     parser.add_argument('--select-band',type=float,default=0.,help='relative band above the lowest validation L1 inside which the behaviour score decides')
+    parser.add_argument('--share',nargs='*',default=[],help='SOURCE=FRACTION: frames of this source dataset (a folder beside the dataset) make up this share of the draws')
+    parser.add_argument('--breakdown',help='checkpoint whose first actions are compared with the teacher by kind of episode; --output then names a JSON file')
+    parser.add_argument('--source',help='with --breakdown: only frames of this source dataset')
+    parser.add_argument('--negative-probe',help='checkpoint shown the hard-negative frames with two sentences; --dataset is the folder of those episodes; --output names a JSON file')
+    parser.add_argument('--probe-steps',type=int,default=3,help='with --negative-probe: decisions taken from the start of an episode (or from the end of its forced turn)')
     arguments=parser.parse_args()
-    if arguments.probe:probe(arguments)
+    if arguments.breakdown:breakdown(arguments)
+    elif arguments.negative_probe:negative_probe(arguments)
+    elif arguments.probe:probe(arguments)
     elif arguments.score:score(arguments)
     elif arguments.verify:verify(arguments)
     else:train(arguments)

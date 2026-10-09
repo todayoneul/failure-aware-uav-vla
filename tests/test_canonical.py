@@ -115,7 +115,7 @@ class LandingReadingTests(unittest.TestCase):
         cls.runner=visual_search
         cls.flight=[step(30.,forward=1.,epoch=0.),step(10.,forward=1.,epoch=.5),step(2.,over=True,epoch=1.),step(1.,over=True,height=4.,epoch=1.5)]+\
                    [step(1.,over=True,height=2.5,landed=True,epoch=2.+index*.5) for index in range(4)]
-        cls.down={'object':'blue_pad','offset_m':[.6,-.8],'position':[0,0,0],'time_stamp':1}
+        cls.down={'object':'blue_pad','offset_m':[.6,-.8],'position':[0.,0.,-2.5],'time_stamp':1}
         cls.latched={'active':True,'state':'DISARMED','path':list(STATES),'touchdown_detected':True,'stable_contact_detected':True,'finalizer_triggered':True,
                      'disarm_triggered':True,'touchdown_velocity_mps':.4,'horizontal_velocity_mps':0.,'stable_duration_s':1.5}
 
@@ -168,6 +168,107 @@ class LandingReadingTests(unittest.TestCase):
         self.assertEqual((unlatched['failure'],unlatched['mechanism']),('FINALIZER','did not latch'))
         bounced=read(dict(legacy,finalizer=self.latched,touchdown_success=True,stable_physical_landing=False,system_land_success=False),rows,CONFIG['success_radius_m'],LANDING,{},{})
         self.assertEqual(bounced['failure'],'PHYSICAL_LANDING')
+
+
+class EvaluatorV2Tests(unittest.TestCase):
+    """canonical_evaluator_v2: a stable landing is read from the contact and the vehicle's positions, not from the reported speed."""
+    @classmethod
+    def setUpClass(cls):
+        try:
+            from scripts import visual_search
+        except ImportError as error:raise unittest.SkipTest(f'simulator client not installed here: {error}')
+        cls.runner=visual_search;cls.rule=LANDING['evaluator']
+        cls.latched={'active':True,'state':'DISARMED','path':list(STATES),'touchdown_detected':True,'stable_contact_detected':True,'finalizer_triggered':True,
+                     'disarm_triggered':True,'touchdown_velocity_mps':.5,'horizontal_velocity_mps':0.,'stable_duration_s':1.5}
+        cls.down={'object':'blue_pad','offset_m':[.6,-.8],'position':[0.,0.,-2.5],'time_stamp':1}
+        # Coming in, coming down, then four decisions on the pad. The reported vertical speed never settles (0.08 m/s) and the
+        # legacy flag `landed` is never set, exactly as in the two recorded flights.
+        cls.approach=[step(30.,forward=1.,epoch=0.),step(10.,forward=1.,epoch=.5),step(2.,over=True,epoch=1.),step(1.,over=True,height=3.1,epoch=1.5)]
+        cls.rest=[dict(step(1.,over=True,height=2.5,epoch=2.+index*.5),velocity=[0.,0.,.08]) for index in range(4)]
+
+    def read(self,steps,stopped=True,touchdown='own',finalizer='latched',hit=None,task='land',reason='landed',landing=None):
+        episode={'id':'e','target':'blue_pad','task':task}
+        return self.runner.summarise(episode,steps,CONFIG,reason,stopped,{'red_pad':42.},landing or LANDING,self.down if touchdown=='own' else touchdown,hit,
+                                     self.latched if finalizer=='latched' else finalizer)
+
+    def test_the_thresholds_are_in_the_rule_and_the_finalizer_is_as_it_was(self):
+        self.assertEqual(self.rule['version'],'canonical_evaluator_v2')
+        self.assertEqual((self.rule['stable_position_window_steps'],self.rule['stable_horizontal_displacement_m'],self.rule['stable_vertical_displacement_m'],
+                          self.rule['surface_height_tolerance_m']),(3,.05,.05,.05))
+        self.assertEqual({key:RULE[key] for key in ('descent_down_m','descent_window','max_vertical_mps','max_horizontal_mps','height_tolerance_m','leave_m','stable_decisions')},
+                         {'descent_down_m':.08,'descent_window':6,'max_vertical_mps':.1,'max_horizontal_mps':.1,'height_tolerance_m':.05,'leave_m':.15,'stable_decisions':3})
+
+    def test_a_vehicle_standing_still_with_a_noisy_reported_speed_has_landed(self):
+        result=self.read(self.approach+self.rest)
+        self.assertEqual(result['evaluator'],'canonical_evaluator_v2')
+        self.assertTrue(result['physical_landing'] and result['touchdown_success'] and result['stable_physical_landing'] and result['system_land_success'] and result['success'])
+        self.assertEqual((result['standing']['decisions'],result['standing']['horizontal_m'],result['standing']['vertical_m']),(3,0.,0.))
+        # The legacy reading of the same log is kept beside it and still says no.
+        self.assertFalse(result['legacy_evaluator']['stable_physical_landing'] or result['legacy_evaluator']['system_land_success'])
+        # The speed of the contact is what the vehicle was doing at the last decision before it stood on the pad.
+        self.assertEqual((result['touchdown']['step'],result['touchdown']['vertical_speed_mps']),(4,.4))
+
+    def test_the_two_recorded_landings_the_legacy_reading_missed(self):
+        for item in json.loads((ROOT/'tests/data/noisy_velocity_landings.json').read_text(encoding='utf-8'))['episodes']:
+            episode={'id':item['id'],'target':item['target'],'task':'land'}
+            result=self.runner.summarise(episode,item['steps'],CONFIG,item['reason'],item['stopped'],item['other_objects_m'],LANDING,item['touchdown'],None,item['finalizer'])
+            self.assertFalse(item['recorded']['stable_physical_landing'] or item['recorded']['success'],item['id'])
+            self.assertEqual(result['legacy_evaluator']['stable_physical_landing'],item['recorded']['stable_physical_landing'],item['id'])
+            self.assertTrue(result['stable_physical_landing'] and result['system_land_success'] and result['success'],item['id'])
+            self.assertLess(result['standing']['vertical_m'],.001,item['id']);self.assertLess(result['standing']['horizontal_m'],.001,item['id'])
+            self.assertTrue(.4<abs(result['touchdown']['vertical_speed_mps'])<=LANDING['touchdown']['max_vertical_speed_mps'],item['id'])
+
+    def test_on_the_pad_but_still_moving_is_not_a_stable_landing(self):
+        sliding=[dict(row,position=[.2*index,0.,-2.5]) for index,row in enumerate(self.rest)]
+        result=self.read(self.approach+sliding)
+        self.assertTrue(result['touchdown_success']);self.assertFalse(result['physical_landing'] or result['stable_physical_landing'] or result['system_land_success'] or result['success'])
+        creeping=[dict(row,position=[0.,0.,-2.5-.04*index]) for index,row in enumerate(self.rest)]
+        self.assertFalse(self.read(self.approach+creeping)['stable_physical_landing'])
+        # One decision is not a window, and a vehicle that left the surface again has not landed.
+        self.assertFalse(self.read(self.approach+self.rest[:2])['stable_physical_landing'])
+        hopped=self.rest+[dict(step(1.,over=True,height=3.,epoch=4.),velocity=[0.,0.,0.])]
+        self.assertFalse(self.read(self.approach+hopped)['stable_physical_landing'])
+        just_inside=[dict(row,position=[.02*index,0.,-2.5]) for index,row in enumerate(self.rest)]
+        self.assertTrue(self.read(self.approach+just_inside)['stable_physical_landing'])
+
+    def test_a_stable_landing_on_the_wrong_pad_is_a_physical_landing_and_a_failed_task(self):
+        result=self.read(self.approach+self.rest,touchdown=dict(self.down,object='red_pad'))
+        self.assertTrue(result['physical_landing'] and result['finalizer']['finalizer_triggered'] and result['wrong_target'])
+        self.assertEqual(result['landed_on'],'red_pad')
+        self.assertFalse(result['touchdown_success'] or result['stable_physical_landing'] or result['system_land_success'] or result['success'])
+        # The named pad, outside its landing region; and the named pad with another contact on the way.
+        self.assertFalse(self.read(self.approach+self.rest,touchdown=dict(self.down,offset_m=[6.8,0.]))['success'])
+        struck=self.read(self.approach+self.rest,hit='FieldBarn')
+        self.assertTrue(struck['physical_landing']);self.assertFalse(struck['stable_physical_landing'] or struck['success'])
+
+    def test_a_hover_is_not_a_landing_however_still_it_is(self):
+        hover=[dict(step(1.,over=True,height=2.5,epoch=index*.5),velocity=[0.,0.,0.]) for index in range(6)]
+        result=self.read(hover,touchdown=None,finalizer=dict(self.latched,state='FLYING',finalizer_triggered=False,disarm_triggered=False,touchdown_detected=False),reason='model_stop')
+        self.assertFalse(result['physical_landing'] or result['touchdown_success'] or result['stable_physical_landing'] or result['system_land_success'] or result['success'])
+        self.assertFalse(result['landed']);self.assertTrue(result['strict_policy_zero_action'] is False)
+
+    def test_an_approach_mission_has_no_finalizer_and_no_landing_reading(self):
+        finalizer=LandingFinalizer(RULE,APPROACH);self.assertFalse(finalizer.active)
+        stopped=[step(30.,forward=1.,epoch=0.),step(14.,epoch=.5),step(13.,epoch=1.),step(13.,epoch=1.5)]
+        result=self.read(stopped,touchdown=None,finalizer=finalizer.report(),task='approach',reason='model_stop')
+        self.assertTrue(result['success']);self.assertNotIn('system_land_success',result);self.assertNotIn('physical_landing',result)
+        # An approach flight that touched down on the pad has not done what it was asked.
+        self.assertFalse(self.read(self.approach+self.rest,finalizer=finalizer.report(),task='approach',reason='model_stop')['success'])
+
+    def test_a_stable_contact_latched_and_disarmed_is_the_systems_landing(self):
+        own=self.read(self.approach+self.rest);self.assertTrue(own['system_land_success']);self.assertFalse(own['finalizer_rescued_success'])
+        rescued=self.read(self.approach+self.rest,stopped=False)
+        self.assertTrue(rescued['system_land_success'] and rescued['success'] and rescued['finalizer_rescued_success']);self.assertFalse(rescued['strict_policy_zero_action'])
+        for missing in ('finalizer_triggered','disarm_triggered'):
+            result=self.read(self.approach+self.rest,finalizer=dict(self.latched,**{missing:False}))
+            self.assertTrue(result['stable_physical_landing']);self.assertFalse(result['system_land_success'] or result['success'])
+
+    def test_a_run_without_the_contacts_position_or_without_the_rule_is_read_the_old_way(self):
+        old_rule={key:value for key,value in LANDING.items() if key!='evaluator'}
+        flagged=self.approach+[dict(row,landed=True) for row in self.rest]
+        for result in (self.read(flagged,landing=old_rule),self.read(flagged,touchdown={key:value for key,value in self.down.items() if key!='position'})):
+            self.assertNotIn('evaluator',result);self.assertNotIn('physical_landing',result);self.assertTrue(result['stable_physical_landing'] and result['system_land_success'])
+        self.assertFalse(self.read(self.approach+self.rest,landing=old_rule)['stable_physical_landing'])
 
 
 class CanonicalSetTests(unittest.TestCase):

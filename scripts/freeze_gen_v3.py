@@ -105,6 +105,9 @@ def read(episode,rows,radius,landing,geometries,maps):
             'touchdown_inside':down.get('inside_region'),'touchdown_soft':down.get('soft'),
             'finalizer_active':bool(finalizer.get('active')),'touchdown_success':episode.get('touchdown_success'),
             'stable_physical_landing':episode.get('stable_physical_landing'),'system_landing':episode.get('system_land_success'),
+            # From evaluator v2 on: standing still on a pad whichever pad it is, and which reading the run was recorded with.
+            'physical_landing':episode.get('physical_landing'),'evaluator':episode.get('evaluator','legacy') if task=='land' else None,
+            'finalizer_rescued_success':episode.get('finalizer_rescued_success'),
             'strict_policy_zero_action':episode.get('strict_policy_zero_action',bool(landed and episode.get('landed_on')==target and episode['stopped'])) if task=='land' else None,
             'finalizer_triggered':finalizer.get('finalizer_triggered'),'disarm_triggered':finalizer.get('disarm_triggered'),
             'stable_duration_s':finalizer.get('stable_duration_s'),'finalizer_state':finalizer.get('state')}

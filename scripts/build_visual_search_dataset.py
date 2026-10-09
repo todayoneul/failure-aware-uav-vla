@@ -95,7 +95,8 @@ def collisions(records):
                               record['summary']['target'] if record['summary'].get('twin_of') else None)
                              for record in records if 'split' in record['summary']),
             'folders':repeated(record['traj_rel_dir'] for record in records),
-            'starts':repeated(tuple(record['summary']['start_xy'])+(record['summary']['target'],record['summary'].get('task','approach'))
+            # ... and a start flown again in the layout that exchanges two objects shares everything but the layout.
+            'starts':repeated(tuple(record['summary']['start_xy'])+(record['summary']['target'],record['summary'].get('task','approach'),record['summary'].get('layout'))
                               for record in records if 'start_xy' in record['summary'])}
 
 

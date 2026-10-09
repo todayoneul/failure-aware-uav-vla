@@ -39,6 +39,15 @@
     "glide_down_m": 0.25
   },
   "after_touchdown_ticks": 20,
+  "evaluator": {
+    "version": "canonical_evaluator_v2",
+    "description": "How a stable physical landing is read from a flight's log, from Gen-v3c on (docs/gen_v3c_hard_negative_grounding.md). The first reading asked for a reported vertical speed of at most 0.05 m/s at each decision; in two of 24 landings of the canonical validation run the simulator kept reporting 0.04-0.095 m/s for a vehicle whose position did not change by a millimetre, and both were counted as not stable. This reading uses positions only: the contact on a pad from above (touchdown), the last `stable_position_window_steps` decisions all at the contact's height, and no more movement between them than the two displacement limits. Which pad it is, the landing region and the speed of the contact are judged separately, as before. Fixed before any flight was judged with it; earlier runs keep the reading they were recorded with.",
+    "stable_position_window_steps": 3,
+    "stable_horizontal_displacement_m": 0.05,
+    "stable_vertical_displacement_m": 0.05,
+    "surface_height_tolerance_m": 0.05,
+    "from": "measured over windows of three decisions in 63 teacher landings and 24 landings of the model (canonical validation and test starts, 194 windows of a standing vehicle): standing, at most 0.0000 m horizontally and 0.0003 m vertically; a window that still holds the last decision of the descent, up to 0.20 m vertically; the final descent, at least 0.45 m vertically. 0.05 m is more than a hundred times the first and a ninth of the last, and is what the finalizer's own limit (0.1 m/s) allows in one decision. A vehicle hovering at an approach stop moved 0.001-0.05 m vertically and 0.2-1.4 m horizontally in such a window, so stillness alone does not tell a hover from a landing; the contact and the height do."
+  },
   "finalizer": {
     "description": "Low-level end of a landing (src/visual_search/finalizer.py), active only when the sentence asks for a landing. It latches LANDED after a contact made while descending has stayed still for `stable_decisions` decisions, then passes no motion command on and disarms. It reads the contact report and the vehicle's own positions; it is not told what the vehicle stands on. Fixed before any flight was judged with it.",
     "descent_down_m": 0.08,
