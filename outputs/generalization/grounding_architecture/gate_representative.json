@@ -1,0 +1,71 @@
+{
+ "gate": "representative",
+ "run": "outputs/visual_search/arch_film_validation",
+ "passed": true,
+ "checks": [
+  {
+   "check": "flights",
+   "value": 36,
+   "needs": ">= 30",
+   "passed": true
+  },
+  {
+   "check": "success rate",
+   "value": 0.944,
+   "needs": ">= 0.8",
+   "passed": true
+  },
+  {
+   "check": "landing success rate (system: stable physical landing on the named pad, latched and disarmed)",
+   "value": 0.926,
+   "needs": ">= 0.75",
+   "passed": true
+  },
+  {
+   "check": "grounded when the target came into view",
+   "value": 1.0,
+   "needs": ">= 0.9",
+   "passed": true
+  },
+  {
+   "check": "end of flight as the sentence asked",
+   "value": 0.972,
+   "needs": ">= 0.9",
+   "passed": true
+  },
+  {
+   "check": "flights that ended at a wrong object",
+   "value": 2,
+   "needs": "<= 2",
+   "passed": true
+  },
+  {
+   "check": "collisions",
+   "value": 0,
+   "needs": "<= 1",
+   "passed": true
+  },
+  {
+   "check": "episodes with a runner error",
+   "value": 0,
+   "needs": "<= 0",
+   "passed": true
+  }
+ ],
+ "flights": 36,
+ "success": 34,
+ "landings": 27,
+ "landing_success": 25,
+ "approaches": 9,
+ "approach_success": 9,
+ "grounded": 34,
+ "in_view": 34,
+ "terminal_as_asked": 35,
+ "wrong_target": 2,
+ "collisions": 0,
+ "left_out_because_the_teacher_did_not_finish": [],
+ "failures": {
+  "av-24172-blue_pad-near_pair-swapped": "SEARCH (stopped by itself)",
+  "av-24267-red_pad-far_red_past": "SEARCH (stopped by itself)"
+ }
+}

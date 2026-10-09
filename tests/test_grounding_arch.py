@@ -70,6 +70,43 @@ class PilotSetTests(unittest.TestCase):
             self.assertFalse(set(ARCH['layouts'][name])&(set(V3C['train_layouts'][name])|set(CONFIG['gen_v3']['train_layouts'][name])|set(CONFIG['canonical']['test_layouts'][name])))
 
 
+class ValidationSetTests(unittest.TestCase):
+    """The fresh validation set of the pilot's best checkpoint: the Gen-v3c make-up, new seeds, new starts."""
+    @classmethod
+    def setUpClass(cls):
+        if not grounding_arch.FILES['validation'].exists():raise unittest.SkipTest('no architecture went on to a validation set')
+        cls.episodes=json.loads(grounding_arch.FILES['validation'].read_text(encoding='utf-8'))['episodes']
+
+    def test_the_file_is_reproduced_exactly_by_its_generator(self):
+        self.assertEqual(grounding_arch.build_validation(CONFIG,OFT),self.episodes)
+
+    def test_it_has_the_canonical_make_up_and_its_own_seeds_and_starts(self):
+        before=json.loads(gen_v3c.FILES['validation'].read_text(encoding='utf-8'))['episodes'];low,high=ARCH['seeds']['validation']
+        self.assertEqual(len(self.episodes),36);self.assertEqual(sorted(e['role'] for e in self.episodes),sorted(e['role'] for e in before))
+        self.assertEqual(sum(e['task']=='land' for e in self.episodes),27);self.assertFalse({e['id'] for e in self.episodes}&{e['id'] for e in before})
+        for band,span in V3C['bands_m'].items():self.assertEqual(sum(e['band']==band for e in self.episodes),12)
+        earlier=grounding_arch.earlier_points(grounding_arch.FILES['pilot'])
+        for e in self.episodes:
+            self.assertTrue(low<=e['seed']<=high);self.assertLessEqual(e['start_distance_m'],V3C['max_start_m']);self.assertIn(e['layout'],V3C['validation_layouts'][e['map']])
+            self.assertNotIn('kick',e);self.assertTrue(e['id'].startswith('av-'))
+            if 'twin_of' not in e:self.assertGreaterEqual(min(math.dist(e['start_xy'],xy) for where,xy in earlier if where==e['map']),ARCH['separation_m'],e['id'])
+        pilot=json.loads(grounding_arch.FILES['pilot'].read_text(encoding='utf-8'))['episodes'][0];self.assertIn((pilot['map'],pilot['start_xy']),earlier)
+
+    def test_the_smoke_starts_and_the_starts_flown_twice(self):
+        chosen=canonical.smoke_ids(CONFIG,self.episodes);by_id={e['id']:e for e in self.episodes}
+        self.assertEqual(len(set(chosen)),10);self.assertEqual(sum(by_id[i]['task']=='land' for i in chosen),7)
+        critical=grounding_arch.critical_ids(self.episodes);self.assertTrue(12<=len(critical)<=20)
+        for name in critical:
+            e=by_id[name];self.assertGreater(e['plan']['acquired_tick'],0)
+            self.assertTrue(any(gen_v3c.relation_of(SCENES[e['map']],e['target'],item['name']) for item in e['others_in_view']))
+        self.assertTrue({e['role'] for e in self.episodes if e['id'] in critical}>={'past_color','past_shape','red_past','swap'})
+
+    def test_what_was_decided_after_the_pilot_is_written_down_and_changes_no_number(self):
+        outcome=ARCH['outcome'];self.assertIn('not credited to FiLM',outcome['control']);self.assertIn('not as evidence for the architecture',outcome['what_goes_on'])
+        self.assertEqual(ARCH['validation']['gates'],'gen_v3c.gates')
+        self.assertEqual({k:v for k,v in V3C['gates']['representative'].items() if k!='what'},{k:v for k,v in CONFIG['canonical']['gates']['representative'].items() if k!='what'})
+
+
 class PilotLineTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

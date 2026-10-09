@@ -1,0 +1,141 @@
+{
+ "paths": [
+  "outputs/aerovla_oft/checkpoints/grounding_film",
+  "configs/targets",
+  "configs/visual_search.json",
+  "configs/aerovla_oft.json",
+  "configs/maps",
+  "configs/gen_v3_canonical_44m_test.json",
+  "configs/grounding_architecture_validation.json",
+  "configs/grounding_architecture_pilot.json",
+  "src/visual_search/finalizer.py",
+  "src/visual_search/maps.py",
+  "src/visual_search/generalization.py",
+  "src/aerovla_oft/model.py",
+  "src/aerovla_oft/spec.py",
+  "scripts/visual_search.py",
+  "scripts/run_visual_search.ps1"
+ ],
+ "files": {
+  "outputs/aerovla_oft/checkpoints/grounding_film/head.pt": {
+   "bytes": 76227981,
+   "sha256": "bd038bae3ce1b64415f949ebf821bd6baffabfb7d4cdb31819ccc8d7e2b306f6"
+  },
+  "outputs/aerovla_oft/checkpoints/grounding_film/last/head.pt": {
+   "bytes": 76227981,
+   "sha256": "7a221ce41377407e07017d7a642c1c451e063e088bc5c19a1d6351e024ba8fe8"
+  },
+  "outputs/aerovla_oft/checkpoints/grounding_film/last/manifest.json": {
+   "bytes": 50670,
+   "sha256": "6aa1ada73d05c8677b06d0036198b75cf4e888955732f50fb5681645c343274c"
+  },
+  "outputs/aerovla_oft/checkpoints/grounding_film/last/oft/adapter_config.json": {
+   "bytes": 976,
+   "sha256": "0129c55904830b6293745f029ddfdb9749cd7b6ab30c0d583d5b929ee48bd401"
+  },
+  "outputs/aerovla_oft/checkpoints/grounding_film/last/oft/adapter_model.safetensors": {
+   "bytes": 159974600,
+   "sha256": "fbb5b0b140c04f1136de9b999bcbdab16ee1bb8ef917d4b8e8fe3b70ea74ef77"
+  },
+  "outputs/aerovla_oft/checkpoints/grounding_film/last/README.md": {
+   "bytes": 5189,
+   "sha256": "b847e61dade206934bfb8372a78769c57804c79a3c89cfce93dc7017df62d245"
+  },
+  "outputs/aerovla_oft/checkpoints/grounding_film/manifest.json": {
+   "bytes": 53089,
+   "sha256": "a8f2382bb4afe65a784ad99ea5f428d2933d46866ef6571001cb62a5e9640a0c"
+  },
+  "outputs/aerovla_oft/checkpoints/grounding_film/oft/adapter_config.json": {
+   "bytes": 976,
+   "sha256": "0129c55904830b6293745f029ddfdb9749cd7b6ab30c0d583d5b929ee48bd401"
+  },
+  "outputs/aerovla_oft/checkpoints/grounding_film/oft/adapter_model.safetensors": {
+   "bytes": 159974600,
+   "sha256": "1f0fb6eb453631078c969290c324ebe1e3dabc0dca03c31d5c159715adfbaa31"
+  },
+  "outputs/aerovla_oft/checkpoints/grounding_film/README.md": {
+   "bytes": 5189,
+   "sha256": "b847e61dade206934bfb8372a78769c57804c79a3c89cfce93dc7017df62d245"
+  },
+  "configs/targets/landing_pads.json": {
+   "bytes": 5353,
+   "sha256": "93b49acd269c2de411431f452bb50d119213fbdcc08824e482ea5b8c7f6b32d3"
+  },
+  "configs/targets/objects.json": {
+   "bytes": 3073,
+   "sha256": "3d821306b2a34869e4babf9f042a93dea1884698fa52c4c4115e5d8d5921b8e2"
+  },
+  "configs/visual_search.json": {
+   "bytes": 30456,
+   "sha256": "991349b09d35a5652dc1f86574bb4b32d1e788086ba351fc8b32b189198b37ab"
+  },
+  "configs/aerovla_oft.json": {
+   "bytes": 996,
+   "sha256": "ebebf4913c5d62d65c5edb85a32dab2c021c6984f93e4ed28f07b0cb50971bf8"
+  },
+  "configs/maps/blocks.json": {
+   "bytes": 3115,
+   "sha256": "f1c488463960ee69d12d30220ff9c608d359fda4a08743716b352a6bbb87c6ce"
+  },
+  "configs/maps/blocks.obstacles.json": {
+   "bytes": 10914,
+   "sha256": "798ded91b8594b10c0c42428ea1a348edc9528e5562a28c72601edda6fbc7f8c"
+  },
+  "configs/maps/depot.json": {
+   "bytes": 3980,
+   "sha256": "973925aa168cf96fd40b073049ca26d47c3c95e05aa307d21206313bc2dc8d8a"
+  },
+  "configs/maps/field.json": {
+   "bytes": 6826,
+   "sha256": "f312ebee1938611c6831d4ec455f4f3dd72394d28dd61b1e71faf039dcfd19c7"
+  },
+  "configs/maps/lot.json": {
+   "bytes": 6715,
+   "sha256": "6c111d9ab611169f87c99ef6a5fe6b11a644fef6ae92cb310de2497473b44bc9"
+  },
+  "configs/maps/yard.json": {
+   "bytes": 3616,
+   "sha256": "d038060496f12a47182034bc647840dc5642e5b78173cccf7c65ab4e5d59d67f"
+  },
+  "configs/gen_v3_canonical_44m_test.json": {
+   "bytes": 54879,
+   "sha256": "1a77849f73d2809d6fcac00a4d2e79e63eb905d57408ec52c08a59822eeaa939"
+  },
+  "configs/grounding_architecture_validation.json": {
+   "bytes": 42761,
+   "sha256": "61b836c7192a461ba8fb4374007853b484e3eb122b4e58a1f6c778e7f88b26be"
+  },
+  "configs/grounding_architecture_pilot.json": {
+   "bytes": 22336,
+   "sha256": "60cd2f24011761667c5949e1fceecc4078ec09deb9307fce6dec7834d328b802"
+  },
+  "src/visual_search/finalizer.py": {
+   "bytes": 5137,
+   "sha256": "45c864f6b7f13675dc0c9c107cf068c8204c19032c0aeda5ce5e0288d2aa1aaa"
+  },
+  "src/visual_search/maps.py": {
+   "bytes": 11257,
+   "sha256": "020d9c31b53fa6a7615ea7f07760547bf0fee8d1d6d5ac7d8f5204b77d32c3b5"
+  },
+  "src/visual_search/generalization.py": {
+   "bytes": 29542,
+   "sha256": "f39fc585cae238802d7123d406ae438b8f2c1214561f6de8094bd5e00e300909"
+  },
+  "src/aerovla_oft/model.py": {
+   "bytes": 18111,
+   "sha256": "0aad6d24c279354cccdac41656acaf2ca6699a68307d7013bedf8fb9e59d115a"
+  },
+  "src/aerovla_oft/spec.py": {
+   "bytes": 3973,
+   "sha256": "1762cb9b09686053e12ebaac8aa9612f30f5edd75198ddd1646fc016b48b2123"
+  },
+  "scripts/visual_search.py": {
+   "bytes": 44287,
+   "sha256": "4bfaaa9d2e76dd603e093debde6a3188ab34046945fbbc692ade9be95e1d9088"
+  },
+  "scripts/run_visual_search.ps1": {
+   "bytes": 6327,
+   "sha256": "144cc83cc5272aac9ae904c60613935bb5051decd082bd9afd3cd1064790ba0f"
+  }
+ }
+}
