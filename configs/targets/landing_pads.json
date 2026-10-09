@@ -38,5 +38,18 @@
     "glide_height_m": 7.0,
     "glide_down_m": 0.25
   },
-  "after_touchdown_ticks": 20
+  "after_touchdown_ticks": 20,
+  "finalizer": {
+    "description": "Low-level end of a landing (src/visual_search/finalizer.py), active only when the sentence asks for a landing. It latches LANDED after a contact made while descending has stayed still for `stable_decisions` decisions, then passes no motion command on and disarms. It reads the contact report and the vehicle's own positions; it is not told what the vehicle stands on. Fixed before any flight was judged with it.",
+    "descent_down_m": 0.08,
+    "descent_from": "a commanded descent larger than the policy's own stop band on the down axis (8 % of its 1.0 m range)",
+    "descent_window": 6,
+    "max_vertical_mps": 0.1,
+    "max_horizontal_mps": 0.1,
+    "speed_from": "measured over one decision from the vehicle's positions. In 61 recorded teacher landings the vehicle moved at most 0.029 m/s vertically and 0.0 m/s horizontally while standing on a pad, and descended at a median of 0.51 m/s; 0.1 m/s is three times the first and a fifth of the second",
+    "height_tolerance_m": 0.05,
+    "leave_m": 0.15,
+    "stable_decisions": 3,
+    "stable_from": "three decisions in a row, one second between the first and the last"
+  }
 }

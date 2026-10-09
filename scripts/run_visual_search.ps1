@@ -1,4 +1,4 @@
-param([ValidateSet('baseline','teacher','oft')][string]$Policy='baseline',[string]$Checkpoint='',[string[]]$Cases=@('A','B','C'),[string[]]$Targets=@('blue_cone','orange_ball'),[ValidateRange(1,200)][int]$Episodes=2,[int]$SeedStart=0,[string]$Output='outputs/visual_search/run',[string]$Record='',[switch]$Resume,[switch]$Live,[string]$Distro='Ubuntu',[switch]$ShowSimulator,[string]$Plan='',[string]$Set='',[string[]]$Only=@(),[int]$Skip=0,[int]$Limit=0,[string]$Layout='',[string]$Strategy='',[ValidateSet('step','continuous')][string]$Flight='step',[string]$ModelName='',[int]$TopicsPort=8989,[int]$ServicesPort=8990,[switch]$PilotVerbs,[string]$Named='')
+param([ValidateSet('baseline','teacher','oft')][string]$Policy='baseline',[string]$Checkpoint='',[string[]]$Cases=@('A','B','C'),[string[]]$Targets=@('blue_cone','orange_ball'),[ValidateRange(1,200)][int]$Episodes=2,[int]$SeedStart=0,[string]$Output='outputs/visual_search/run',[string]$Record='',[switch]$Resume,[switch]$Live,[string]$Distro='Ubuntu',[switch]$ShowSimulator,[string]$Plan='',[string]$Set='',[string[]]$Only=@(),[int]$Skip=0,[int]$Limit=0,[string]$Layout='',[string]$Strategy='',[ValidateSet('step','continuous')][string]$Flight='step',[string]$ModelName='',[int]$TopicsPort=8989,[int]$ServicesPort=8990,[switch]$PilotVerbs,[string]$Named='',[ValidateSet('on','off')][string]$Finalizer='on')
 $ErrorActionPreference='Stop'
 # `powershell -File` hands a comma list over as one string.
 $Cases=@($Cases | ForEach-Object { $_ -split ',' } | Where-Object { $_ })
@@ -52,6 +52,8 @@ try {
         $taskArgs+='--targets'; $taskArgs+=$Targets
     }
     if ($ModelName) { $taskArgs+='--model-name'; $taskArgs+=$ModelName }
+    # The low-level landing finalizer is on unless a run asks to fly as before it existed.
+    if ($Finalizer -eq 'off') { $taskArgs+='--finalizer'; $taskArgs+='off' }
     if ($Checkpoint) { $taskArgs+='--checkpoint'; $taskArgs+="$taskWslRoot/$($Checkpoint.Replace('\','/'))" }
     if ($Record) { $taskArgs+='--record'; $taskArgs+="$taskWslRoot/$($Record.Replace('\','/'))" }
     if ($Resume) { $taskArgs+='--resume' }

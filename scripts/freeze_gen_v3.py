@@ -15,7 +15,10 @@ model flew it and whenever, from its step log:
 
 A failed episode gets exactly one stage, the first one it did not pass:
   COLLISION, SEARCH, GROUNDING, WRONG_TARGET, APPROACH, then for an approach STOP and for a landing
-  ALIGNMENT, DESCENT, LANDING.
+  ALIGNMENT, DESCENT, LANDING. A landing flown with the low-level finalizer has, in place of LANDING,
+  PHYSICAL_LANDING (it touched the named pad but did not come to rest on it inside the landing region)
+  and FINALIZER (it rested there and the finalizer did not latch or disarm). Runs from before the
+  finalizer are read exactly as they were.
 
 Output: summary.json, episodes.csv, one csv per table and failures/ (a trace and a picture per failure
 of the models named with --pictures).
@@ -35,7 +38,7 @@ from src.visual_search.maps import load_map,load_landing
 FORWARD_M=.25
 FAR_M=54.
 GROUNDED_STEPS=3
-STAGES=('COLLISION','SEARCH','GROUNDING','WRONG_TARGET','APPROACH','STOP','ALIGNMENT','DESCENT','LANDING')
+STAGES=('COLLISION','SEARCH','GROUNDING','WRONG_TARGET','APPROACH','STOP','ALIGNMENT','DESCENT','LANDING','PHYSICAL_LANDING','FINALIZER')
 GROUNDING_SETS=(('Q1','Basic'),('Q2','Colour distractor'),('Q3','Shape distractor'),('Q4','Position swap'),('Q5','Query swap'),('Q10','Paraphrase (landing)'))
 REGRESSION_SETS=('G1','G3','P','L1','L2','L3')
 
@@ -76,6 +79,8 @@ def read(episode,rows,radius,landing,geometries,maps):
     descended=bool(over) and min(row['height_m'] for row in rows[over[0]:])<=rows[over[0]]['height_m']-stage['descent_started_m']
     # Stopped in the air without having come down over a pad: what an approach asks for.
     hovered=bool(episode['stopped'] and not landed and not descended)
+    # The three readings of a landing and the system's result; absent in runs from before the finalizer.
+    finalizer=episode.get('finalizer') or {}
     scene=maps.setdefault(episode.get('map','blocks'),load_map(episode.get('map','blocks')));objects=scene['objects']
     def relation(name):
         if name is None:return 'none'
@@ -97,7 +102,12 @@ def read(episode,rows,radius,landing,geometries,maps):
             'touchdown_error_m':None if not down else round(down['horizontal_error_m'],2),
             'touchdown_vertical_mps':None if not down else round(abs(down['vertical_speed_mps']),2),
             'touchdown_horizontal_mps':None if not down else round(down['horizontal_speed_mps'],2),
-            'touchdown_inside':down.get('inside_region'),'touchdown_soft':down.get('soft')}
+            'touchdown_inside':down.get('inside_region'),'touchdown_soft':down.get('soft'),
+            'finalizer_active':bool(finalizer.get('active')),'touchdown_success':episode.get('touchdown_success'),
+            'stable_physical_landing':episode.get('stable_physical_landing'),'system_landing':episode.get('system_land_success'),
+            'strict_policy_zero_action':episode.get('strict_policy_zero_action',bool(landed and episode.get('landed_on')==target and episode['stopped'])) if task=='land' else None,
+            'finalizer_triggered':finalizer.get('finalizer_triggered'),'disarm_triggered':finalizer.get('disarm_triggered'),
+            'stable_duration_s':finalizer.get('stable_duration_s'),'finalizer_state':finalizer.get('state')}
     record['failure'],record['mechanism']=classify(record)
     return record
 
@@ -114,6 +124,10 @@ def classify(r):
     if r['task']=='approach':return 'STOP','landed instead of hovering' if r['landed'] else 'stopped outside the radius' if r['self_stop'] else 'did not stop'
     if not r['aligned']:return 'ALIGNMENT','hovered instead of landing' if r['hovered'] else how
     if not r['touchdown_on_target']:return 'DESCENT','hovered instead of landing' if r['hovered'] else 'did not start' if not r['descent_started'] else how
+    if r.get('finalizer_active'):
+        if not r['stable_physical_landing']:
+            return 'PHYSICAL_LANDING','outside the landing region' if not r['touchdown_inside'] else 'hard touchdown' if not r['touchdown_soft'] else 'did not stay on the pad'
+        return 'FINALIZER','did not latch' if not r['finalizer_triggered'] else 'did not disarm'
     return 'LANDING','no stop after touchdown' if not r['self_stop'] else 'outside the landing region' if not r['touchdown_inside'] else 'hard touchdown'
 
 

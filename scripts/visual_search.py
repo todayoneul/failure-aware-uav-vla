@@ -40,6 +40,7 @@ from src.mission.flight import climb_to
 from src.visual_search.episodes import load_config,make_episode,relative_target,policy_inputs,Teacher
 from src.visual_search.generalization import SearchTeacher,STOP_STATES,Pushes
 from src.visual_search.maps import load_map,MapGeometry,scene_objects,load_landing,owner_of,lighting
+from src.visual_search.finalizer import LandingFinalizer
 from src.visual_search.shapes import mesh
 from src.aerovla_oft.spec import load_config as load_oft_config,proprio_vector,is_stop
 
@@ -104,6 +105,7 @@ class SearchEnv:
         self.client.subscribe(self.drone.robot_info['collision_info'],lambda _,message:self.collisions.append(message))
         self.geometry=MapGeometry(map_config,layout);self.target=episode['target'];ground=map_config['ground_z']
         self.map_config=map_config;self.layout=layout;self.task=episode.get('task','approach');self.scanned=0;self.touchdown=None;self.hit=None
+        self.contact_event=False
         item=self.geometry.objects[self.target];self.surface=item['size_m'][2] if item['landable'] else 0.
         self.corners=[[item['centre'][0]+dx*item['size_m'][0]/2,item['centre'][1]+dy*item['size_m'][1]/2,ground-h*item['size_m'][2]]
                       for dx in (-1,1) for dy in (-1,1) for h in (0,1)]
@@ -126,6 +128,8 @@ class SearchEnv:
         kept with the vehicle's place at that moment. Anything else touched is a collision."""
         tolerance=self.landing['touchdown']['from_above_tolerance_m']
         events=self.collisions[self.scanned:];self.scanned+=len(events)
+        # For the executor: was any contact reported since the last call? What was touched is not passed on to it.
+        self.contact_event=any(event.get('time_stamp',0)>self.flight_stamp for event in events)
         for event in events:
             if event.get('time_stamp',0)<=self.flight_stamp or self.hit:continue
             owner=owner_of(self.map_config,self.layout,event.get('object_name',''))
@@ -208,9 +212,20 @@ class SearchEnv:
             self.drone.disarm();self.drone.disable_api_control()
         except Exception:pass
 
+    def disarm(self):
+        """Motors off after a latched landing. No hover first: the vehicle stands on a surface."""
+        try:
+            self.drone.disarm();self.drone.disable_api_control();return True
+        except Exception:return False
 
-def landing_summary(episode,steps,config,landing,stopped,touchdown,hit,others):
-    """What an episode did about its target and, for a landing, how far through the landing it got."""
+
+def landing_summary(episode,steps,config,landing,stopped,touchdown,hit,others,finalizer=None):
+    """What an episode did about its target and, for a landing, how far through the landing it got.
+
+    A landing is read three ways, kept apart: touchdown (the named pad, inside its landing region, a soft contact),
+    stable physical landing (and standing still on it for the finalizer's duration), and strict policy zero-action
+    (and the policy gave the zero action by itself). With the finalizer in use the result of the mission is the
+    system's: a stable physical landing on the named pad that the finalizer latched and disarmed on."""
     radius=config['success_radius_m'];stage=landing['stages'];rule=landing['touchdown'];task=episode.get('task','approach');last=steps[-1]
     distances=[s['distance_m'] for s in steps];seen=[bool(s['front_seen'] or s['down_seen']) for s in steps]
     # The object the vehicle ended at: the one it stands on, or else the nearest one within the success radius.
@@ -239,10 +254,25 @@ def landing_summary(episode,steps,config,landing,stopped,touchdown,hit,others):
         result['land_success']=bool(down and down['object']==episode['target'] and down['inside_region'] and down['soft'] and stopped and not hit
                                     and last.get('landed'))
         result['stages']['land_success']=result['land_success']
+        rule=landing['finalizer'];on_target=bool(down and down['object']==episode['target'])
+        # Longest stretch of decisions standing still on the pad, from the log alone (not from what the finalizer said).
+        still=best=0
+        for before,after in zip(steps,steps[1:]):
+            dt=max(1e-6,after['epoch']-before['epoch'])
+            slow=math.hypot(after['position'][0]-before['position'][0],after['position'][1]-before['position'][1])/dt<=rule['max_horizontal_mps']
+            still=still+1 if before.get('landed') and after.get('landed') and slow else 0;best=max(best,still)
+        result['touchdown_success']=bool(on_target and down['inside_region'] and abs(down['vertical_speed_mps'])<=landing['touchdown']['max_vertical_speed_mps'])
+        result['stable_physical_landing']=bool(result['touchdown_success'] and best+1>=rule['stable_decisions'] and last.get('landed'))
+        result['strict_policy_zero_action']=bool(on_target and stopped)
+        result['strict_land_success']=result['land_success']
+        if finalizer and finalizer['active']:
+            result['finalizer']=finalizer
+            result['system_land_success']=bool(result['stable_physical_landing'] and finalizer['finalizer_triggered'] and finalizer['disarm_triggered'] and not hit)
+            result['stages']['system_land_success']=result['system_land_success']
     return result
 
 
-def summarise(episode,steps,config,reason,stopped,others=None,landing=None,touchdown=None,hit=None):
+def summarise(episode,steps,config,reason,stopped,others=None,landing=None,touchdown=None,hit=None,finalizer=None):
     distances=[s['distance_m'] for s in steps];first=steps[0];last=steps[-1]
     turns=[s['action'][2] for s in steps if abs(s['action'][2])>1e-3]
     toward=None
@@ -255,12 +285,13 @@ def summarise(episode,steps,config,reason,stopped,others=None,landing=None,touch
     radius=config['success_radius_m'];heights=[s['height_m'] for s in steps]
     # A stop beside another object of the scene, while the named one is out of range.
     wrong=[name for name,distance in (others or {}).items() if stopped and distance<=radius and last['distance_m']>radius]
-    extra=landing_summary(episode,steps,config,landing,stopped,touchdown,hit,others) if landing else {}
+    extra=landing_summary(episode,steps,config,landing,stopped,touchdown,hit,others,finalizer) if landing else {}
     # Approach: stopped by itself in the air within the radius, without having come down over a pad (a forced push aside).
-    # Land: the landing rule (configs/targets/landing_pads.json).
+    # Land: with the finalizer, the system's landing (stable physical landing on the named pad, latched and disarmed);
+    # without it, the strict rule that also needs the policy's own zero action (configs/targets/landing_pads.json).
     came_down=bool(extra and extra['stages']['descent_started'] and not episode.get('pushes'))
-    success=extra['land_success'] if extra.get('task')=='land' else bool(stopped and last['distance_m']<=radius and reason!='collision'
-                                                                         and not extra.get('landed') and not came_down)
+    success=(extra.get('system_land_success',extra['land_success']) if extra.get('task')=='land'
+             else bool(stopped and last['distance_m']<=radius and reason!='collision' and not extra.get('landed') and not came_down))
     return {**episode,**extra,'reason':reason,'stopped':stopped,'steps':len(steps),'initial_distance_m':first['distance_m'],
             'final_distance_m':last['distance_m'],'minimum_distance_m':min(distances),
             'success':success,
@@ -281,6 +312,8 @@ async def run_episode(env,episode,policy,args,record):
     planned='strategy' in episode;kick=episode.get('kick');kick_left=0.;altitude_setpoint=None
     teacher=SearchTeacher(config,oft,episode['strategy'],env.ceiling,env.landing) if planned else Teacher(config,oft)
     task=episode.get('task','approach');landed_ticks=0;pushes=Pushes(episode)
+    # The executor's own end of a landing. It is given the sentence and the vehicle's state, never the target.
+    finalizer=LandingFinalizer(env.landing['finalizer'],episode['instruction'],enabled=planned and args.finalizer=='on');executed_down=0.
     frames_dir=(record['root']/record['rel']) if record else None
     if record:
         for name in ('frontcamera','downcamera'):(frames_dir/name).mkdir(parents=True,exist_ok=True)
@@ -291,10 +324,13 @@ async def run_episode(env,episode,policy,args,record):
         if hit:reason='collision';break
         if touchdown:
             # The vehicle stands on a pad and no longer moves; a policy that has not stopped a few decisions later never will.
+            # (With the finalizer latched the landing is already complete; the wait only records whether the policy stops too.)
             landed_ticks+=1
-            if landed_ticks>env.landing['after_touchdown_ticks']:reason='landed_no_stop';break
+            if landed_ticks>env.landing['after_touchdown_ticks']:reason='landed' if finalizer.latched else 'landed_no_stop';break
         observation=env.observe();private=observation['privileged'];state=observation['state']
         resting=env.resting(state);on_pad=resting is not None
+        # Wall-clock time between decisions: the simulator's own state can stand still, stamp included, while the vehicle rests.
+        finalizer.update(state['position'],time.time(),env.contact_event,executed_down)
         proprio=proprio_vector(state,env.ground_z,oft,observation['yaw_rate'])
         inputs=policy_inputs(observation['frames']['front'],observation['frames']['down'],episode['instruction'],
                              proprio if oft['proprio']['enabled'] else None)
@@ -302,7 +338,7 @@ async def run_episode(env,episode,policy,args,record):
               'height_m':private['height_m'],'bearing_deg':private['bearing_deg'],'distance_m':private['distance_m'],
               'front_seen':private['front']['seen'],'front_in_fov':private['front']['in_fov'],'down_seen':private['down']['seen'],
               'front_pixel':private['front']['pixel'],'down_pixel':private['down']['pixel'],'ahead_m':private['ahead_m'],
-              'over':private['over'],'landed':on_pad,'velocity':state['velocity'],'target_size':private['size'],
+              'over':private['over'],'landed':on_pad,'velocity':state['velocity'],'target_size':private['size'],'finalizer':finalizer.state,
               'input_sha256':{name:digest(inputs[name]) for name in ('front','down')},'proprio':proprio}
         perturbed=False
         if args.policy=='baseline':
@@ -353,8 +389,14 @@ async def run_episode(env,episode,policy,args,record):
             halted=is_stop(action,oft) and not perturbed
             stop_count=stop_count+1 if halted else 0
             if stop_count>=config['stop_ticks'] and not pushes.pending():
-                steps.append(step);reason='model_stop' if args.policy=='oft' else 'teacher_stop';stopped=True;break
-            await env.tick(action,observation['yaw'])
+                # The policy's own stop. On a surface the finalizer may be a decision or two from latching; it is given them.
+                stopped=True
+                if finalizer.state!='CONTACT_CANDIDATE':
+                    steps.append(step);reason='landed' if finalizer.latched else 'model_stop' if args.policy=='oft' else 'teacher_stop';break
+            # Once the landing is latched no motion command is passed on, whatever the policy says.
+            executed=finalizer.command(action)
+            step['executed']=list(executed);executed_down=executed[1]
+            await env.tick(executed,observation['yaw'])
             await asyncio.sleep(max(0.,oft['tick_s']-(time.monotonic()-started)))
         steps.append(step)
         if args.live:
@@ -369,11 +411,12 @@ async def run_episode(env,episode,policy,args,record):
     touchdown,hit=env.contacts()
     if hit:reason='collision'
     others=env.others(steps[-1]['position']) if steps else None
-    await env.close()
+    if finalizer.latched:finalizer.disarmed(env.disarm())
+    else:await env.close()
     if args.live:
         (Path(args.output)/'live_result.json').write_text(json.dumps({'episode':episode['id'],'reason':reason,'stopped':stopped,
                                                                       'final_distance_m':steps[-1]['distance_m'] if steps else None}))
-    return summarise(episode,steps,config,reason,stopped,others,env.landing,touchdown,hit),steps
+    return summarise(episode,steps,config,reason,stopped,others,env.landing,touchdown,hit,finalizer.report()),steps
 
 
 def planned_episodes(args,config):
@@ -474,6 +517,7 @@ if __name__=='__main__':
     parser.add_argument('--strategy',help='teacher search strategy to use instead of the planned one')
     parser.add_argument('--pilot-verbs',action='store_true',help="word the instruction as the pilot's training data did")
     parser.add_argument('--named',help="control: name this object (or 'another') in the sentence instead of the planned one")
+    parser.add_argument('--finalizer',choices=('on','off'),default='on',help='the low-level landing finalizer for sentences that ask for a landing; off flies as before it existed')
     parser.add_argument('--output',default=str(ROOT/'outputs/visual_search/run'));parser.add_argument('--record',help='dataset root to write teacher episodes into')
     parser.add_argument('--resume',action='store_true');parser.add_argument('--live',action='store_true')
     arguments=parser.parse_args()

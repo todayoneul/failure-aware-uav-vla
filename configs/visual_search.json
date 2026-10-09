@@ -139,5 +139,23 @@
       "far_land_visible": {"base": "visible", "task": "land", "range": "far", "count": [25, 3]},
       "far_land_search": {"base": "search", "task": "land", "range": "far", "count": [25, 3]}
     }
+  },
+  "canonical": {
+    "description": "The canonical clean mission for the failure-aware experiments (docs/canonical_clean_baseline.md): find the blue landing pad and land on it, from at most 44 m. Farther starts are kept as a separate long-range challenge. No model is trained for this; the second Gen-v3 checkpoint is flown as it is, with the low-level landing finalizer. The gates use the validation starts only and their thresholds were fixed before any flight; the test is flown once after they pass and is judged by the representative thresholds.",
+    "mission": "Find the blue landing pad and land on it.",
+    "checkpoint": "outputs/aerovla_oft/checkpoints/generalization_v3b",
+    "max_start_m": 44.0,
+    "bands_m": {"near": [10.0, 20.0], "mid": [20.0, 32.0], "far": [32.0, 44.0]},
+    "band_note": "A start stands at least 5 m clear of every object, the pad included, so the nearest starts are about 12 m from the pad's centre.",
+    "seeds": {"validation": [8500, 8999], "test": [9500, 9999]},
+    "separation_m": 6.0,
+    "past_within_m": 60.0,
+    "validation_layouts": {"field": ["a", "b", "c", "d"], "lot": ["a", "b", "c", "d"]},
+    "test_layouts": {"field": ["g", "h", "i", "j"], "lot": ["g", "h", "i", "j"]},
+    "gates": {
+      "smoke": {"what": "ten validation starts (canonical.smoke_ids)", "episodes": 10, "success_min": 7, "landing_success_min": 1, "far_band_success_min": 1, "collisions_max": 1, "errors_max": 0},
+      "representative": {"what": "every validation start; also the standard the test is read by", "episodes_min": 30, "success_rate_min": 0.8, "landing_success_rate_min": 0.75,
+                         "grounded_rate_min": 0.9, "terminal_as_asked_rate_min": 0.9, "wrong_target_max": 2, "collisions_max": 1, "errors_max": 0}
+    }
   }
 }
