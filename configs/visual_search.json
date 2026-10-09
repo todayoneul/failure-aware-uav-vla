@@ -197,9 +197,9 @@
       }
     },
     "fine_tune": {
-      "description": "Fixed before the run. A correction, not a retraining: the second Gen-v3 checkpoint goes on at a quarter of its learning rate (its own run ended at 2.5e-5 after decaying from 2e-4), for 2,000 updates of 4 frames. Half of the drawn frames come from the added episodes and half from everything the checkpoint was trained on, so that search, plain grounding, approach, landing and the approach-or-land pairs stay in front of it. The checkpoint kept is chosen by the same rule as before, on validation frames that are half new and half old.",
+      "description": "Fixed before the run. A correction, not a retraining: the second Gen-v3 checkpoint goes on at a quarter of its learning rate (its own run ended at 2.5e-5 after decaying from 2e-4), for 2,000 updates of 4 frames. Half of the drawn frames come from the added episodes and half from everything the checkpoint was trained on, so that search, plain grounding, approach, landing and the approach-or-land pairs stay in front of it. The checkpoint kept is chosen by the same rule as before, on validation frames that are half new and half old. Among the added frames, the ones on which the choice of object is made are drawn three times as often: every frame of a hard-negative episode without the named object in view, and the first eight frames of a swap or query twin. They are about a fifth of the added frames, and without this each would be drawn about once. (This weight was added after the plan was committed and before any training; nothing had been trained or flown.)",
       "updates": 2000, "learning_rate": 5e-05, "batch_size": 1, "gradient_accumulation": 4, "eval_every": 250, "eval_samples": 600,
-      "hard_negative_share": 0.5, "boost": {"small_visible": 2}, "balance": 3.0, "select_band": 0.02,
+      "hard_negative_share": 0.5, "boost": {"small_visible": 2, "selection": 3}, "balance": 3.0, "select_band": 0.02,
       "validation_mix": "every validation frame of the added episodes and as many frames of the earlier validation episodes, drawn in proportion to the teacher's states"
     },
     "pilot": {

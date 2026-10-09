@@ -250,6 +250,7 @@ class GateAndFineTuneTests(unittest.TestCase):
             self.assertEqual({k:v for k,v in now[name].items() if k!='what'},{k:v for k,v in before[name].items() if k!='what'})
         tune=V3C['fine_tune'];self.assertEqual((tune['updates'],tune['learning_rate'],tune['hard_negative_share'],tune['batch_size'],tune['gradient_accumulation']),(2000,5e-5,.5,1,4))
         self.assertTrue(1000<=tune['updates']<=3000);self.assertLess(tune['learning_rate'],OFT['train']['learning_rate'])
+        self.assertEqual(tune['boost'],{'small_visible':2,'selection':3})
         self.assertEqual(V3C['start_checkpoint'],CONFIG['canonical']['checkpoint']);self.assertNotEqual(V3C['checkpoint'],V3C['start_checkpoint'])
         self.assertEqual((OFT['chunk_size'],OFT['proprio']['enabled'],OFT['head'].get('output','linear')),(4,False,'linear'))
         self.assertEqual(V3C['max_start_m'],CONFIG['canonical']['max_start_m']);self.assertEqual(V3C['evaluator'],'canonical_evaluator_v2')
@@ -303,6 +304,18 @@ class GateAndFineTuneTests(unittest.TestCase):
         self.assertEqual(frames,{'added':100,'None':900})
         self.assertAlmostEqual(sum(weights[900:])/sum(weights),.5);self.assertAlmostEqual(weights[600]/weights[0],3.);self.assertAlmostEqual(weights[950]/weights[900],2.)
         self.assertRaises(ValueError,apply_shares,samples,[1.]*1000,{'missing':.5});self.assertRaises(ValueError,apply_shares,samples,[1.]*1000,{'added':1.})
+
+    def test_the_frames_the_choice_is_made_on(self):
+        try:
+            from scripts.train_aerovla_oft import BOOSTS
+        except ImportError as error:raise unittest.SkipTest(f'training dependencies not installed here: {error}')
+        chosen=BOOSTS['selection'];meta=lambda case,state,step=20:{'case':case,'teacher_state':state,'step':step}
+        for case in ('color_first','shape_first','lost'):
+            self.assertTrue(chosen(meta(case,'search')));self.assertFalse(chosen(meta(case,'approach')) or chosen(meta(case,'descend')))
+        for case in ('swap','query'):
+            self.assertTrue(chosen(meta(case,'approach',0)) and chosen(meta(case,'align',7)));self.assertFalse(chosen(meta(case,'approach',8)))
+        # Nothing of the earlier data is drawn more often by it.
+        for case in ('search_past','land_past_same_color','query_search-query','land_visible','reacquire','search'):self.assertFalse(chosen(meta(case,'search',0)))
 
     def test_a_layout_swapped_twin_is_not_a_repeat_for_the_merge_and_a_true_repeat_still_is(self):
         from scripts.build_visual_search_dataset import collisions

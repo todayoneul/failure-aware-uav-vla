@@ -33,7 +33,12 @@ MANIFEST=ROOT/'outputs/integration/model-downloads.json'
 AXES=('forward','down','yaw')
 # Frames that can be drawn more often than their share: far, small targets in view, and the last part of a landing.
 BOOSTS={'small_visible':lambda meta:meta.get('size_bucket')=='small' and meta['target_visible'],
-        'landing':lambda meta:meta['teacher_state'] in ('final','descend','landed')}
+        'landing':lambda meta:meta['teacher_state'] in ('final','descend','landed'),
+        # Gen-v3c: the frames on which the choice of object is made. In a hard-negative episode, every frame without the named
+        # object in view (the teacher turns on, whatever else the view holds); in its swap and query twins, the first frames,
+        # where the same view holds the object that is named.
+        'selection':lambda meta:((meta['case'] in ('color_first','shape_first','lost') and meta['teacher_state']=='search')
+                                 or (meta['case'] in ('swap','query') and meta['step']<8))}
 GROUNDING=('advance','turn');TERMINAL=('stop','descend')
 
 
@@ -388,7 +393,7 @@ if __name__=='__main__':
     parser.add_argument('--score',help='checkpoint to evaluate on the validation file; --output then names a JSON file')
     parser.add_argument('--probe',help='checkpoint to show the same frames to with the sentence changed; --output then names a JSON file')
     parser.add_argument('--probe-samples',type=int,default=60)
-    parser.add_argument('--boost',nargs='*',default=[],help='NAME=FACTOR: draw these frames more often (small_visible, landing)')
+    parser.add_argument('--boost',nargs='*',default=[],help='NAME=FACTOR: draw these frames more often (small_visible, landing, selection)')
     parser.add_argument('--select-band',type=float,default=0.,help='relative band above the lowest validation L1 inside which the behaviour score decides')
     parser.add_argument('--share',nargs='*',default=[],help='SOURCE=FRACTION: frames of this source dataset (a folder beside the dataset) make up this share of the draws')
     parser.add_argument('--breakdown',help='checkpoint whose first actions are compared with the teacher by kind of episode; --output then names a JSON file')
