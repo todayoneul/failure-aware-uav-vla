@@ -29,6 +29,9 @@
 | [generalization/flown_g1.jpg](generalization/flown_g1.jpg), `flown_yard.jpg`, `flown_g1_v1_v2.jpg` | 평가 실행의 `steps.jsonl`을 `export_visual_search_media.py flown`으로 그림 | 같은 held-out 시작에서의 실제 궤적: pilot 대 Gen-v1, Yard의 Gen-v1, Gen-v1 대 Gen-v2 |
 | [generalization/search_g1.gif](generalization/search_g1.gif), `reacquire_g1.gif`, `yard_g3.gif`, `climb_g1_v1.gif` | Gen-v1을 `-Record`로 다시 비행한 `g1-0013`, `g1-0030`, `g3-0138`, `g1-0026` | 탐색 → 획득 → 접근, 놓친 뒤 다시 찾기, Yard에서의 성공, 벽을 넘어 올라가 찾기. 2 판단마다 한 장 |
 | [generalization/climb_g1_v2.gif](generalization/climb_g1_v2.gif), `fixed_g1_v2.gif`, `failure_g1_v1.gif` | Gen-v2와 Gen-v1을 같은 시작에서 `-Record`로 비행 | Gen-v2가 벽을 넘어 찾고 10.5m에서 정지. 같은 시작 `g1-0008`에서 Gen-v1은 목표 앞에서 계속 상승(실패), Gen-v2는 15 판단 만에 정지 |
+| [gen_v3/dataset_samples.jpg](gen_v3/dataset_samples.jpg), `plan_depot.jpg`, `plan_field.jpg` | `datasets/projectairsim_visual_search/generalization_v3_added`, `scripts/plan_generalization.py figure --test-file configs/gen_v3_test_spawns.json` | Gen-v3 학습 data의 frame 12개(위 Front, 아래 Down), Depot의 test 시작, Field의 학습 시작과 QS 시작 |
+| [gen_v3/mission_land.gif](gen_v3/mission_land.gif), `land.gif`, `approach.gif`, `two_pads.gif`, `blue_cylinder.gif` | 두 번째 Gen-v3 checkpoint를 검증 시작에서 `-Record`로 비행(`val-5430`, `val-5415`와 그 approach twin, `val-5324`, `val-5402`) | 60m 밖에서 찾아 착륙, 같은 자세의 착륙과 접근, 두 pad 중 지시한 쪽, 다른 물체를 지나 blue cylinder로. 2 판단마다 한 장. test set의 비행이 아님 |
+| [gen_v3/failure_far_blue.gif](gen_v3/failure_far_blue.gif), `failure_no_stop.gif` | 같은 방식(`val-5405`, `val-5418`) | 실패 두 가지: 85m의 blue pad 앞에서 망설임, touchdown 뒤 0 행동을 내지 못함 |
 | [visual_search_dataset/](visual_search_dataset/) | `datasets/projectairsim_visual_search/pilot`에서 sample 3개 | 학습 데이터 예시: `samples.json`(search / approach / stop), `samples.jpg`(각 Front 위·Down 아래), `summary.json`(전체 통계) |
 | [mission_landmark.png](mission_landmark.png) | `outputs/mission_demo/` 대화형 세션의 `current_view.png` | Blue cone landmark 미션: 43 step, 모델 LAND, 착륙, 목표 3.59m |
 

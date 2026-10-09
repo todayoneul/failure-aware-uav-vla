@@ -1,0 +1,5 @@
+model,range,correct_target,approached,aligned,descent_started,touchdown,landing
+Teacher,Near,8/8,8/8,8/8,8/8,8/8,8/8
+Teacher,Medium,8/8,8/8,8/8,8/8,8/8,8/8
+Teacher,Far,8/8,8/8,8/8,8/8,8/8,8/8
+Teacher,All,24/24,24/24,24/24,24/24,24/24,24/24

@@ -51,9 +51,18 @@ G1의 실제 궤적입니다. 위는 Gen-v1, 아래는 Gen-v2이고, 채운 점�
 - **읽을 때 주의할 점.** Yard는 같은 simulator 안에 만든 다른 장면이지 다른 환경이 아닙니다. Gen-v2는 같은 평가 set의 실패를 보고 고친 것이라 새 추정치가 아닙니다. 처음 보는 물체와 44m 이상 먼 시작은 아직 약합니다.
 - **새 장거리 평가(40–90m, 새 seed 36회)에서 Gen-v2는 27/36입니다.** 학습한 장면에서는 70–90m도 6/6이지만 Yard의 56m 이상은 4/12입니다. 목표는 매번 시야에 들어왔고, 실패는 그 목표를 지나치며 계속 회전한 경우입니다. 학습은 하지 않았습니다.
 
+**Gen-v3 (진행 중)** — 목표는 "Find the blue landing pad and land on it."입니다. 색이나 형태가 같은 다른 물체가 있는 장면에서 지시한 물체를 고르고, 찾아가서, 위에서 맞추고, 내려앉는 것까지를 같은 구조(Front/Down RGB와 문장, 전진·하강·yaw)로 학습했습니다. 평가 앞에 둔 gate를 아직 통과하지 못해, 새 held-out 장면(Depot)의 156개 시작은 비행하지 않았습니다.
+
+- ✅ 문장으로 지시한 물체 찾기 — Gen-v1·v2에서 held-out으로 확인
+- ✅ 시작 위치와 장면이 바뀌어도 — Gen-v2에서 확인(먼 시작은 부분적)
+- ◻ 색·형태가 같은 물체 사이의 정확한 선택 — 검증 시작에서 색은 구분, 같은 색 다른 형태는 44m 이하에서만. held-out 미측정
+- ◻ 지시한 pad에 착륙 — 검증 시작 18회 중 touchdown 16회, 규칙 전체 14회. held-out 미측정
+
+같은 자세에서 문장만 바꾸면 끝이 달라집니다: [착륙](outputs/examples/gen_v3/land.gif) · [접근 후 공중 정지](outputs/examples/gen_v3/approach.gif) · [60m 밖에서 찾아 착륙](outputs/examples/gen_v3/mission_land.gif) · [실패: 먼 파란 목표 앞에서 망설임](outputs/examples/gen_v3/failure_far_blue.gif)
+
 GIF: [탐색](outputs/examples/generalization/search_g1.gif) · [놓친 뒤 다시 찾기](outputs/examples/generalization/reacquire_g1.gif) · [Yard](outputs/examples/generalization/yard_g3.gif) · [Gen-v1의 실패](outputs/examples/generalization/failure_g1_v1.gif)와 [같은 시작에서의 Gen-v2](outputs/examples/generalization/fixed_g1_v2.gif) · [pilot 단계의 비행](outputs/examples/visual_search_oft.gif)
 
-문서: [pilot — 구조와 학습 가능성](docs/aerovla_oft.md) · [Gen-v1 — 시작 위치·물체·장면 일반화](docs/aerovla_oft_generalization.md) · [Gen-v2 — 실패 분류와 전환 데이터 보강](docs/aerovla_oft_gen_v2.md) · [장거리 held-out 평가](docs/aerovla_oft_long_range.md)
+문서: [pilot — 구조와 학습 가능성](docs/aerovla_oft.md) · [Gen-v1 — 시작 위치·물체·장면 일반화](docs/aerovla_oft_generalization.md) · [Gen-v2 — 실패 분류와 전환 데이터 보강](docs/aerovla_oft_gen_v2.md) · [장거리 held-out 평가](docs/aerovla_oft_long_range.md) · [Gen-v3 — grounding과 착륙(진행 중)](docs/aerovla_oft_gen_v3.md)
 
 ### 2. 맵에서 목표를 골라 보내기 — Coordinate Goal Mode
 
@@ -115,6 +124,7 @@ GIF: [탐색](outputs/examples/generalization/search_g1.gif) · [놓친 뒤 다�
 | 힌트 없이 찾게 학습시킬 수 있는가 | 이 맵에서는 가능. pilot은 자기 구역에서 23/24 | [AeroVLA-OFT](docs/aerovla_oft.md) |
 | 그 모델은 시작 위치를 외운 것인가 | pilot은 그렇다(처음 보는 시작 4/32). 데이터를 넓힌 Gen-v1은 27/32, 학습하지 않은 장면 19/20 | [일반화](docs/aerovla_oft_generalization.md) |
 | 남은 실패는 못 찾아서인가, 찾은 뒤인가 | 찾은 뒤. 찾기는 73/73. 전환 데이터를 더한 Gen-v2는 32/32 | [Gen-v2](docs/aerovla_oft_gen_v2.md) |
+| 문장으로 착륙까지 시킬 수 있는가 | 검증 시작에서는 지시한 pad에 16/18 touchdown, approach를 시키면 내려앉지 않음(0/18). held-out은 아직 | [Gen-v3](docs/aerovla_oft_gen_v3.md) |
 | 탐색 방향을 섞어 가르치면 | 탐색이 사라짐(탐색 frame의 yaw 예측 +0.88 → +0.07). 영상 한 장만 보는 정책이라서 | [해당 절](docs/aerovla_oft_generalization.md#teacher) |
 
 ## System Architecture
@@ -171,6 +181,7 @@ outputs/generalization/  동결한 결과 표와 실패 분류 (원자료는 로
 | [aerovla_oft_generalization](docs/aerovla_oft_generalization.md) | 맵 정의, held-out 시작 상태, teacher, Gen-v1의 G0–G4 결과와 대조 시험 |
 | [aerovla_oft_gen_v2](docs/aerovla_oft_gen_v2.md) | Gen-v1 결과 동결, 실패 분류, 전환 데이터 보강, Gen-v1 대 Gen-v2 |
 | [aerovla_oft_long_range](docs/aerovla_oft_long_range.md) | 새 장거리 held-out set, 단계별 결과, 장면·물체별 분리, 다음 변경 |
+| [aerovla_oft_gen_v3](docs/aerovla_oft_gen_v3.md) | distractor가 있는 장면, 착륙 teacher와 착륙 규칙, 평가 gate, 두 차례 학습, 검증·회귀 결과, 남은 병목 |
 | [experiments](docs/experiments.md) | 날짜별 실험 요약 |
 | [failure_plan](docs/failure_plan.md) | 이후 넣을 장애 후보 |
 

@@ -1,0 +1,13 @@
+model,set,success,grounded,collisions
+OFT Gen-v3,G1,31/32,31/32,0
+OFT Gen-v3,G3,20/20,20/20,0
+OFT Gen-v3,P,22/24,22/24,0
+OFT Gen-v3,L1,12/12,12/12,0
+OFT Gen-v3,L2,10/12,11/12,0
+OFT Gen-v3,L3,8/12,9/12,0
+OFT Gen-v2,G1,32/32,32/32,0
+OFT Gen-v2,G3,18/20,19/20,0
+OFT Gen-v2,P,24/24,24/24,0
+OFT Gen-v2,L1,11/12,12/12,0
+OFT Gen-v2,L2,8/12,10/12,0
+OFT Gen-v2,L3,8/12,8/12,0

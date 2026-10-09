@@ -1,0 +1,4 @@
+model,range,in_view,grounded,grounded_on_first_view,approached,success
+Teacher,40-55m,6/6,6/6,6/6,6/6,6/6
+Teacher,55-70m,6/6,6/6,6/6,6/6,6/6
+Teacher,70-90m,6/6,6/6,5/6,6/6,6/6

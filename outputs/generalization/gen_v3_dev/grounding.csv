@@ -1,0 +1,7 @@
+model,test,success,correct_target,wrong_target
+Teacher,Basic,8/8,8/8,0
+Teacher,Colour distractor,8/8,8/8,0
+Teacher,Shape distractor,8/8,8/8,0
+Teacher,Position swap,16/16,16/16,0
+Teacher,Query swap,16/16,16/16,0
+Teacher,Paraphrase (landing),18/18,18/18,0

@@ -142,3 +142,21 @@ step마다 멈추는 대신 도착 2초 전에 다음 판단을 시작해 명령
 - **판정:** 부분적으로 일반화. 병목은 탐색도 정지도 아니고, 학습하지 않은 장면에서 멀리 작게 보이는 목표를 알아보는 것.
 - **다음:** 탐색 구조는 그대로. 장면 외관을 달리한 장거리 접근 시작 데이터가 다음 후보. Gaussian Blur는 Blocks 전 거리와 Yard 55m 이하에서 이 기준선과 비교.
 - **Tests:** Python 151/151.
+
+## AeroVLA-OFT Gen-v3 (grounding과 착륙) — 2026-10-08~09
+
+브랜치 `exp/aerovla-oft-gen-v3-grounding-landing`. 상세: [Gen-v3](aerovla_oft_gen_v3.md). 동결한 표: `outputs/generalization/gen_v3_dev/`. **Gate를 통과하지 못해 새 test set 156개는 비행하지 않았다.**
+
+- **과제:** "Find the blue landing pad and land on it." 입력·출력·구조는 Gen-v2와 같음(FiLM, proprio 없음). 착륙도 전진·하강·yaw로 하고 `land_async`는 쓰지 않음.
+- **준비:** 물체 9종(파랑·빨강 pad 14×14×2.5m, cube 2, cylinder 2, ball, cone, 학습에 없는 pyramid)을 한 catalogue로. 학습 장면 Field·Lot, 평가 전용 Depot(Scene C)을 실행 중에 생성. 착륙 teacher, collision topic으로 읽는 touchdown, 착륙 규칙(`configs/targets/landing_pads.json`).
+- **Test set:** seed 8000번대 156개를 학습 계획 전에 고정(색·형태 distractor, 위치 swap, query swap, approach 대 land, 40–90m, canonical 착륙 24, 안 쓴 문장). teacher 156/156.
+- **Gate:** pilot → smoke 10 → representative 36을 통과해야 test set을 비행. 기준은 config에 미리 고정. smoke·representative는 검증 split의 시작.
+- **Pilot:** 첫 시도는 통과 못 함(착륙 4회 중 2회가 pad 0.3m 위에서 정지, approach 2회가 경계를 지나 착륙 동작). pad 윗면에 격자, 낮게 내려온 뒤 하강 유지, 경계 안쪽으로 민 approach를 넣고 두 번째에 통과(착륙 touchdown 4/4, approach 공중 정지 4/4).
+- **첫 학습:** 859 episode / 40,432 sample, 8,000 update, 262분, val L1 0.066. Smoke 6/10으로 통과 못 함. 검증 시작 36개 진단: 28/36, 실패는 같은 색 다른 물체 4, touchdown 뒤 미정지 3, 원거리 1.
+- **두 번째 학습:** 같은 색 대비(query twin 등)와 착륙 끝부분 보강 199 episode를 더해 1,052 episode / 52,396 sample, 처음부터 12,000 update, 406분, val L1 0.056. Smoke 7/10 통과, representative 27/36(0.75, 기준 0.80)으로 통과 못 함.
+- **검증 시작에서(두 번째):** approach를 시켰는데 내려앉음 0/18, 지시한 pad에 touchdown 16/18, 착륙 규칙 전체 14/18, 충돌 0. 파랑이 아닌 목표 12/12, 파란 목표 15/24(54m 이상 3/9).
+- **회귀(두 번째, 기존 set 112회):** Gen-v2 101 → 103. G1 31/32, G3 20/20, P 22/24, L 30/36(Yard의 본 물체 8/12 → 11/12, 처음 보는 물체 7/12 그대로).
+- **찾은 것:** Front 화면의 수평선 부근은 기체의 팔이 가리고 가운데 16°만 열림(55m 이상, 8–25° 벗어난 목표는 31–35%만 보임). simulator는 touchdown마다 접촉 event를 한 번만 보냄.
+- **남은 병목:** 54m 이상에서 파란 물체 넷 중 지시한 것을 확정하지 못함. 그다음은 touchdown 뒤의 0 행동(2/18).
+- **Tests:** Python 189/189.
+- **다음:** canonical mission의 범위(44m 이하 권장)를 먼저 정함. Blur는 gate를 통과한 뒤.

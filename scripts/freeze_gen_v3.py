@@ -33,6 +33,7 @@ from scripts.freeze_generalization_results import nearest_other,picture
 from src.visual_search.maps import load_map,load_landing
 
 FORWARD_M=.25
+FAR_M=54.
 GROUNDED_STEPS=3
 STAGES=('COLLISION','SEARCH','GROUNDING','WRONG_TARGET','APPROACH','STOP','ALIGNMENT','DESCENT','LANDING')
 GROUNDING_SETS=(('Q1','Basic'),('Q2','Colour distractor'),('Q3','Shape distractor'),('Q4','Position swap'),('Q5','Query swap'),('Q10','Paraphrase (landing)'))
@@ -142,6 +143,8 @@ def main():
         errors[label]=[episode['id'] for episode in data['episodes'] if episode.get('error')]
         if model not in models:models.append(model)
         for episode in episodes:
+            # A start with forced pushes is a training device, not a test of a policy.
+            if episode.get('pushes'):continue
             rows=steps[episode['id']];record=read(episode,rows,radius,landing,geometries,maps)
             record={'model':model,'set':level,'episode':episode['id'],'map':episode.get('map','blocks'),'layout':episode.get('layout','pilot'),
                     'kind':episode.get('kind',episode.get('case')),'instruction':episode['instruction'],'range':episode.get('range',''),
@@ -232,6 +235,19 @@ def main():
               ('Training scenes, held-out layout, landing',rate([i for i in seen if i['task']=='land'],'success'))]
         result['scenes']=dict(rows)
         if fresh:markdown('Scene',('Where','Success'),rows)
+        # Validation starts of the training plan: training scenes, seeds no training episode used. Development data, not a test.
+        dev=of('VAL')
+        if dev:
+            blue=lambda item:maps[item['map']]['objects'][item['target']].get('attributes',{}).get('color')=='blue'
+            far=lambda item:item['initial_distance_m']>=FAR_M
+            groups=(('All',dev),('Approach',[i for i in dev if i['task']=='approach']),('Landing',[i for i in dev if i['task']=='land']),
+                    (f'Start under {FAR_M:.0f} m',[i for i in dev if not far(i)]),(f'Start {FAR_M:.0f} m and more',[i for i in dev if far(i)]),
+                    ('Blue target',[i for i in dev if blue(i)]),('Target of another colour',[i for i in dev if not blue(i)]),
+                    (f'Blue target, {FAR_M:.0f} m and more',[i for i in dev if blue(i) and far(i)]),(f'Other colour, {FAR_M:.0f} m and more',[i for i in dev if not blue(i) and far(i)]))
+            rows=[(name,rate(group,'success'),rate([i for i in group if i['acquired']],'grounded'),rate(group,'terminal_as_asked'),sum(i['wrong_target'] for i in group),
+                   rate([i for i in group if i['task']=='land'],'touchdown_on_target')) for name,group in groups]
+            result['validation']=[dict(zip(('group','success','grounded','terminal_as_asked','wrong_target','touchdown_on_named_pad'),row)) for row in rows]
+            markdown('Validation starts (development data, not the test set)',('Group','Success','Grounded','End as asked','Wrong object','Touchdown on the named pad'),rows)
         rows=[(level,rate(of(level),'success'),rate(of(level),'grounded'),sum(i['collision'] for i in of(level))) for level in REGRESSION_SETS if of(level)]
         result['regression']=[dict(zip(('set','success','grounded','collisions'),row)) for row in rows]
         if rows:markdown('Earlier sets',('Set','Success','Grounded','Collisions'),rows)
@@ -250,7 +266,7 @@ def main():
     with (output/'episodes.csv').open('w',newline='',encoding='utf-8') as file:
         writer=csv.DictWriter(file,fieldnames=list(items[0]));writer.writeheader();writer.writerows(items)
     for name,key in (('grounding.csv','grounding'),('far_grounding.csv','far'),('landing.csv','landing'),('confusion.csv','confusion'),('failures.csv','failures'),
-                     ('regression.csv','regression'),('long_range.csv','long_range')):
+                     ('regression.csv','regression'),('long_range.csv','long_range'),('validation.csv','validation')):
         rows=[]
         for model,result in tables.items():
             block=result.get(key) or [];block=block['sets'] if isinstance(block,dict) else block

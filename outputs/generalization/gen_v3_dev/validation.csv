@@ -1,0 +1,19 @@
+model,group,success,grounded,terminal_as_asked,wrong_target,touchdown_on_named_pad
+OFT Gen-v3 first,All,28/36,33/35,33/36,4,16/18
+OFT Gen-v3 first,Approach,15/18,17/18,17/18,2,-
+OFT Gen-v3 first,Landing,13/18,16/17,16/18,2,16/18
+OFT Gen-v3 first,Start under 54 m,19/22,21/21,21/22,1,11/12
+OFT Gen-v3 first,Start 54 m and more,9/14,12/14,12/14,3,5/6
+OFT Gen-v3 first,Blue target,17/24,21/23,21/24,4,10/12
+OFT Gen-v3 first,Target of another colour,11/12,12/12,12/12,0,6/6
+OFT Gen-v3 first,"Blue target, 54 m and more",5/9,7/9,7/9,3,2/3
+OFT Gen-v3 first,"Other colour, 54 m and more",4/5,5/5,5/5,0,3/3
+OFT Gen-v3,All,27/36,32/35,30/36,2,16/18
+OFT Gen-v3,Approach,13/18,15/18,14/18,1,-
+OFT Gen-v3,Landing,14/18,17/17,16/18,1,16/18
+OFT Gen-v3,Start under 54 m,19/22,21/21,21/22,1,11/12
+OFT Gen-v3,Start 54 m and more,8/14,11/14,9/14,1,5/6
+OFT Gen-v3,Blue target,15/24,20/23,18/24,2,10/12
+OFT Gen-v3,Target of another colour,12/12,12/12,12/12,0,6/6
+OFT Gen-v3,"Blue target, 54 m and more",3/9,6/9,4/9,1,2/3
+OFT Gen-v3,"Other colour, 54 m and more",5/5,5/5,5/5,0,3/3

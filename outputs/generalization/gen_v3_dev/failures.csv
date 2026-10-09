@@ -1,0 +1,37 @@
+model,stage,count,how,by_set
+OFT Gen-v3 first,COLLISION,0,,"{""VAL"": 0}"
+OFT Gen-v3 first,SEARCH,1,stopped by itself,"{""VAL"": 1}"
+OFT Gen-v3 first,GROUNDING,0,,"{""VAL"": 0}"
+OFT Gen-v3 first,WRONG_TARGET,3,"at blue_cylinder, at blue_pad","{""VAL"": 3}"
+OFT Gen-v3 first,APPROACH,1,timeout,"{""VAL"": 1}"
+OFT Gen-v3 first,STOP,0,,"{""VAL"": 0}"
+OFT Gen-v3 first,ALIGNMENT,0,,"{""VAL"": 0}"
+OFT Gen-v3 first,DESCENT,0,,"{""VAL"": 0}"
+OFT Gen-v3 first,LANDING,3,no stop after touchdown,"{""VAL"": 3}"
+OFT Gen-v3,COLLISION,0,,"{""G1"": 0, ""L2"": 0, ""L3"": 0, ""P"": 0, ""VAL"": 0}"
+OFT Gen-v3,SEARCH,1,stopped by itself,"{""G1"": 0, ""L2"": 0, ""L3"": 0, ""P"": 0, ""VAL"": 1}"
+OFT Gen-v3,GROUNDING,10,"passed over, stopped by itself","{""G1"": 1, ""L2"": 1, ""L3"": 3, ""P"": 2, ""VAL"": 3}"
+OFT Gen-v3,WRONG_TARGET,1,at blue_pad,"{""G1"": 0, ""L2"": 0, ""L3"": 0, ""P"": 0, ""VAL"": 1}"
+OFT Gen-v3,APPROACH,3,timeout,"{""G1"": 0, ""L2"": 1, ""L3"": 0, ""P"": 0, ""VAL"": 2}"
+OFT Gen-v3,STOP,1,did not stop,"{""G1"": 0, ""L2"": 0, ""L3"": 1, ""P"": 0, ""VAL"": 0}"
+OFT Gen-v3,ALIGNMENT,0,,"{""G1"": 0, ""L2"": 0, ""L3"": 0, ""P"": 0, ""VAL"": 0}"
+OFT Gen-v3,DESCENT,0,,"{""G1"": 0, ""L2"": 0, ""L3"": 0, ""P"": 0, ""VAL"": 0}"
+OFT Gen-v3,LANDING,2,no stop after touchdown,"{""G1"": 0, ""L2"": 0, ""L3"": 0, ""P"": 0, ""VAL"": 2}"
+OFT Gen-v2,COLLISION,0,,"{""G3"": 0, ""L1"": 0, ""L2"": 0, ""L3"": 0}"
+OFT Gen-v2,SEARCH,0,,"{""G3"": 0, ""L1"": 0, ""L2"": 0, ""L3"": 0}"
+OFT Gen-v2,GROUNDING,7,"passed over, stopped by itself","{""G3"": 1, ""L1"": 0, ""L2"": 2, ""L3"": 4}"
+OFT Gen-v2,WRONG_TARGET,0,,"{""G3"": 0, ""L1"": 0, ""L2"": 0, ""L3"": 0}"
+OFT Gen-v2,APPROACH,3,timeout,"{""G3"": 0, ""L1"": 1, ""L2"": 2, ""L3"": 0}"
+OFT Gen-v2,STOP,1,did not stop,"{""G3"": 1, ""L1"": 0, ""L2"": 0, ""L3"": 0}"
+OFT Gen-v2,ALIGNMENT,0,,"{""G3"": 0, ""L1"": 0, ""L2"": 0, ""L3"": 0}"
+OFT Gen-v2,DESCENT,0,,"{""G3"": 0, ""L1"": 0, ""L2"": 0, ""L3"": 0}"
+OFT Gen-v2,LANDING,0,,"{""G3"": 0, ""L1"": 0, ""L2"": 0, ""L3"": 0}"
+Teacher,COLLISION,0,,{}
+Teacher,SEARCH,0,,{}
+Teacher,GROUNDING,0,,{}
+Teacher,WRONG_TARGET,0,,{}
+Teacher,APPROACH,0,,{}
+Teacher,STOP,0,,{}
+Teacher,ALIGNMENT,0,,{}
+Teacher,DESCENT,0,,{}
+Teacher,LANDING,0,,{}

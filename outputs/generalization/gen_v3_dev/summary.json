@@ -1,0 +1,1045 @@
+{
+ "left_out": {
+  "because": "None did not finish the start in the simulator",
+  "episodes": []
+ },
+ "definitions": {
+  "forward_m": 0.25,
+  "grounded_steps": 3,
+  "approach_m": 20.0,
+  "aligned_m": 3.5,
+  "landing_rule": {
+   "definition": "the collision topic names the pad or its marking while the vehicle is above the pad's top surface; the simulator holds the vehicle still from that moment",
+   "from_above_tolerance_m": 0.3,
+   "landing_region_half_width_m": 6.6,
+   "landing_region_from": "pad half-width (7.0 m) minus the vehicle half-span (0.4 m): the whole vehicle stands on the pad",
+   "max_vertical_speed_mps": 0.75,
+   "max_vertical_speed_from": "the action range allows 1.0 m/s of descent and the teacher's final descent is 0.5 m/s; half-way between the two separates a controlled descent from one at full rate",
+   "max_horizontal_speed_mps": 0.5,
+   "max_horizontal_speed_from": "a quarter of the 2.0 m/s the action range allows forward"
+  },
+  "stages": [
+   "COLLISION",
+   "SEARCH",
+   "GROUNDING",
+   "WRONG_TARGET",
+   "APPROACH",
+   "STOP",
+   "ALIGNMENT",
+   "DESCENT",
+   "LANDING"
+  ]
+ },
+ "episodes_with_errors": {
+  "OFT Gen-v3 first:VAL": [],
+  "OFT Gen-v3:VAL": [],
+  "OFT Gen-v2:L1": [],
+  "OFT Gen-v3:L1": [],
+  "OFT Gen-v2:L2": [],
+  "OFT Gen-v3:L2": [],
+  "OFT Gen-v2:L3": [],
+  "OFT Gen-v3:L3": [],
+  "OFT Gen-v2:G3": [],
+  "OFT Gen-v3:G3": [],
+  "OFT Gen-v2:G1": [],
+  "OFT Gen-v3:G1": [],
+  "OFT Gen-v2:P": [],
+  "OFT Gen-v3:P": [],
+  "Teacher:Q1": [],
+  "Teacher:Q2": [],
+  "Teacher:Q3": [],
+  "Teacher:Q4": [],
+  "Teacher:Q5": [],
+  "Teacher:Q6": [],
+  "Teacher:Q7": [],
+  "Teacher:Q8": [],
+  "Teacher:Q8R": [],
+  "Teacher:Q10": [],
+  "Teacher:QS": []
+ },
+ "models": {
+  "OFT Gen-v3 first": {
+   "grounding": {
+    "sets": [],
+    "position_swap_pairs_both_correct": "-",
+    "query_swap_poses_all_correct": "-"
+   },
+   "wrong_target": {
+    "episodes": 0,
+    "wrong": 0
+   },
+   "confusion": [],
+   "far": [],
+   "long_range": [],
+   "landing": [],
+   "scenes": {
+    "Depot (scene C), approach": "-",
+    "Depot (scene C), landing": "-",
+    "Training scenes, held-out layout, approach": "-",
+    "Training scenes, held-out layout, landing": "-"
+   },
+   "validation": [
+    {
+     "group": "All",
+     "success": "28/36",
+     "grounded": "33/35",
+     "terminal_as_asked": "33/36",
+     "wrong_target": 4,
+     "touchdown_on_named_pad": "16/18"
+    },
+    {
+     "group": "Approach",
+     "success": "15/18",
+     "grounded": "17/18",
+     "terminal_as_asked": "17/18",
+     "wrong_target": 2,
+     "touchdown_on_named_pad": "-"
+    },
+    {
+     "group": "Landing",
+     "success": "13/18",
+     "grounded": "16/17",
+     "terminal_as_asked": "16/18",
+     "wrong_target": 2,
+     "touchdown_on_named_pad": "16/18"
+    },
+    {
+     "group": "Start under 54 m",
+     "success": "19/22",
+     "grounded": "21/21",
+     "terminal_as_asked": "21/22",
+     "wrong_target": 1,
+     "touchdown_on_named_pad": "11/12"
+    },
+    {
+     "group": "Start 54 m and more",
+     "success": "9/14",
+     "grounded": "12/14",
+     "terminal_as_asked": "12/14",
+     "wrong_target": 3,
+     "touchdown_on_named_pad": "5/6"
+    },
+    {
+     "group": "Blue target",
+     "success": "17/24",
+     "grounded": "21/23",
+     "terminal_as_asked": "21/24",
+     "wrong_target": 4,
+     "touchdown_on_named_pad": "10/12"
+    },
+    {
+     "group": "Target of another colour",
+     "success": "11/12",
+     "grounded": "12/12",
+     "terminal_as_asked": "12/12",
+     "wrong_target": 0,
+     "touchdown_on_named_pad": "6/6"
+    },
+    {
+     "group": "Blue target, 54 m and more",
+     "success": "5/9",
+     "grounded": "7/9",
+     "terminal_as_asked": "7/9",
+     "wrong_target": 3,
+     "touchdown_on_named_pad": "2/3"
+    },
+    {
+     "group": "Other colour, 54 m and more",
+     "success": "4/5",
+     "grounded": "5/5",
+     "terminal_as_asked": "5/5",
+     "wrong_target": 0,
+     "touchdown_on_named_pad": "3/3"
+    }
+   ],
+   "regression": [],
+   "failures": [
+    {
+     "stage": "COLLISION",
+     "count": 0,
+     "how": "",
+     "by_set": {
+      "VAL": 0
+     }
+    },
+    {
+     "stage": "SEARCH",
+     "count": 1,
+     "how": "stopped by itself",
+     "by_set": {
+      "VAL": 1
+     }
+    },
+    {
+     "stage": "GROUNDING",
+     "count": 0,
+     "how": "",
+     "by_set": {
+      "VAL": 0
+     }
+    },
+    {
+     "stage": "WRONG_TARGET",
+     "count": 3,
+     "how": "at blue_cylinder, at blue_pad",
+     "by_set": {
+      "VAL": 3
+     }
+    },
+    {
+     "stage": "APPROACH",
+     "count": 1,
+     "how": "timeout",
+     "by_set": {
+      "VAL": 1
+     }
+    },
+    {
+     "stage": "STOP",
+     "count": 0,
+     "how": "",
+     "by_set": {
+      "VAL": 0
+     }
+    },
+    {
+     "stage": "ALIGNMENT",
+     "count": 0,
+     "how": "",
+     "by_set": {
+      "VAL": 0
+     }
+    },
+    {
+     "stage": "DESCENT",
+     "count": 0,
+     "how": "",
+     "by_set": {
+      "VAL": 0
+     }
+    },
+    {
+     "stage": "LANDING",
+     "count": 3,
+     "how": "no stop after touchdown",
+     "by_set": {
+      "VAL": 3
+     }
+    }
+   ],
+   "totals": {
+    "episodes": 36,
+    "success": 28,
+    "collisions": 0,
+    "timeouts": 1,
+    "acquired": "35/36",
+    "grounded": "33/35",
+    "hidden_at_start_acquired": "15/16",
+    "by_set": {
+     "VAL": "28/36"
+    }
+   }
+  },
+  "OFT Gen-v3": {
+   "grounding": {
+    "sets": [],
+    "position_swap_pairs_both_correct": "-",
+    "query_swap_poses_all_correct": "-"
+   },
+   "wrong_target": {
+    "episodes": 0,
+    "wrong": 0
+   },
+   "confusion": [],
+   "far": [],
+   "long_range": [
+    {
+     "range": "L1",
+     "in_view": "12/12",
+     "grounded": "12/12",
+     "grounded_on_first_view": "6/12",
+     "approached": "12/12",
+     "success": "12/12"
+    },
+    {
+     "range": "L2",
+     "in_view": "12/12",
+     "grounded": "11/12",
+     "grounded_on_first_view": "6/12",
+     "approached": "10/12",
+     "success": "10/12"
+    },
+    {
+     "range": "L3",
+     "in_view": "12/12",
+     "grounded": "9/12",
+     "grounded_on_first_view": "4/12",
+     "approached": "9/12",
+     "success": "8/12"
+    }
+   ],
+   "landing": [],
+   "scenes": {
+    "Depot (scene C), approach": "-",
+    "Depot (scene C), landing": "-",
+    "Training scenes, held-out layout, approach": "-",
+    "Training scenes, held-out layout, landing": "-"
+   },
+   "validation": [
+    {
+     "group": "All",
+     "success": "27/36",
+     "grounded": "32/35",
+     "terminal_as_asked": "30/36",
+     "wrong_target": 2,
+     "touchdown_on_named_pad": "16/18"
+    },
+    {
+     "group": "Approach",
+     "success": "13/18",
+     "grounded": "15/18",
+     "terminal_as_asked": "14/18",
+     "wrong_target": 1,
+     "touchdown_on_named_pad": "-"
+    },
+    {
+     "group": "Landing",
+     "success": "14/18",
+     "grounded": "17/17",
+     "terminal_as_asked": "16/18",
+     "wrong_target": 1,
+     "touchdown_on_named_pad": "16/18"
+    },
+    {
+     "group": "Start under 54 m",
+     "success": "19/22",
+     "grounded": "21/21",
+     "terminal_as_asked": "21/22",
+     "wrong_target": 1,
+     "touchdown_on_named_pad": "11/12"
+    },
+    {
+     "group": "Start 54 m and more",
+     "success": "8/14",
+     "grounded": "11/14",
+     "terminal_as_asked": "9/14",
+     "wrong_target": 1,
+     "touchdown_on_named_pad": "5/6"
+    },
+    {
+     "group": "Blue target",
+     "success": "15/24",
+     "grounded": "20/23",
+     "terminal_as_asked": "18/24",
+     "wrong_target": 2,
+     "touchdown_on_named_pad": "10/12"
+    },
+    {
+     "group": "Target of another colour",
+     "success": "12/12",
+     "grounded": "12/12",
+     "terminal_as_asked": "12/12",
+     "wrong_target": 0,
+     "touchdown_on_named_pad": "6/6"
+    },
+    {
+     "group": "Blue target, 54 m and more",
+     "success": "3/9",
+     "grounded": "6/9",
+     "terminal_as_asked": "4/9",
+     "wrong_target": 1,
+     "touchdown_on_named_pad": "2/3"
+    },
+    {
+     "group": "Other colour, 54 m and more",
+     "success": "5/5",
+     "grounded": "5/5",
+     "terminal_as_asked": "5/5",
+     "wrong_target": 0,
+     "touchdown_on_named_pad": "3/3"
+    }
+   ],
+   "regression": [
+    {
+     "set": "G1",
+     "success": "31/32",
+     "grounded": "31/32",
+     "collisions": 0
+    },
+    {
+     "set": "G3",
+     "success": "20/20",
+     "grounded": "20/20",
+     "collisions": 0
+    },
+    {
+     "set": "P",
+     "success": "22/24",
+     "grounded": "22/24",
+     "collisions": 0
+    },
+    {
+     "set": "L1",
+     "success": "12/12",
+     "grounded": "12/12",
+     "collisions": 0
+    },
+    {
+     "set": "L2",
+     "success": "10/12",
+     "grounded": "11/12",
+     "collisions": 0
+    },
+    {
+     "set": "L3",
+     "success": "8/12",
+     "grounded": "9/12",
+     "collisions": 0
+    }
+   ],
+   "failures": [
+    {
+     "stage": "COLLISION",
+     "count": 0,
+     "how": "",
+     "by_set": {
+      "G1": 0,
+      "L2": 0,
+      "L3": 0,
+      "P": 0,
+      "VAL": 0
+     }
+    },
+    {
+     "stage": "SEARCH",
+     "count": 1,
+     "how": "stopped by itself",
+     "by_set": {
+      "G1": 0,
+      "L2": 0,
+      "L3": 0,
+      "P": 0,
+      "VAL": 1
+     }
+    },
+    {
+     "stage": "GROUNDING",
+     "count": 10,
+     "how": "passed over, stopped by itself",
+     "by_set": {
+      "G1": 1,
+      "L2": 1,
+      "L3": 3,
+      "P": 2,
+      "VAL": 3
+     }
+    },
+    {
+     "stage": "WRONG_TARGET",
+     "count": 1,
+     "how": "at blue_pad",
+     "by_set": {
+      "G1": 0,
+      "L2": 0,
+      "L3": 0,
+      "P": 0,
+      "VAL": 1
+     }
+    },
+    {
+     "stage": "APPROACH",
+     "count": 3,
+     "how": "timeout",
+     "by_set": {
+      "G1": 0,
+      "L2": 1,
+      "L3": 0,
+      "P": 0,
+      "VAL": 2
+     }
+    },
+    {
+     "stage": "STOP",
+     "count": 1,
+     "how": "did not stop",
+     "by_set": {
+      "G1": 0,
+      "L2": 0,
+      "L3": 1,
+      "P": 0,
+      "VAL": 0
+     }
+    },
+    {
+     "stage": "ALIGNMENT",
+     "count": 0,
+     "how": "",
+     "by_set": {
+      "G1": 0,
+      "L2": 0,
+      "L3": 0,
+      "P": 0,
+      "VAL": 0
+     }
+    },
+    {
+     "stage": "DESCENT",
+     "count": 0,
+     "how": "",
+     "by_set": {
+      "G1": 0,
+      "L2": 0,
+      "L3": 0,
+      "P": 0,
+      "VAL": 0
+     }
+    },
+    {
+     "stage": "LANDING",
+     "count": 2,
+     "how": "no stop after touchdown",
+     "by_set": {
+      "G1": 0,
+      "L2": 0,
+      "L3": 0,
+      "P": 0,
+      "VAL": 2
+     }
+    }
+   ],
+   "totals": {
+    "episodes": 148,
+    "success": 130,
+    "collisions": 0,
+    "timeouts": 13,
+    "acquired": "147/148",
+    "grounded": "137/147",
+    "hidden_at_start_acquired": "73/74",
+    "by_set": {
+     "G1": "31/32",
+     "G3": "20/20",
+     "L1": "12/12",
+     "L2": "10/12",
+     "L3": "8/12",
+     "P": "22/24",
+     "VAL": "27/36"
+    }
+   }
+  },
+  "OFT Gen-v2": {
+   "grounding": {
+    "sets": [],
+    "position_swap_pairs_both_correct": "-",
+    "query_swap_poses_all_correct": "-"
+   },
+   "wrong_target": {
+    "episodes": 0,
+    "wrong": 0
+   },
+   "confusion": [],
+   "far": [],
+   "long_range": [
+    {
+     "range": "L1",
+     "in_view": "12/12",
+     "grounded": "12/12",
+     "grounded_on_first_view": "8/12",
+     "approached": "11/12",
+     "success": "11/12"
+    },
+    {
+     "range": "L2",
+     "in_view": "12/12",
+     "grounded": "10/12",
+     "grounded_on_first_view": "7/12",
+     "approached": "8/12",
+     "success": "8/12"
+    },
+    {
+     "range": "L3",
+     "in_view": "12/12",
+     "grounded": "8/12",
+     "grounded_on_first_view": "3/12",
+     "approached": "8/12",
+     "success": "8/12"
+    }
+   ],
+   "landing": [],
+   "scenes": {
+    "Depot (scene C), approach": "-",
+    "Depot (scene C), landing": "-",
+    "Training scenes, held-out layout, approach": "-",
+    "Training scenes, held-out layout, landing": "-"
+   },
+   "regression": [
+    {
+     "set": "G1",
+     "success": "32/32",
+     "grounded": "32/32",
+     "collisions": 0
+    },
+    {
+     "set": "G3",
+     "success": "18/20",
+     "grounded": "19/20",
+     "collisions": 0
+    },
+    {
+     "set": "P",
+     "success": "24/24",
+     "grounded": "24/24",
+     "collisions": 0
+    },
+    {
+     "set": "L1",
+     "success": "11/12",
+     "grounded": "12/12",
+     "collisions": 0
+    },
+    {
+     "set": "L2",
+     "success": "8/12",
+     "grounded": "10/12",
+     "collisions": 0
+    },
+    {
+     "set": "L3",
+     "success": "8/12",
+     "grounded": "8/12",
+     "collisions": 0
+    }
+   ],
+   "failures": [
+    {
+     "stage": "COLLISION",
+     "count": 0,
+     "how": "",
+     "by_set": {
+      "G3": 0,
+      "L1": 0,
+      "L2": 0,
+      "L3": 0
+     }
+    },
+    {
+     "stage": "SEARCH",
+     "count": 0,
+     "how": "",
+     "by_set": {
+      "G3": 0,
+      "L1": 0,
+      "L2": 0,
+      "L3": 0
+     }
+    },
+    {
+     "stage": "GROUNDING",
+     "count": 7,
+     "how": "passed over, stopped by itself",
+     "by_set": {
+      "G3": 1,
+      "L1": 0,
+      "L2": 2,
+      "L3": 4
+     }
+    },
+    {
+     "stage": "WRONG_TARGET",
+     "count": 0,
+     "how": "",
+     "by_set": {
+      "G3": 0,
+      "L1": 0,
+      "L2": 0,
+      "L3": 0
+     }
+    },
+    {
+     "stage": "APPROACH",
+     "count": 3,
+     "how": "timeout",
+     "by_set": {
+      "G3": 0,
+      "L1": 1,
+      "L2": 2,
+      "L3": 0
+     }
+    },
+    {
+     "stage": "STOP",
+     "count": 1,
+     "how": "did not stop",
+     "by_set": {
+      "G3": 1,
+      "L1": 0,
+      "L2": 0,
+      "L3": 0
+     }
+    },
+    {
+     "stage": "ALIGNMENT",
+     "count": 0,
+     "how": "",
+     "by_set": {
+      "G3": 0,
+      "L1": 0,
+      "L2": 0,
+      "L3": 0
+     }
+    },
+    {
+     "stage": "DESCENT",
+     "count": 0,
+     "how": "",
+     "by_set": {
+      "G3": 0,
+      "L1": 0,
+      "L2": 0,
+      "L3": 0
+     }
+    },
+    {
+     "stage": "LANDING",
+     "count": 0,
+     "how": "",
+     "by_set": {
+      "G3": 0,
+      "L1": 0,
+      "L2": 0,
+      "L3": 0
+     }
+    }
+   ],
+   "totals": {
+    "episodes": 112,
+    "success": 101,
+    "collisions": 0,
+    "timeouts": 9,
+    "acquired": "112/112",
+    "grounded": "105/112",
+    "hidden_at_start_acquired": "58/58",
+    "by_set": {
+     "G1": "32/32",
+     "G3": "18/20",
+     "L1": "11/12",
+     "L2": "8/12",
+     "L3": "8/12",
+     "P": "24/24"
+    }
+   }
+  },
+  "Teacher": {
+   "grounding": {
+    "sets": [
+     {
+      "test": "Basic",
+      "success": "8/8",
+      "correct_target": "8/8",
+      "wrong_target": 0
+     },
+     {
+      "test": "Colour distractor",
+      "success": "8/8",
+      "correct_target": "8/8",
+      "wrong_target": 0
+     },
+     {
+      "test": "Shape distractor",
+      "success": "8/8",
+      "correct_target": "8/8",
+      "wrong_target": 0
+     },
+     {
+      "test": "Position swap",
+      "success": "16/16",
+      "correct_target": "16/16",
+      "wrong_target": 0
+     },
+     {
+      "test": "Query swap",
+      "success": "16/16",
+      "correct_target": "16/16",
+      "wrong_target": 0
+     },
+     {
+      "test": "Paraphrase (landing)",
+      "success": "18/18",
+      "correct_target": "18/18",
+      "wrong_target": 0
+     }
+    ],
+    "position_swap_pairs_both_correct": "16/16",
+    "query_swap_poses_all_correct": "4/4"
+   },
+   "wrong_target": {
+    "episodes": 156,
+    "wrong": 0
+   },
+   "confusion": [
+    {
+     "named": "blue_cone",
+     "target": 1,
+     "same colour": 0,
+     "same shape": 0,
+     "other": 0,
+     "none": 0
+    },
+    {
+     "named": "blue_cube",
+     "target": 1,
+     "same colour": 0,
+     "same shape": 0,
+     "other": 0,
+     "none": 0
+    },
+    {
+     "named": "blue_cylinder",
+     "target": 5,
+     "same colour": 0,
+     "same shape": 0,
+     "other": 0,
+     "none": 0
+    },
+    {
+     "named": "blue_pad",
+     "target": 129,
+     "same colour": 0,
+     "same shape": 0,
+     "other": 0,
+     "none": 0
+    },
+    {
+     "named": "green_cylinder",
+     "target": 3,
+     "same colour": 0,
+     "same shape": 0,
+     "other": 0,
+     "none": 0
+    },
+    {
+     "named": "orange_ball",
+     "target": 1,
+     "same colour": 0,
+     "same shape": 0,
+     "other": 0,
+     "none": 0
+    },
+    {
+     "named": "red_cube",
+     "target": 3,
+     "same colour": 0,
+     "same shape": 0,
+     "other": 0,
+     "none": 0
+    },
+    {
+     "named": "red_pad",
+     "target": 13,
+     "same colour": 0,
+     "same shape": 0,
+     "other": 0,
+     "none": 0
+    }
+   ],
+   "far": [
+    {
+     "range": "40-55m",
+     "in_view": "6/6",
+     "grounded": "6/6",
+     "grounded_on_first_view": "6/6",
+     "approached": "6/6",
+     "success": "6/6"
+    },
+    {
+     "range": "55-70m",
+     "in_view": "6/6",
+     "grounded": "6/6",
+     "grounded_on_first_view": "6/6",
+     "approached": "6/6",
+     "success": "6/6"
+    },
+    {
+     "range": "70-90m",
+     "in_view": "6/6",
+     "grounded": "6/6",
+     "grounded_on_first_view": "5/6",
+     "approached": "6/6",
+     "success": "6/6"
+    }
+   ],
+   "long_range": [],
+   "landing": [
+    {
+     "range": "Near",
+     "correct_target": "8/8",
+     "approached": "8/8",
+     "aligned": "8/8",
+     "descent_started": "8/8",
+     "touchdown": "8/8",
+     "landing": "8/8"
+    },
+    {
+     "range": "Medium",
+     "correct_target": "8/8",
+     "approached": "8/8",
+     "aligned": "8/8",
+     "descent_started": "8/8",
+     "touchdown": "8/8",
+     "landing": "8/8"
+    },
+    {
+     "range": "Far",
+     "correct_target": "8/8",
+     "approached": "8/8",
+     "aligned": "8/8",
+     "descent_started": "8/8",
+     "touchdown": "8/8",
+     "landing": "8/8"
+    },
+    {
+     "range": "All",
+     "correct_target": "24/24",
+     "approached": "24/24",
+     "aligned": "24/24",
+     "descent_started": "24/24",
+     "touchdown": "24/24",
+     "landing": "24/24"
+    }
+   ],
+   "touchdown": {
+    "landing_episodes": 62,
+    "success": 62,
+    "touchdowns_on_target": 62,
+    "horizontal_error_m": {
+     "median": 0.67,
+     "p90": 0.88,
+     "max": 1.03
+    },
+    "vertical_speed_mps": {
+     "median": 0.36,
+     "max": 0.37
+    },
+    "horizontal_speed_mps": {
+     "median": 0.01,
+     "max": 0.06
+    },
+    "landed_on_another_pad": 0
+   },
+   "landing_sets": {
+    "Q8": "24/24",
+    "Q8R": "6/6",
+    "Q10": "18/18",
+    "QS": "8/8"
+   },
+   "terminal": {
+    "rows": [
+     {
+      "sentence": "Find ... and land on it. (trained words)",
+      "landed": "6/6",
+      "hovered": "0/6",
+      "success": "6/6"
+     },
+     {
+      "sentence": "Approach ... (trained words)",
+      "landed": "0/6",
+      "hovered": "6/6",
+      "success": "6/6"
+     },
+     {
+      "sentence": "Find and approach ... (unseen words)",
+      "landed": "0/6",
+      "hovered": "6/6",
+      "success": "6/6"
+     }
+    ],
+    "as_asked": "18/18",
+    "poses_all_as_asked": "6/6"
+   },
+   "scenes": {
+    "Depot (scene C), approach": "86/86",
+    "Depot (scene C), landing": "54/54",
+    "Training scenes, held-out layout, approach": "8/8",
+    "Training scenes, held-out layout, landing": "8/8"
+   },
+   "regression": [],
+   "failures": [
+    {
+     "stage": "COLLISION",
+     "count": 0,
+     "how": "",
+     "by_set": {}
+    },
+    {
+     "stage": "SEARCH",
+     "count": 0,
+     "how": "",
+     "by_set": {}
+    },
+    {
+     "stage": "GROUNDING",
+     "count": 0,
+     "how": "",
+     "by_set": {}
+    },
+    {
+     "stage": "WRONG_TARGET",
+     "count": 0,
+     "how": "",
+     "by_set": {}
+    },
+    {
+     "stage": "APPROACH",
+     "count": 0,
+     "how": "",
+     "by_set": {}
+    },
+    {
+     "stage": "STOP",
+     "count": 0,
+     "how": "",
+     "by_set": {}
+    },
+    {
+     "stage": "ALIGNMENT",
+     "count": 0,
+     "how": "",
+     "by_set": {}
+    },
+    {
+     "stage": "DESCENT",
+     "count": 0,
+     "how": "",
+     "by_set": {}
+    },
+    {
+     "stage": "LANDING",
+     "count": 0,
+     "how": "",
+     "by_set": {}
+    }
+   ],
+   "totals": {
+    "episodes": 156,
+    "success": 156,
+    "collisions": 0,
+    "timeouts": 0,
+    "acquired": "156/156",
+    "grounded": "156/156",
+    "hidden_at_start_acquired": "74/74",
+    "by_set": {
+     "Q1": "8/8",
+     "Q10": "18/18",
+     "Q2": "8/8",
+     "Q3": "8/8",
+     "Q4": "16/16",
+     "Q5": "16/16",
+     "Q6": "18/18",
+     "Q7": "18/18",
+     "Q8": "24/24",
+     "Q8R": "6/6",
+     "QS": "16/16"
+    }
+   }
+  }
+ }
+}

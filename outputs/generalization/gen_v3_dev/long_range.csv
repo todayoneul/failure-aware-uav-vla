@@ -1,0 +1,7 @@
+model,range,in_view,grounded,grounded_on_first_view,approached,success
+OFT Gen-v3,L1,12/12,12/12,6/12,12/12,12/12
+OFT Gen-v3,L2,12/12,11/12,6/12,10/12,10/12
+OFT Gen-v3,L3,12/12,9/12,4/12,9/12,8/12
+OFT Gen-v2,L1,12/12,12/12,8/12,11/12,11/12
+OFT Gen-v2,L2,12/12,10/12,7/12,8/12,8/12
+OFT Gen-v2,L3,12/12,8/12,3/12,8/12,8/12
