@@ -38,7 +38,8 @@
     "finalizer": "on",
     "evaluation_loop": "scripts/visual_search.run_episode after SearchEnv.reset, as in the canonical test",
     "attempts_per_flight": 3,
-    "runtime_error": "A flight that ends in an exception of the harness (simulator not answering, a missing camera image, a failed take-off) is flown again and every such attempt is logged in flights.jsonl. A flight that the policy ended, or that ran out of decisions, collided or went to a wrong object, is a result and is never flown again."
+    "runtime_error": "A flight that ends in an exception of the harness (simulator not answering, a missing camera image, a failed take-off) is flown again and every such attempt is logged in flights.jsonl. A flight that the policy ended, or that ran out of decisions, collided or went to a wrong object, is a result and is never flown again.",
+    "runtime_error_added_during_the_run": "Added after the main run, on seeing one of its flights (clean, ct-9517-blue_pad-mid_behind): the evaluation's disarm call swallows the exception of a simulator that no longer answers and returns 'not disarmed', so a stable, latched landing on the named pad was recorded as a failed mission while the simulator connection was lost (68 s of harness time after its last decision against 6.5-10 s for the other 191 flights; the next flight raised 'Object closed' and the simulator was restarted). A flight whose disarm call the simulator did not answer is therefore a harness error like the others: set aside with its whole record kept, logged, and flown again. Applied to that one flight after the fact and by the worker itself from then on."
   },
   "frames": {"every_decisions": 2, "jpeg_quality": 90, "note": "For figures: the raw Front and Down frames and, in a blurred condition, the frames the policy was given. Local files, not in Git."},
   "image_quality": {

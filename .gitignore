@@ -30,6 +30,14 @@
 !/outputs/examples/grounding_film_mission/
 # Frozen result tables of the generalisation runs (small files; the raw run folders stay local).
 !/outputs/generalization/
+# Gaussian blur characterization: tables, the run's own records and small pictures (the flights and their frames stay local).
+!/outputs/failures/
+/outputs/failures/*
+!/outputs/failures/gaussian_blur/
+/outputs/failures/gaussian_blur/*
+!/outputs/failures/gaussian_blur/summary/
+!/outputs/failures/gaussian_blur/examples/
+!/outputs/failures/gaussian_blur/config/
 
 # Downloaded simulator, datasets and model weights.
 /assets/

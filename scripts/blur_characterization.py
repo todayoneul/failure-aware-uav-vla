@@ -4,6 +4,9 @@
   blur_characterization.py order [--phase P]      print the order of the flights and how the conditions are balanced
   blur_characterization.py fly --host H [--phase main|repeat] [--output DIR] [--limit N] [--starts FILE]
                                                   fly what is not flown yet (WSL, simulator running)
+  blur_characterization.py set-aside START CONDITION --reason TEXT [--phase P]
+                                                  take a recorded flight out because the harness decided its outcome; it is
+                                                  kept beside the results, logged, and flown again by the next `fly`
 
 A flight is the canonical evaluation's own: `SearchEnv.reset` and `run_episode` of scripts/visual_search.py, with the
 frozen checkpoint, the finalizer and the evaluator as they are. The one thing added is the failure between the camera and
@@ -72,6 +75,11 @@ def make_environment(canonical):
             started=time.perf_counter();used=self.injector.apply(raw);finished=time.perf_counter()
             self.trace.append({'raw':raw,'used':used,'blur_ms':(finished-started)*1000,'clock':started,'simulator_ns':observation['stamp']})
             return observation if used is raw else dict(observation,frames=used)
+
+        def disarm(self):
+            # The canonical call returns False when the simulator does not answer it; the flight's record then says "not
+            # disarmed" although nothing about the policy or the finalizer failed. Remembered, so that such a flight is flown again.
+            answered=super().disarm();self.disarm_answered=answered;return answered
     return BlurEnv
 
 
@@ -126,6 +134,29 @@ def save_frames(folder,trace,every,quality,blurred):
 def condition_folder(root,phase,condition):return root/condition if phase=='main' else root/'repeat'/condition
 
 
+def set_aside(root,phase,start,condition,reason):
+    """Take a recorded flight out of the results because the harness, not the policy, decided its outcome; it is then flown
+    again like any flight that ended in a harness error. Nothing is deleted: the flight's summary, steps and frames are moved
+    to `set_aside` beside the results, and the flight log gets a line saying what was done and why."""
+    folder=condition_folder(root,phase,condition);data=json.loads((folder/'results.json').read_text(encoding='utf-8'))
+    kept=[episode for episode in data['episodes'] if episode['id']!=start];taken=[episode for episode in data['episodes'] if episode['id']==start]
+    if len(taken)!=1:raise SystemExit(f'{start} is not among the recorded {condition} flights')
+    aside=folder/'set_aside';aside.mkdir(exist_ok=True);moved={}
+    for name in ('steps.jsonl','extra.jsonl'):
+        lines=(folder/name).read_text(encoding='utf-8').splitlines();mine=[line for line in lines if json.loads(line)['episode']==start]
+        (folder/name).write_text(''.join(line+'\n' for line in lines if json.loads(line)['episode']!=start),encoding='utf-8');moved[name]=mine
+    (aside/f'{start}.json').write_text(json.dumps({'reason':reason,'summary':taken[0],'steps':[json.loads(line) for line in moved['steps.jsonl']],
+                                                   'extra':[json.loads(line) for line in moved['extra.jsonl']]}),encoding='utf-8')
+    if (folder/'frames'/start).exists():(folder/'frames'/start).rename(aside/f'{start}-frames')
+    data['episodes']=kept;(folder/'results.json').write_text(json.dumps(data,indent=1),encoding='utf-8')
+    log=root/('flights.jsonl' if phase=='main' else 'repeat/flights.jsonl')
+    with log.open('a',encoding='utf-8') as file:
+        file.write(json.dumps({'phase':phase,'start':start,'condition':condition,'outcome':'set_aside_as_runtime_error','error':reason,
+                               'recorded_as':{key:taken[0].get(key) for key in ('success','reason','steps','landed_on','stable_physical_landing','system_land_success')},
+                               'started_epoch':time.time(),'seconds':0.})+'\n')
+    print(f'set aside {start} {condition}: {reason}')
+
+
 def flown(folder):
     path=folder/'results.json'
     return json.loads(path.read_text(encoding='utf-8'))['episodes'] if path.exists() else []
@@ -147,7 +178,9 @@ async def fly(args):
     attempts={}
     if log.exists():
         for line in log.read_text(encoding='utf-8').splitlines():
-            entry=json.loads(line);key=(entry['start'],entry['condition']);attempts[key]=attempts.get(key,0)+1
+            entry=json.loads(line);key=(entry['start'],entry['condition'])
+            # A flight set aside afterwards was one attempt, already counted by its own line.
+            if entry['outcome']!='set_aside_as_runtime_error':attempts[key]=attempts.get(key,0)+1
     limit=experiment['runtime']['attempts_per_flight']
     pending=[flight for flight in flights if flight not in finished and attempts.get(flight,0)<limit]
     given_up=[flight for flight in flights if flight not in finished and attempts.get(flight,0)>=limit]
@@ -167,7 +200,7 @@ async def fly(args):
         for index,(start,condition) in enumerate(flights):
             if (start,condition) not in pending:continue
             episode=dict(by_id[start]);folder=condition_folder(root,args.phase,condition);folder.mkdir(parents=True,exist_ok=True)
-            injector=blur.Injector(condition);env.injector=injector;env.trace=[];policy=RecordedPolicy(model)
+            injector=blur.Injector(condition);env.injector=injector;env.trace=[];env.disarm_answered=None;policy=RecordedPolicy(model)
             entry={'phase':args.phase,'index':index,'start':start,'condition':condition,'position_in_start':index%len(experiment['conditions']),
                    'attempt':attempts.get((start,condition),0)+1,'started_epoch':time.time()}
             try:
@@ -183,10 +216,12 @@ async def fly(args):
                 status=3;continue
             # Outside the retry: a harness that gave the policy anything but what it logged stops the experiment.
             rows,checks=examine(injector,env.trace,policy.seen,steps,episode,uses_proprio)
-            factor=checks['real_time_factor']
-            if factor is not None and factor<experiment['runtime']['real_time']['minimum_factor']:
-                # The simulator did not keep real time: not a flight of the policy. Logged, and flown again.
-                entry.update(outcome='runtime_error',error=f'simulator advanced {factor:.2f} of real time',seconds=time.time()-entry['started_epoch'])
+            factor=checks['real_time_factor'];slow=factor is not None and factor<experiment['runtime']['real_time']['minimum_factor']
+            if slow or env.disarm_answered is False:
+                # The simulator did not keep real time, or stopped answering at the disarm call: not a flight of the policy.
+                # Logged, and flown again.
+                entry.update(outcome='runtime_error',error=f'simulator advanced {factor:.2f} of real time' if slow else 'the simulator did not answer the disarm call',
+                             seconds=time.time()-entry['started_epoch'])
                 attempts[(start,condition)]=entry['attempt']
                 with log.open('a',encoding='utf-8') as file:file.write(json.dumps(entry)+'\n')
                 print(f'INVALID {start} {condition}: {entry["error"]}',flush=True);status=3;continue
@@ -217,8 +252,12 @@ def main():
     run=commands.add_parser('fly');run.add_argument('--host',required=True);run.add_argument('--ports',type=int,nargs=2,default=[8989,8990])
     run.add_argument('--phase',choices=('main','repeat'),default='main');run.add_argument('--output',default='outputs/failures/gaussian_blur')
     run.add_argument('--limit',type=int,default=0,help='only the first N starts of the phase');run.add_argument('--starts',help='another starts file (for a check of the harness; never mixed into the experiment)')
+    aside=commands.add_parser('set-aside');aside.add_argument('start');aside.add_argument('condition',choices=blur.SEVERITY_ORDER);aside.add_argument('--reason',required=True)
+    aside.add_argument('--phase',choices=('main','repeat'),default='main');aside.add_argument('--output',default='outputs/failures/gaussian_blur')
     parser.add_argument('--config');args=parser.parse_args();experiment=blur.load(args.config)
     if args.command=='subset':write_subset(experiment);return
+    if args.command=='set-aside':
+        root=Path(args.output);set_aside(root if root.is_absolute() else ROOT/root,args.phase,args.start,args.condition,args.reason);return
     if args.command=='order':
         episodes=starts_of(experiment);flights=blur.flight_order(experiment,phase_ids(experiment,args.phase,episodes),args.phase)
         print(json.dumps({'phase':args.phase,'flights':len(flights),'position_of_each_condition':blur.positions(flights,list(experiment['conditions'])),'order':flights},indent=1));return

@@ -28,7 +28,8 @@ function Confirm-FrozenBaseline([string]$When) {
     $taskResult=& $taskPython (Join-Path $PSScriptRoot 'freeze_baseline.py') verify $taskFrozen
     $taskPassed=($LASTEXITCODE -eq 0)
     $taskLine=@{when=$When;phase=$Phase;utc=(Get-Date).ToUniversalTime().ToString('o');passed=$taskPassed;result=(($taskResult -join '') | ConvertFrom-Json)} | ConvertTo-Json -Compress -Depth 5
-    Add-Content -LiteralPath (Join-Path $taskRecords 'frozen_verification.jsonl') -Value $taskLine -Encoding utf8
+    # Appended as plain UTF-8 (Windows PowerShell's own utf8 writes a byte-order mark that JSON readers trip over).
+    [IO.File]::AppendAllText((Join-Path $taskRecords 'frozen_verification.jsonl'),$taskLine+"`n",(New-Object Text.UTF8Encoding $false))
     if (-not $taskPassed) { throw "The frozen baseline does not match its record ($When); flights made with it are not valid." }
     Write-Host "Frozen baseline verified ($When)."
 }
@@ -56,8 +57,10 @@ for ($taskAttempt=1; $taskAttempt -le $Attempts; $taskAttempt++) {
         $taskArgs=@('-d',$Distro,'--exec',$taskWslPython,"$taskWslRoot/scripts/blur_characterization.py",'fly','--host',$taskHost,'--ports',"$TopicsPort","$ServicesPort",'--phase',$Phase,'--output',"$taskWslRoot/$($Output.Replace('\','/'))")
         if ($Limit) { $taskArgs+='--limit'; $taskArgs+="$Limit" }
         if ($Starts) { $taskArgs+='--starts'; $taskArgs+=$Starts.Replace('\','/') }
-        Write-Host "Blur characterization ($Phase), launch $taskAttempt of at most $Attempts; progress: $Output/worker-$Phase.log"
-        $taskWorker=Start-Process -FilePath 'wsl.exe' -ArgumentList (Join-NativeArguments $taskArgs) -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $taskOutput "worker-$Phase-$taskAttempt.log") -RedirectStandardError (Join-Path $taskOutput "worker-$Phase-$taskAttempt-errors.log")
+        # One log per launch, named by its time: a later launch of the same phase must not write over an earlier one's.
+        $taskLog="worker-$Phase-$((Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ'))"
+        Write-Host "Blur characterization ($Phase), launch $taskAttempt of at most $Attempts; progress: $Output/$taskLog.log"
+        $taskWorker=Start-Process -FilePath 'wsl.exe' -ArgumentList (Join-NativeArguments $taskArgs) -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $taskOutput "$taskLog.log") -RedirectStandardError (Join-Path $taskOutput "$taskLog-errors.log")
         Enable-ProcessExitTracking $taskWorker
         $taskWorker.WaitForExit()
         $taskCode=$taskWorker.ExitCode
@@ -69,7 +72,7 @@ for ($taskAttempt=1; $taskAttempt -le $Attempts; $taskAttempt++) {
     }
     Confirm-FrozenBaseline "after launch $taskAttempt"
     if ($taskCode -eq 0) { Write-Host "Blur characterization ($Phase) complete: $Output"; exit 0 }
-    if ($taskCode -notin 3,4) { throw "Blur characterization worker failed (exit $taskCode); inspect $Output/worker-$Phase-$taskAttempt.log and its errors log" }
+    if ($taskCode -notin 3,4) { throw "Blur characterization worker failed (exit $taskCode); inspect $Output/$taskLog.log and its errors log" }
     Write-Host "Worker ended with flights left (exit $taskCode); starting again."
 }
 throw "Flights remain after $Attempts launches; inspect $Output/flights.jsonl"

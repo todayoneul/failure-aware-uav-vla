@@ -315,4 +315,25 @@ class AnalysisTests(unittest.TestCase):
         self.assertFalse(np.array_equal(render(waiting,control,images)[40:100,630:935],render(waiting,mission_key(mission_key(control,ord('b')),ord('3')),images)[40:100,630:935]))
 
 
+class SetAsideTests(unittest.TestCase):
+    def test_a_flight_the_harness_decided_is_taken_out_whole_kept_and_can_be_flown_again(self):
+        from scripts import blur_characterization as worker
+        lines=lambda rows:''.join(json.dumps(row)+chr(10) for row in rows)
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);folder=root/'clean';(folder/'frames/a').mkdir(parents=True);(folder/'frames/a/0000.jpg').write_bytes(b'x')
+            episode=lambda name,ok:{'id':name,'success':ok,'reason':'landed','steps':2,'landed_on':'blue_pad','stable_physical_landing':True,'system_land_success':ok}
+            (folder/'results.json').write_text(json.dumps({'policy':'oft','config':{},'episodes':[episode('a',False),episode('b',True)]}))
+            (folder/'steps.jsonl').write_text(lines({'episode':name,'step':index} for name in 'ab' for index in range(2)))
+            (folder/'extra.jsonl').write_text(lines({'episode':name,'step':index} for name in 'ab' for index in range(2)))
+            (root/'flights.jsonl').write_text(lines([{'start':'a','condition':'clean','outcome':'flown','attempt':1}]))
+            with patch('builtins.print'):worker.set_aside(root,'main','a','clean','the simulator did not answer the disarm call')
+            self.assertEqual([item['id'] for item in json.loads((folder/'results.json').read_text())['episodes']],['b'])
+            self.assertEqual({json.loads(line)['episode'] for line in (folder/'steps.jsonl').read_text().splitlines()},{'b'})
+            kept=json.loads((folder/'set_aside/a.json').read_text());self.assertEqual((kept['summary']['id'],len(kept['steps']),len(kept['extra'])),('a',2,2))
+            self.assertTrue((folder/'set_aside/a-frames/0000.jpg').exists())
+            log=[json.loads(line) for line in (root/'flights.jsonl').read_text().splitlines()]
+            self.assertEqual((log[-1]['outcome'],log[-1]['recorded_as']['stable_physical_landing'],log[-1]['recorded_as']['success']),('set_aside_as_runtime_error',True,False))
+            with self.assertRaises(SystemExit),patch('builtins.print'):worker.set_aside(root,'main','a','clean','again')
+
+
 if __name__=='__main__':unittest.main()

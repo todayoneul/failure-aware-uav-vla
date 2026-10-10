@@ -86,8 +86,23 @@ def landing_table(items):
             'finalizer_latched':sum(bool(i['finalizer_triggered']) for i in land),'disarmed':sum(bool(i['disarm_triggered']) for i in land),
             # Found, grounded and aligned over the pad, and the mission still failed: a failure of the landing itself.
             'failed_after_alignment':[i['episode'] for i in after],
+            # Of the landings that got over the pad: how many then started to descend, and how many touched it.
+            'descent_of_those_over_the_pad':[sum(bool(i['descent_started']) for i in land if i['over_pad']),sum(i['over_pad'] for i in land)],
+            'touched_of_those_that_descended':[sum(bool(i['touchdown_on_target']) for i in land if i['descent_started']),sum(bool(i['descent_started']) for i in land)],
             'touchdown_error_m':spread([i['touchdown_error_m'] for i in land if i['touchdown_on_target']]),
             'touchdown_vertical_mps':spread([i['touchdown_vertical_mps'] for i in land if i['touchdown_on_target']])}
+
+
+def stops_table(items,radius,pad_half_m=7.):
+    """Where the flights ended that the policy ended itself without completing the mission. Descriptive: added while reading
+    the flights, not one of the measures fixed beforehand."""
+    stopped=[i for i in items if i['self_stop'] and not i['success'] and not i['collision']];land=[i for i in stopped if i['task']=='land' and not i['landed']]
+    return {'own_stop_without_success':len(stopped),'within_the_first_10_decisions':sum(i['steps']<=10 for i in stopped),
+            'farther_than_the_success_radius':sum(i['final_distance_m']>radius for i in stopped),
+            'landings_stopped_in_the_air':len(land),'landings_stopped_in_the_air_over_the_pad':sum(i['final_distance_m']<=pad_half_m for i in land),
+            'landings_stopped_in_the_air_within_the_radius':sum(i['final_distance_m']<=radius for i in land),
+            'final_distance_m':spread([i['final_distance_m'] for i in stopped]),'final_height_m':spread([i['final_height_m'] for i in land]),
+            'decisions':spread([i['steps'] for i in stopped]),'starts':[i['episode'] for i in stopped]}
 
 
 def search_table(items):
@@ -180,6 +195,8 @@ def analyse(root,starts=None):
     summary['by_band_landing']=by_group({name:{'items':[i for i in item['items'] if i['task']=='land']} for name,item in data.items()},lambda i:i['band'],('near','mid','far'))
     summary['by_initial_visibility']=by_group(data,lambda i:'visible' if i['initially_visible'] else 'invisible',('visible','invisible'))
     summary['by_task']=by_group(data,lambda i:i['task'],('land','approach'))
+    both=lambda i:i['task']+', '+('visible' if i['initially_visible'] else 'invisible')
+    summary['by_task_and_initial_visibility']=by_group(data,both,('land, visible','land, invisible','approach, visible','approach, invisible'))
     summary['by_distractor']=by_group(data,kind,('none','same_color','same_shape'))
     summary['by_related_object_in_first_view']=by_group(data,lambda i:'related first' if facts[i['episode']]['first_view'] else 'no related object first',('related first','no related object first'))
     summary['by_scene']=by_group(data,lambda i:i['map'],sorted(scenes))
@@ -187,6 +204,8 @@ def analyse(root,starts=None):
                                        for row in selection(item['items'],item['episodes'],item['steps'],landing)] for name,item in data.items()}
     summary['landing']={name:landing_table(item['items']) for name,item in data.items()}
     summary['search']={name:search_table(item['items']) for name,item in data.items()}
+    from src.visual_search.episodes import load_config
+    summary['own_stops']={name:stops_table(item['items'],load_config()['success_radius_m']) for name,item in data.items()}
     summary['grounding']={name:grounding_table(item['items']) for name,item in data.items()}
     summary['wrong_targets']=[row for name,item in data.items() for row in wrong_targets(name,item['items'],facts,scenes)]
     confusions={}
@@ -216,7 +235,8 @@ def analyse(root,starts=None):
     # The clean flights of this run against the clean test flown before.
     historical=ROOT/experiment['historical_clean']['run']/'episodes.csv'
     if historical.exists() and 'clean' in data:
-        with historical.open(encoding='utf-8') as file:before={row['episode']:row['success']=='True' for row in csv.DictReader(file)}
+        # (The file also holds the teacher's flights over the same starts.)
+        with historical.open(encoding='utf-8') as file:before={row['episode']:row['success']=='True' for row in csv.DictReader(file) if row['model']!='Teacher'}
         now=outcome['clean']
         summary['clean_reproducibility']={'historical':share(sum(before.values()),len(before)),'this_run':share(sum(now.values()),len(now)),
                                           'same_outcome':sum(before[start]==now[start] for start in now if start in before),
@@ -234,8 +254,9 @@ def analyse(root,starts=None):
     attempts=[];given_up=[]
     for phase,path in (('main',root/'flights.jsonl'),('repeat',root/'repeat/flights.jsonl')):
         if path.exists():attempts+=[json.loads(line) for line in path.read_text(encoding='utf-8').splitlines()]
-    errors=[entry for entry in attempts if entry['outcome']=='runtime_error']
-    summary['runtime']={'attempts':len(attempts),'harness_errors':[{key:entry[key] for key in ('phase','start','condition','attempt','error')} for entry in errors],
+    errors=[entry for entry in attempts if entry['outcome'] in ('runtime_error','set_aside_as_runtime_error')]
+    summary['runtime']={'attempts':sum(entry['outcome']!='set_aside_as_runtime_error' for entry in attempts),
+                        'harness_errors':[{key:entry.get(key) for key in ('phase','start','condition','attempt','outcome','error','recorded_as')} for entry in errors],
                         'flights_never_completed':[start+' '+name for name in data for start in ids if start not in data[name]['by_start']]}
     return summary,data,again,cells,facts
 
@@ -258,18 +279,33 @@ def lines_of(summary,cells,facts):
                 summary['retention'][name]['landing']['drop_points'],summary['retention'][name]['landing']['retention']) for name in conditions])
     for title,key,names in (('Distance band','by_band',('near','mid','far')),('Distance band, landings only','by_band_landing',('near','mid','far')),
                             ('Named object in the first view','by_initial_visibility',('visible','invisible')),('Task','by_task',('land','approach')),
+                            ('Task and first view','by_task_and_initial_visibility',('land, visible','land, invisible','approach, visible','approach, invisible')),
                             ('Related object beside the named one or first in view','by_distractor',('none','same_color','same_shape')),
                             ('A related object in the first view, the named one outside it','by_related_object_in_first_view',('related first','no related object first')),
                             ('Scene','by_scene',tuple(summary['by_scene']))):
         table(title,('Group',)+head,[(name,)+tuple(pair(summary[key][name][condition]) for condition in conditions) for name in names])
     keys=('landings','down_view_saw_the_pad','over_the_pad','alignment','descent','correct_pad_touched','touched_another_pad','touchdown','stable_landing','system_landing','strict_zero_action','finalizer_latched','disarmed')
     table('Landing',('Metric',)+head,[(key.replace('_',' '),)+tuple(summary['landing'][name][key] for name in conditions) for key in keys]
-          +[('failed after alignment',)+tuple(len(summary['landing'][name]['failed_after_alignment']) for name in conditions)])
+          +[('failed after alignment',)+tuple(len(summary['landing'][name]['failed_after_alignment']) for name in conditions),
+            ('descent started, of those over the pad',)+tuple(share(*summary['landing'][name]['descent_of_those_over_the_pad']) for name in conditions),
+            ('named pad touched, of those that descended',)+tuple(share(*summary['landing'][name]['touched_of_those_that_descended']) for name in conditions),
+            ('median touchdown error (m)',)+tuple(None if not summary['landing'][name]['touchdown_error_m'] else round(summary['landing'][name]['touchdown_error_m']['median'],2) for name in conditions)])
+    if summary.get('apparent_size'):
+        table('Size of the named object in the Front image at its first sighting (starts split at the clean median)',('Group',)+head,
+              [(name,)+tuple(pair(summary['apparent_size']['success'][name][condition]) for condition in conditions) for name in ('small','large')])
+    table('Order of the four flights of a start (mission success by position)',('Position',)+head,
+          [(f'{position+1}.',)+tuple(pair(summary['position_in_start'][name][str(position)]) for name in conditions) for position in range(4)])
     table('Search (starts with the named object outside the first view)',('Metric',)+head,
           [('starts',)+tuple(summary['search'][name]['starts_with_the_target_outside_the_first_view'] for name in conditions),
            ('acquired',)+tuple(summary['search'][name]['acquired'] for name in conditions),('mission success',)+tuple(summary['search'][name]['success'] for name in conditions),
            ('median decision of first sighting',)+tuple((summary['search'][name]['first_view_step'] or {}).get('median') for name in conditions),
            ('median yaw before first sighting (deg)',)+tuple((summary['search'][name]['yaw_before_first_view_deg'] or {}).get('median') for name in conditions)])
+    table('Flights the policy ended itself without completing the mission (descriptive)',('Metric',)+head,
+          [(key.replace('_',' '),)+tuple(summary['own_stops'][name][key] for name in conditions)
+           for key in ('own_stop_without_success','within_the_first_10_decisions','farther_than_the_success_radius','landings_stopped_in_the_air',
+                       'landings_stopped_in_the_air_within_the_radius','landings_stopped_in_the_air_over_the_pad')]
+          +[('median final distance (m)',)+tuple((summary['own_stops'][name]['final_distance_m'] or {}).get('median') for name in conditions),
+            ('median final height of landings stopped in the air (m)',)+tuple((summary['own_stops'][name]['final_height_m'] or {}).get('median') for name in conditions)])
     table('Grounding transition',('Metric',)+head,[(key.replace('_',' '),)+tuple(summary['grounding'][name][key] for name in conditions)
                                                   for key in ('in_view','grounded','grounded_on_first_view','ended_at_named_object')])
     table('Failure class (first stage not passed)',('Class',)+head,[(label,)+tuple(len(summary['taxonomy'][name][label]) for name in conditions) for label in blur.ALL_CLASSES])
@@ -370,7 +406,7 @@ def figures(summary,data,cells,output):
     figure,axes=plt.subplots(1,2,figsize=(9,3.4))
     for axis,camera in zip(axes,blur.CAMERAS):
         values=[[max(row['quality']['input'][camera]['laplacian_variance'],1e-3) for rows in data[name]['extra'].values() for row in rows] for name in conditions]
-        parts=axis.boxplot(values,labels=conditions,showfliers=False,patch_artist=True)
+        parts=axis.boxplot(values,tick_labels=conditions,showfliers=False,patch_artist=True)
         for patch,name in zip(parts['boxes'],conditions):patch.set_facecolor(colours[name])
         axis.set_yscale('log');axis.set_title(f'{camera.capitalize()} camera',fontsize=9);axis.set_ylabel('Laplacian variance of the model input (log)')
     figure.suptitle('Sharpness of the frames the policy was given, every decision',fontsize=10);figure.tight_layout();figure.savefig(output/'laplacian_variance.png',dpi=110);plt.close(figure)
