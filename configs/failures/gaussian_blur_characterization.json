@@ -1,0 +1,87 @@
+{
+  "description": "Gaussian blur robustness characterization of the frozen clean baseline (docs/failure_gaussian_blur.md). One independent variable: the severity of a Gaussian blur applied to the Front and Down RGB frames the policy is given. Everything here was fixed and committed before any flight of the experiment, and nothing in it is changed after a result is seen. Nothing is trained, detected or recovered.",
+  "question": "At which severity, at which stage and by how much does Gaussian blur damage visual search, language-conditioned target grounding, approach, alignment and landing of a system that reaches 47/48 on the clean canonical test?",
+  "checkpoint": "outputs/aerovla_oft/checkpoints/grounding_film",
+  "frozen_record": "grounding_film",
+  "starts": "configs/gen_v3_canonical_44m_test.json",
+  "starts_note": "The 48 canonical test starts, flown once clean before. They are reused here as a paired benchmark, not to select or train a model. Recovery work designed from these results must be evaluated on new starts.",
+  "conditions": {
+    "clean": null,
+    "low": {"kernel": 7, "sigma": 1.5},
+    "medium": {"kernel": 15, "sigma": 3.0},
+    "high": {"kernel": 31, "sigma": 6.0}
+  },
+  "conditions_note": "The severities of the interactive demo's keys 1 / 2 / 3 (src/failures/gaussian_blur.py), applied with cv2.GaussianBlur to the 256 x 256 camera frame before any preprocessing. Clean is the camera frame itself, the same array.",
+  "cameras": ["front", "down"],
+  "not_given_to_the_policy": ["whether blur is on", "severity", "kernel", "sigma", "any image-quality number"],
+  "unchanged_between_conditions": ["checkpoint", "sentence", "target", "scene and layout", "start pose and height", "landing finalizer", "evaluator", "decision budget", "executor", "camera", "success rule"],
+  "ground_truth": "Visibility, depth, target geometry, contacts, the finalizer and the evaluator read the simulator as it is. Only the two RGB arrays handed to the policy are blurred.",
+  "order": {
+    "seed": 31001,
+    "rule": "Start by start in the order of the starts file; the four conditions of a start in one of the 24 possible orders. Each order is used for two starts, so every condition is flown first, second, third and last of its start 12 times. Which start gets which order is drawn from the seed (src/failures/blur_experiment.flight_order). Every flight is its own episode: the scene is loaded again and nothing is carried over."
+  },
+  "repeat": {
+    "subset": "configs/failures/gaussian_blur_repeat_subset.json",
+    "seed": 31002,
+    "selection_seed": 31003,
+    "composition": {"same_color": 3, "same_shape": 2, "initially_invisible": 2, "far": 2, "landing_heavy": 2, "easy_control": 1},
+    "rule": "Twelve starts chosen from the plan of the starts alone, before any flight: for each kind in turn, the first starts of a seeded shuffle that are of the kind and not yet chosen. same_color / same_shape: the object beside the named one, or a related object in the first view, shares only that attribute. initially_invisible: the named object is outside the first view. far: 32-44 m. landing_heavy: a landing from 10-20 m with the pad in the first view, so the flight is mostly alignment and descent. easy_control: an approach from 10-20 m with the object in the first view. After the main run the twelve are flown once more in all four conditions, in orders that form three Latin squares."
+  },
+  "runtime": {
+    "simulator_arguments": ["-windowed", "-ResX=640", "-ResY=480"],
+    "simulator_window": "shown",
+    "simulator_window_note": "The canonical test was flown with the simulator's window hidden. When this experiment was prepared the desktop session of the machine was disconnected, and in that state a hidden simulator took off and then stopped advancing (the unmodified evaluation launcher showed the same); with its window shown it flew normally. The window is therefore shown, with the same size and arguments, for every flight of this experiment, the clean ones included.",
+    "real_time": {
+      "minimum_factor": 0.8,
+      "rule": "The simulator's clock is meant to follow real time. For every flight the simulator time and the wall time between its first and its last decision are logged. A flight in which the simulator advanced less than `minimum_factor` of the wall time did not have a working simulator: it is a harness error, logged and flown again, whatever its outcome. Fixed before any flight."
+    },
+    "finalizer": "on",
+    "evaluation_loop": "scripts/visual_search.run_episode after SearchEnv.reset, as in the canonical test",
+    "attempts_per_flight": 3,
+    "runtime_error": "A flight that ends in an exception of the harness (simulator not answering, a missing camera image, a failed take-off) is flown again and every such attempt is logged in flights.jsonl. A flight that the policy ended, or that ran out of decisions, collided or went to a wrong object, is a result and is never flown again."
+  },
+  "frames": {"every_decisions": 2, "jpeg_quality": 90, "note": "For figures: the raw Front and Down frames and, in a blurred condition, the frames the policy was given. Local files, not in Git."},
+  "image_quality": {
+    "note": "Computed after a flight from the arrays it used, for every decision, for the raw frame and for the frame given to the policy. Analysis only: no threshold is derived or applied, and the policy never receives any of it.",
+    "laplacian_variance": "variance of the 3 x 3 Laplacian of the grey image",
+    "gradient_magnitude": "mean magnitude of the 3 x 3 Sobel gradient of the grey image",
+    "local_contrast": "mean standard deviation of the grey levels over 16 x 16 pixel blocks"
+  },
+  "measures": {
+    "note": "Every flight is read by the reader of the canonical tables (scripts/freeze_gen_v3.read), unchanged.",
+    "mission_success": "the canonical success: a landing is the system's landing (stable physical landing on the named pad, latched and disarmed); an approach is a stop in the air within 15 m by the policy itself",
+    "acquisition": "the named object was in the Front or Down view at some decision (simulator ground truth and depth)",
+    "correct_grounding": "of the flights that acquired it: while it was in view the policy began to fly toward it (three decisions in a row with a forward command of at least 0.25 m)",
+    "ended_at_named_object": "the object the flight ended at is the named one",
+    "wrong_target": "the flight ended at another object, or came within 15 m of one without ever coming within 20 m of the named one",
+    "approach": "came within 20 m of the named object",
+    "alignment": "landings: over the pad and within 3.5 m of its centre at some decision. Stricter than a landing needs (the landing region reaches 6.6 m), so a landing can succeed without it",
+    "descent": "landings: over the pad, and then at least 1 m lower",
+    "touchdown": "landings: a soft contact with the named pad inside its landing region",
+    "stable_landing": "landings: and standing still on it at the end (evaluator v2)",
+    "system_landing": "landings: and latched and disarmed by the finalizer",
+    "strict_zero_action": "landings: on the named pad and the policy gave the zero action by itself",
+    "collision": "a contact with anything but the top of a pad",
+    "timeout": "the flight used all its decisions"
+  },
+  "taxonomy": {
+    "note": "A failed flight gets one class: the first stage it did not pass, in the canonical classifier's order (collision, search, wrong target, grounding, approach, then stop for an approach, and alignment, descent, landing for a landing). How a flight ended (timeout, own stop, collision, contact) is reported beside it. The count of flights that ended at a wrong object is reported whatever class they have.",
+    "B1_SEARCH_FAILURE": "the named object never came into view",
+    "B2_GROUNDING_FAILURE": "it was in view and the policy never began to fly toward it",
+    "B3_APPROACH_FAILURE": "it began, and never came within 20 m; or an approach stopped by itself outside 15 m",
+    "B4_ALIGNMENT_FAILURE": "a landing came within 20 m and was never over the pad within 3.5 m of its centre",
+    "B5_DESCENT_FAILURE": "aligned, and the descent never started",
+    "B6_TOUCHDOWN_FAILURE": "the descent started and the named pad was not touched",
+    "B7_STABLE_LANDING_FAILURE": "the named pad was touched and the landing is not a stable one inside the region, or the finalizer did not latch and disarm",
+    "B8_WRONG_TARGET": "the flight ended at another object (after having seen the named one)",
+    "B9_COLLISION": "a collision",
+    "B10_TIMEOUT": "an approach came within 20 m and the policy never stopped",
+    "B11_RUNTIME_ERROR": "the harness failed on every attempt; counted apart from mission failures",
+    "B12_OTHER": "anything else, such as a touchdown during an approach"
+  },
+  "historical_clean": {
+    "run": "outputs/generalization/grounding_architecture/test",
+    "success": "47/48",
+    "note": "Flown once on 2026-10-10 before this experiment. The clean condition is flown again here, in the same process and between the blurred flights."
+  }
+}

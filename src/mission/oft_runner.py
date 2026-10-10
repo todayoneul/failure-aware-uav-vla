@@ -191,10 +191,17 @@ class Watch:
         # The files the viewer shows are these very arrays, and the hashes let it check that.
         self.feed.image(files['front'],front);self.feed.image(files['down'],down)
         unchanged=front is self.raw.get('front') and down is self.raw.get('down')
-        self.inputs.append({'step':self.step,'input_sha256':hashes,'instruction':instruction,'proprio':proprio,'camera_frames_unchanged':unchanged,
-                            'failure':self.blur['failure_type'] if self.blur.get('failure_enabled') else 'normal'})
+        # Under a failure the camera's own frames are kept beside the model's: for the evaluator and for looking at, never for the policy.
+        raw_hashes=hashes if unchanged else {name:sha256(self.raw[name]) for name in ('front','down')};raw_files=None
+        if not unchanged:
+            raw_files={name:f'raw_{slot}_{name}.png' for name in ('front','down')}
+            for name in raw_files:self.feed.image(raw_files[name],self.raw[name])
+        self.inputs.append({'step':self.step,'input_sha256':hashes,'raw_sha256':raw_hashes,'instruction':instruction,'proprio':proprio,
+                            'camera_frames_unchanged':unchanged,'failure':self.blur['failure_type'] if self.blur.get('failure_enabled') else 'normal',
+                            'severity':self.blur.get('severity') if self.blur.get('failure_enabled') else None,
+                            'kernel':self.blur.get('kernel'),'sigma':self.blur.get('sigma')})
         self.telemetry.update(step=self.step,input_step=self.step,input_files=files,phase='AeroVLA-OFT inference',
-                              failure={**self.blur,'used_frame_sha256':hashes,'camera_frames_unchanged':unchanged},
+                              failure={**self.blur,'used_frame_sha256':hashes,'raw_frame_sha256':raw_hashes,'raw_files':raw_files,'camera_frames_unchanged':unchanged},
                               model_input={'step':self.step,'instruction':instruction,'sha256':hashes,'proprio_sent':proprio is not None,
                                            'scope':'actual model input'},input_verified=None)
         self.publish()
@@ -377,6 +384,8 @@ async def main(args):
                 # The hashes the canonical loop logged for what it gave the policy, against those of what the display was given.
                 'input_hash_agreement':agreed if steps else None,
                 'camera_frames_unchanged':all(item['camera_frames_unchanged'] for item in watch.inputs) if watch.inputs else None,
+                # Decisions per failure condition of this flight (the B / 1 / 2 / 3 keys can change it between decisions).
+                'failure_decisions':{name:sum((item['severity'] or 'clean')==name for item in watch.inputs) for name in ('clean','low','medium','high')},
                 'mean_decision_s':summary.get('mean_decision_s') if summary else None})
         print(f'MISSION {mission_id} {target["object_id"]} {task} -> {state_name}: {reason}',flush=True)
         if back:

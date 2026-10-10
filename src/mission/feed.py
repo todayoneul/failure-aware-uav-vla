@@ -13,7 +13,7 @@ import threading
 import time
 from pathlib import Path
 from src.failures.control import read_control
-from src.failures.gaussian_blur import GaussianBlurFailure,SEVERITIES
+from src.failures.blur_experiment import Injector
 from src.integration.blur_demo_support import publish_image
 
 
@@ -24,7 +24,7 @@ class Feed:
     def __init__(self,output,period_s=.05):
         self.output=Path(output);self.output.mkdir(parents=True,exist_ok=True);self.period=period_s
         self.control=read_control(self.output/'control.json');self.control_warning=None
-        self.failure=GaussianBlurFailure();self.last_chase=0.;self.chase_ready=False
+        self.injector=Injector('clean');self.last_chase=0.;self.chase_ready=False
         self.lock=threading.Lock();self.pending={};self.lines=[];self.wake=threading.Event();self.idle=threading.Event();self.idle.set()
         self.closed=False;self.errors=[]
         self.thread=threading.Thread(target=self._run,name='mission-feed',daemon=True);self.thread.start()
@@ -50,13 +50,13 @@ class Feed:
         self.wake.set()
 
     def fail(self,frames):
-        """The frames the policy is to be given, and what was done to them. Blur off: the same arrays, untouched."""
-        control=self.control;enabled=bool(control['enabled'])
-        self.failure.enabled=enabled;self.failure.set_severity(control['severity'])
-        used={name:self.failure.apply(frame) for name,frame in frames.items()} if enabled else frames
-        kernel,sigma=SEVERITIES[control['severity']]
+        """The frames the policy is to be given, and what was done to them. Blur off: the same arrays, untouched.
+        Blur on: the experiment's own injector (src/failures/blur_experiment.py), Front and Down with the key's severity."""
+        control=self.control;name=control['severity'] if control['enabled'] else 'clean'
+        if name!=self.injector.name:self.injector=Injector(name)
+        used=self.injector.apply(frames);enabled=name!='clean'
         return used,{'failure_enabled':enabled,'failure_type':'gaussian_blur' if enabled else 'normal','severity':control['severity'],
-                     'revision':control['revision'],'kernel':kernel,'sigma':sigma}
+                     'revision':control['revision'],'kernel':self.injector.kernel,'sigma':self.injector.sigma}
 
     def chase_callback(self,_,message):
         """The simulator's chase camera, on the subscriber's own thread."""

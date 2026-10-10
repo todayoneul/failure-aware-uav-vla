@@ -8,6 +8,7 @@ import math
 import textwrap
 import cv2
 import numpy as np
+from src.failures.gaussian_blur import SEVERITIES
 from src.mission.geometry import world_to_pixel
 
 WINDOW='MISSION CONTROL | AeroVLA-OFT grounding_film'
@@ -70,7 +71,7 @@ def render(telemetry,control,images,show_overlay=False):
     # --- header ---------------------------------------------------------------------------------------------------------
     text('Mission Control',20,35,.9,INK,2)
     text(status,20,75,.8,GREEN if status=='SUCCESS' else RED if status in ('FAILED','ABORTED') else BLUE,2)
-    text(f'Target: {target["name"] if target else "none - click an object or press N"}',300,62,.62,INK,2)
+    text(f'Target: {target["name"] if target else "none"}',300,62,.62,INK,2)
     text(f'Task: {task}',300,88,.62,PURPLE,2)
     launch=telemetry.get('launch') or {}
     line=f'Launch: {launch.get("name","--")} ({launch.get("index",0)+1}/{launch.get("count",1)})'
@@ -87,9 +88,15 @@ def render(telemetry,control,images,show_overlay=False):
     else:text('Checkpoint loading...',940,60,.47,BLUE)
     frozen=str(policy.get('frozen','--')).upper()
     text(f'Grounding: {"FiLM" if kind=="film" else kind} | frozen baseline: {frozen}',940,82,.47,GREEN if frozen=='VERIFIED' else RED)
-    failure=telemetry.get('failure') or {};blur=failure.get('failure_enabled')
+    # The failure the model's input is under now: what the last decision was given, or between flights what the keys ask for.
+    failure=telemetry.get('failure') or {};blur=failure.get('failure_enabled') if not preview else control.get('enabled')
+    severity=str(failure.get('severity') if not preview else control.get('severity','')).lower()
     text('Prompt mode: instruction-only (frozen)',940,104,.47,PURPLE)
-    text('Failure: '+(f'GAUSSIAN BLUR {failure.get("severity","").upper()}' if blur else 'NORMAL'),1250,104,.5,RED if blur else GREEN,2)
+    if blur:
+        kernel,sigma=SEVERITIES.get(severity,(failure.get('kernel'),failure.get('sigma')))
+        text('FAILURE: GAUSSIAN BLUR',640,62,.6,RED,2)
+        text(f'Severity: {severity.upper()} | Kernel: {kernel} x {kernel} | Sigma: {sigma}',640,88,.42,RED,1)
+    else:text('Failure: NORMAL',640,62,.6,GREEN,2)
 
     # --- buttons --------------------------------------------------------------------------------------------------------
     main=control.get('main_view','map')
@@ -184,7 +191,10 @@ def render(telemetry,control,images,show_overlay=False):
                     frame=overlay(frame,item.get('pixel') if item.get('in_fov') else None,item.get('visible'))
             canvas[754:1010,left:left+256]=frame
         else:cv2.rectangle(canvas,(left,754),(left+256,1010),(215,215,215),-1)
-    text('overlay is display-only' if show_overlay else 'raw frames: nothing is drawn on them',20,1026,.42,EVALUATOR if show_overlay else GRAY)
+    blurred=bool(failure.get('failure_enabled')) and not preview
+    if blurred and not show_overlay:
+        text('blurred frames are the MODEL INPUT',20,1023,.4,RED);text('RAW kept for evaluator/debug only',20,1037,.4,RED)
+    else:text('overlay is display-only' if show_overlay else 'raw frames: nothing is drawn on them',20,1026,.42,EVALUATOR if show_overlay else GRAY)
     inference=telemetry.get('inference') or {};action=inference.get('action');executed=telemetry.get('executed')
     text('Model action (decoded)',610,748,.56,INK,2);text('Executed command',900,748,.56,INK,2);text('Landing finalizer',1190,748,.56,INK,2)
     def axes(values,x,y):

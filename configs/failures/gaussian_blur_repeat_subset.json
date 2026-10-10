@@ -1,0 +1,165 @@
+{
+ "description": "The twelve canonical test starts flown a second time in every condition (configs/failures/gaussian_blur_characterization.json, `repeat`). Chosen from the plan of the starts before any flight of the experiment; a start may be of several kinds, `chosen_as` is the kind it was picked for.",
+ "rule": "Twelve starts chosen from the plan of the starts alone, before any flight: for each kind in turn, the first starts of a seeded shuffle that are of the kind and not yet chosen. same_color / same_shape: the object beside the named one, or a related object in the first view, shares only that attribute. initially_invisible: the named object is outside the first view. far: 32-44 m. landing_heavy: a landing from 10-20 m with the pad in the first view, so the flight is mostly alignment and descent. easy_control: an approach from 10-20 m with the object in the first view. After the main run the twelve are flown once more in all four conditions, in orders that form three Latin squares.",
+ "composition": {
+  "same_color": 3,
+  "same_shape": 2,
+  "initially_invisible": 2,
+  "far": 2,
+  "landing_heavy": 2,
+  "easy_control": 1
+ },
+ "selection_seed": 31003,
+ "starts": [
+  {
+   "id": "ct-9507-blue_pad-near_pair2",
+   "chosen_as": "same_color",
+   "same_color": true,
+   "same_shape": false,
+   "beside": "same_color",
+   "first_view": [],
+   "initially_invisible": false,
+   "band": "near",
+   "task": "land",
+   "role": "pair2"
+  },
+  {
+   "id": "ct-9521-blue_pad-far_visible-approach",
+   "chosen_as": "same_color",
+   "same_color": true,
+   "same_shape": false,
+   "beside": "same_color",
+   "first_view": [],
+   "initially_invisible": false,
+   "band": "far",
+   "task": "approach",
+   "role": "approach"
+  },
+  {
+   "id": "ct-9522-blue_pad-far_search-approach",
+   "chosen_as": "same_color",
+   "same_color": true,
+   "same_shape": false,
+   "beside": "same_color",
+   "first_view": [],
+   "initially_invisible": true,
+   "band": "far",
+   "task": "approach",
+   "role": "approach"
+  },
+  {
+   "id": "ct-9508-red_pad-near_red_visible",
+   "chosen_as": "same_shape",
+   "same_color": false,
+   "same_shape": true,
+   "beside": "same_shape",
+   "first_view": [],
+   "initially_invisible": false,
+   "band": "near",
+   "task": "land",
+   "role": "red_visible"
+  },
+  {
+   "id": "ct-9502-blue_pad-near_edge",
+   "chosen_as": "same_shape",
+   "same_color": false,
+   "same_shape": true,
+   "beside": "same_shape",
+   "first_view": [],
+   "initially_invisible": false,
+   "band": "near",
+   "task": "land",
+   "role": "edge"
+  },
+  {
+   "id": "ct-9503-blue_pad-near_pair-swapped",
+   "chosen_as": "initially_invisible",
+   "same_color": false,
+   "same_shape": true,
+   "beside": "same_shape",
+   "first_view": [
+    "same_shape"
+   ],
+   "initially_invisible": true,
+   "band": "near",
+   "task": "land",
+   "role": "swap"
+  },
+  {
+   "id": "ct-9511-blue_pad-mid_search",
+   "chosen_as": "initially_invisible",
+   "same_color": false,
+   "same_shape": true,
+   "beside": "same_shape",
+   "first_view": [
+    "same_shape"
+   ],
+   "initially_invisible": true,
+   "band": "mid",
+   "task": "land",
+   "role": "search"
+  },
+  {
+   "id": "ct-9524-blue_pad-far_pair-swapped",
+   "chosen_as": "far",
+   "same_color": false,
+   "same_shape": true,
+   "beside": "same_shape",
+   "first_view": [
+    "same_shape"
+   ],
+   "initially_invisible": true,
+   "band": "far",
+   "task": "land",
+   "role": "swap"
+  },
+  {
+   "id": "ct-9529-red_pad-far_red_visible",
+   "chosen_as": "far",
+   "same_color": true,
+   "same_shape": false,
+   "beside": "same_color",
+   "first_view": [],
+   "initially_invisible": false,
+   "band": "far",
+   "task": "land",
+   "role": "red_visible"
+  },
+  {
+   "id": "ct-9503-blue_pad-near_pair",
+   "chosen_as": "landing_heavy",
+   "same_color": false,
+   "same_shape": true,
+   "beside": "same_shape",
+   "first_view": [],
+   "initially_invisible": false,
+   "band": "near",
+   "task": "land",
+   "role": "pair"
+  },
+  {
+   "id": "ct-9505-blue_pad-near_visible2",
+   "chosen_as": "landing_heavy",
+   "same_color": true,
+   "same_shape": false,
+   "beside": "same_color",
+   "first_view": [],
+   "initially_invisible": false,
+   "band": "near",
+   "task": "land",
+   "role": "visible2"
+  },
+  {
+   "id": "ct-9500-blue_pad-near_visible-approach",
+   "chosen_as": "easy_control",
+   "same_color": false,
+   "same_shape": true,
+   "beside": "same_shape",
+   "first_view": [],
+   "initially_invisible": false,
+   "band": "near",
+   "task": "approach",
+   "role": "approach"
+  }
+ ]
+}
