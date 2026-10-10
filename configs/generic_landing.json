@@ -1,0 +1,85 @@
+{
+  "description": "Phase B, stage 1: generic landing (docs/generic_landing_active_search_v2.md). Can the same policy (Front + Down RGB and one sentence, three action axes, the architecture of the frozen baseline) land on the flat top of a cube and of a cylinder as it lands on a pad? Everything in this file was fixed before any episode was recorded, any update trained or any flight of a trained checkpoint flown: the data's make-up, the teacher's rule, the training schedule, the candidate checkpoints, how one is chosen, the validation starts and every number of the gates. The frozen baseline (grounding_film), its canonical result (47/48), the Gaussian blur results and the sealed Depot set are not touched; the 48 canonical test starts are not flown.",
+  "start_checkpoint": "outputs/aerovla_oft/checkpoints/grounding_film",
+  "checkpoint": "outputs/aerovla_oft/checkpoints/generic_landing_v1",
+  "run": "outputs/aerovla_oft/checkpoints/generic_landing_v1_run",
+  "dataset": {"added": "generic_landing_added", "merged": "generic_landing_v1", "replay": ["generalization_v1", "generalization_v2_added", "generalization_v3_added", "generalization_v3b_added", "generalization_v3c_added"]},
+  "scenes": ["field", "lot"],
+  "layouts": {
+    "train": ["a", "b", "c", "d", "k", "l", "m", "n"],
+    "evaluation": ["t", "u", "p", "q", "r", "s"],
+    "note": "Episodes are recorded in the eight layouts of each scene that earlier episodes were recorded in. Every check flies in the six layouts of each scene that no episode was ever recorded in (earlier checks flew in them from other starts). The canonical test's layouts (g-j) and the sealed test's (e) are not used. All of it is the two training scenes: a new layout or a new start here is not a new scene."
+  },
+  "seeds": {"train": [40000, 40999], "val": [41000, 41199], "pilot": [41500, 41599], "validation": [42000, 42999], "regression": [43000, 43999]},
+  "separation_m": 6.0,
+  "targets": {"pad": ["blue_pad", "red_pad"], "cube": ["blue_cube", "red_cube"], "cylinder": ["blue_cylinder", "green_cylinder"]},
+  "bands_m": {"near": [10.0, 20.0], "mid": [20.0, 32.0], "far": [32.0, 44.0]},
+  "height_m": [3.0, 12.0],
+  "height_note": "A cube's top is 8 m above the ground and a cylinder's 9 m, so most starts are lower than the top they are to land on and the landing needs a climb. The earlier data started at 5-9 m (and 9-14 m for its high approaches).",
+  "first_view": {
+    "visible_deg": [0.0, 25.0],
+    "invisible_deg": [60.0, 180.0],
+    "note": "Half of the starts have the named object inside the first front view, half outside it with a free line to it (a turn shows it). Starts whose target is hidden behind something belong to stage 2."
+  },
+  "instructions": {"land": "land", "approach": "approach"},
+  "max_ticks": 320,
+  "training": {
+    "description": "Per kind of surface: 54 landings (27 for each of its two objects; 18 in each band; half with the object in the first view) and 16 of those starts flown again with the sentence that asks for an approach. 3 x 70 = 210 episodes, 48 of them approach twins (23 %). A capped sphere is not in the data.",
+    "land_per_kind": 54,
+    "approach_twins_per_kind": 16,
+    "val_land_per_kind": 6,
+    "val_approach_twins_per_kind": 2
+  },
+  "teacher": {
+    "description": "src/landing/teacher.SurfaceTeacher: the canonical teacher, and while a landing's target is in view two additions. Within the canonical glide distance of the object and lower than its top plus a margin, it climbs (holding its place inside the canonical arrival distance until it is high enough). Over a surface smaller than a pad it shrinks the canonical radii with the surface and eases in at 0.05 m per decision per metre left. The margin over a pad is the canonical slow height (2.5 m), so a pad flown at the earlier data's heights is flown as before; over a smaller surface it is the canonical commit height plus 0.5 m. An episode is kept only if the teacher landed inside the surface's usable region and stopped (or, for an approach, stopped in the air inside the success radius).",
+    "search": "canonical: turn right until the object is in view, climb when something close fills the view. No part of the search knows where the target is."
+  },
+  "fine_tune": {
+    "description": "From the frozen baseline, with its architecture and its way of training: the correction LoRA, the action head and the FiLM module are trained; the vision encoder, the projector, the language model and the AeroVLA adapter are not. The schedule of the last two corrections (updates of 4 frames at 5e-5, decaying to a tenth), a quarter longer. The FiLM module is no longer the identity it started as, so it gets the LoRA's rate, not ten times it. 45 % of the drawn frames come from the generic landing episodes and 55 % from everything the baseline was trained on, in the proportions it had there (search, grounding, pad landings, approaches, hard negatives).",
+    "updates": 2500,
+    "learning_rate": 5e-05,
+    "grounding_learning_rate": 5e-05,
+    "batch_size": 1,
+    "gradient_accumulation": 4,
+    "share": 0.45,
+    "eval_every": 250,
+    "eval_samples": 600,
+    "balance": 3.0,
+    "boost": {"small_visible": 2, "selection": 3},
+    "select_band": 0.02,
+    "val_file": "val_mix",
+    "candidates": [1000, 1500, 2000, 2500],
+    "candidates_note": "Saved as they are reached, whatever the validation loss says. The checkpoint the validation loss would keep is saved too, as the earlier runs saved theirs, and is not a candidate unless it is one of the four."
+  },
+  "pilot": {
+    "description": "Fifteen starts flown once by the frozen baseline and by each of the four candidates: for each kind of surface four landings (one near, two mid, one far; two with the object in the first view) and one approach twin. The candidate that goes on is chosen by `order`, each line breaking a tie of the line before. It goes on to the validation set only if it meets `pass`; otherwise stage 1 has failed and nothing more is flown.",
+    "land_per_kind": 4,
+    "approach_twins_per_kind": 1,
+    "order": ["landings on cubes and cylinders (more)", "flights that end at a wrong object (fewer)", "landings on pads (more)", "collisions (fewer)", "validation L1 at that update (lower)", "the earlier update"],
+    "pass": {"cube_cylinder_landings_min": 5, "cube_cylinder_landings_of": 8, "pad_landings_min": 3, "pad_landings_of": 4, "approach_touchdowns_max": 0, "collisions_max": 2}
+  },
+  "validation": {
+    "description": "Thirty landing starts (ten for each kind of surface: three near, four mid, three far; five with the object in the first view) and six of them flown again as approaches (two per kind): 36 flights. The gates are judged on the first flight of every start. Landings are read by the surface evaluator (src/landing/evaluator.py), approaches by the canonical evaluator. `smoke` is flown first and stops the chain if it is not met.",
+    "land_per_kind": 10,
+    "approach_twins_per_kind": 2,
+    "smoke": {"starts_per_kind": 3, "success_min": 6, "of": 9, "collisions_max": 1},
+    "gates": {
+      "success_min": 30, "of": 36,
+      "land_system_success_min": 24, "land_of": 30,
+      "pad_land_min": 9, "cube_land_min": 8, "cylinder_land_min": 8, "per_kind_of": 10,
+      "wrong_target_max": 2,
+      "collisions_max": 1,
+      "approach_touchdowns_max": 0
+    },
+    "gates_from": "the plan of the phase: overall 30 of 36; landings 80 %; pad landings 90 %, cube 75 %, cylinder 75 % (of ten: 9, 8, 8); at most two flights at a wrong object, one collision, no touchdown in an approach.",
+    "repeats": "The starts whose first view holds a related object (same colour or same shape) and not the named one are flown a second time and reported beside the gate; the second flight judges nothing."
+  },
+  "regression": {
+    "description": "What the baseline could do inside 44 m must still be there. The 48 canonical test starts are spent and are not a development gate; a fresh set with the make-up of the canonical validation (36 starts and their twins: pad landings, approaches, a same-colour or same-shape object in the first view, the pad outside the first view, the far band) is drawn in the evaluation layouts and flown once by the frozen baseline and once by the checkpoint that passed the validation. The checkpoint passes if it is not worse than the baseline by more than the spread seen when one checkpoint flies one set twice.",
+    "success_below_baseline_max": 2,
+    "wrong_target_above_baseline_max": 1,
+    "collisions_above_baseline_max": 1,
+    "landings_below_baseline_max": 2,
+    "spread_from": "the Gaussian blur characterization: the frozen baseline's two clean flights of the canonical starts differed on 1 of 48, and its two flights of the repeat subset on 1 of 48 start-condition pairs"
+  }
+}

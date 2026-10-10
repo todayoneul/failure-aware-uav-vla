@@ -29,6 +29,8 @@ class FakeSim:
             self.solids.append({'name':spec.get('object') or spec.get('native'),'centre':item['centre'],'size':item['size_m'][:2],'top':item['size_m'][2],
                                 'round':spec.get('shape')=='cylinder'})
         for item in structures(map_config,layout):
+            # (A ground cover, a slab a few centimetres high under the whole scene, is the ground.)
+            if item.get('lift_m',0.)+item['size_m'][2]<.5:continue
             self.solids.append({'name':item['name'],'centre':item['position'],'size':item['size_m'][:2],'top':item.get('lift_m',0.)+item['size_m'][2],
                                 'round':item['shape']=='cylinder'})
 

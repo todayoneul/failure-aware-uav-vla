@@ -3,16 +3,23 @@
   surface_flights.py --host H --plan FILE --output DIR                    controlled flights: each episode's own scripted pilot
   surface_flights.py --host H --plan FILE --output DIR --policy oft --checkpoint DIR [--limit N]
                                                                           the same starts flown by an AeroVLA-OFT checkpoint
+  surface_flights.py --host H --plan FILE --set train --output DIR --policy teacher [--record ROOT] [--finalizer off]
+                                                                          flown by the privileged teacher (src/landing/teacher.py);
+                                                                          with --record, kept as training episodes
 
 A flight is the canonical evaluation's own: `SearchEnv.reset` and `run_episode` of scripts/visual_search.py, from the
-episode's start fields (start_xy, start_yaw_deg, start_height_m), with the finalizer as it is. Two things are added around
-it and nothing inside: a contact with any landing surface is read the way a contact with a pad is (src/landing/env.py),
-and the finished flight is read by the surface evaluator (src/landing/evaluator.py) beside the canonical summary.
+episode's start fields (start_xy, start_yaw_deg, start_height_m), with the finalizer as it is. Three things are added around
+it and nothing inside: a contact with any landing surface is read the way a contact with a pad is (src/landing/env.py), the
+teacher the loop builds is the one that can land on any such surface, and the finished flight is read by the surface
+evaluator (src/landing/evaluator.py) beside the canonical summary.
 
 A controlled plan (configs/experiments/controlled_landings.json) gives every episode a scripted pilot (src/landing/controlled.py)
 and what the evaluator has to say about the flight, written before it is flown; the result of each such check is PASS or
-FAIL. A controlled flight says nothing about any policy. A plan of starts (scripts/plan_arbitrary_starts.py) flown with
---policy oft records what the checkpoint did from each start.
+FAIL. A controlled flight says nothing about any policy.
+
+With --record a teacher flight is written as the earlier recorded episodes were (frames under ROOT/<scene>/<id>/, the
+episode under ROOT/episodes/) if the teacher did what the sentence asked by the surface evaluator's reading and the
+simulator kept real time; otherwise the episode is written under ROOT/rejected/ and is no part of the data.
 
 results.json holds one record per episode: the start asked for and the start reached, the canonical summary, the surface
 reading and the checks. steps.jsonl holds every decision. Exit 0: every episode flown and every check passed; 1: a check
@@ -22,7 +29,9 @@ import os
 os.environ['HF_HUB_OFFLINE']='1';os.environ['TRANSFORMERS_OFFLINE']='1'
 import argparse
 import asyncio
+import contextlib
 import json
+import shutil
 import sys
 import time
 import traceback
@@ -30,19 +39,23 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
 
 CONNECTION_WORDS=('Connection','closed','NNG','Timed out','timed out')
+REAL_TIME_MINIMUM=.8     # as in the blur characterization: a flight whose simulator fell behind the clock is not a flight to keep
 
 
-def load_plan(path,config):
+def load_plan(path,config,which=None):
     """The episodes of a plan in the form the canonical environment flies. A controlled plan names its map once and leaves
-    the sentence to the evaluation's own templates; a planned-starts file has every field already."""
+    the sentence to the evaluation's own templates; a planned-starts file has every field already. `which` names the list
+    of a plan that holds several (train, val)."""
     from src.mission import semantic
     from src.visual_search.maps import load_map
     plan=json.loads(Path(path).read_text(encoding='utf-8'));episodes=[];maps={}
-    for item in plan['episodes']:
-        episode=dict(item);name=episode.get('map') or plan['map'];absolute=str(name if Path(name).is_absolute() else ROOT/name)
-        if absolute not in maps:maps[absolute]=load_map(absolute)
-        map_config=maps[absolute];layout=episode.get('layout') or plan.get('layout') or map_config['mission']['layout']
-        episode.update(map=absolute,layout=layout,kind=episode.get('kind','controlled'),strategy=episode.get('strategy',map_config.get('mission',{}).get('strategy','right')))
+    for item in plan[which or 'episodes']:
+        episode=dict(item);name=episode.get('map') or plan['map']
+        # A scene of the evaluation by its name, or a map file by its path from the repository root.
+        key=name if not str(name).endswith('.json') else str(name if Path(name).is_absolute() else ROOT/name)
+        if key not in maps:maps[key]=load_map(key)
+        map_config=maps[key];layout=episode.get('layout') or plan.get('layout') or map_config['mission']['layout']
+        episode.update(map=key,layout=layout,kind=episode.get('kind','controlled'),strategy=episode.get('strategy',map_config.get('mission',{}).get('strategy','right')))
         if 'instruction' not in episode:
             target={item['object_id']:item for item in semantic.semantic_targets(map_config,layout)}[episode['target']]
             # The sentence of a landing that would be refused is never built: the episode is not flown.
@@ -63,6 +76,16 @@ def start_checks(episode,env,tolerance):
     return wanted,rows
 
 
+@contextlib.contextmanager
+def surface_teacher(canonical,env):
+    """For the length of one flight the teacher the canonical loop builds is the one that knows landing surfaces."""
+    from src.landing.teacher import teacher_class
+    original=canonical.SearchTeacher
+    canonical.SearchTeacher=teacher_class(lambda:env.surfaces[env.target])
+    try:yield
+    finally:canonical.SearchTeacher=original
+
+
 async def fly(args):
     from projectairsim import ProjectAirSimClient
     import scripts.visual_search as canonical
@@ -77,19 +100,22 @@ async def fly(args):
     class FlightEnv(SurfaceContacts,canonical.SearchEnv):
         """The canonical environment with landing surfaces; it also keeps the vehicle's last true state for a scripted pilot."""
         async def reset(self,episode):
-            self.last_state=None
+            self.last_state=None;self.last_stamp=None
             await super().reset(episode)
+            # The teacher is told how high the top is that the sentence names (the canonical environment says so for a pad only).
+            named=self.surfaces[self.target];self.surface=named.top_m if named.landable else 0.
             self.reached=starts.reached(adapt_state(self.drone.get_ground_truth_kinematics()),self.ground_z)
 
         def observe(self):
-            observation=super().observe();self.last_state=observation['state'];return observation
+            observation=super().observe();self.last_state=observation['state'];self.last_stamp=observation['stamp'];return observation
 
-    config=load_config();plan,episodes,maps=load_plan(args.plan,config)
+    config=load_config();plan,episodes,maps=load_plan(args.plan,config,args.set)
     if args.only:episodes=[episode for episode in episodes if episode['id'] in args.only]
-    if args.limit:episodes=episodes[:args.limit]
+    episodes=episodes[args.skip:args.skip+args.limit] if args.limit else episodes[args.skip:]
     output=Path(args.output);output.mkdir(parents=True,exist_ok=True);results_path=output/'results.json'
     done=json.loads(results_path.read_text(encoding='utf-8'))['episodes'] if results_path.exists() and not args.again else []
     finished={item['id'] for item in done};tolerance=plan.get('start_tolerance') or {'xy_m':.05,'yaw_deg':.5,'height_m':.15}
+    record_root=Path(args.record) if args.record else None
     model=None;oft=json.loads((ROOT/'configs/aerovla_oft.json').read_text(encoding='utf-8'))
     if args.policy=='oft':
         from src.aerovla_oft.model import AeroVLAOFT
@@ -97,8 +123,8 @@ async def fly(args):
         model=AeroVLAOFT(canonical.MANIFEST,oft,checkpoint=args.checkpoint)
 
     def save():
-        results_path.write_text(json.dumps({'plan':str(args.plan),'policy':args.policy,'checkpoint':args.checkpoint,'evaluator':evaluator.VERSION,
-                                            'start_tolerance':tolerance,'episodes':done},indent=1),encoding='utf-8')
+        results_path.write_text(json.dumps({'plan':str(args.plan),'set':args.set,'policy':args.policy,'checkpoint':args.checkpoint,'model_name':args.model_name,
+                                            'finalizer':args.finalizer,'evaluator':evaluator.VERSION,'start_tolerance':tolerance,'episodes':done},indent=1),encoding='utf-8')
 
     client=None;env=None;status=0
     try:
@@ -115,32 +141,56 @@ async def fly(args):
             if client is None:
                 client=ProjectAirSimClient(address=args.host,port_topics=args.ports[0],port_services=args.ports[1]);client.connect()
                 client.socket_services.recv_timeout=60000;env=FlightEnv(client,config,oft,output)
+            kept=None;rel=f'{maps[episode["map"]]["id"]}/{episode["id"]}'
             try:
                 await env.reset(episode)
                 wanted,rows=start_checks(episode,env,tolerance)
-                if args.policy=='oft':policy=model
+                arguments=argparse.Namespace(policy='teacher' if args.policy=='teacher' else 'oft',finalizer=args.finalizer,live=False,output=str(output),set=None,
+                                             model_name=args.model_name or args.policy)
+                kept={'root':record_root,'rel':rel} if record_root and args.policy=='teacher' else None
+                if kept and (record_root/rel).exists():shutil.rmtree(record_root/rel)
+                clock=time.time();stamp=env.drone.get_ground_truth_kinematics()['time_stamp']
+                if args.policy=='teacher':
+                    with surface_teacher(canonical,env):summary,steps=await canonical.run_episode(env,episode,None,arguments,kept)
                 else:
-                    aim,top=aim_point(episode['pilot'],env.surfaces);policy=ControlledPilot(env,oft,env.landing,aim,top,episode['pilot']['mode'])
-                arguments=argparse.Namespace(policy='oft',finalizer='on',live=False,output=str(output),set=None,model_name=args.policy)
-                summary,steps=await canonical.run_episode(env,episode,policy,arguments,None)
+                    if args.policy=='oft':policy=model
+                    else:
+                        aim,top=aim_point(episode['pilot'],env.surfaces);policy=ControlledPilot(env,oft,env.landing,aim,top,episode['pilot']['mode'])
+                    summary,steps=await canonical.run_episode(env,episode,policy,arguments,None)
             except Exception:
                 error=traceback.format_exc();print(error,flush=True)
                 # A flight the harness lost is not a result: it is reported, kept out of results.json and flown again next time.
                 with (output/'harness_errors.jsonl').open('a',encoding='utf-8') as file:file.write(json.dumps({'id':episode['id'],'epoch':time.time(),'error':error})+'\n')
+                if kept and (record_root/rel).exists():shutil.rmtree(record_root/rel)
                 status=4 if any(word in error for word in CONNECTION_WORDS) else 1
                 if status==4:break
                 continue
+            # Simulator time over wall time of the flight. The simulator's clock stops with the motors after a landing, so the
+            # flight is timed up to its last decision.
+            factor=None
+            if len(steps)>1:
+                wall=steps[-1]['epoch']-clock
+                try:factor=((env.last_stamp or stamp)-stamp)/1e9/wall if wall>0 else None
+                except Exception:factor=None
             reading=evaluator.read(summary,env.surfaces,env.landing,steps)
-            if args.policy!='oft':rows+=compare({**reading,'reason':summary['reason'],'stopped':summary['stopped']},episode.get('expect',{}))
+            if args.policy=='controlled':rows+=compare({**reading,'reason':summary['reason'],'stopped':summary['stopped']},episode.get('expect',{}))
             record.update(flown=True,start=wanted.to_dict(),start_reached=env.reached.to_dict(),spawn=env.spawn,summary=summary,surface_landing=reading,
-                          words=evaluator.words(reading,summary) if episode['task']=='land' else None,
-                          pilot_phases=getattr(policy,'phases',None),checks=rows,passed=all(row[3] for row in rows))
+                          words=evaluator.words(reading,summary) if episode['task']=='land' else None,real_time_factor=factor,
+                          pilot_phases=getattr(policy,'phases',None) if args.policy=='controlled' else None,checks=rows,passed=all(row[3] for row in rows))
+            if kept:
+                # A recorded episode is training data only if the teacher did what the sentence asked and stopped by itself.
+                good=bool(reading['success'] and summary['reason']=='teacher_stop' and (factor is None or factor>=getattr(args,'real_time_minimum',REAL_TIME_MINIMUM)) and record['passed'])
+                folder=record_root/('episodes' if good else 'rejected');folder.mkdir(parents=True,exist_ok=True)
+                (folder/f'{episode["id"]}.json').write_text(json.dumps({'summary':{**summary,'surface_landing':reading,'real_time_factor':factor},'traj_rel_dir':rel,'steps':steps}))
+                if not good and (record_root/rel).exists():shutil.rmtree(record_root/rel)
+                record['recorded']=good
             done.append(record);save()
             with (output/'steps.jsonl').open('a',encoding='utf-8') as file:
                 for step in steps:file.write(json.dumps({'episode':episode['id'],**step})+'\n')
             failed=[row[0] for row in rows if not row[3]]
             print(f'EPISODE {episode["id"]} {summary["reason"]} success={reading["success"]} landed_on={reading["landed_on"]} collision={reading["collision"]} '
-                  f'steps={summary["steps"]} -> {"PASS" if record["passed"] else "FAIL "+", ".join(failed)}',flush=True)
+                  f'steps={summary["steps"]} rt={factor if factor is None else round(factor,2)}'+(f' recorded={record["recorded"]}' if kept else '')
+                  +f' -> {"PASS" if record["passed"] else "FAIL "+", ".join(failed)}',flush=True)
     finally:
         if client is not None:
             try:client.disconnect()
@@ -152,10 +202,15 @@ async def fly(args):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('--host',required=True);parser.add_argument('--ports',type=int,nargs=2,default=[8989,8990])
-    parser.add_argument('--plan',required=True);parser.add_argument('--output',required=True)
-    parser.add_argument('--policy',choices=('controlled','oft'),default='controlled');parser.add_argument('--checkpoint')
-    parser.add_argument('--only',nargs='+',help='episode ids to fly');parser.add_argument('--limit',type=int,default=0)
+    parser.add_argument('--plan',required=True);parser.add_argument('--set',help='the list of the plan to fly (train, val); default: episodes')
+    parser.add_argument('--output',required=True)
+    parser.add_argument('--policy',choices=('controlled','oft','teacher'),default='controlled');parser.add_argument('--checkpoint');parser.add_argument('--model-name')
+    parser.add_argument('--finalizer',choices=('on','off'),default='on',help='off: as the recorded episodes were flown, the teacher ends its own landing')
+    parser.add_argument('--record',help='with --policy teacher: dataset folder the flights are recorded into')
+    parser.add_argument('--only',nargs='+',help='episode ids to fly');parser.add_argument('--skip',type=int,default=0);parser.add_argument('--limit',type=int,default=0)
+    parser.add_argument('--real-time-minimum',type=float,default=REAL_TIME_MINIMUM,help='a recorded flight whose simulator ran slower than this share of real time is rejected')
     parser.add_argument('--again',action='store_true',help='fly everything again instead of keeping what results.json already holds')
     arguments=parser.parse_args()
     if arguments.policy=='oft' and not arguments.checkpoint:parser.error('--checkpoint is required for --policy oft')
+    if arguments.record and arguments.policy!='teacher':parser.error('--record is for --policy teacher')
     asyncio.run(fly(arguments))

@@ -371,7 +371,8 @@ class ControlledPlanTests(unittest.IsolatedAsyncioTestCase):
         with tempfile.TemporaryDirectory() as directory:
             for layout in ('mission','mission_cap'):
                 only=[episode['id'] for episode in plan['episodes'] if episode.get('layout','mission')==layout];sim=FakeSim(demo,layout)
-                arguments=argparse.Namespace(host='fake',ports=[1,2],plan=str(PLAN),output=directory,policy='controlled',checkpoint=None,only=only,limit=0,again=False)
+                arguments=argparse.Namespace(host='fake',ports=[1,2],plan=str(PLAN),set=None,output=directory,policy='controlled',checkpoint=None,model_name=None,
+                                             finalizer='on',record=None,only=only,skip=0,limit=0,again=False)
                 with patch.object(projectairsim,'ProjectAirSimClient',lambda **_:FakeClient(sim)),patch.object(canonical,'World',world_class(sim)), \
                      patch.object(canonical,'Drone',drone_class(sim)),patch.object(canonical,'matched_camera_images',sim.camera), \
                      patch.object(canonical,'asyncio',clock),patch('builtins.print'):

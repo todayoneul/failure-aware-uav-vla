@@ -223,6 +223,10 @@ def train(args):
                 if select(best,lowest,candidate,args.select_band):
                     best=candidate;model.save(output,{'training':record(update,None,entry['val'],stored[:8])})
                 entry['best_update']=best['update']
+                if update in args.save_at or (last and update+1 in args.save_at):
+                    # A candidate fixed before training: kept whatever its validation loss, with that loss beside it.
+                    name=update+1 if last and update+1 in args.save_at else update
+                    model.save(output/f'update-{name}',{'training':record(update,None,entry['val'],stored[:8]),'candidate':candidate});entry['saved_candidate']=name
             history.append(entry);print(json.dumps(entry),flush=True)
             if args.patience and stale>=args.patience:stopped_early=True;break
     final_train,_=evaluate(model,args.dataset,stratified(samples,args.eval_samples),config)
@@ -440,6 +444,7 @@ if __name__=='__main__':
     parser.add_argument('--probe-steps',type=int,default=3,help='with --negative-probe: decisions taken from the start of an episode (or from the end of its forced turn)')
     parser.add_argument('--grounding',choices=('film','cross_attention'),help='train with this language-vision grounding module (configs/visual_search.json, grounding_architecture.experiments)')
     parser.add_argument('--grounding-lr',type=float,help='learning rate of the grounding module; by default the one in the configuration')
+    parser.add_argument('--save-at',type=int,nargs='*',default=[],help='updates (multiples of --eval-every) whose weights are kept under OUTPUT/update-N whatever the validation loss')
     parser.add_argument('--cost',help='checkpoint whose parameters, inference time and peak memory are measured; --output then names a JSON file')
     arguments=parser.parse_args()
     if arguments.cost:cost(arguments)

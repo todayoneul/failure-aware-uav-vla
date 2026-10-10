@@ -1,7 +1,9 @@
-param([string]$Plan='configs/experiments/controlled_landings.json',[string]$Output='outputs/arbitrary_start/controlled',[ValidateSet('controlled','oft')][string]$Policy='controlled',[string]$Checkpoint='outputs/aerovla_oft/checkpoints/grounding_film',[string[]]$Only=@(),[int]$Limit=0,[switch]$Again,[ValidateRange(1,10)][int]$Attempts=3,[string]$Distro='Ubuntu',[switch]$HideSimulator)
+param([string]$Plan='configs/experiments/controlled_landings.json',[string]$Output='outputs/arbitrary_start/controlled',[ValidateSet('controlled','oft','teacher')][string]$Policy='controlled',[string]$Checkpoint='outputs/aerovla_oft/checkpoints/grounding_film',[string]$ModelName='',[string]$Set='',[string]$Record='',[ValidateSet('on','off')][string]$Finalizer='on',[string[]]$Only=@(),[int]$Skip=0,[int]$Limit=0,[switch]$Again,[ValidateRange(1,10)][int]$Attempts=3,[string]$Distro='Ubuntu',[switch]$HideSimulator,[int]$TopicsPort=8989,[int]$ServicesPort=8990)
 # Flies a plan of starts with landing surfaces read as surfaces (docs/arbitrary_start_generalized_landing.md). The worker is
 # scripts/surface_flights.py: the canonical episode loop from each episode's own start, flown by the episode's scripted pilot
-# (-Policy controlled: flights whose outcome is known beforehand, for checking the evaluator) or by a checkpoint (-Policy oft).
+# (-Policy controlled: flights whose outcome is known beforehand, for checking the evaluator), by a checkpoint (-Policy oft)
+# or by the privileged teacher (-Policy teacher; with -Record the flights are kept as training episodes, flown with
+# -Finalizer off as the earlier data was). -TopicsPort / -ServicesPort let several simulators record side by side.
 # The simulator is started as scripts/run_blur_characterization.ps1 starts it, with its window shown. The frozen baselines'
 # fingerprints are verified before the simulator starts and after the worker ends: nothing here trains or changes a model.
 $ErrorActionPreference='Stop'
@@ -36,22 +38,28 @@ function Confirm-FrozenBaselines([string]$When) {
 for ($taskAttempt=1; $taskAttempt -le $Attempts; $taskAttempt++) {
     Confirm-FrozenBaselines "before launch $taskAttempt"
     $taskPortDeadline=(Get-Date).AddSeconds(30)
-    while ((Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | Where-Object LocalPort -in 8989,8990) -and (Get-Date) -lt $taskPortDeadline) { Start-Sleep -Milliseconds 500 }
-    if (Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | Where-Object LocalPort -in 8989,8990) { throw 'Close the existing simulator/client first.' }
+    while ((Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | Where-Object LocalPort -in $TopicsPort,$ServicesPort) -and (Get-Date) -lt $taskPortDeadline) { Start-Sleep -Milliseconds 500 }
+    if (Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | Where-Object LocalPort -in $TopicsPort,$ServicesPort) { throw 'Close the existing simulator/client first.' }
     $taskHost=((& wsl -d $Distro --exec ip -4 route show default) -split '\s+')[2]
     if (-not $taskHost) { throw 'Current Windows NAT host address unavailable' }
     $taskSim=$null; $taskCode=1
     try {
         $taskWindow=if($HideSimulator){'Hidden'}else{'Normal'}
-        $taskSim=Start-Process -FilePath $taskExe -WorkingDirectory (Split-Path $taskExe) -ArgumentList @('-windowed','-ResX=640','-ResY=480') -WindowStyle $taskWindow -PassThru
+        $taskSimArgs=@('-windowed','-ResX=640','-ResY=480')
+        if ($TopicsPort -ne 8989 -or $ServicesPort -ne 8990) { $taskSimArgs+="-topicsport=$TopicsPort"; $taskSimArgs+="-servicesport=$ServicesPort" }
+        $taskSim=Start-Process -FilePath $taskExe -WorkingDirectory (Split-Path $taskExe) -ArgumentList $taskSimArgs -WindowStyle $taskWindow -PassThru
         $taskDeadline=(Get-Date).AddSeconds(45)
         do {
             Start-Sleep -Milliseconds 500
-            $taskPorts=@(Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | Where-Object { $_.OwningProcess -eq $taskSim.Id -and $_.LocalPort -in 8989,8990 })
+            $taskPorts=@(Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | Where-Object { $_.OwningProcess -eq $taskSim.Id -and $_.LocalPort -in $TopicsPort,$ServicesPort })
         } while ($taskPorts.Count -lt 2 -and (Get-Date) -lt $taskDeadline -and -not $taskSim.HasExited)
         if ($taskPorts.Count -lt 2) { throw 'Simulator ports did not become ready' }
-        $taskArgs=@('-d',$Distro,'--exec',$taskWslPython,"$taskWslRoot/scripts/surface_flights.py",'--host',$taskHost,'--plan',"$taskWslRoot/$($Plan.Replace('\','/'))",'--output',"$taskWslRoot/$($Output.Replace('\','/'))",'--policy',$Policy)
+        $taskArgs=@('-d',$Distro,'--exec',$taskWslPython,"$taskWslRoot/scripts/surface_flights.py",'--host',$taskHost,'--ports',"$TopicsPort","$ServicesPort",'--finalizer',$Finalizer,'--plan',"$taskWslRoot/$($Plan.Replace('\','/'))",'--output',"$taskWslRoot/$($Output.Replace('\','/'))",'--policy',$Policy)
         if ($Policy -eq 'oft') { $taskArgs+='--checkpoint'; $taskArgs+="$taskWslRoot/$($Checkpoint.Replace('\','/'))" }
+        if ($ModelName) { $taskArgs+='--model-name'; $taskArgs+=$ModelName }
+        if ($Set) { $taskArgs+='--set'; $taskArgs+=$Set }
+        if ($Record) { $taskArgs+='--record'; $taskArgs+="$taskWslRoot/$($Record.Replace([char]92,'/'))" }
+        if ($Skip) { $taskArgs+='--skip'; $taskArgs+="$Skip" }
         if ($Only.Count) { $taskArgs+='--only'; $taskArgs+=$Only }
         if ($Limit) { $taskArgs+='--limit'; $taskArgs+="$Limit" }
         if ($Again -and $taskAttempt -eq 1) { $taskArgs+='--again' }
