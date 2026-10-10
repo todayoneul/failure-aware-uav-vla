@@ -174,25 +174,37 @@ def render_canvas(telemetry,control,images):
     return canvas
 
 
-def main():
+def main(output=None):
+    global OUT
+    if output:OUT=Path(output) if Path(output).is_absolute() else ROOT/output
     control=read_control(OUT/'control.json');telemetry={};packet=None;map_image=None;images={};saved=set();last_export=0
-    cv2.namedWindow(WINDOW,cv2.WINDOW_NORMAL);cv2.resizeWindow(WINDOW,1332,936);cv2.moveWindow(WINDOW,20,20)
+    # An AeroVLA-OFT policy has its own canvas: what the model is given, apart from what only the evaluator knows.
+    grounding=control.get('policy')=='grounding-film';overlay=False;chase_stamp=None;buttons=MISSION_BUTTONS+VIEW_BUTTONS+BLUR_BUTTONS;window=WINDOW
+    if grounding:
+        import scripts.grounding_mission_view as view
+        buttons=view.BUTTONS;window=view.WINDOW
+    cv2.namedWindow(window,cv2.WINDOW_NORMAL);cv2.resizeWindow(window,1332,936);cv2.moveWindow(window,20,20)
     def send(key):
-        nonlocal control
+        nonlocal control,overlay
+        if grounding and key in (ord('o'),ord('O')):overlay=not overlay;return      # a choice of this window; nothing is sent
         control=mission_key(read_control(OUT/'control.json'),key);write_control(OUT/'control.json',control)
         log_control('mission viewer key/button',{'key':key,'request_id':control.get('mission_request_id')})
     def mouse(event,x,y,*_):
         nonlocal control
         if event!=cv2.EVENT_LBUTTONDOWN:return
-        if packet is not None:
+        if packet is not None and not (grounding and control.get('main_view')=='chase'):
             pixel=map_pixel(x,y,packet['camera'])
+            if grounding and pixel is not None:
+                # The corner of the map that the chase-camera inset covers is not the map.
+                left,top,width,height=MAP_RECT;iw,ih=view.INSET
+                if x<left+iw+8 and y>=top+height-ih-8:return
             if pixel is not None:
                 control=request_selection(read_control(OUT/'control.json'),packet['frame_id'],pixel)
                 write_control(OUT/'control.json',control)
                 log_control('mission viewer map click',{'frame_id':packet['frame_id'],'pixel':pixel,'request_id':control.get('mission_request_id')});return
-        for left,top,width,height,key,_ in MISSION_BUTTONS+VIEW_BUTTONS+BLUR_BUTTONS:
+        for left,top,width,height,key,_ in buttons:
             if left<=x<left+width and top<=y<top+height:send(key);return
-    cv2.setMouseCallback(WINDOW,mouse)
+    cv2.setMouseCallback(window,mouse)
     try:
         while not control['quit']:
             try:
@@ -204,12 +216,25 @@ def main():
             except (OSError,ValueError):pass
             preview=(telemetry.get('mission') or {}).get('state') in ('IDLE','TARGET_SELECTED')
             pair=read_preview_pair(telemetry) if preview else read_input_pair(OUT,telemetry)
-            images.update(pair or {'front':None,'down':None})
+            if grounding:
+                # A pair is shown only when its pixels hash to what the worker says it gave the model; until then the last one stays.
+                if pair:images.update(pair,verified=not preview,shown_step=telemetry.get('input_step'))
+                elif images.get('shown_step')!=telemetry.get('input_step'):images['verified']=False
+                chase=OUT/'chase_latest.png'
+                try:
+                    stamp=chase.stat().st_mtime_ns
+                    if stamp!=chase_stamp:
+                        frame=cv2.imread(str(chase))
+                        if frame is not None:images['chase_cam']=frame;chase_stamp=stamp
+                except OSError:pass
+            else:images.update(pair or {'front':None,'down':None})
             images['camera_scope']='preview (not model input)' if preview else f'model input step {telemetry.get("input_step",0)}'
             images['visibility']=(telemetry.get('preview_visibility') if preview else telemetry.get('target_visibility') if telemetry.get('visibility_step')==telemetry.get('input_step') else None) or {}
-            if map_image is not None:images['chase']=render_map(map_image,packet,telemetry)
-            canvas=render_canvas(telemetry,control,images)
-            cv2.imshow(WINDOW,canvas)
+            if map_image is not None:
+                images['chase']=render_map(map_image,packet,telemetry)
+                if grounding:view.annotate_map(images['chase'],packet,telemetry)
+            canvas=view.render(telemetry,control,images,overlay) if grounding else render_canvas(telemetry,control,images)
+            cv2.imshow(window,canvas)
             if map_image is not None and time.monotonic()-last_export>1:
                 cv2.imwrite(str(OUT/"current_view.png"),canvas);last_export=time.monotonic()
             status=(telemetry.get('mission') or {}).get('state','IDLE')
@@ -218,8 +243,11 @@ def main():
                 cv2.imwrite(str(OUT/f'{label}.png'),canvas);saved.add(label)
             key=cv2.waitKey(40)&0xff
             if key!=255:send(key)
-            if cv2.getWindowProperty(WINDOW,cv2.WND_PROP_VISIBLE)<1:send(ord('q'))
+            if cv2.getWindowProperty(window,cv2.WND_PROP_VISIBLE)<1:send(ord('q'))
     finally:cv2.destroyAllWindows()
 
 
-if __name__=='__main__':main()
+if __name__=='__main__':
+    import argparse
+    parser=argparse.ArgumentParser();parser.add_argument('--output',help='run folder; default outputs/mission_demo')
+    main(parser.parse_args().output)

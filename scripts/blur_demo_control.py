@@ -16,9 +16,11 @@ def main():
     parser.add_argument('--output', type=Path, default=Path('outputs/failure_demo'))
     parser.add_argument('--steps', type=int, default=30)
     parser.add_argument('--mode', choices=('blur','mission'), default='blur')
+    parser.add_argument('--policy', choices=('legacy','grounding-film'), default='legacy')
     args = parser.parse_args()
-    if not 1 <= args.steps <= 60:
-        parser.error('--steps must be within 1..60')
+    grounding = args.mode == 'mission' and args.policy == 'grounding-film'
+    if not 1 <= args.steps <= (400 if grounding else 60):
+        parser.error('--steps must be within 1..60 (1..400 for --policy grounding-film)')
     output = args.output if args.output.is_absolute() else ROOT/args.output
     path = output/'control.json'
     if args.action == 'init':
@@ -26,11 +28,13 @@ def main():
         initialize_run_output(output)
         if args.mode=='mission':
             from src.mission.control import default_mission_control
-            write_control(path, default_mission_control())
+            write_control(path, default_mission_control(args.policy))
         else:write_control(path, default_control())
         session=BlurDemoSession(ROOT, output, args.steps)
         if args.mode=='mission':
             session.update(mission={'state':'IDLE','target':None,'errors':None})
+            if grounding:
+                session.update(policy={'mode':'grounding-film'}, phase='Starting the simulator')
         print('Control initialized: blur OFF, severity MEDIUM', flush=True)
     else:
         state = read_control(path)

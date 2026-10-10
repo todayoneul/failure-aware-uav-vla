@@ -69,13 +69,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--pid-file', type=Path, required=True)
     parser.add_argument('--run-token', required=True)
-    parser.add_argument('--mode',choices=('blur','mission'),default='blur')
+    parser.add_argument('--mode',choices=('blur','mission','grounding'),default='blur')
     args = parser.parse_args()
     if args.pid_file.exists():
         pid = int(args.pid_file.read_text().strip())
         root=Path(__file__).resolve().parents[1]
-        script=root/('src/mission/runner.py' if args.mode=='mission' else 'src/integration/closed_loop_runner.py')
-        marker='--mission-demo' if args.mode=='mission' else '--blur-demo'
+        script=root/{'mission':'src/mission/runner.py','grounding':'src/mission/oft_runner.py'}.get(args.mode,'src/integration/closed_loop_runner.py')
+        marker='--blur-demo' if args.mode=='blur' else '--mission-demo'
         print(json.dumps(stop_owned_worker(pid, script, args.run_token, marker)))
     else:
         print(json.dumps({'pid': None, 'terminated': True, 'forced': False, 'note': 'Python worker not started'}))

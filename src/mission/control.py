@@ -3,10 +3,19 @@ import copy
 from src.failures.control import default_control, apply_key
 
 
-def default_mission_control():
-    return {**default_control(),'mission_request_id':0,'mission_request':None,'mission_requests':[],
-            'overview_view':'top','overview_zoom':1.,'overview_pan':[0,0],'overview_focus':'map',
-            'direction_hint':True,'prompt_mode':'hint'}
+GROUNDING='grounding-film'
+INSTRUCTION_ONLY='instruction-only'
+TASKS=('land','approach')
+
+
+def default_mission_control(policy='legacy'):
+    state={**default_control(),'mission_request_id':0,'mission_request':None,'mission_requests':[],
+           'overview_view':'top','overview_zoom':1.,'overview_pan':[0,0],'overview_focus':'map',
+           'direction_hint':True,'prompt_mode':'hint'}
+    if policy==GROUNDING:
+        # An AeroVLA-OFT policy is given the sentence alone: no prompt mode can be chosen, and the task is part of the sentence.
+        state.update(policy=GROUNDING,direction_hint=False,prompt_mode=INSTRUCTION_ONLY,main_view='map')
+    return state
 
 
 def enqueue(state,request):
@@ -25,7 +34,26 @@ def request_selection(state, frame_id, pixel):
     return enqueue(state,{'action':'select','frame_id':int(frame_id),'pixel':list(map(int,pixel))})
 
 
+def grounding_key(state,key):
+    """Keys that mean something else, or nothing, when the policy is an AeroVLA-OFT checkpoint. None: handled as before."""
+    letter=chr(key).lower() if 0<=key<256 else ''
+    if letter=='m':return copy.deepcopy(state)          # the prompt is the sentence; there is no mode to change
+    if letter=='t':return enqueue(state,{'action':'task'})   # LAND <-> APPROACH, for the next mission
+    if letter=='l':return enqueue(state,{'action':'launch'})
+    if letter=='f':
+        result=copy.deepcopy(state);result.update(main_view='map',overview_pan=[0,0],overview_view='top',overview_zoom=1.,overview_focus='map')
+        return result
+    if letter=='c':
+        # The simulator's chase camera fills the main panel; the map keeps its own view.
+        result=copy.deepcopy(state);result['main_view']='chase'
+        return result
+    return None
+
+
 def mission_key(state,key):
+    if state.get('policy')==GROUNDING:
+        result=grounding_key(state,key)
+        if result is not None:return result
     if key in (ord('+'),ord('='),ord('-')):
         result=copy.deepcopy(state)
         result['overview_zoom']=max(.5,min(12,state.get('overview_zoom',1.)*(1.25 if key!=ord('-') else .8)))

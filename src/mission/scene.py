@@ -28,6 +28,9 @@ def scene_records(world,names=None):
 
 
 class OverviewScene:
+    # Where a capture is written. A mission whose loop may not wait for the disk hands these to its own writer.
+    publish_image=staticmethod(publish_image);publish_json=staticmethod(publish_json)
+
     def __init__(self,world,drone,output):
         self.world,self.drone,self.output=world,drone,Path(output)
         records=scene_records(world);self.records=records
@@ -58,17 +61,25 @@ class OverviewScene:
                 'image_sha256':hashlib.sha256(image.tobytes()).hexdigest(),'bounds':self.region,'rig':rig}
         self.frames[self.counter]=(values.copy(),meta,image.copy())
         while len(self.frames)>4:self.frames.popitem(last=False)
-        publish_image(self.output/packet['image_file'],image)
-        publish_json(self.output/'overview.json',packet)
+        self.publish_image(self.output/packet['image_file'],image)
+        self.publish_json(self.output/'overview.json',packet)
         return image,packet
+
+    def rebind(self,world,drone):
+        """The same scene loaded again: its geometry is unchanged, the simulator objects are new."""
+        self.world,self.drone=world,drone;self.frames.clear()
+
+    def point_at(self,frame_id,pixel):
+        """The world point under a clicked map pixel, or None where the capture has no depth."""
+        if frame_id not in self.frames:raise ValueError('Map refreshed; select on the current frame again')
+        depth,meta=self.frames[frame_id][:2];u,v=map(int,pixel)
+        try:return pixel_to_world((u,v),float(depth[v,u]),meta)
+        except (ValueError,IndexError):return None
 
     def landmark_at(self,frame_id,pixel):
         """A click on a configured landmark selects the object itself, whatever its surface slope."""
-        if frame_id not in self.frames:raise ValueError('Map refreshed; select on the current frame again')
-        depth,meta=self.frames[frame_id][:2];u,v=map(int,pixel)
-        try:point=pixel_to_world((u,v),float(depth[v,u]),meta)
-        except (ValueError,IndexError):return None
-        return landmark_at(self.landmarks,point)
+        point=self.point_at(frame_id,pixel)
+        return landmark_at(self.landmarks,point) if point is not None else None
 
     def describe(self,frame_id,pixel,point):
         """Kind and colour of the object whose top was clicked; None on the ground."""
