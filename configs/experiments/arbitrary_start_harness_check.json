@@ -1,0 +1,161 @@
+{
+ "description": "Starts drawn once from a seed by scripts/plan_arbitrary_starts.py and flown as written. `arguments` are what they were drawn with; `--check` draws them again and compares. Each episode has the fields the canonical environment reads its start from (start_xy, start_yaw_deg, start_height_m) and what the start shows of the object, from the map's boxes. The map path is from the repository root.",
+ "generator": "scripts/plan_arbitrary_starts.py",
+ "arguments": {
+  "map": "configs/mission/grounding_film_demo.json",
+  "layout": "mission",
+  "target": "blue_pad",
+  "task": "land",
+  "count": 3,
+  "seed": 30100,
+  "min_distance": 15.0,
+  "max_distance": 40.0,
+  "height": null,
+  "yaw": "random",
+  "avoid": [],
+  "separation": null,
+  "max_ticks": null
+ },
+ "seed": 30100,
+ "map": "configs/mission/grounding_film_demo.json",
+ "map_id": "blocks",
+ "layout": "mission",
+ "target": "blue_pad",
+ "task": "land",
+ "rule": {
+  "clearance_m": 5.0,
+  "clearance_from": "configs/visual_search.json generalization.start_margin_m",
+  "height_m": [
+   0.8,
+   14.0
+  ],
+  "height_from": [
+   "configs/flight_limits.json minimum_clearance_m",
+   "the map file, altitude.ceiling_m"
+  ]
+ },
+ "avoided_starts": 0,
+ "canonical_range_m": 44.0,
+ "counts": {
+  "starts": 3,
+  "initially_visible": 2,
+  "occluded": 0,
+  "requires_translation": 0,
+  "beyond_canonical_range": 0
+ },
+ "episodes": [
+  {
+   "id": "as-30100-000-blue_pad-land",
+   "kind": "arbitrary_start",
+   "split": "arbitrary_start",
+   "seed": 30100,
+   "index": 0,
+   "map": "configs/mission/grounding_film_demo.json",
+   "layout": "mission",
+   "target": "blue_pad",
+   "task": "land",
+   "strategy": "right",
+   "start_xy": [
+    33.2,
+    77.4
+   ],
+   "start_yaw_deg": -45.24,
+   "start_height_m": 7.2,
+   "start_direction_deg": 327.81,
+   "instruction_id": "land",
+   "instruction": "Find the blue landing pad and land on it.",
+   "start_distance_m": 27.41,
+   "target_bearing_deg": -166.94,
+   "sector": "behind",
+   "initially_visible": false,
+   "initially_invisible": true,
+   "line_of_sight": true,
+   "occluded": false,
+   "occluded_by": null,
+   "visible_after_climb": true,
+   "requires_translation": false,
+   "others_in_view": [
+    {
+     "name": "red_cube",
+     "bearing_deg": 20.6,
+     "distance_m": 27.3
+    },
+    {
+     "name": "green_cylinder",
+     "bearing_deg": -20.1,
+     "distance_m": 52.2
+    }
+   ]
+  },
+  {
+   "id": "as-30100-001-blue_pad-land",
+   "kind": "arbitrary_start",
+   "split": "arbitrary_start",
+   "seed": 30100,
+   "index": 1,
+   "map": "configs/mission/grounding_film_demo.json",
+   "layout": "mission",
+   "target": "blue_pad",
+   "task": "land",
+   "strategy": "right",
+   "start_xy": [
+    -9.62,
+    80.91
+   ],
+   "start_yaw_deg": 40.88,
+   "start_height_m": 6.3,
+   "start_direction_deg": 209.49,
+   "instruction_id": "land",
+   "instruction": "Find the blue landing pad and land on it.",
+   "start_distance_m": 22.54,
+   "target_bearing_deg": -11.4,
+   "sector": "front",
+   "initially_visible": true,
+   "initially_invisible": false,
+   "line_of_sight": true,
+   "occluded": false,
+   "occluded_by": null,
+   "visible_after_climb": true,
+   "requires_translation": false,
+   "others_in_view": [
+    {
+     "name": "red_pad",
+     "bearing_deg": -30.3,
+     "distance_m": 60.6
+    }
+   ]
+  },
+  {
+   "id": "as-30100-002-blue_pad-land",
+   "kind": "arbitrary_start",
+   "split": "arbitrary_start",
+   "seed": 30100,
+   "index": 2,
+   "map": "configs/mission/grounding_film_demo.json",
+   "layout": "mission",
+   "target": "blue_pad",
+   "task": "land",
+   "strategy": "right",
+   "start_xy": [
+    23.83,
+    81.42
+   ],
+   "start_yaw_deg": 149.07,
+   "start_height_m": 8.74,
+   "start_direction_deg": 322.57,
+   "instruction_id": "land",
+   "instruction": "Find the blue landing pad and land on it.",
+   "start_distance_m": 17.41,
+   "target_bearing_deg": -6.49,
+   "sector": "front",
+   "initially_visible": true,
+   "initially_invisible": false,
+   "line_of_sight": true,
+   "occluded": false,
+   "occluded_by": null,
+   "visible_after_climb": true,
+   "requires_translation": false,
+   "others_in_view": []
+  }
+ ]
+}

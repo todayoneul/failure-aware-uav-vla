@@ -1,0 +1,2033 @@
+{
+ "plan": "controlled_landings.json",
+ "policy": "controlled",
+ "evaluator": "generalized_surface_v1",
+ "start_tolerance": {
+  "xy_m": 0.05,
+  "yaw_deg": 0.5,
+  "height_m": 0.15,
+  "from": "the 48 clean flights of the Gaussian blur characterization, planned start against the first decision: place within 0.0003 m, heading within 0.0001 deg, height 0.05 to 0.09 m below the one asked for (the climb settles a little low). The tolerances are well above the first two and under twice the third."
+ },
+ "frozen_verifications": [
+  {
+   "when": "before launch 1",
+   "record": "grounding_film",
+   "passed": true,
+   "utc": "2026-10-10T15:39:37.5076235Z"
+  },
+  {
+   "when": "before launch 1",
+   "record": "gen_v2",
+   "passed": true,
+   "utc": "2026-10-10T15:39:37.9396950Z"
+  },
+  {
+   "when": "after launch 1",
+   "record": "grounding_film",
+   "passed": true,
+   "utc": "2026-10-10T15:49:49.7401040Z"
+  },
+  {
+   "when": "after launch 1",
+   "record": "gen_v2",
+   "passed": true,
+   "utc": "2026-10-10T15:49:50.1471849Z"
+  }
+ ],
+ "episodes": [
+  {
+   "id": "start-near",
+   "layout": "mission",
+   "target": "blue_pad",
+   "task": "approach",
+   "instruction": "Approach the blue landing pad.",
+   "pilot": {
+    "mode": "hold"
+   },
+   "why": "an arbitrary start: 21.5 m from the blue pad, low, facing away from it",
+   "flown": true,
+   "passed": true,
+   "checks": [
+    [
+     "spawn_on_ground",
+     true,
+     true,
+     true
+    ],
+    [
+     "start_xy_error_m",
+     "<= 0.05",
+     0.0,
+     true
+    ],
+    [
+     "start_yaw_error_deg",
+     "<= 0.5",
+     0.0,
+     true
+    ],
+    [
+     "start_height_error_m",
+     "within 0.15",
+     -0.046,
+     true
+    ],
+    [
+     "reason",
+     "model_stop",
+     "model_stop",
+     true
+    ],
+    [
+     "collision",
+     false,
+     false,
+     true
+    ]
+   ],
+   "start": {
+    "x": 18.0,
+    "y": 72.0,
+    "yaw_deg": 30.0,
+    "height_m": 4.0
+   },
+   "start_reached": {
+    "x": 18.0,
+    "y": 72.0,
+    "yaw_deg": 30.00000473909813,
+    "height_m": 3.954008936882019
+   },
+   "start_error": {
+    "xy_error_m": 0.0,
+    "yaw_error_deg": 4.739098130812636e-06,
+    "height_error_m": -0.04599106311798096
+   },
+   "spawn": {
+    "rest_z": -1.192681908607483,
+    "expected_z": -1.19,
+    "error_m": -0.0026819086074829634,
+    "tolerance_m": 0.05,
+    "on_ground": true
+   },
+   "reason": "model_stop",
+   "stopped": true,
+   "decisions": 4,
+   "mean_decision_s": 0.5060613950093588,
+   "finalizer_path": null,
+   "surface": {
+    "surface": "rectangle",
+    "landable": true,
+    "top_m": 2.5,
+    "usable_radius_m": null,
+    "usable_half_extent_m": [
+     6.6,
+     6.6
+    ]
+   },
+   "read": {
+    "success": false,
+    "landed_on": null,
+    "collision": null,
+    "contact_from_above": false,
+    "correct_object": false,
+    "wrong_object": false,
+    "on_top": false,
+    "inside_region": false,
+    "acceptable_touchdown": false,
+    "physical_landing": false,
+    "finalizer_latched": false,
+    "horizontal_error_m": null,
+    "vertical_speed_mps": null,
+    "touchdown_decision": null,
+    "canonical_touchdown_decision": null,
+    "canonical_vertical_speed_mps": null,
+    "canonical_success": false,
+    "decisions_over_surface": 0
+   },
+   "words": null,
+   "pilot_phases": [
+    "rest"
+   ]
+  },
+  {
+   "id": "start-mid",
+   "layout": "mission",
+   "target": "blue_pad",
+   "task": "approach",
+   "instruction": "Approach the blue landing pad.",
+   "pilot": {
+    "mode": "hold"
+   },
+   "why": "an arbitrary start: 41 m from the blue pad, high, a negative heading",
+   "flown": true,
+   "passed": true,
+   "checks": [
+    [
+     "spawn_on_ground",
+     true,
+     true,
+     true
+    ],
+    [
+     "start_xy_error_m",
+     "<= 0.05",
+     0.0,
+     true
+    ],
+    [
+     "start_yaw_error_deg",
+     "<= 0.5",
+     0.0,
+     true
+    ],
+    [
+     "start_height_error_m",
+     "within 0.15",
+     -0.0728,
+     true
+    ],
+    [
+     "reason",
+     "model_stop",
+     "model_stop",
+     true
+    ],
+    [
+     "collision",
+     false,
+     false,
+     true
+    ]
+   ],
+   "start": {
+    "x": 36.0,
+    "y": 60.0,
+    "yaw_deg": -160.0,
+    "height_m": 9.0
+   },
+   "start_reached": {
+    "x": 36.0,
+    "y": 60.0,
+    "yaw_deg": -160.0000099285972,
+    "height_m": 8.927196860313416
+   },
+   "start_error": {
+    "xy_error_m": 0.0,
+    "yaw_error_deg": 9.928597194175381e-06,
+    "height_error_m": -0.07280313968658447
+   },
+   "spawn": {
+    "rest_z": -1.192681908607483,
+    "expected_z": -1.19,
+    "error_m": -0.0026819086074829634,
+    "tolerance_m": 0.05,
+    "on_ground": true
+   },
+   "reason": "model_stop",
+   "stopped": true,
+   "decisions": 4,
+   "mean_decision_s": 0.5054959456125895,
+   "finalizer_path": null,
+   "surface": {
+    "surface": "rectangle",
+    "landable": true,
+    "top_m": 2.5,
+    "usable_radius_m": null,
+    "usable_half_extent_m": [
+     6.6,
+     6.6
+    ]
+   },
+   "read": {
+    "success": false,
+    "landed_on": null,
+    "collision": null,
+    "contact_from_above": false,
+    "correct_object": false,
+    "wrong_object": false,
+    "on_top": false,
+    "inside_region": false,
+    "acceptable_touchdown": false,
+    "physical_landing": false,
+    "finalizer_latched": false,
+    "horizontal_error_m": null,
+    "vertical_speed_mps": null,
+    "touchdown_decision": null,
+    "canonical_touchdown_decision": null,
+    "canonical_vertical_speed_mps": null,
+    "canonical_success": false,
+    "decisions_over_surface": 0
+   },
+   "words": null,
+   "pilot_phases": [
+    "rest"
+   ]
+  },
+  {
+   "id": "start-far",
+   "layout": "mission",
+   "target": "blue_pad",
+   "task": "approach",
+   "instruction": "Approach the blue landing pad.",
+   "pilot": {
+    "mode": "hold"
+   },
+   "why": "an arbitrary start: 78 m from the blue pad, behind a block, near the ceiling. Beyond the range the model was validated in; only the start is looked at",
+   "flown": true,
+   "passed": true,
+   "checks": [
+    [
+     "spawn_on_ground",
+     true,
+     true,
+     true
+    ],
+    [
+     "start_xy_error_m",
+     "<= 0.05",
+     0.0,
+     true
+    ],
+    [
+     "start_yaw_error_deg",
+     "<= 0.5",
+     0.0,
+     true
+    ],
+    [
+     "start_height_error_m",
+     "within 0.15",
+     -0.0299,
+     true
+    ],
+    [
+     "reason",
+     "model_stop",
+     "model_stop",
+     true
+    ],
+    [
+     "collision",
+     false,
+     false,
+     true
+    ]
+   ],
+   "start": {
+    "x": -20.0,
+    "y": 20.0,
+    "yaw_deg": 45.0,
+    "height_m": 12.0
+   },
+   "start_reached": {
+    "x": -20.0,
+    "y": 20.0,
+    "yaw_deg": 45.00000234965424,
+    "height_m": 11.970062613487244
+   },
+   "start_error": {
+    "xy_error_m": 0.0,
+    "yaw_error_deg": 2.3496542382872576e-06,
+    "height_error_m": -0.029937386512756348
+   },
+   "spawn": {
+    "rest_z": -1.192681908607483,
+    "expected_z": -1.19,
+    "error_m": -0.0026819086074829634,
+    "tolerance_m": 0.05,
+    "on_ground": true
+   },
+   "reason": "model_stop",
+   "stopped": true,
+   "decisions": 4,
+   "mean_decision_s": 0.5036734739939371,
+   "finalizer_path": null,
+   "surface": {
+    "surface": "rectangle",
+    "landable": true,
+    "top_m": 2.5,
+    "usable_radius_m": null,
+    "usable_half_extent_m": [
+     6.6,
+     6.6
+    ]
+   },
+   "read": {
+    "success": false,
+    "landed_on": null,
+    "collision": null,
+    "contact_from_above": false,
+    "correct_object": false,
+    "wrong_object": false,
+    "on_top": false,
+    "inside_region": false,
+    "acceptable_touchdown": false,
+    "physical_landing": false,
+    "finalizer_latched": false,
+    "horizontal_error_m": null,
+    "vertical_speed_mps": null,
+    "touchdown_decision": null,
+    "canonical_touchdown_decision": null,
+    "canonical_vertical_speed_mps": null,
+    "canonical_success": false,
+    "decisions_over_surface": 0
+   },
+   "words": null,
+   "pilot_phases": [
+    "rest"
+   ]
+  },
+  {
+   "id": "pad-land",
+   "layout": "mission",
+   "target": "blue_pad",
+   "task": "land",
+   "instruction": "Find the blue landing pad and land on it.",
+   "pilot": {
+    "mode": "land",
+    "aim": "blue_pad"
+   },
+   "why": "the landing the canonical evaluator already reads: both readings have to call it a success",
+   "flown": true,
+   "passed": true,
+   "checks": [
+    [
+     "spawn_on_ground",
+     true,
+     true,
+     true
+    ],
+    [
+     "start_xy_error_m",
+     "<= 0.05",
+     0.0,
+     true
+    ],
+    [
+     "start_yaw_error_deg",
+     "<= 0.5",
+     0.0,
+     true
+    ],
+    [
+     "start_height_error_m",
+     "within 0.15",
+     -0.0527,
+     true
+    ],
+    [
+     "success",
+     true,
+     true,
+     true
+    ],
+    [
+     "canonical_success",
+     true,
+     true,
+     true
+    ],
+    [
+     "landed_on",
+     "blue_pad",
+     "blue_pad",
+     true
+    ],
+    [
+     "correct_object",
+     true,
+     true,
+     true
+    ],
+    [
+     "inside_region",
+     true,
+     true,
+     true
+    ],
+    [
+     "physical_landing",
+     true,
+     true,
+     true
+    ],
+    [
+     "finalizer_latched",
+     true,
+     true,
+     true
+    ],
+    [
+     "collision",
+     false,
+     false,
+     true
+    ],
+    [
+     "reason",
+     "landed",
+     "landed",
+     true
+    ]
+   ],
+   "start": {
+    "x": 24.0,
+    "y": 74.0,
+    "yaw_deg": 0.0,
+    "height_m": 6.0
+   },
+   "start_reached": {
+    "x": 24.0,
+    "y": 74.0,
+    "yaw_deg": 0.0,
+    "height_m": 5.94733190536499
+   },
+   "start_error": {
+    "xy_error_m": 0.0,
+    "yaw_error_deg": 0.0,
+    "height_error_m": -0.052668094635009766
+   },
+   "spawn": {
+    "rest_z": -1.1926817893981934,
+    "expected_z": -1.19,
+    "error_m": -0.0026817893981934127,
+    "tolerance_m": 0.05,
+    "on_ground": true
+   },
+   "reason": "landed",
+   "stopped": true,
+   "decisions": 86,
+   "mean_decision_s": 0.49418296252979954,
+   "finalizer_path": [
+    "FLYING",
+    "LANDING_DESCENT",
+    "CONTACT_CANDIDATE",
+    "STABLE_CONTACT",
+    "LANDED_LATCHED",
+    "DISARMED"
+   ],
+   "surface": {
+    "surface": "rectangle",
+    "landable": true,
+    "top_m": 2.5,
+    "usable_radius_m": null,
+    "usable_half_extent_m": [
+     6.6,
+     6.6
+    ]
+   },
+   "read": {
+    "success": true,
+    "landed_on": "blue_pad",
+    "collision": null,
+    "contact_from_above": true,
+    "correct_object": true,
+    "wrong_object": false,
+    "on_top": true,
+    "inside_region": true,
+    "acceptable_touchdown": true,
+    "physical_landing": true,
+    "finalizer_latched": true,
+    "horizontal_error_m": 1.28264716182193,
+    "vertical_speed_mps": 0.368325799703598,
+    "touchdown_decision": 82,
+    "canonical_touchdown_decision": 82,
+    "canonical_vertical_speed_mps": 0.368325799703598,
+    "canonical_success": true,
+    "decisions_over_surface": 60
+   },
+   "words": "landed on the named object (rectangle surface); latched and disarmed",
+   "pilot_phases": [
+    "transit",
+    "descend",
+    "rest"
+   ]
+  },
+  {
+   "id": "cube-land",
+   "layout": "mission",
+   "target": "blue_cube",
+   "task": "land",
+   "instruction": "Find the blue cube and land on it.",
+   "pilot": {
+    "mode": "land",
+    "aim": "blue_cube"
+   },
+   "why": "the top of a cube, 8 m above the ground: a rectangle surface",
+   "flown": true,
+   "passed": true,
+   "checks": [
+    [
+     "spawn_on_ground",
+     true,
+     true,
+     true
+    ],
+    [
+     "start_xy_error_m",
+     "<= 0.05",
+     0.0,
+     true
+    ],
+    [
+     "start_yaw_error_deg",
+     "<= 0.5",
+     0.0,
+     true
+    ],
+    [
+     "start_height_error_m",
+     "within 0.15",
+     -0.0523,
+     true
+    ],
+    [
+     "success",
+     true,
+     true,
+     true
+    ],
+    [
+     "landed_on",
+     "blue_cube",
+     "blue_cube",
+     true
+    ],
+    [
+     "correct_object",
+     true,
+     true,
+     true
+    ],
+    [
+     "inside_region",
+     true,
+     true,
+     true
+    ],
+    [
+     "physical_landing",
+     true,
+     true,
+     true
+    ],
+    [
+     "finalizer_latched",
+     true,
+     true,
+     true
+    ],
+    [
+     "collision",
+     false,
+     false,
+     true
+    ],
+    [
+     "reason",
+     "landed",
+     "landed",
+     true
+    ]
+   ],
+   "start": {
+    "x": 20.0,
+    "y": 52.0,
+    "yaw_deg": 200.0,
+    "height_m": 6.0
+   },
+   "start_reached": {
+    "x": 20.0,
+    "y": 52.0,
+    "yaw_deg": -159.99999570686523,
+    "height_m": 5.94765043258667
+   },
+   "start_error": {
+    "xy_error_m": 0.0,
+    "yaw_error_deg": 4.293134793442732e-06,
+    "height_error_m": -0.05234956741333008
+   },
+   "spawn": {
+    "rest_z": -1.1926817893981934,
+    "expected_z": -1.19,
+    "error_m": -0.0026817893981934127,
+    "tolerance_m": 0.05,
+    "on_ground": true
+   },
+   "reason": "landed",
+   "stopped": true,
+   "decisions": 56,
+   "mean_decision_s": 0.48818031224337494,
+   "finalizer_path": [
+    "FLYING",
+    "LANDING_DESCENT",
+    "CONTACT_CANDIDATE",
+    "STABLE_CONTACT",
+    "LANDED_LATCHED",
+    "DISARMED"
+   ],
+   "surface": {
+    "surface": "rectangle",
+    "landable": true,
+    "top_m": 8.0,
+    "usable_radius_m": null,
+    "usable_half_extent_m": [
+     3.6,
+     3.6
+    ]
+   },
+   "read": {
+    "success": true,
+    "landed_on": "blue_cube",
+    "collision": null,
+    "contact_from_above": true,
+    "correct_object": true,
+    "wrong_object": false,
+    "on_top": true,
+    "inside_region": true,
+    "acceptable_touchdown": true,
+    "physical_landing": true,
+    "finalizer_latched": true,
+    "horizontal_error_m": 3.3992661026138986,
+    "vertical_speed_mps": 0.3695644438266754,
+    "touchdown_decision": 51,
+    "canonical_touchdown_decision": 5,
+    "canonical_vertical_speed_mps": -0.7453294992446899,
+    "canonical_success": true,
+    "decisions_over_surface": 22
+   },
+   "words": "landed on the named object (rectangle surface); latched and disarmed",
+   "pilot_phases": [
+    "climb",
+    "transit",
+    "descend",
+    "rest"
+   ]
+  },
+  {
+   "id": "cylinder-land",
+   "layout": "mission",
+   "target": "green_cylinder",
+   "task": "land",
+   "instruction": "Find the green cylinder and land on it.",
+   "pilot": {
+    "mode": "land",
+    "aim": "green_cylinder"
+   },
+   "why": "the top of a cylinder, 9 m above the ground: a circle surface",
+   "flown": true,
+   "passed": true,
+   "checks": [
+    [
+     "spawn_on_ground",
+     true,
+     true,
+     true
+    ],
+    [
+     "start_xy_error_m",
+     "<= 0.05",
+     0.0,
+     true
+    ],
+    [
+     "start_yaw_error_deg",
+     "<= 0.5",
+     0.0,
+     true
+    ],
+    [
+     "start_height_error_m",
+     "within 0.15",
+     -0.0529,
+     true
+    ],
+    [
+     "success",
+     true,
+     true,
+     true
+    ],
+    [
+     "landed_on",
+     "green_cylinder",
+     "green_cylinder",
+     true
+    ],
+    [
+     "correct_object",
+     true,
+     true,
+     true
+    ],
+    [
+     "inside_region",
+     true,
+     true,
+     true
+    ],
+    [
+     "physical_landing",
+     true,
+     true,
+     true
+    ],
+    [
+     "finalizer_latched",
+     true,
+     true,
+     true
+    ],
+    [
+     "collision",
+     false,
+     false,
+     true
+    ],
+    [
+     "reason",
+     "landed",
+     "landed",
+     true
+    ]
+   ],
+   "start": {
+    "x": 70.0,
+    "y": 32.1,
+    "yaw_deg": 90.0,
+    "height_m": 6.0
+   },
+   "start_reached": {
+    "x": 70.0,
+    "y": 32.099998474121094,
+    "yaw_deg": 89.99999803884913,
+    "height_m": 5.947107791900635
+   },
+   "start_error": {
+    "xy_error_m": 1.5258789076710855e-06,
+    "yaw_error_deg": 1.961150871920836e-06,
+    "height_error_m": -0.052892208099365234
+   },
+   "spawn": {
+    "rest_z": -1.1926817893981934,
+    "expected_z": -1.19,
+    "error_m": -0.0026817893981934127,
+    "tolerance_m": 0.05,
+    "on_ground": true
+   },
+   "reason": "landed",
+   "stopped": true,
+   "decisions": 70,
+   "mean_decision_s": 0.4916334912396859,
+   "finalizer_path": [
+    "FLYING",
+    "LANDING_DESCENT",
+    "CONTACT_CANDIDATE",
+    "STABLE_CONTACT",
+    "LANDED_LATCHED",
+    "DISARMED"
+   ],
+   "surface": {
+    "surface": "circle",
+    "landable": true,
+    "top_m": 9.0,
+    "usable_radius_m": 3.6,
+    "usable_half_extent_m": null
+   },
+   "read": {
+    "success": true,
+    "landed_on": "green_cylinder",
+    "collision": null,
+    "contact_from_above": true,
+    "correct_object": true,
+    "wrong_object": false,
+    "on_top": true,
+    "inside_region": true,
+    "acceptable_touchdown": true,
+    "physical_landing": true,
+    "finalizer_latched": true,
+    "horizontal_error_m": 2.591611750960583,
+    "vertical_speed_mps": 0.38606375455856323,
+    "touchdown_decision": 66,
+    "canonical_touchdown_decision": 7,
+    "canonical_vertical_speed_mps": -0.7608597278594971,
+    "canonical_success": false,
+    "decisions_over_surface": 40
+   },
+   "words": "landed on the named object (circle surface); latched and disarmed",
+   "pilot_phases": [
+    "climb",
+    "transit",
+    "descend",
+    "rest"
+   ]
+  },
+  {
+   "id": "cube-side",
+   "layout": "mission",
+   "target": "blue_cube",
+   "task": "land",
+   "instruction": "Find the blue cube and land on it.",
+   "pilot": {
+    "mode": "ram",
+    "aim": "blue_cube"
+   },
+   "why": "flying into the side of the cube it was sent to land on is a collision, not a landing",
+   "flown": true,
+   "passed": true,
+   "checks": [
+    [
+     "spawn_on_ground",
+     true,
+     true,
+     true
+    ],
+    [
+     "start_xy_error_m",
+     "<= 0.05",
+     0.0,
+     true
+    ],
+    [
+     "start_yaw_error_deg",
+     "<= 0.5",
+     0.0,
+     true
+    ],
+    [
+     "start_height_error_m",
+     "within 0.15",
+     -0.0526,
+     true
+    ],
+    [
+     "success",
+     false,
+     false,
+     true
+    ],
+    [
+     "collision",
+     true,
+     true,
+     true
+    ],
+    [
+     "contact_from_above",
+     false,
+     false,
+     true
+    ],
+    [
+     "landed_on",
+     null,
+     null,
+     true
+    ],
+    [
+     "reason",
+     "collision",
+     "collision",
+     true
+    ]
+   ],
+   "start": {
+    "x": 22.0,
+    "y": 66.0,
+    "yaw_deg": 0.0,
+    "height_m": 6.0
+   },
+   "start_reached": {
+    "x": 22.0,
+    "y": 66.0,
+    "yaw_deg": 0.0,
+    "height_m": 5.94736385345459
+   },
+   "start_error": {
+    "xy_error_m": 0.0,
+    "yaw_error_deg": 0.0,
+    "height_error_m": -0.052636146545410156
+   },
+   "spawn": {
+    "rest_z": -1.1926817893981934,
+    "expected_z": -1.19,
+    "error_m": -0.0026817893981934127,
+    "tolerance_m": 0.05,
+    "on_ground": true
+   },
+   "reason": "collision",
+   "stopped": false,
+   "decisions": 32,
+   "mean_decision_s": 0.4691558499490061,
+   "finalizer_path": [
+    "FLYING"
+   ],
+   "surface": {
+    "surface": "rectangle",
+    "landable": true,
+    "top_m": 8.0,
+    "usable_radius_m": null,
+    "usable_half_extent_m": [
+     3.6,
+     3.6
+    ]
+   },
+   "read": {
+    "success": false,
+    "landed_on": null,
+    "collision": "BlueCube",
+    "contact_from_above": false,
+    "correct_object": false,
+    "wrong_object": false,
+    "on_top": false,
+    "inside_region": false,
+    "acceptable_touchdown": false,
+    "physical_landing": false,
+    "finalizer_latched": false,
+    "horizontal_error_m": null,
+    "vertical_speed_mps": null,
+    "touchdown_decision": null,
+    "canonical_touchdown_decision": null,
+    "canonical_vertical_speed_mps": null,
+    "canonical_success": false,
+    "decisions_over_surface": 0
+   },
+   "words": "COLLISION with BlueCube",
+   "pilot_phases": [
+    "ram"
+   ]
+  },
+  {
+   "id": "cube-wrong",
+   "layout": "mission",
+   "target": "blue_cube",
+   "task": "land",
+   "instruction": "Find the blue cube and land on it.",
+   "pilot": {
+    "mode": "land",
+    "aim": "red_cube"
+   },
+   "why": "the sentence names the blue cube and the vehicle lands on the red one: a physical landing, a latched finalizer, a failed mission",
+   "flown": true,
+   "passed": true,
+   "checks": [
+    [
+     "spawn_on_ground",
+     true,
+     true,
+     true
+    ],
+    [
+     "start_xy_error_m",
+     "<= 0.05",
+     0.0,
+     true
+    ],
+    [
+     "start_yaw_error_deg",
+     "<= 0.5",
+     0.0,
+     true
+    ],
+    [
+     "start_height_error_m",
+     "within 0.15",
+     -0.053,
+     true
+    ],
+    [
+     "success",
+     false,
+     false,
+     true
+    ],
+    [
+     "landed_on",
+     "red_cube",
+     "red_cube",
+     true
+    ],
+    [
+     "wrong_object",
+     true,
+     true,
+     true
+    ],
+    [
+     "wrong_object_landing",
+     true,
+     true,
+     true
+    ],
+    [
+     "physical_landing",
+     true,
+     true,
+     true
+    ],
+    [
+     "finalizer_latched",
+     true,
+     true,
+     true
+    ],
+    [
+     "collision",
+     false,
+     false,
+     true
+    ]
+   ],
+   "start": {
+    "x": 40.0,
+    "y": 52.0,
+    "yaw_deg": -90.0,
+    "height_m": 6.0
+   },
+   "start_reached": {
+    "x": 40.0,
+    "y": 52.0,
+    "yaw_deg": -89.99999803884911,
+    "height_m": 5.947024703025818
+   },
+   "start_error": {
+    "xy_error_m": 0.0,
+    "yaw_error_deg": 1.961150871920836e-06,
+    "height_error_m": -0.05297529697418213
+   },
+   "spawn": {
+    "rest_z": -1.192681908607483,
+    "expected_z": -1.19,
+    "error_m": -0.0026819086074829634,
+    "tolerance_m": 0.05,
+    "on_ground": true
+   },
+   "reason": "landed",
+   "stopped": true,
+   "decisions": 55,
+   "mean_decision_s": 0.4869333196569372,
+   "finalizer_path": [
+    "FLYING",
+    "LANDING_DESCENT",
+    "CONTACT_CANDIDATE",
+    "STABLE_CONTACT",
+    "LANDED_LATCHED",
+    "DISARMED"
+   ],
+   "surface": {
+    "surface": "rectangle",
+    "landable": true,
+    "top_m": 8.0,
+    "usable_radius_m": null,
+    "usable_half_extent_m": [
+     3.6,
+     3.6
+    ]
+   },
+   "read": {
+    "success": false,
+    "landed_on": "red_cube",
+    "collision": null,
+    "contact_from_above": true,
+    "correct_object": false,
+    "wrong_object": true,
+    "on_top": true,
+    "inside_region": true,
+    "acceptable_touchdown": true,
+    "physical_landing": true,
+    "finalizer_latched": true,
+    "horizontal_error_m": 3.398388041326586,
+    "vertical_speed_mps": 0.3662072420120239,
+    "touchdown_decision": 51,
+    "canonical_touchdown_decision": 5,
+    "canonical_vertical_speed_mps": -0.741032600402832,
+    "canonical_success": false,
+    "decisions_over_surface": 0
+   },
+   "words": "landed on red_cube, not on the named object: a physical landing, a failed mission",
+   "pilot_phases": [
+    "climb",
+    "transit",
+    "descend",
+    "rest"
+   ]
+  },
+  {
+   "id": "cylinder-edge",
+   "layout": "mission",
+   "target": "green_cylinder",
+   "task": "land",
+   "instruction": "Find the green cylinder and land on it.",
+   "pilot": {
+    "mode": "land",
+    "aim": "green_cylinder",
+    "offset_m": [
+     3.8,
+     0.0
+    ]
+   },
+   "why": "3.8 m from the cylinder's axis: on its top (radius 4.0 m) and outside the usable region (3.6 m), with part of the vehicle past the edge",
+   "flown": true,
+   "passed": false,
+   "checks": [
+    [
+     "spawn_on_ground",
+     true,
+     true,
+     true
+    ],
+    [
+     "start_xy_error_m",
+     "<= 0.05",
+     0.0,
+     true
+    ],
+    [
+     "start_yaw_error_deg",
+     "<= 0.5",
+     0.0,
+     true
+    ],
+    [
+     "start_height_error_m",
+     "within 0.15",
+     -0.0542,
+     true
+    ],
+    [
+     "success",
+     false,
+     false,
+     true
+    ],
+    [
+     "landed_on",
+     "green_cylinder",
+     null,
+     false
+    ],
+    [
+     "correct_object",
+     true,
+     false,
+     false
+    ],
+    [
+     "on_top",
+     true,
+     false,
+     false
+    ],
+    [
+     "inside_region",
+     false,
+     false,
+     true
+    ],
+    [
+     "collision",
+     false,
+     false,
+     true
+    ]
+   ],
+   "start": {
+    "x": 70.0,
+    "y": 20.0,
+    "yaw_deg": 180.0,
+    "height_m": 6.0
+   },
+   "start_reached": {
+    "x": 70.0,
+    "y": 20.0,
+    "yaw_deg": -179.99999132573808,
+    "height_m": 5.945799231529236
+   },
+   "start_error": {
+    "xy_error_m": 0.0,
+    "yaw_error_deg": 8.67426194872678e-06,
+    "height_error_m": -0.05420076847076416
+   },
+   "spawn": {
+    "rest_z": -1.192681908607483,
+    "expected_z": -1.19,
+    "error_m": -0.0026819086074829634,
+    "tolerance_m": 0.05,
+    "on_ground": true
+   },
+   "reason": "max_steps",
+   "stopped": false,
+   "decisions": 240,
+   "mean_decision_s": 0.49034427598929303,
+   "finalizer_path": [
+    "FLYING",
+    "LANDING_DESCENT"
+   ],
+   "surface": {
+    "surface": "circle",
+    "landable": true,
+    "top_m": 9.0,
+    "usable_radius_m": 3.6,
+    "usable_half_extent_m": null
+   },
+   "read": {
+    "success": false,
+    "landed_on": null,
+    "collision": null,
+    "contact_from_above": false,
+    "correct_object": false,
+    "wrong_object": false,
+    "on_top": false,
+    "inside_region": false,
+    "acceptable_touchdown": false,
+    "physical_landing": false,
+    "finalizer_latched": false,
+    "horizontal_error_m": null,
+    "vertical_speed_mps": null,
+    "touchdown_decision": null,
+    "canonical_touchdown_decision": null,
+    "canonical_vertical_speed_mps": null,
+    "canonical_success": false,
+    "decisions_over_surface": 22
+   },
+   "words": "ran out of decisions before landing",
+   "pilot_phases": [
+    "climb",
+    "transit",
+    "descend"
+   ]
+  },
+  {
+   "id": "cube-hover",
+   "layout": "mission",
+   "target": "blue_cube",
+   "task": "land",
+   "instruction": "Find the blue cube and land on it.",
+   "pilot": {
+    "mode": "hover",
+    "aim": "blue_cube"
+   },
+   "why": "stopping in the air over the cube is not a landing on it",
+   "flown": true,
+   "passed": true,
+   "checks": [
+    [
+     "spawn_on_ground",
+     true,
+     true,
+     true
+    ],
+    [
+     "start_xy_error_m",
+     "<= 0.05",
+     0.0,
+     true
+    ],
+    [
+     "start_yaw_error_deg",
+     "<= 0.5",
+     0.0,
+     true
+    ],
+    [
+     "start_height_error_m",
+     "within 0.15",
+     -0.0534,
+     true
+    ],
+    [
+     "success",
+     false,
+     false,
+     true
+    ],
+    [
+     "contact_from_above",
+     false,
+     false,
+     true
+    ],
+    [
+     "landed_on",
+     null,
+     null,
+     true
+    ],
+    [
+     "physical_landing",
+     false,
+     false,
+     true
+    ],
+    [
+     "collision",
+     false,
+     false,
+     true
+    ],
+    [
+     "reason",
+     "model_stop",
+     "model_stop",
+     true
+    ],
+    [
+     "stopped",
+     true,
+     true,
+     true
+    ]
+   ],
+   "start": {
+    "x": 14.0,
+    "y": 48.0,
+    "yaw_deg": 180.0,
+    "height_m": 6.0
+   },
+   "start_reached": {
+    "x": 14.0,
+    "y": 48.0,
+    "yaw_deg": -179.999990827869,
+    "height_m": 5.946636080741882
+   },
+   "start_error": {
+    "xy_error_m": 0.0,
+    "yaw_error_deg": 9.172131001378148e-06,
+    "height_error_m": -0.053363919258117676
+   },
+   "spawn": {
+    "rest_z": -1.192681908607483,
+    "expected_z": -1.19,
+    "error_m": -0.0026819086074829634,
+    "tolerance_m": 0.05,
+    "on_ground": true
+   },
+   "reason": "model_stop",
+   "stopped": true,
+   "decisions": 99,
+   "mean_decision_s": 0.485424703481246,
+   "finalizer_path": [
+    "FLYING"
+   ],
+   "surface": {
+    "surface": "rectangle",
+    "landable": true,
+    "top_m": 8.0,
+    "usable_radius_m": null,
+    "usable_half_extent_m": [
+     3.6,
+     3.6
+    ]
+   },
+   "read": {
+    "success": false,
+    "landed_on": null,
+    "collision": null,
+    "contact_from_above": false,
+    "correct_object": false,
+    "wrong_object": false,
+    "on_top": false,
+    "inside_region": false,
+    "acceptable_touchdown": false,
+    "physical_landing": false,
+    "finalizer_latched": false,
+    "horizontal_error_m": null,
+    "vertical_speed_mps": null,
+    "touchdown_decision": null,
+    "canonical_touchdown_decision": null,
+    "canonical_vertical_speed_mps": null,
+    "canonical_success": false,
+    "decisions_over_surface": 66
+   },
+   "words": "stopped in the air over the named object without landing on it",
+   "pilot_phases": [
+    "climb",
+    "transit",
+    "hover"
+   ]
+  },
+  {
+   "id": "sphere-land-refused",
+   "layout": "mission",
+   "target": "orange_ball",
+   "task": "land",
+   "instruction": null,
+   "pilot": null,
+   "why": "a sphere has no landing surface: the landing is refused and nothing flies",
+   "flown": false,
+   "passed": true,
+   "checks": [
+    [
+     "refused",
+     true,
+     true,
+     true
+    ]
+   ],
+   "refusal": "Selected object has no valid landing surface. Use APPROACH."
+  },
+  {
+   "id": "sphere-approach",
+   "layout": "mission",
+   "target": "orange_ball",
+   "task": "approach",
+   "instruction": "Approach the orange ball.",
+   "pilot": {
+    "mode": "hover",
+    "aim": [
+     80.15,
+     32.1
+    ],
+    "top_m": 3.0
+   },
+   "why": "an approach to the sphere is read by the canonical evaluator alone, as before: a stop in the air 11 m from its centre",
+   "flown": true,
+   "passed": true,
+   "checks": [
+    [
+     "spawn_on_ground",
+     true,
+     true,
+     true
+    ],
+    [
+     "start_xy_error_m",
+     "<= 0.05",
+     0.0,
+     true
+    ],
+    [
+     "start_yaw_error_deg",
+     "<= 0.5",
+     0.0,
+     true
+    ],
+    [
+     "start_height_error_m",
+     "within 0.15",
+     -0.0527,
+     true
+    ],
+    [
+     "success",
+     true,
+     true,
+     true
+    ],
+    [
+     "canonical_success",
+     true,
+     true,
+     true
+    ],
+    [
+     "contact_from_above",
+     false,
+     false,
+     true
+    ],
+    [
+     "collision",
+     false,
+     false,
+     true
+    ],
+    [
+     "reason",
+     "model_stop",
+     "model_stop",
+     true
+    ],
+    [
+     "stopped",
+     true,
+     true,
+     true
+    ]
+   ],
+   "start": {
+    "x": 70.0,
+    "y": 32.1,
+    "yaw_deg": 90.0,
+    "height_m": 6.0
+   },
+   "start_reached": {
+    "x": 70.0,
+    "y": 32.099998474121094,
+    "yaw_deg": 89.99999803884918,
+    "height_m": 5.947332859039307
+   },
+   "start_error": {
+    "xy_error_m": 1.5258789076710855e-06,
+    "yaw_error_deg": 1.961150815077417e-06,
+    "height_error_m": -0.05266714096069336
+   },
+   "spawn": {
+    "rest_z": -1.1926817893981934,
+    "expected_z": -1.19,
+    "error_m": -0.0026817893981934127,
+    "tolerance_m": 0.05,
+    "on_ground": true
+   },
+   "reason": "model_stop",
+   "stopped": true,
+   "decisions": 59,
+   "mean_decision_s": 0.4876444833032016,
+   "finalizer_path": null,
+   "surface": {
+    "surface": "none",
+    "landable": false,
+    "top_m": 9.7,
+    "usable_radius_m": null,
+    "usable_half_extent_m": null
+   },
+   "read": {
+    "success": true,
+    "landed_on": null,
+    "collision": null,
+    "contact_from_above": false,
+    "correct_object": false,
+    "wrong_object": false,
+    "on_top": false,
+    "inside_region": false,
+    "acceptable_touchdown": false,
+    "physical_landing": false,
+    "finalizer_latched": false,
+    "horizontal_error_m": null,
+    "vertical_speed_mps": null,
+    "touchdown_decision": null,
+    "canonical_touchdown_decision": null,
+    "canonical_vertical_speed_mps": null,
+    "canonical_success": true,
+    "decisions_over_surface": 0
+   },
+   "words": null,
+   "pilot_phases": [
+    "transit",
+    "hover"
+   ]
+  },
+  {
+   "id": "sphere-top",
+   "layout": "mission",
+   "target": "orange_ball",
+   "task": "approach",
+   "instruction": "Approach the orange ball.",
+   "pilot": {
+    "mode": "land",
+    "aim": "orange_ball"
+   },
+   "why": "coming down on the top of the sphere is a collision: there is no surface there to touch down on",
+   "flown": true,
+   "passed": true,
+   "checks": [
+    [
+     "spawn_on_ground",
+     true,
+     true,
+     true
+    ],
+    [
+     "start_xy_error_m",
+     "<= 0.05",
+     0.0,
+     true
+    ],
+    [
+     "start_yaw_error_deg",
+     "<= 0.5",
+     0.0,
+     true
+    ],
+    [
+     "start_height_error_m",
+     "within 0.15",
+     -0.0542,
+     true
+    ],
+    [
+     "success",
+     false,
+     false,
+     true
+    ],
+    [
+     "collision",
+     true,
+     true,
+     true
+    ],
+    [
+     "contact_from_above",
+     false,
+     false,
+     true
+    ],
+    [
+     "landed_on",
+     null,
+     null,
+     true
+    ]
+   ],
+   "start": {
+    "x": 70.0,
+    "y": 20.0,
+    "yaw_deg": 180.0,
+    "height_m": 6.0
+   },
+   "start_reached": {
+    "x": 70.0,
+    "y": 20.0,
+    "yaw_deg": -179.9999918578484,
+    "height_m": 5.945787310600281
+   },
+   "start_error": {
+    "xy_error_m": 0.0,
+    "yaw_error_deg": 8.142151614265458e-06,
+    "height_error_m": -0.05421268939971924
+   },
+   "spawn": {
+    "rest_z": -1.192681908607483,
+    "expected_z": -1.19,
+    "error_m": -0.0026819086074829634,
+    "tolerance_m": 0.05,
+    "on_ground": true
+   },
+   "reason": "collision",
+   "stopped": false,
+   "decisions": 61,
+   "mean_decision_s": 0.48796663284301756,
+   "finalizer_path": null,
+   "surface": {
+    "surface": "none",
+    "landable": false,
+    "top_m": 9.7,
+    "usable_radius_m": null,
+    "usable_half_extent_m": null
+   },
+   "read": {
+    "success": false,
+    "landed_on": null,
+    "collision": "OrangeBall",
+    "contact_from_above": false,
+    "correct_object": false,
+    "wrong_object": false,
+    "on_top": false,
+    "inside_region": false,
+    "acceptable_touchdown": false,
+    "physical_landing": false,
+    "finalizer_latched": false,
+    "horizontal_error_m": null,
+    "vertical_speed_mps": null,
+    "touchdown_decision": null,
+    "canonical_touchdown_decision": null,
+    "canonical_vertical_speed_mps": null,
+    "canonical_success": false,
+    "decisions_over_surface": 0
+   },
+   "words": null,
+   "pilot_phases": [
+    "climb",
+    "transit",
+    "descend"
+   ]
+  },
+  {
+   "id": "cap-land",
+   "layout": "mission_cap",
+   "target": "orange_ball",
+   "task": "land",
+   "instruction": "Find the orange ball and land on it.",
+   "pilot": {
+    "mode": "land",
+    "aim": "orange_ball"
+   },
+   "why": "the sphere with a flat plate on it (layout mission_cap): the plate is a cap surface",
+   "flown": true,
+   "passed": true,
+   "checks": [
+    [
+     "spawn_on_ground",
+     true,
+     true,
+     true
+    ],
+    [
+     "start_xy_error_m",
+     "<= 0.05",
+     0.0,
+     true
+    ],
+    [
+     "start_yaw_error_deg",
+     "<= 0.5",
+     0.0,
+     true
+    ],
+    [
+     "start_height_error_m",
+     "within 0.15",
+     -0.0526,
+     true
+    ],
+    [
+     "success",
+     true,
+     true,
+     true
+    ],
+    [
+     "landed_on",
+     "orange_ball",
+     "orange_ball",
+     true
+    ],
+    [
+     "correct_object",
+     true,
+     true,
+     true
+    ],
+    [
+     "inside_region",
+     true,
+     true,
+     true
+    ],
+    [
+     "physical_landing",
+     true,
+     true,
+     true
+    ],
+    [
+     "finalizer_latched",
+     true,
+     true,
+     true
+    ],
+    [
+     "collision",
+     false,
+     false,
+     true
+    ],
+    [
+     "reason",
+     "landed",
+     "landed",
+     true
+    ]
+   ],
+   "start": {
+    "x": 70.0,
+    "y": 32.1,
+    "yaw_deg": 90.0,
+    "height_m": 6.0
+   },
+   "start_reached": {
+    "x": 70.0,
+    "y": 32.099998474121094,
+    "yaw_deg": 89.99999803884918,
+    "height_m": 5.947352886199951
+   },
+   "start_error": {
+    "xy_error_m": 1.5258789076710855e-06,
+    "yaw_error_deg": 1.961150815077417e-06,
+    "height_error_m": -0.05264711380004883
+   },
+   "spawn": {
+    "rest_z": -1.1926817893981934,
+    "expected_z": -1.19,
+    "error_m": -0.0026817893981934127,
+    "tolerance_m": 0.05,
+    "on_ground": true
+   },
+   "reason": "landed",
+   "stopped": true,
+   "decisions": 98,
+   "mean_decision_s": 0.49529541153268714,
+   "finalizer_path": [
+    "FLYING",
+    "LANDING_DESCENT",
+    "CONTACT_CANDIDATE",
+    "STABLE_CONTACT",
+    "LANDED_LATCHED",
+    "DISARMED"
+   ],
+   "surface": {
+    "surface": "cap",
+    "landable": true,
+    "top_m": 9.899999999999999,
+    "usable_radius_m": 2.6,
+    "usable_half_extent_m": null
+   },
+   "read": {
+    "success": true,
+    "landed_on": "orange_ball",
+    "collision": null,
+    "contact_from_above": true,
+    "correct_object": true,
+    "wrong_object": false,
+    "on_top": true,
+    "inside_region": true,
+    "acceptable_touchdown": true,
+    "physical_landing": true,
+    "finalizer_latched": true,
+    "horizontal_error_m": 2.2897735595708153,
+    "vertical_speed_mps": 0.37087079882621765,
+    "touchdown_decision": 94,
+    "canonical_touchdown_decision": 94,
+    "canonical_vertical_speed_mps": 0.37087079882621765,
+    "canonical_success": true,
+    "decisions_over_surface": 49
+   },
+   "words": "landed on the named object (cap surface); latched and disarmed",
+   "pilot_phases": [
+    "climb",
+    "transit",
+    "descend",
+    "rest"
+   ]
+  },
+  {
+   "id": "cap-body",
+   "layout": "mission_cap",
+   "target": "orange_ball",
+   "task": "land",
+   "instruction": "Find the orange ball and land on it.",
+   "pilot": {
+    "mode": "land",
+    "aim": "orange_ball",
+    "offset_m": [
+     -4.2,
+     0.0
+    ]
+   },
+   "why": "beside the plate (4.2 m from the axis; the plate's radius is 3 m): the vehicle comes down on the sphere itself, which is a collision even though the object has a cap",
+   "flown": true,
+   "passed": false,
+   "checks": [
+    [
+     "spawn_on_ground",
+     true,
+     true,
+     true
+    ],
+    [
+     "start_xy_error_m",
+     "<= 0.05",
+     0.0,
+     true
+    ],
+    [
+     "start_yaw_error_deg",
+     "<= 0.5",
+     0.0,
+     true
+    ],
+    [
+     "start_height_error_m",
+     "within 0.15",
+     -0.0533,
+     true
+    ],
+    [
+     "success",
+     false,
+     true,
+     false
+    ],
+    [
+     "collision",
+     true,
+     false,
+     false
+    ],
+    [
+     "contact_from_above",
+     false,
+     true,
+     false
+    ],
+    [
+     "landed_on",
+     null,
+     "orange_ball",
+     false
+    ]
+   ],
+   "start": {
+    "x": 70.0,
+    "y": 32.1,
+    "yaw_deg": 90.0,
+    "height_m": 6.0
+   },
+   "start_reached": {
+    "x": 70.0,
+    "y": 32.099998474121094,
+    "yaw_deg": 89.99999803884924,
+    "height_m": 5.946659564971924
+   },
+   "start_error": {
+    "xy_error_m": 1.5258789076710855e-06,
+    "yaw_error_deg": 1.961150758233998e-06,
+    "height_error_m": -0.05334043502807617
+   },
+   "spawn": {
+    "rest_z": -1.1926817893981934,
+    "expected_z": -1.19,
+    "error_m": -0.0026817893981934127,
+    "tolerance_m": 0.05,
+    "on_ground": true
+   },
+   "reason": "landed",
+   "stopped": true,
+   "decisions": 94,
+   "mean_decision_s": 0.4835354051282329,
+   "finalizer_path": [
+    "FLYING",
+    "LANDING_DESCENT",
+    "CONTACT_CANDIDATE",
+    "STABLE_CONTACT",
+    "LANDED_LATCHED",
+    "DISARMED"
+   ],
+   "surface": {
+    "surface": "cap",
+    "landable": true,
+    "top_m": 9.899999999999999,
+    "usable_radius_m": 2.6,
+    "usable_half_extent_m": null
+   },
+   "read": {
+    "success": true,
+    "landed_on": "orange_ball",
+    "collision": null,
+    "contact_from_above": true,
+    "correct_object": true,
+    "wrong_object": false,
+    "on_top": true,
+    "inside_region": true,
+    "acceptable_touchdown": true,
+    "physical_landing": true,
+    "finalizer_latched": true,
+    "horizontal_error_m": 1.9178222656256128,
+    "vertical_speed_mps": 0.36493945121765137,
+    "touchdown_decision": 90,
+    "canonical_touchdown_decision": 90,
+    "canonical_vertical_speed_mps": 0.36493945121765137,
+    "canonical_success": true,
+    "decisions_over_surface": 30
+   },
+   "words": "landed on the named object (cap surface); latched and disarmed",
+   "pilot_phases": [
+    "climb",
+    "transit",
+    "descend",
+    "rest"
+   ]
+  }
+ ]
+}

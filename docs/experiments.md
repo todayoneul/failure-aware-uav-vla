@@ -249,3 +249,20 @@ step마다 멈추는 대신 도착 2초 전에 다음 판단을 시작해 명령
 - **Interactive:** `run_grounding_film_mission_demo.ps1`의 B, 1/2/3이 같은 주입기를 쓰고 화면에 강도·kernel·sigma를 표시. 정성 확인 두 세션에서 clean·low 착륙, medium은 pad 위 정지, high는 26–28m 앞 정지.
 - **Tests:** Python 309/309, PowerShell 4/4.
 - **다음:** Front만 / Down만 blur하는 ablation, 그다음 detector와 recovery. 이 48개 시작은 더 이상 held-out이 아니므로 recovery는 새 시작에서 평가한다.
+
+## Arbitrary start + generalized landing surface — 2026-10-11
+
+브랜치 `feat/arbitrary-start-generalized-landing`. 상세: [Arbitrary Start + Generalized Landing Surface](arbitrary_start_generalized_landing.md). 표: `outputs/arbitrary_start/summary/`. **Infrastructure만.** 학습, checkpoint 변경, canonical 48 재평가, blur 재실행, Depot 비행은 없다. 동결 지문 두 개는 simulator를 띄울 때마다 전후로 그대로.
+
+- **시작:** `StartState`(x, y, yaw, height) 하나로 지도, launcher, 계획, 로그가 통한다. 비행은 canonical `SearchEnv.reset`이 원래 읽던 field 그대로. 규칙의 숫자는 모두 기존 것(장애물 여유 5m, 높이 0.8–14m).
+- **조작:** S(start placement), 클릭 = 위치, 끌기 = 방향, [ ] = 높이, J K = yaw. Launcher `-StartX -StartY -StartYaw -StartHeight -Layout`. 시작할 수 없으면 `INVALID START`와 이유, G 꺼짐.
+- **재현:** simulator에서 요청한 시작과 도달한 시작의 차이는 위치·yaw 0, 높이 −0.03 ~ −0.09m.
+- **Planner:** `scripts/plan_arbitrary_starts.py`. Seed에서 한 번 뽑고 파일대로 비행. 거리 범위 자유(44m 밖 포함), 가림·이동 필요 여부를 기록. 예시 파일은 비행하지 않았다.
+- **착륙면:** rectangle(pad, cube), circle(cylinder), cap(판을 얹은 sphere), none(sphere, cone). 쓸 수 있는 영역 = 윗면 − 기체 half-span. Pad에서는 canonical 6.6m와 같다.
+- **Evaluator:** 닿은 surface의 영역으로 canonical 단계를 다시 읽는다. Physical landing과 mission 성공을 분리. Touchdown decision은 높이만이 아니라 접촉에서 찾는다(cube 위로 오르는 기체는 윗면 높이를 지나간다).
+- **기록된 비행:** 341개(touchdown 179)를 다시 읽어 341개가 그대로.
+- **Scripted 확인 비행 (simulator):** 계획 15개와 기대값을 비행 전에 commit. 첫 run 13/15: 틀린 둘은 pilot이 목표점을 1.3–3.4m 지나친 비행이었고 evaluator는 일어난 일을 그대로 읽었다. Pilot을 느린 접근으로 바꾸고 두 episode의 시작을 접선 방향으로 옮긴 뒤(기대값은 그대로) 15개 모두 다시 비행: 15/15.
+- **학습된 정책 (정성, 한 번씩):** 임의의 시작에서 blue pad LAND와 APPROACH 성공. Cube LAND, cylinder LAND, cap LAND는 모두 공중 정지로 실패. Sphere APPROACH 성공, sphere LAND는 거절.
+- **기존 것:** preset launch, legacy demo, B / 1 / 2 / 3 정상.
+- **Tests:** Python 370/370, PowerShell 4/4.
+- **다음:** 자동으로 학습을 시작하지 않는다. 권하는 것은 Active Search v2 + Generic Landing 학습(45–110m, 가려진 target, 상승, cube·cylinder LAND 궤적).

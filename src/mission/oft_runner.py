@@ -521,7 +521,7 @@ async def main(args):
                         if not placing:raise ValueError('Press S to place a start before changing its height or heading')
                         current=wanted_start()
                         if action=='start_height':chosen,message=starts.step_height(current,request['step'],demo,config,steps_of['height_step_m'])
-                        else:chosen=current.moved(yaw_deg=starts.wrap_deg(current.yaw_deg+request['step']*steps_of['yaw_step_deg']))
+                        else:chosen=current.moved(yaw_deg=round(starts.wrap_deg(current.yaw_deg+request['step']*steps_of['yaw_step_deg']),1))
                         note=choose_start(chosen);message=note or message
                     elif action=='reset':
                         placing=False

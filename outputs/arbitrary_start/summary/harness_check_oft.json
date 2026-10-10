@@ -1,0 +1,353 @@
+{
+ "plan": "arbitrary_start_harness_check.json",
+ "policy": "oft",
+ "evaluator": "generalized_surface_v1",
+ "start_tolerance": {
+  "xy_m": 0.05,
+  "yaw_deg": 0.5,
+  "height_m": 0.15
+ },
+ "frozen_verifications": [
+  {
+   "when": "before launch 1",
+   "record": "grounding_film",
+   "passed": true,
+   "utc": "2026-10-10T16:21:08.8451095Z"
+  },
+  {
+   "when": "before launch 1",
+   "record": "gen_v2",
+   "passed": true,
+   "utc": "2026-10-10T16:21:09.3152229Z"
+  },
+  {
+   "when": "after launch 1",
+   "record": "grounding_film",
+   "passed": true,
+   "utc": "2026-10-10T16:23:40.6545162Z"
+  },
+  {
+   "when": "after launch 1",
+   "record": "gen_v2",
+   "passed": true,
+   "utc": "2026-10-10T16:23:41.0340672Z"
+  }
+ ],
+ "episodes": [
+  {
+   "id": "as-30100-000-blue_pad-land",
+   "layout": "mission",
+   "target": "blue_pad",
+   "task": "land",
+   "instruction": "Find the blue landing pad and land on it.",
+   "pilot": null,
+   "why": null,
+   "flown": true,
+   "passed": true,
+   "checks": [
+    [
+     "spawn_on_ground",
+     true,
+     true,
+     true
+    ],
+    [
+     "start_xy_error_m",
+     "<= 0.05",
+     0.0,
+     true
+    ],
+    [
+     "start_yaw_error_deg",
+     "<= 0.5",
+     0.0,
+     true
+    ],
+    [
+     "start_height_error_m",
+     "within 0.15",
+     -0.0724,
+     true
+    ]
+   ],
+   "start": {
+    "x": 33.2,
+    "y": 77.4,
+    "yaw_deg": -45.24,
+    "height_m": 7.2
+   },
+   "start_reached": {
+    "x": 33.20000076293945,
+    "y": 77.4000015258789,
+    "yaw_deg": -45.24000144373872,
+    "height_m": 7.127620220184326
+   },
+   "start_error": {
+    "xy_error_m": 1.705984473548727e-06,
+    "yaw_error_deg": 1.4437387108046096e-06,
+    "height_error_m": -0.072379779815674
+   },
+   "spawn": {
+    "rest_z": -1.1926817893981934,
+    "expected_z": -1.19,
+    "error_m": -0.0026817893981934127,
+    "tolerance_m": 0.05,
+    "on_ground": true
+   },
+   "reason": "landed",
+   "stopped": true,
+   "decisions": 73,
+   "mean_decision_s": 0.5604938599798415,
+   "finalizer_path": [
+    "FLYING",
+    "LANDING_DESCENT",
+    "CONTACT_CANDIDATE",
+    "STABLE_CONTACT",
+    "LANDED_LATCHED",
+    "DISARMED"
+   ],
+   "surface": {
+    "surface": "rectangle",
+    "landable": true,
+    "top_m": 2.5,
+    "usable_radius_m": null,
+    "usable_half_extent_m": [
+     6.6,
+     6.6
+    ]
+   },
+   "read": {
+    "success": true,
+    "landed_on": "blue_pad",
+    "collision": null,
+    "contact_from_above": true,
+    "correct_object": true,
+    "wrong_object": false,
+    "on_top": true,
+    "inside_region": true,
+    "acceptable_touchdown": true,
+    "physical_landing": true,
+    "finalizer_latched": true,
+    "horizontal_error_m": 2.1233729293483683,
+    "vertical_speed_mps": 0.5747969746589661,
+    "touchdown_decision": 68,
+    "canonical_touchdown_decision": 68,
+    "canonical_vertical_speed_mps": 0.5747969746589661,
+    "canonical_success": true,
+    "decisions_over_surface": 24
+   },
+   "words": "landed on the named object (rectangle surface); latched and disarmed",
+   "pilot_phases": null
+  },
+  {
+   "id": "as-30100-001-blue_pad-land",
+   "layout": "mission",
+   "target": "blue_pad",
+   "task": "land",
+   "instruction": "Find the blue landing pad and land on it.",
+   "pilot": null,
+   "why": null,
+   "flown": true,
+   "passed": true,
+   "checks": [
+    [
+     "spawn_on_ground",
+     true,
+     true,
+     true
+    ],
+    [
+     "start_xy_error_m",
+     "<= 0.05",
+     0.0,
+     true
+    ],
+    [
+     "start_yaw_error_deg",
+     "<= 0.5",
+     0.0,
+     true
+    ],
+    [
+     "start_height_error_m",
+     "within 0.15",
+     -0.0573,
+     true
+    ]
+   ],
+   "start": {
+    "x": -9.62,
+    "y": 80.91,
+    "yaw_deg": 40.88,
+    "height_m": 6.3
+   },
+   "start_reached": {
+    "x": -9.619999885559082,
+    "y": 80.91000366210938,
+    "yaw_deg": 40.880002585902645,
+    "height_m": 6.24268901348114
+   },
+   "start_error": {
+    "xy_error_m": 3.6638970813833655e-06,
+    "yaw_error_deg": 2.585902649343552e-06,
+    "height_error_m": -0.057310986518859686
+   },
+   "spawn": {
+    "rest_z": -1.192681908607483,
+    "expected_z": -1.19,
+    "error_m": -0.0026819086074829634,
+    "tolerance_m": 0.05,
+    "on_ground": true
+   },
+   "reason": "landed",
+   "stopped": true,
+   "decisions": 42,
+   "mean_decision_s": 0.5549150094753359,
+   "finalizer_path": [
+    "FLYING",
+    "LANDING_DESCENT",
+    "CONTACT_CANDIDATE",
+    "STABLE_CONTACT",
+    "LANDED_LATCHED",
+    "DISARMED"
+   ],
+   "surface": {
+    "surface": "rectangle",
+    "landable": true,
+    "top_m": 2.5,
+    "usable_radius_m": null,
+    "usable_half_extent_m": [
+     6.6,
+     6.6
+    ]
+   },
+   "read": {
+    "success": true,
+    "landed_on": "blue_pad",
+    "collision": null,
+    "contact_from_above": true,
+    "correct_object": true,
+    "wrong_object": false,
+    "on_top": true,
+    "inside_region": true,
+    "acceptable_touchdown": true,
+    "physical_landing": true,
+    "finalizer_latched": true,
+    "horizontal_error_m": 4.876789729923454,
+    "vertical_speed_mps": 0.567074179649353,
+    "touchdown_decision": 37,
+    "canonical_touchdown_decision": 37,
+    "canonical_vertical_speed_mps": 0.567074179649353,
+    "canonical_success": true,
+    "decisions_over_surface": 22
+   },
+   "words": "landed on the named object (rectangle surface); latched and disarmed",
+   "pilot_phases": null
+  },
+  {
+   "id": "as-30100-002-blue_pad-land",
+   "layout": "mission",
+   "target": "blue_pad",
+   "task": "land",
+   "instruction": "Find the blue landing pad and land on it.",
+   "pilot": null,
+   "why": null,
+   "flown": true,
+   "passed": true,
+   "checks": [
+    [
+     "spawn_on_ground",
+     true,
+     true,
+     true
+    ],
+    [
+     "start_xy_error_m",
+     "<= 0.05",
+     0.0,
+     true
+    ],
+    [
+     "start_yaw_error_deg",
+     "<= 0.5",
+     0.0,
+     true
+    ],
+    [
+     "start_height_error_m",
+     "within 0.15",
+     -0.0801,
+     true
+    ]
+   ],
+   "start": {
+    "x": 23.83,
+    "y": 81.42,
+    "yaw_deg": 149.07,
+    "height_m": 8.74
+   },
+   "start_reached": {
+    "x": 23.829999923706055,
+    "y": 81.41999816894531,
+    "yaw_deg": 149.070014705895,
+    "height_m": 8.659891605377197
+   },
+   "start_error": {
+    "xy_error_m": 1.8326434570564635e-06,
+    "yaw_error_deg": 1.4705895011957182e-05,
+    "height_error_m": -0.08010839462280295
+   },
+   "spawn": {
+    "rest_z": -1.1926817893981934,
+    "expected_z": -1.19,
+    "error_m": -0.0026817893981934127,
+    "tolerance_m": 0.05,
+    "on_ground": true
+   },
+   "reason": "landed",
+   "stopped": true,
+   "decisions": 41,
+   "mean_decision_s": 0.5603394091129303,
+   "finalizer_path": [
+    "FLYING",
+    "LANDING_DESCENT",
+    "CONTACT_CANDIDATE",
+    "STABLE_CONTACT",
+    "LANDED_LATCHED",
+    "DISARMED"
+   ],
+   "surface": {
+    "surface": "rectangle",
+    "landable": true,
+    "top_m": 2.5,
+    "usable_radius_m": null,
+    "usable_half_extent_m": [
+     6.6,
+     6.6
+    ]
+   },
+   "read": {
+    "success": true,
+    "landed_on": "blue_pad",
+    "collision": null,
+    "contact_from_above": true,
+    "correct_object": true,
+    "wrong_object": false,
+    "on_top": true,
+    "inside_region": true,
+    "acceptable_touchdown": true,
+    "physical_landing": true,
+    "finalizer_latched": true,
+    "horizontal_error_m": 2.31600482638587,
+    "vertical_speed_mps": 0.5746220946311951,
+    "touchdown_decision": 36,
+    "canonical_touchdown_decision": 36,
+    "canonical_vertical_speed_mps": 0.5746220946311951,
+    "canonical_success": true,
+    "decisions_over_surface": 29
+   },
+   "words": "landed on the named object (rectangle surface); latched and disarmed",
+   "pilot_phases": null
+  }
+ ]
+}

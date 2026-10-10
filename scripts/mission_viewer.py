@@ -194,17 +194,12 @@ def main(output=None):
         nonlocal control
         if grounding and control.get('start_mode') and packet is not None and control.get('main_view')!='chase':
             # A start is being placed: the map takes the press, the drag and the release; the buttons work as ever.
-            pixel=map_pixel(x,y,packet['camera']);left,top,width,height=MAP_RECT;iw,ih=view.INSET
-            if pixel is not None and x<left+iw+8 and y>=top+height-ih-8:pixel=None
-            if event==cv2.EVENT_LBUTTONDOWN and pixel is not None:drag.press(pixel);return
-            if event==cv2.EVENT_MOUSEMOVE:drag.move(pixel);return
-            if event==cv2.EVENT_LBUTTONUP:
-                gesture=drag.release(pixel)
-                if gesture:
-                    control=request_start_pose(read_control(OUT/'control.json'),packet['frame_id'],*gesture);write_control(OUT/'control.json',control)
-                    log_control('mission viewer start placement',{'frame_id':packet['frame_id'],'pixel':gesture[0],'heading_pixel':gesture[1],
-                                                                  'request_id':control.get('mission_request_id')})
-                return
+            gesture=view.start_gesture(drag,event,x,y,packet['camera'])
+            if isinstance(gesture,tuple):
+                control=request_start_pose(read_control(OUT/'control.json'),packet['frame_id'],*gesture);write_control(OUT/'control.json',control)
+                log_control('mission viewer start placement',{'frame_id':packet['frame_id'],'pixel':gesture[0],'heading_pixel':gesture[1],
+                                                              'request_id':control.get('mission_request_id')})
+            if gesture is not None:return
         if event!=cv2.EVENT_LBUTTONDOWN:return
         if packet is not None and not (grounding and control.get('main_view')=='chase'):
             pixel=map_pixel(x,y,packet['camera'])

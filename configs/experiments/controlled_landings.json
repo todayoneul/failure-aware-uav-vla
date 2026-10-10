@@ -1,5 +1,6 @@
 {
   "description": "Controlled flights for checking the start and the landing evaluator (docs/arbitrary_start_generalized_landing.md). Every flight here is flown by a scripted pilot that is told where to go (src/landing/controlled.py), not by a policy: its outcome is known beforehand, and `expect` is what the surface evaluator (src/landing/evaluator.py) has to read from it. Written before any of these flights was flown. Each flown episode is also checked for its start: the vehicle resting on the ground, and the place, heading and height reached against the ones asked for. Nothing here measures a model.",
+  "changed_after_the_first_run": "The fifteen episodes and what each has to show (`expect`) are as they were written before any flight (commit 7f165be). The first run in the simulator (2026-10-11, kept under outputs/arbitrary_start/controlled_run1, summary in outputs/arbitrary_start/summary) passed thirteen. The two that did not were flights that never did what their episode describes: the scripted pilot flew at full speed until it was over its point and, with the vehicle's velocity lag of about 2.4 s, came down 1.3 to 3.4 m past it. In `cap-body` that put the vehicle on the plate, 1.9 m from its middle, and the evaluator read a landing on the plate, which is what happened; in `cylinder-edge` it came down beside the cylinder and the evaluator read no landing, which is also what happened. The pilot was then given a slow, proportional approach (src/landing/controlled.py), and the starts of these two episodes were moved so that the point is approached along the tangent of the circle it lies on (for `cap-body` the point itself was moved a quarter turn round the sphere, still 4.2 m from the axis). No `expect` was changed. All episodes were flown again.",
   "map": "configs/mission/grounding_film_demo.json",
   "start_tolerance": {
     "xy_m": 0.05,
@@ -45,10 +46,10 @@
      "pilot": {"mode": "land", "aim": "red_cube"},
      "expect": {"success": false, "landed_on": "red_cube", "wrong_object": true, "wrong_object_landing": true, "physical_landing": true, "finalizer_latched": true, "collision": false},
      "why": "the sentence names the blue cube and the vehicle lands on the red one: a physical landing, a latched finalizer, a failed mission"},
-    {"id": "cylinder-edge", "target": "green_cylinder", "task": "land", "start_xy": [70.0, 20.0], "start_yaw_deg": 180.0, "start_height_m": 6.0,
+    {"id": "cylinder-edge", "target": "green_cylinder", "task": "land", "start_xy": [58.8, 12.0], "start_yaw_deg": 180.0, "start_height_m": 6.0,
      "pilot": {"mode": "land", "aim": "green_cylinder", "offset_m": [3.8, 0.0]},
      "expect": {"success": false, "landed_on": "green_cylinder", "correct_object": true, "on_top": true, "inside_region": false, "collision": false},
-     "why": "3.8 m from the cylinder's axis: on its top (radius 4.0 m) and outside the usable region (3.6 m), with part of the vehicle past the edge"},
+     "why": "3.8 m from the cylinder's axis: on its top (radius 4.0 m) and outside the usable region (3.6 m), with part of the vehicle past the edge. Flown along the tangent at that point (the start is straight south of it), so that being a little early or late along the track does not change the distance from the axis"},
     {"id": "cube-hover", "target": "blue_cube", "task": "land", "start_xy": [14.0, 48.0], "start_yaw_deg": 180.0, "start_height_m": 6.0,
      "pilot": {"mode": "hover", "aim": "blue_cube"},
      "expect": {"success": false, "contact_from_above": false, "landed_on": null, "physical_landing": false, "collision": false, "reason": "model_stop", "stopped": true},
@@ -69,9 +70,9 @@
      "pilot": {"mode": "land", "aim": "orange_ball"},
      "expect": {"success": true, "landed_on": "orange_ball", "correct_object": true, "inside_region": true, "physical_landing": true, "finalizer_latched": true, "collision": false, "reason": "landed"},
      "why": "the sphere with a flat plate on it (layout mission_cap): the plate is a cap surface"},
-    {"id": "cap-body", "layout": "mission_cap", "target": "orange_ball", "task": "land", "start_xy": [70.0, 32.1], "start_yaw_deg": 90.0, "start_height_m": 6.0,
-     "pilot": {"mode": "land", "aim": "orange_ball", "offset_m": [-4.2, 0.0]},
+    {"id": "cap-body", "layout": "mission_cap", "target": "orange_ball", "task": "land", "start_xy": [70.0, 27.9], "start_yaw_deg": 90.0, "start_height_m": 6.0,
+     "pilot": {"mode": "land", "aim": "orange_ball", "offset_m": [0.0, -4.2]},
      "expect": {"success": false, "collision": true, "contact_from_above": false, "landed_on": null},
-     "why": "beside the plate (4.2 m from the axis; the plate's radius is 3 m): the vehicle comes down on the sphere itself, which is a collision even though the object has a cap"}
+     "why": "beside the plate (4.2 m from the axis; the plate's radius is 3 m): the vehicle comes down on the sphere itself, which is a collision even though the object has a cap. Flown along the tangent at that point (the start is straight west of it)"}
   ]
 }

@@ -365,6 +365,31 @@ class ViewerStartTests(unittest.TestCase):
         self.assertEqual(drag.release(None),([300,200],[340,230]));self.assertIsNone(drag.preview())
         drag.move((1,1));self.assertIsNone(drag.release())
 
+    def test_the_mouse_on_the_map_is_a_start_and_on_a_button_is_a_button(self):
+        import cv2
+        from scripts.grounding_mission_view import StartDrag,start_gesture,map_pixel,MAP_RECT,INSET,BUTTONS
+        meta={'width':640,'height':360};left,top,width,height=MAP_RECT;drag=StartDrag()
+        # The canvas shows the 640 x 360 capture in a 900 x 506 panel: the middle of the panel is the middle of the capture.
+        self.assertEqual(map_pixel(left+width//2,top+height//2,meta),[320,180]);self.assertEqual(map_pixel(left,top,meta),[0,0])
+        self.assertIsNone(map_pixel(left-1,top+10,meta));self.assertIsNone(map_pixel(left+10,top+height,meta))
+        # The corner the chase-camera inset covers is not the map.
+        self.assertIsNone(map_pixel(left+INSET[0]//2,top+height-INSET[1]//2,meta))
+        # Press, drag, release: the place pressed and the place released, in the capture's pixels.
+        self.assertEqual(start_gesture(drag,cv2.EVENT_LBUTTONDOWN,left+450,top+253,meta),'taken')
+        self.assertEqual(start_gesture(drag,cv2.EVENT_MOUSEMOVE,left+500,top+300,meta),'taken');self.assertIsNotNone(drag.preview())
+        self.assertEqual(start_gesture(drag,cv2.EVENT_LBUTTONUP,left+520,top+310,meta),([320,180],[369,220]))
+        # A press and a release in one place: the place alone.
+        start_gesture(drag,cv2.EVENT_LBUTTONDOWN,left+450,top+253,meta)
+        self.assertEqual(start_gesture(drag,cv2.EVENT_LBUTTONUP,left+452,top+254,meta),([320,180],None))
+        # Released off the map: the heading is toward where the pointer left it.
+        start_gesture(drag,cv2.EVENT_LBUTTONDOWN,left+450,top+253,meta);start_gesture(drag,cv2.EVENT_MOUSEMOVE,left+880,top+253,meta)
+        start_gesture(drag,cv2.EVENT_MOUSEMOVE,left+width+60,top+253,meta)
+        self.assertEqual(start_gesture(drag,cv2.EVENT_LBUTTONUP,left+width+60,top+253,meta),([320,180],[625,180]))
+        # A press on a button is left to the buttons, and begins nothing.
+        button=BUTTONS[0];self.assertIsNone(start_gesture(drag,cv2.EVENT_LBUTTONDOWN,button[0]+5,button[1]+5,meta))
+        self.assertEqual(start_gesture(drag,cv2.EVENT_LBUTTONUP,button[0]+5,button[1]+5,meta),'taken');self.assertIsNone(drag.preview())
+        self.assertIsNone(start_gesture(drag,cv2.EVENT_RBUTTONDOWN,left+450,top+253,meta))
+
     def test_the_canvas_shows_the_start_its_mode_and_why_g_is_off(self):
         from scripts.grounding_mission_view import render,annotate_map,BUTTONS,start_lines,START,INVALID
         from src.mission.control import default_mission_control,mission_key

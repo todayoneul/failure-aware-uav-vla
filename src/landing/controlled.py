@@ -11,17 +11,31 @@ known beforehand, so that what the evaluator says about them can be checked.
     ram     fly straight at the aim point at the height the flight started at (into the side of something taller)
     hold    give the zero action from the first decision (a start that is only looked at)
 
-The rates are the canonical teacher's (configs/targets/landing_pads.json, `teacher`): full descent down to its slow height
-above the surface, its final descent rate below that.
+The descent rates are the canonical teacher's (configs/targets/landing_pads.json, `teacher`): full descent down to its slow
+height above the surface, its final descent rate below that.
+
+The approach is slow on purpose. The vehicle follows a velocity command with a lag of about 2.4 s (measured in the first
+controlled run: a command of 2 m/s was reached to within a third after each further second, and a vehicle told to stop
+from 1.3 m/s travelled another 2.5 m). Flown at full speed until it is over the point, it lands metres past it; the first
+form of this pilot did, and missed two of its fifteen marks. The forward command is therefore proportional to the distance
+left, with the gain at which that lag gives no overshoot, and the point counts as reached only once the vehicle is over
+it and nearly still.
 """
 import math
 from src.visual_search.episodes import relative_target
 from src.aerovla_oft.spec import normalize_action,is_stop
 
 MODES=('land','hover','ram','hold')
-ARRIVE_M=.1          # the aim point is reached within this; the transit below never commands less than the stop band allows
-GAIN=.5              # share of the remaining distance flown per decision when close: no overshoot at one decision of lag
-FACE_DEG=20.         # the vehicle turns on the spot until the aim point is within this of straight ahead
+GAIN_M=.05           # forward metres per decision for each metre left: 0.1 per second, about 1 / (4 x the lag)
+CREEP_M=.02          # the least forward command while the point is ahead and not reached
+ARRIVE_M=.15         # reached: within this of the point ...
+ARRIVE_MPS=.05       # ... and slower than this (the vehicle then drifts on about a decimetre)
+STALL_M=.5           # or: within this, slower than STALL_MPS, for STALL_DECISIONS decisions (a vehicle that came to rest just short)
+STALL_MPS=.02
+STALL_DECISIONS=10
+FACE_DEG=20.         # the vehicle turns on the spot until the point is within this of straight ahead
+STEADY_M=.5          # nearer than this the heading is left alone: the bearing of a point underfoot means nothing
+DITHER_M=.1          # see `act`
 
 
 class ControlledPilot:
@@ -30,19 +44,26 @@ class ControlledPilot:
         self.env=env;self.oft=oft;self.aim=list(aim_xy);self.top=float(top_m);self.mode=mode;self.teacher=landing['teacher']
         (_,self.forward_max),(_,self.down_max),(_,self.yaw_max)=oft['action_bounds'].values()
         # Flown over at the height above the surface from which the canonical descent is committed.
-        self.cruise=self.top+self.teacher['commit_height_m'];self.arrived=False;self.phases=[]
+        self.cruise=self.top+self.teacher['commit_height_m'];self.arrived=False;self.phases=[];self.slow=0;self.count=0
 
     def act(self):
         """(action, phase) from the vehicle's true state: the pilot's privilege, which no policy has."""
         env=self.env;state=env.last_state;bearing,distance,_=relative_target(state,self.aim);height=env.ground_z-state['position'][2]
+        speed=math.hypot(state['velocity'][0],state['velocity'][1])
         if self.mode=='hold' or env.touchdown is not None or env.hit:return [0.,0.,0.],'rest'
         turn=max(-self.yaw_max,min(self.yaw_max,math.radians(bearing)))
         if self.mode=='ram':return [self.forward_max if abs(bearing)<=FACE_DEG else 0.,0.,turn],'ram'
         if not self.arrived:
-            if height<self.cruise-.25:return [0.,-min(self.down_max,self.cruise-height),turn if distance>ARRIVE_M else 0.],'climb'
-            if distance>ARRIVE_M:
-                forward=0. if abs(bearing)>FACE_DEG else max(.1,min(self.forward_max,GAIN*distance))
-                return [forward,0.,turn],'transit'
+            if height<self.cruise-.25:return [0.,-min(self.down_max,self.cruise-height),turn if distance>STEADY_M else 0.],'climb'
+            self.slow=self.slow+1 if distance<=STALL_M and speed<=STALL_MPS else 0
+            if not (distance<=ARRIVE_M and speed<=ARRIVE_MPS) and self.slow<STALL_DECISIONS:
+                forward=0. if abs(bearing)>FACE_DEG else min(self.forward_max,max(CREEP_M,GAIN_M*distance))
+                action=[forward,0.,turn if distance>STEADY_M else 0.]
+                # The loop reads four near-zero actions in a row as the policy's own stop. A slow approach is not one: a
+                # decimetre of climb and descent in turn keeps it out of that band without moving the vehicle.
+                self.count+=1
+                if is_stop(action,self.oft):action[1]=DITHER_M if self.count%2 else -DITHER_M
+                return action,'transit'
             self.arrived=True
         if self.mode=='hover':return [0.,0.,0.],'hover'
         above=height-self.top

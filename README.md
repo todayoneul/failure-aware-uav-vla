@@ -13,6 +13,7 @@
 | 맵에서 목표를 골라 보내기 (방향 힌트 사용) | 동작. 20m 안 정지는 조건에 따라 0–60% | `.\scripts\run_mission_demo.ps1` |
 | 문장만 주고 찾아가기 (방향 힌트 없음) | AeroVLA-OFT로 동작. 처음 보는 시작 32/32, 학습하지 않은 장면 18/20. 처음 보는 물체는 약함 | `.\scripts\run_visual_search_demo.ps1` |
 | 맵에서 물체를 골라 문장으로 보내기 (착륙 또는 접근) | 동작. 동결한 baseline을 직접 조작해 보는 시연 | `.\scripts\run_grounding_film_mission_demo.ps1` |
+| 시작 자세를 직접 정하기, pad가 아닌 평평한 윗면(cube, cylinder)에 착륙 임무 주기 | Simulator·화면·evaluator가 지원. **정책이 그렇게 착륙하도록 배운 것은 아님** | [문서](docs/arbitrary_start_generalized_landing.md) |
 | Gaussian Blur가 baseline을 어디서 얼마나 무너뜨리는지 측정 (Clean / Low / Medium / High) | 완료. 48개 시작에서 성공 46 → 40 → 24 → 8. Blur에 강하지 않음 | [결과](docs/failure_gaussian_blur.md) |
 | 장애 자동 감지·복구 | 아직 없음 | - |
 
@@ -96,6 +97,14 @@ GIF: [탐색](outputs/examples/generalization/search_g1.gif) · [놓친 뒤 다�
 - **시연이지 평가가 아닙니다.** 수동 확인 13회 중 10회 성공, 2회 실패, 1회는 중단입니다. 최종 배치의 여섯 시나리오는 모두 지시대로 끝났고, 실패는 blue cone 접근 두 번입니다(색 블록 벽을 정면으로 본 첫 배치, 그리고 110m 밖 건물 뒤의 cone). Canonical test의 47/48은 그대로입니다.
 
 [구조, 조작, 수동 확인 기록](docs/grounding_film_interactive_demo.md)
+
+**시작 자세와 착륙면.** Interactive Mission Control now supports user-selected UAV start poses and generalized landing surfaces for pads, boxes and cylinders.
+
+- **S**를 누르고 지도를 클릭하면 시작 위치, 끌면 보는 방향, **[ ]**로 높이, **J K**로 yaw를 정합니다. 시작할 수 없는 곳(장애물에서 5m 안, 물체 위, ceiling 위)은 이유와 함께 거절됩니다. Launcher에서도 줄 수 있습니다: `-StartX 70 -StartY 32.1 -StartYaw 0 -StartHeight 12`.
+- LAND는 pad뿐 아니라 cube와 cylinder의 윗면에도 줄 수 있습니다("Find the blue cube and land on it."). Sphere와 cone에는 착륙면이 없어 APPROACH만 됩니다. 착륙 판정은 닿은 면의 모양과 크기로 합니다.
+- **이것은 simulator, 화면, evaluator의 기능입니다.** 모델은 바뀌지 않았고 cube나 cylinder에 내리는 것을 배운 적이 없습니다. 현재 baseline으로 한 번씩 시켜 본 cube, cylinder, cap을 얹은 sphere 착륙은 셋 다 공중에서 멈췄습니다. Evaluator 자체는 결과를 미리 아는 scripted 비행 15개로 확인했습니다(15/15. 첫 run은 13/15였고, 틀린 둘은 scripted pilot이 목표점을 지나쳐 내린 비행이었습니다).
+
+[시작 규칙, 착륙면, 판정, 확인 기록, 한계](docs/arbitrary_start_generalized_landing.md)
 
 ### 3. 맵에서 목표를 골라 보내기 — Coordinate Goal Mode
 
@@ -201,12 +210,15 @@ scripts/             launcher(.ps1), 계획·평가·학습·요약·동결 스�
 configs/             비행·미션 한도, landmark, 평가 protocol, OFT 설정
 configs/maps/        맵 파일(장애물, 물체, layout). 고정된 held-out 시작 상태는 configs/generalization_test_spawns.json
 configs/mission/     Interactive Mission Control의 지도(물체 배치, launch 자세)
+configs/landing/     착륙면 규칙(어떤 모양에 어떤 면이 있는가)
+configs/experiments/ 시작 계획 파일과 scripted 확인 비행의 계획
 configs/failures/    장애 실험의 고정 조건(Gaussian Blur 강도, 비행 순서, repeat subset)
-tests/               simulator 없이 도는 테스트 (Python 309개 + PowerShell 4개)
+tests/               simulator 없이 도는 테스트 (Python 370개 + PowerShell 4개)
 docs/                아래 문서
 outputs/examples/    README에 쓰는 실제 화면과 GIF
 outputs/generalization/  동결한 결과 표와 실패 분류 (원자료는 로컬에만)
 outputs/failures/        장애 실험의 표, 실행 기록, 예시 그림 (비행 원자료는 로컬에만)
+outputs/arbitrary_start/ 시작·착륙면 확인의 표와 예시 화면 (비행 원자료는 로컬에만)
 ```
 
 ## 문서
@@ -228,6 +240,7 @@ outputs/failures/        장애 실험의 표, 실행 기록, 예시 그림 (비
 | [gen_v3c_hard_negative_grounding](docs/gen_v3c_hard_negative_grounding.md) | Evaluator v2(위치로 읽는 안정 착륙), hard-negative data와 배치, 보정 학습, pilot, 새 검증 set의 gate 결과, 목표 선택 진단, 다음 후보 |
 | [language_vision_grounding_architecture](docs/language_vision_grounding_architecture.md) | 시각 경로 audit, FiLM과 cross-attention 모듈, 같은 시작을 두 번씩 비행하는 pilot, 대조 실험, 새 검증 gate, 동결, canonical test 48의 결과 |
 | [long_range_same_color_grounding](docs/long_range_same_color_grounding.md) | 44m를 넘는 시작에서 같은 색 물체를 고르는 문제: 관측, canonical 범위에서 뺀 이유, 나중에 시도할 후보 |
+| [arbitrary_start_generalized_landing](docs/arbitrary_start_generalized_landing.md) | 임의의 시작 자세와 일반 착륙면: 시작 규칙, 지도·launcher 조작, 시작 planner, rectangle / circle / cap, finalizer와 evaluator의 역할, scripted 확인 비행, 정성 확인, 한계 |
 | [failure_gaussian_blur](docs/failure_gaussian_blur.md) | Gaussian Blur 특성화: 고정한 조건과 순서, 주입 위치와 확인, 강도별·단계별 결과, 실패 분류, 착륙·탐색·목표 선택, paired 비교와 repeat, 선명도 통계, 지연, 다음 단계 |
 | [experiments](docs/experiments.md) | 날짜별 실험 요약 |
 | [failure_plan](docs/failure_plan.md) | 이후 넣을 장애 후보 |
@@ -253,6 +266,8 @@ outputs/failures/        장애 실험의 표, 실행 기록, 예시 그림 (비
 - [x] Visual search from unseen starts and in a held-out scene (Gen-v1), failure taxonomy and transition data (Gen-v2)
 - [x] Interactive Mission Control flown by the frozen AeroVLA-OFT baseline (qualitative demonstration)
 - [x] Gaussian Blur robustness characterization of the frozen baseline (Clean / Low / Medium / High, paired on the canonical starts)
+- [x] Arbitrary start poses and generalized landing surfaces in the simulator, the mission interface and the evaluator (infrastructure; no model change)
+- [ ] Active search beyond 44 m and landing on cubes and cylinders (training; not started)
 - [ ] Front-only / Down-only blur ablation, then blur detection and recovery, evaluated on new starts
 - [ ] Unseen-object grounding, turn rate of the executor
 - [ ] Additional failure types

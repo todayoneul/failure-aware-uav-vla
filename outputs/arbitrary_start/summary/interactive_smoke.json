@@ -1,0 +1,498 @@
+{
+ "description": "The interactive Mission Control driven by hand through the control file its keys and mouse write to (2026-10-11), with the frozen baseline as the policy. Qualitative: a handful of flights, each once. They show that a start of the user's own is flown from, that a landing on a cube, a cylinder and a capped sphere can be asked for and is read, and that the earlier behaviour is kept. They measure nothing about the model. The start was placed by writing the request the viewer writes for a press, a drag and a release on the map; the gesture itself was not made with a physical mouse.",
+ "not_flown": [
+  {
+   "what": "a start on top of the blue pad (map click)",
+   "result": "INVALID START. Reason: inside blue_pad: a flight starts on open ground; not on the ground: the clicked surface is 2.6 m above it",
+   "g": "refused, no mission"
+  },
+  {
+   "what": "a start on the roof of a block (map click)",
+   "result": "INVALID START. Reason: inside TemplateCube_Rounded_99: a flight starts on open ground; not on the ground: the clicked surface is 15.1 m above it",
+   "g": "not pressed"
+  },
+  {
+   "what": "the height key pressed seven times from 8 m",
+   "result": "stops at 14.0 m, the ceiling"
+  },
+  {
+   "what": "LAND asked for on the orange ball (layout mission)",
+   "result": "Selected object has no valid landing surface. Use APPROACH.",
+   "g": "refused, no mission"
+  },
+  {
+   "what": "launcher given -StartX 10 -StartY 92",
+   "result": "INVALID START: inside blue_pad; the launcher stops before the simulator is started"
+  },
+  {
+   "what": "legacy launcher given -StartHeight 8",
+   "result": "refused: -StartX, -StartY, -StartYaw, -StartHeight and -Layout are for -Policy grounding-film"
+  }
+ ],
+ "sessions": [
+  {
+   "session": 1,
+   "folder": "20261010T160717Z-a2d0a2ea",
+   "layout": "mission",
+   "status": "STOPPED",
+   "missions": [
+    {
+     "mission": 1,
+     "target": "blue_pad",
+     "task": "land",
+     "instruction": "Find the blue landing pad and land on it.",
+     "state": "SUCCESS",
+     "result": "landed on the named object (rectangle surface); latched and disarmed",
+     "start_asked": {
+      "x": 20.23,
+      "y": 75.26,
+      "yaw_deg": 151.9,
+      "height_m": 8.0,
+      "source": "custom"
+     },
+     "start_reached": {
+      "x": 20.23,
+      "y": 75.26,
+      "yaw_deg": 151.9,
+      "height_m": 7.9145
+     },
+     "start_error": {
+      "xy_error_m": 6e-06,
+      "yaw_error_deg": 6e-06,
+      "height_error_m": -0.08552
+     },
+     "reproduce": ".\\scripts\\run_grounding_film_mission_demo.ps1 -StartX 20.23 -StartY 75.26 -StartYaw 151.9 -StartHeight 8",
+     "decisions": 89,
+     "final_distance_m": 3.63,
+     "surface": "rectangle",
+     "landed_on": "blue_pad",
+     "inside_region": true,
+     "physical_landing": true,
+     "finalizer": "DISARMED",
+     "policy_stopped_by_itself": true,
+     "mean_decision_s": 0.541,
+     "mean_inference_ms": 423.3,
+     "input_hash_agreement": true,
+     "camera_frames_unchanged": true,
+     "failure_decisions": {
+      "clean": 89,
+      "low": 0,
+      "medium": 0,
+      "high": 0
+     },
+     "model_input": "Front RGB + Down RGB + Instruction ONLY",
+     "not_sent_to_model": [
+      "target XYZ",
+      "distance",
+      "bearing",
+      "direction hint",
+      "overview",
+      "marker",
+      "start pose",
+      "landing surface"
+     ]
+    },
+    {
+     "mission": 2,
+     "target": "blue_pad",
+     "task": "approach",
+     "instruction": "Approach the blue landing pad.",
+     "state": "SUCCESS",
+     "result": "stopped in the air beside the named object",
+     "start_asked": {
+      "x": 20.23,
+      "y": 75.26,
+      "yaw_deg": 151.9,
+      "height_m": 8.0,
+      "source": "custom"
+     },
+     "start_reached": {
+      "x": 20.23,
+      "y": 75.26,
+      "yaw_deg": 151.9,
+      "height_m": 7.914
+     },
+     "start_error": {
+      "xy_error_m": 6e-06,
+      "yaw_error_deg": 6e-06,
+      "height_error_m": -0.086013
+     },
+     "reproduce": ".\\scripts\\run_grounding_film_mission_demo.ps1 -StartX 20.23 -StartY 75.26 -StartYaw 151.9 -StartHeight 8",
+     "decisions": 67,
+     "final_distance_m": 11.76,
+     "surface": "rectangle",
+     "landed_on": null,
+     "inside_region": null,
+     "physical_landing": false,
+     "finalizer": null,
+     "policy_stopped_by_itself": true,
+     "mean_decision_s": 0.537,
+     "mean_inference_ms": 426.4,
+     "input_hash_agreement": true,
+     "camera_frames_unchanged": true,
+     "failure_decisions": {
+      "clean": 67,
+      "low": 0,
+      "medium": 0,
+      "high": 0
+     },
+     "model_input": "Front RGB + Down RGB + Instruction ONLY",
+     "not_sent_to_model": [
+      "target XYZ",
+      "distance",
+      "bearing",
+      "direction hint",
+      "overview",
+      "marker",
+      "start pose",
+      "landing surface"
+     ]
+    },
+    {
+     "mission": 3,
+     "target": "blue_cube",
+     "task": "land",
+     "instruction": "Find the blue cube and land on it.",
+     "state": "FAILED",
+     "result": "stopped without landing on the named object",
+     "start_asked": {
+      "x": 20.23,
+      "y": 52.15,
+      "yaw_deg": 145.3,
+      "height_m": 6.0,
+      "source": "custom"
+     },
+     "start_reached": {
+      "x": 20.23,
+      "y": 52.15,
+      "yaw_deg": 145.3,
+      "height_m": 5.9462
+     },
+     "start_error": {
+      "xy_error_m": 2e-06,
+      "yaw_error_deg": 1e-05,
+      "height_error_m": -0.053794
+     },
+     "reproduce": ".\\scripts\\run_grounding_film_mission_demo.ps1 -StartX 20.23 -StartY 52.15 -StartYaw 145.3 -StartHeight 6",
+     "decisions": 21,
+     "final_distance_m": 8.17,
+     "surface": "rectangle",
+     "landed_on": null,
+     "inside_region": null,
+     "physical_landing": false,
+     "finalizer": "FLYING",
+     "policy_stopped_by_itself": true,
+     "mean_decision_s": 0.555,
+     "mean_inference_ms": 428.6,
+     "input_hash_agreement": true,
+     "camera_frames_unchanged": true,
+     "failure_decisions": {
+      "clean": 21,
+      "low": 0,
+      "medium": 0,
+      "high": 0
+     },
+     "model_input": "Front RGB + Down RGB + Instruction ONLY",
+     "not_sent_to_model": [
+      "target XYZ",
+      "distance",
+      "bearing",
+      "direction hint",
+      "overview",
+      "marker",
+      "start pose",
+      "landing surface"
+     ]
+    },
+    {
+     "mission": 4,
+     "target": "green_cylinder",
+     "task": "land",
+     "instruction": "Find the green cylinder and land on it.",
+     "state": "FAILED",
+     "result": "stopped without landing on the named object",
+     "start_asked": {
+      "x": 69.81,
+      "y": 31.87,
+      "yaw_deg": -168.7,
+      "height_m": 6.0,
+      "source": "custom"
+     },
+     "start_reached": {
+      "x": 69.81,
+      "y": 31.87,
+      "yaw_deg": -168.7,
+      "height_m": 5.9462
+     },
+     "start_error": {
+      "xy_error_m": 3e-06,
+      "yaw_error_deg": 3e-06,
+      "height_error_m": -0.053806
+     },
+     "reproduce": ".\\scripts\\run_grounding_film_mission_demo.ps1 -StartX 69.81 -StartY 31.87 -StartYaw -168.7 -StartHeight 6",
+     "decisions": 13,
+     "final_distance_m": 9.32,
+     "surface": "circle",
+     "landed_on": null,
+     "inside_region": null,
+     "physical_landing": false,
+     "finalizer": "FLYING",
+     "policy_stopped_by_itself": true,
+     "mean_decision_s": 0.467,
+     "mean_inference_ms": 427.2,
+     "input_hash_agreement": true,
+     "camera_frames_unchanged": true,
+     "failure_decisions": {
+      "clean": 13,
+      "low": 0,
+      "medium": 0,
+      "high": 0
+     },
+     "model_input": "Front RGB + Down RGB + Instruction ONLY",
+     "not_sent_to_model": [
+      "target XYZ",
+      "distance",
+      "bearing",
+      "direction hint",
+      "overview",
+      "marker",
+      "start pose",
+      "landing surface"
+     ]
+    },
+    {
+     "mission": 5,
+     "target": "orange_ball",
+     "task": "approach",
+     "instruction": "Approach the orange ball.",
+     "state": "SUCCESS",
+     "result": "stopped in the air beside the named object",
+     "start_asked": {
+      "x": 69.81,
+      "y": 31.87,
+      "yaw_deg": -168.7,
+      "height_m": 6.0,
+      "source": "custom"
+     },
+     "start_reached": {
+      "x": 69.81,
+      "y": 31.87,
+      "yaw_deg": -168.7,
+      "height_m": 5.9473
+     },
+     "start_error": {
+      "xy_error_m": 3e-06,
+      "yaw_error_deg": 3e-06,
+      "height_error_m": -0.052724
+     },
+     "reproduce": ".\\scripts\\run_grounding_film_mission_demo.ps1 -StartX 69.81 -StartY 31.87 -StartYaw -168.7 -StartHeight 6",
+     "decisions": 40,
+     "final_distance_m": 9.51,
+     "surface": "none",
+     "landed_on": null,
+     "inside_region": null,
+     "physical_landing": false,
+     "finalizer": null,
+     "policy_stopped_by_itself": true,
+     "mean_decision_s": 0.542,
+     "mean_inference_ms": 442.0,
+     "input_hash_agreement": true,
+     "camera_frames_unchanged": true,
+     "failure_decisions": {
+      "clean": 40,
+      "low": 0,
+      "medium": 0,
+      "high": 0
+     },
+     "model_input": "Front RGB + Down RGB + Instruction ONLY",
+     "not_sent_to_model": [
+      "target XYZ",
+      "distance",
+      "bearing",
+      "direction hint",
+      "overview",
+      "marker",
+      "start pose",
+      "landing surface"
+     ]
+    },
+    {
+     "mission": 6,
+     "target": "blue_pad",
+     "task": "land",
+     "instruction": "Find the blue landing pad and land on it.",
+     "state": "SUCCESS",
+     "result": "landed on the named object (rectangle surface); latched and disarmed",
+     "start_asked": {
+      "x": 30.0,
+      "y": 56.0,
+      "yaw_deg": 90.0,
+      "height_m": 6.0,
+      "source": "preset"
+     },
+     "start_reached": {
+      "x": 30.0,
+      "y": 56.0,
+      "yaw_deg": 90.0,
+      "height_m": 5.9459
+     },
+     "start_error": {
+      "xy_error_m": 0.0,
+      "yaw_error_deg": 2e-06,
+      "height_error_m": -0.054145
+     },
+     "reproduce": ".\\scripts\\run_grounding_film_mission_demo.ps1 -StartX 30 -StartY 56 -StartYaw 90 -StartHeight 6",
+     "decisions": 61,
+     "final_distance_m": 1.75,
+     "surface": "rectangle",
+     "landed_on": "blue_pad",
+     "inside_region": true,
+     "physical_landing": true,
+     "finalizer": "DISARMED",
+     "policy_stopped_by_itself": true,
+     "mean_decision_s": 0.538,
+     "mean_inference_ms": 427.4,
+     "input_hash_agreement": true,
+     "camera_frames_unchanged": true,
+     "failure_decisions": {
+      "clean": 61,
+      "low": 0,
+      "medium": 0,
+      "high": 0
+     },
+     "model_input": "Front RGB + Down RGB + Instruction ONLY",
+     "not_sent_to_model": [
+      "target XYZ",
+      "distance",
+      "bearing",
+      "direction hint",
+      "overview",
+      "marker",
+      "start pose",
+      "landing surface"
+     ]
+    },
+    {
+     "mission": 7,
+     "target": "blue_pad",
+     "task": "land",
+     "instruction": "Find the blue landing pad and land on it.",
+     "state": "ABORTED",
+     "result": "manual abort (R)",
+     "start_asked": {
+      "x": 30.0,
+      "y": 56.0,
+      "yaw_deg": 90.0,
+      "height_m": 6.0,
+      "source": "preset"
+     },
+     "start_reached": {
+      "x": 30.0,
+      "y": 56.0,
+      "yaw_deg": 90.0,
+      "height_m": 5.9463
+     },
+     "start_error": {
+      "xy_error_m": 0.0,
+      "yaw_error_deg": 2e-06,
+      "height_error_m": -0.053723
+     },
+     "reproduce": ".\\scripts\\run_grounding_film_mission_demo.ps1 -StartX 30 -StartY 56 -StartYaw 90 -StartHeight 6",
+     "decisions": null,
+     "final_distance_m": null,
+     "surface": null,
+     "landed_on": null,
+     "inside_region": null,
+     "physical_landing": null,
+     "finalizer": null,
+     "policy_stopped_by_itself": null,
+     "mean_decision_s": null,
+     "mean_inference_ms": null,
+     "input_hash_agreement": null,
+     "camera_frames_unchanged": false,
+     "failure_decisions": {
+      "clean": 0,
+      "low": 22,
+      "medium": 0,
+      "high": 0
+     },
+     "model_input": "Front RGB + Down RGB + Instruction ONLY",
+     "not_sent_to_model": [
+      "target XYZ",
+      "distance",
+      "bearing",
+      "direction hint",
+      "overview",
+      "marker",
+      "start pose",
+      "landing surface"
+     ]
+    }
+   ]
+  },
+  {
+   "session": 2,
+   "folder": "20261010T161745Z-8a362184",
+   "layout": "mission_cap",
+   "status": "STOPPED",
+   "missions": [
+    {
+     "mission": 1,
+     "target": "orange_ball",
+     "task": "land",
+     "instruction": "Find the orange ball and land on it.",
+     "state": "FAILED",
+     "result": "stopped in the air over the named object without landing on it",
+     "start_asked": {
+      "x": 70.0,
+      "y": 32.1,
+      "yaw_deg": 0.0,
+      "height_m": 12.0,
+      "source": "custom"
+     },
+     "start_reached": {
+      "x": 70.0,
+      "y": 32.1,
+      "yaw_deg": 0.0,
+      "height_m": 11.9692
+     },
+     "start_error": {
+      "xy_error_m": 2e-06,
+      "yaw_error_deg": 1e-06,
+      "height_error_m": -0.030829
+     },
+     "reproduce": ".\\scripts\\run_grounding_film_mission_demo.ps1 -StartX 70 -StartY 32.1 -StartYaw 0 -StartHeight 12 -Layout mission_cap",
+     "decisions": 59,
+     "final_distance_m": 1.31,
+     "surface": "cap",
+     "landed_on": null,
+     "inside_region": null,
+     "physical_landing": false,
+     "finalizer": "LANDING_DESCENT",
+     "policy_stopped_by_itself": true,
+     "mean_decision_s": 0.54,
+     "mean_inference_ms": 431.5,
+     "input_hash_agreement": true,
+     "camera_frames_unchanged": true,
+     "failure_decisions": {
+      "clean": 59,
+      "low": 0,
+      "medium": 0,
+      "high": 0
+     },
+     "model_input": "Front RGB + Down RGB + Instruction ONLY",
+     "not_sent_to_model": [
+      "target XYZ",
+      "distance",
+      "bearing",
+      "direction hint",
+      "overview",
+      "marker",
+      "start pose",
+      "landing surface"
+     ]
+    }
+   ]
+  }
+ ]
+}

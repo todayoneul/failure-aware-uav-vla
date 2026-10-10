@@ -57,6 +57,28 @@ class StartDrag:
         return (self.origin,self.current) if self.origin is not None and self.dragged(self.current) else None
 
 
+def map_pixel(x,y,meta):
+    """The pixel of the map capture under a point of the canvas, or None off the map or on the inset in its corner."""
+    left,top,width,height=MAP_RECT;iw,ih=INSET
+    if not (left<=x<left+width and top<=y<top+height) or (x<left+iw+8 and y>=top+height-ih-8):return None
+    return [int((x-left)*meta['width']/width),int((y-top)*meta['height']/height)]
+
+
+def start_gesture(drag,event,x,y,meta):
+    """One mouse event of the window while a start is being placed.
+
+    Returns (place pixel, heading pixel or None) when a gesture ends with this event; 'taken' when the event belongs to the
+    map (a press on it, a move, a release with nothing begun); None when it is not the map's (a press on a button)."""
+    pixel=map_pixel(x,y,meta)
+    if event==cv2.EVENT_LBUTTONDOWN:
+        if pixel is None:return None
+        drag.press(pixel);return 'taken'
+    if event==cv2.EVENT_MOUSEMOVE:
+        drag.move(pixel);return 'taken'
+    if event==cv2.EVENT_LBUTTONUP:return drag.release(pixel) or 'taken'
+    return None
+
+
 def start_lines(start):
     return ['START' if start.get('applied') else 'START (not flown to yet)',f'Height {start["height_m"]:.1f} m',f'Yaw {start["yaw_deg"]:+.0f} deg']
 
@@ -89,7 +111,9 @@ def annotate_map(shown,packet,telemetry,drag=None):
             cv2.drawMarker(shown,pixel,colour,cv2.MARKER_DIAMOND,14,2,cv2.LINE_AA)
             if ahead is not None:cv2.arrowedLine(shown,pixel,ahead,colour,2,cv2.LINE_AA,tipLength=.3)
             lines=start_lines(start) if start.get('valid',True) else ['INVALID START']
-            width=max(cv2.getTextSize(line,0,.36,1)[0][0] for line in lines);x,y=pixel[0]+10,pixel[1]+16
+            width=max(cv2.getTextSize(line,0,.36,1)[0][0] for line in lines)
+            # To the left of the marker where there is room: a target's own label stands to its right.
+            x,y=(pixel[0]-width-12 if pixel[0]-width-12>=2 else pixel[0]+10),pixel[1]+16
             cv2.rectangle(shown,(x-2,y-11),(x+width+2,y+13*(len(lines)-1)+4),(235,235,235),-1)
             for index,line in enumerate(lines):cv2.putText(shown,line,(x,y+13*index),0,.36,colour,1,cv2.LINE_AA)
     if drag:
@@ -121,9 +145,9 @@ def render(telemetry,control,images,show_overlay=False):
 
     # --- header ---------------------------------------------------------------------------------------------------------
     text('Mission Control',20,35,.9,INK,2)
-    text(status,20,75,.8,GREEN if status=='SUCCESS' else RED if status in ('FAILED','ABORTED') else BLUE,2)
-    text(f'Target: {target["name"] if target else "none"}',300,62,.62,INK,2)
-    text(f'Task: {task}',300,88,.62,PURPLE,2)
+    text(status,20,72,.8,GREEN if status=='SUCCESS' else RED if status in ('FAILED','ABORTED') else BLUE,2)
+    text(f'Target: {target["name"] if target else "none"}',300,52,.62,INK,2)
+    text(f'Task: {task}',300,77,.62,PURPLE,2)
     launch=telemetry.get('launch') or {};start=telemetry.get('start') or {};placing=bool(start.get('placing') or control.get('start_mode'))
     preset=launch.get('index')
     line='Start: '+(f'{launch.get("name","--")} (preset {preset+1}/{launch.get("count",1)})' if preset is not None else 'CUSTOM')

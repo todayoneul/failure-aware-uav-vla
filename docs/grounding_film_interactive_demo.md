@@ -2,6 +2,8 @@
 
 2026-10-10, 브랜치 `feat/grounding-film-interactive-mission`. 기존 Mission Control 화면에서 동결한 AeroVLA-OFT checkpoint(`grounding_film`)에 미션을 주고, 모델이 실제로 받는 Front/Down 영상과 문장, 모델의 행동, 착륙 finalizer의 상태를 한 창에서 본다.
 
+> 2026-10-11: 시작 자세를 지도에서 직접 정할 수 있고(S), LAND를 cube와 cylinder에도 줄 수 있게 됐다 — [Arbitrary Start + Generalized Landing Surface](arbitrary_start_generalized_landing.md). 이 정책에서 S는 더 이상 지도를 밀지 않는다(방향키가 민다). 아래는 그 전의 기록이다.
+
 **이 화면의 결과는 평가가 아니다.** 사람이 직접 눌러 보는 시연이고, canonical test의 47/48은 그대로다. 모델을 학습하지 않았고 checkpoint, canonical 검증·test set, Depot set은 건드리지 않았다. Gaussian Blur 실험도 하지 않았다.
 
 ![Blue pad에 착륙한 미션의 실제 화면](../outputs/examples/grounding_film_mission/land.jpg)
