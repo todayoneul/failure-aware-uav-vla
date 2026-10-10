@@ -266,3 +266,20 @@ step마다 멈추는 대신 도착 2초 전에 다음 판단을 시작해 명령
 - **기존 것:** preset launch, legacy demo, B / 1 / 2 / 3 정상.
 - **Tests:** Python 370/370, PowerShell 4/4.
 - **다음:** 자동으로 학습을 시작하지 않는다. 권하는 것은 Active Search v2 + Generic Landing 학습(45–110m, 가려진 target, 상승, cube·cylinder LAND 궤적).
+
+## Generic Landing (Phase B, Stage 1) — 2026-10-11
+
+브랜치 `exp/active-search-v2-generic-landing`. 상세: [Generic Landing + Active Search v2](generic_landing_active_search_v2.md). 표: `outputs/generic_landing/summary/`. **Gate를 통과하지 못했다(cube 착륙 6/10, 기준 8/10). Stage 2(Active Search v2)는 시작하지 않았다.** Canonical 48 재평가와 Depot 비행은 없다. 동결 지문 두 개는 simulator를 띄울 때마다 전후로 그대로.
+
+- **질문:** 구조를 바꾸지 않은 같은 정책(Front + Down RGB, 문장 하나)이 pad뿐 아니라 cube와 cylinder의 윗면에도 착륙하는가.
+- **고정:** data, teacher, 학습 일정, 후보(update 1000 / 1500 / 2000 / 2500), pilot 순서, gate를 녹화 전에 commit(`99fa6ae`).
+- **Teacher:** canonical teacher + 상승(윗면 + 여유까지) + 작은 면의 느린 진입. Simulator에서 pilot 15/15, validation 시작 35/36.
+- **Data:** 233 episode 녹화(train 209 + val 24, 14,739 frame). Pad / cube / cylinder 각각 착륙 54 + approach twin 16, 10–44m, 시작 높이 3–12m. 기존 data와 합쳐 1,393 episode.
+- **학습:** `grounding_film`에서 시작, LoRA + head + FiLM, 2,500 update(94분), 새 data 45%. Validation L1 0.1234 → 0.0676.
+- **Pilot (15개 시작, 후보마다 한 번):** cube·cylinder 착륙이 baseline 0/8, update 1000 1/8, 1500 1/8, **2000 6/8**, 2500 5/8. Pad 4/4와 approach 3/3은 모든 후보가 유지. Update 2000 선택. Validation L1이 거의 같은 1500과 2000의 착륙 수가 1과 6이다.
+- **Validation gate (녹화한 적 없는 layout의 36개 시작, 한 번씩):** success 30/36, system landing 24/30, pad 10/10, **cube 6/10**, cylinder 8/10, wrong target 0, 충돌 0, approach twin 6/6(touchdown 0). Cube 줄에서 실패. `generic_landing_v1`은 만들지 않았다.
+- **실패 6개:** 모두 모델이 공중에서 stop 행동을 네 번 낸 것. 상승 도중 2, 윗면보다 높은 곳에서 천천히 전진하다 3, 가운데 위에서 하강을 시작하지 않음 1. 다른 물체로 간 것, 충돌, 영역 밖 착륙은 없다.
+- **원인:** teacher의 느린 진입 label(수평, 전진 0.15m)이 harness의 stop 규칙(전진 0.08m 이하가 네 번 연속) 바로 옆에 있다. Cube·cylinder 착륙 label의 17%가 그렇다. 착륙한 14개 비행 중 10개도 stop 규칙 안의 행동을 한 번 이상 냈다. 녹화 전에 이 거리를 재지 않았다.
+- **기록용 (gate 뒤, 판정과 무관):** 같은 cube·cylinder 20개 시작의 두 번째 비행은 cube 5/10, cylinder 6/10이고 20개 중 5개가 뒤집혔다. 44m 안 regression 36개는 update 2000 35/36, baseline 35/36(pad 착륙 26/27 대 27/27, wrong target 0, 충돌 0). 잃은 하나는 41.7m 탐색 시작에서 첫 decision부터 stop을 낸 비행.
+- **Tests:** Python 383/383, PowerShell 4/4.
+- **다음:** 자동으로 시작하지 않는다. 권하는 것은 느린 진입의 label을 stop 규칙에서 떼어 놓도록 teacher를 고치고, Stage 1을 새 validation set으로 다시 판정하는 것.

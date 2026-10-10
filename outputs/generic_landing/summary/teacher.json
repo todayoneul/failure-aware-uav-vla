@@ -1,0 +1,67 @@
+{
+ "description": "The teacher (src/landing/teacher.SurfaceTeacher) in the simulator: on the pilot and validation starts with the finalizer, and the recording.",
+ "pilot": {
+  "flights": 15,
+  "success": 15,
+  "land": 12,
+  "land_success": 12,
+  "approach": 3,
+  "approach_success": 3,
+  "collisions": 0
+ },
+ "validation": {
+  "flights": 36,
+  "success": 35,
+  "land": 30,
+  "land_success": 29,
+  "approach": 6,
+  "approach_success": 6,
+  "collisions": 0,
+  "failed": [
+   {
+    "id": "glv-42010-blue_pad-far_visible",
+    "task": "land",
+    "reason": "max_steps",
+    "landed_on": null,
+    "collision": null,
+    "wrong_target": false,
+    "final_distance_m": 11.5,
+    "steps": 320
+   }
+  ]
+ },
+ "recording": {
+  "flights": 237,
+  "kept": 233,
+  "rejected": [
+   {
+    "id": "gl-40016-red_pad-mid_search",
+    "reason": "teacher_stop",
+    "teacher_did_it": true,
+    "real_time_factor": 0.7427088960091165
+   },
+   {
+    "id": "gl-40017-blue_pad-far_visible",
+    "reason": "teacher_stop",
+    "teacher_did_it": true,
+    "real_time_factor": 0.7763954498505101
+   },
+   {
+    "id": "gl-40081-red_cube-far_visible",
+    "reason": "teacher_stop",
+    "teacher_did_it": true,
+    "real_time_factor": 0.7759250122781581
+   },
+   {
+    "id": "gl-40088-blue_cube-near_search",
+    "reason": "max_steps",
+    "teacher_did_it": false,
+    "real_time_factor": 0.961464627804225
+   }
+  ],
+  "real_time_factor": {
+   "minimum": 0.7427088960091165,
+   "median": 0.9776004508637889
+  }
+ }
+}

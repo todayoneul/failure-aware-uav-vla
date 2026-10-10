@@ -43,6 +43,11 @@
 /outputs/arbitrary_start/*
 !/outputs/arbitrary_start/summary/
 !/outputs/arbitrary_start/examples/
+# Generic landing (phase B, stage 1): the tables behind the document and one small picture (flights, datasets and checkpoints stay local).
+!/outputs/generic_landing/
+/outputs/generic_landing/*
+!/outputs/generic_landing/summary/
+!/outputs/generic_landing/examples/
 
 # Downloaded simulator, datasets and model weights.
 /assets/

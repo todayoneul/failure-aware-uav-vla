@@ -1,0 +1,301 @@
+{
+ "description": "Generic landing (phase B, stage 1): the data that was recorded and the training run (configs/generic_landing.json, fine_tune).",
+ "recorded": {
+  "episodes": 233,
+  "train_episodes": 209,
+  "val_episodes": 24,
+  "dropped_episodes": {},
+  "samples": 14739,
+  "train_samples": 13314,
+  "val_samples": 1425,
+  "tasks": {
+   "approach": 54,
+   "land": 179
+  },
+  "by_target_episodes": {
+   "blue_cube": 38,
+   "blue_cylinder": 39,
+   "blue_pad": 39,
+   "green_cylinder": 39,
+   "red_cube": 39,
+   "red_pad": 39
+  },
+  "start_distance_m": {
+   "0-12 m": 29,
+   "12-20 m": 51,
+   "20-30 m": 62,
+   "30-40 m": 57,
+   "40-50 m": 34
+  },
+  "start_height_m": {
+   "10-11 m": 31,
+   "11-12 m": 23,
+   "3-4 m": 22,
+   "4-5 m": 35,
+   "5-6 m": 35,
+   "6-7 m": 20,
+   "7-8 m": 17,
+   "8-9 m": 21,
+   "9-10 m": 29
+  },
+  "by_teacher_state": {
+   "align": 128,
+   "approach": 3916,
+   "climb": 1233,
+   "descend": 2478,
+   "final": 4619,
+   "landed": 716,
+   "search": 1433,
+   "stop": 216
+  },
+  "labels_outside_action_bounds": 0
+ },
+ "merged": {
+  "episodes": 1393,
+  "train_episodes": 1250,
+  "val_episodes": 143,
+  "samples": 72068,
+  "train_samples": 64954,
+  "val_samples": 7114,
+  "sources": {
+   "generalization_v1": 292,
+   "generalization_v2_added": 153,
+   "generalization_v3_added": 414,
+   "generalization_v3b_added": 193,
+   "generalization_v3c_added": 108,
+   "generic_landing_added": 233
+  }
+ },
+ "run": {
+  "init": "outputs/aerovla_oft/checkpoints/grounding_film",
+  "planned_updates": 2500,
+  "batch_size": 1,
+  "gradient_accumulation": 4,
+  "learning_rate": 5e-05,
+  "grounding_learning_rate": 5e-05,
+  "share_of_draws": {
+   "generic_landing_added": 0.45
+  },
+  "frames_by_source": {
+   "generic_landing_added": 13314,
+   "None": 51640
+  },
+  "boost": {
+   "small_visible": 2.0,
+   "selection": 3.0
+  },
+  "balance": 3.0,
+  "parameters": {
+   "lora": 39976960,
+   "head": 14716931,
+   "grounding": 4338432
+  },
+  "peak_allocated_GiB": 9.889997482299805,
+  "train_seconds": 5674.231206417084,
+  "gpu": "NVIDIA GeForce RTX 5070"
+ },
+ "labels_against_the_stop_rule": {
+  "stop_rule": {
+   "forward_m": 0.08,
+   "down_m": 0.08,
+   "yaw_rad": 0.0336,
+   "decisions_in_a_row": 4
+  },
+  "landing_decisions_on_cubes_and_cylinders": 9049,
+  "labels_inside_the_stop_rule": 0,
+  "level_labels_with_forward_under_twice_the_stop_rule": 1541,
+  "level_forward_label_m_by_distance_from_the_middle": {
+   "0-2 m": {
+    "decisions": 794,
+    "min": 0.15,
+    "median": 0.15,
+    "max": 0.15
+   },
+   "2-4 m": {
+    "decisions": 1110,
+    "min": 0.15,
+    "median": 0.15,
+    "max": 0.2
+   },
+   "4-6 m": {
+    "decisions": 700,
+    "min": 0.2,
+    "median": 0.24,
+    "max": 0.3
+   },
+   "6-8 m": {
+    "decisions": 534,
+    "min": 0.3,
+    "median": 0.35,
+    "max": 0.4
+   },
+   "8-10 m": {
+    "decisions": 454,
+    "min": 0.4,
+    "median": 0.45,
+    "max": 0.5
+   },
+   "10-12 m": {
+    "decisions": 363,
+    "min": 0.5,
+    "median": 0.54,
+    "max": 0.6
+   },
+   "12-14 m": {
+    "decisions": 145,
+    "min": 0.6,
+    "median": 0.64,
+    "max": 0.7
+   },
+   "14 m and more": {
+    "decisions": 1132,
+    "min": 0.7,
+    "median": 0.99,
+    "max": 1.0
+   }
+  }
+ },
+ "start_checkpoint_on_validation_mix": {
+  "l1": 0.12344963240927125,
+  "behaviour": {
+   "grounding_accuracy": 0.8908296943231441,
+   "terminal_accuracy": 0.5495495495495496,
+   "all": 0.7883333333333333,
+   "terminal_accuracy_land": 0.45454545454545453,
+   "terminal_accuracy_approach": 0.9130434782608695,
+   "score": 0.7201896219363468
+  }
+ },
+ "validation_curve": [
+  {
+   "update": 250,
+   "val_l1": 0.0836099192701901,
+   "behaviour": {
+    "grounding_accuracy": 0.8864628820960698,
+    "terminal_accuracy": 0.8018018018018018,
+    "all": 0.8333333333333334,
+    "terminal_accuracy_land": 0.7613636363636364,
+    "terminal_accuracy_approach": 0.9565217391304348,
+    "score": 0.8441323419489358
+   },
+   "saved_candidate": null
+  },
+  {
+   "update": 500,
+   "val_l1": 0.07970308925141581,
+   "behaviour": {
+    "grounding_accuracy": 0.8056768558951966,
+    "terminal_accuracy": 0.8468468468468469,
+    "all": 0.7783333333333333,
+    "terminal_accuracy_land": 0.8068181818181818,
+    "terminal_accuracy_approach": 1.0,
+    "score": 0.8262618513710217
+   },
+   "saved_candidate": null
+  },
+  {
+   "update": 750,
+   "val_l1": 0.07417265821296799,
+   "behaviour": {
+    "grounding_accuracy": 0.8384279475982532,
+    "terminal_accuracy": 0.9279279279279279,
+    "all": 0.8166666666666667,
+    "terminal_accuracy_land": 0.9204545454545454,
+    "terminal_accuracy_approach": 0.9565217391304348,
+    "score": 0.8831779377630906
+   },
+   "saved_candidate": null
+  },
+  {
+   "update": 1000,
+   "val_l1": 0.07356476548923335,
+   "behaviour": {
+    "grounding_accuracy": 0.9192139737991266,
+    "terminal_accuracy": 0.8918918918918919,
+    "all": 0.8766666666666667,
+    "terminal_accuracy_land": 0.875,
+    "terminal_accuracy_approach": 0.9565217391304348,
+    "score": 0.9055529328455092
+   },
+   "saved_candidate": 1000
+  },
+  {
+   "update": 1250,
+   "val_l1": 0.07031753692339407,
+   "behaviour": {
+    "grounding_accuracy": 0.8777292576419214,
+    "terminal_accuracy": 0.9279279279279279,
+    "all": 0.8483333333333334,
+    "terminal_accuracy_land": 0.9090909090909091,
+    "terminal_accuracy_approach": 1.0,
+    "score": 0.9028285927849247
+   },
+   "saved_candidate": null
+  },
+  {
+   "update": 1500,
+   "val_l1": 0.0691822285449113,
+   "behaviour": {
+    "grounding_accuracy": 0.8973799126637555,
+    "terminal_accuracy": 0.918918918918919,
+    "all": 0.8633333333333333,
+    "terminal_accuracy_land": 0.8977272727272727,
+    "terminal_accuracy_approach": 1.0,
+    "score": 0.9081494157913372
+   },
+   "saved_candidate": 1500
+  },
+  {
+   "update": 1750,
+   "val_l1": 0.07405692481629861,
+   "behaviour": {
+    "grounding_accuracy": 0.8842794759825328,
+    "terminal_accuracy": 0.9279279279279279,
+    "all": 0.8566666666666667,
+    "terminal_accuracy_land": 0.9090909090909091,
+    "terminal_accuracy_approach": 1.0,
+    "score": 0.9061037019552303
+   },
+   "saved_candidate": null
+  },
+  {
+   "update": 2000,
+   "val_l1": 0.06989049011264191,
+   "behaviour": {
+    "grounding_accuracy": 0.8820960698689956,
+    "terminal_accuracy": 0.9369369369369369,
+    "all": 0.86,
+    "terminal_accuracy_land": 0.9204545454545454,
+    "terminal_accuracy_approach": 1.0,
+    "score": 0.9095165034029662
+   },
+   "saved_candidate": 2000
+  },
+  {
+   "update": 2250,
+   "val_l1": 0.06688963043855134,
+   "behaviour": {
+    "grounding_accuracy": 0.8864628820960698,
+    "terminal_accuracy": 0.918918918918919,
+    "all": 0.86,
+    "terminal_accuracy_land": 0.8977272727272727,
+    "terminal_accuracy_approach": 1.0,
+    "score": 0.9026909005074943
+   },
+   "saved_candidate": null
+  },
+  {
+   "update": 2499,
+   "val_l1": 0.06759158337144375,
+   "behaviour": {
+    "grounding_accuracy": 0.8624454148471615,
+    "terminal_accuracy": 0.9369369369369369,
+    "all": 0.8433333333333334,
+    "terminal_accuracy_land": 0.9204545454545454,
+    "terminal_accuracy_approach": 1.0,
+    "score": 0.8996911758920492
+   },
+   "saved_candidate": 2500
+  }
+ ]
+}

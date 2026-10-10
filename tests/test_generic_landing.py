@@ -158,6 +158,72 @@ class PlanTests(unittest.TestCase):
         self.assertEqual(len(self.stage['pilot']['order']),6);self.assertTrue(self.stage['pilot']['order'][0].startswith('landings on cubes and cylinders'))
 
 
+def flight(kind,task,success,wrong=False,hit=None,landed=False,inside=True,target=None,identifier=None):
+    """One flown episode as scripts/surface_flights.py records it, reduced to what the gates read."""
+    target=target or {'pad':'blue_pad','cube':'blue_cube','cylinder':'green_cylinder'}[kind]
+    return {'id':identifier or f'{kind}-{task}-{id(object())}','flown':True,'episode':{'task':task,'target':target,'surface_kind':kind},
+            'summary':{'wrong_target':wrong,'hit':hit,'reason':'collision' if hit else 'landed' if success and task=='land' else 'model_stop','landed':landed,
+                       'stopped':True,'final_distance_m':3.,'steps':80},
+            'surface_landing':{'success':success,'correct_object':success or not wrong,'inside_region':inside,'contact_from_above':landed or (success and task=='land'),
+                               'landed_on':target if success and task=='land' else None,'collision':hit}}
+
+
+class GateTests(unittest.TestCase):
+    def setUp(self):
+        import scripts.generic_landing as tool
+        from src.visual_search import generic_landing as stage1
+        self.tool=tool;self.stage=stage1.load()
+
+    def validation(self,pad=10,cube=10,cylinder=10,approach=6,**changes):
+        records=[]
+        for kind,good in (('pad',pad),('cube',cube),('cylinder',cylinder)):
+            records+=[flight(kind,'land',index<good) for index in range(10)]+[flight(kind,'approach',index<approach//3) for index in range(2)]
+        return records
+
+    def test_the_validation_gate_counts_what_the_plan_asks_for(self):
+        numbers,checks=self.tool.judge_validation(self.stage,'validation',self.validation())
+        self.assertTrue(all(row[3] for row in checks));self.assertEqual((numbers['success'],numbers['land_success'],numbers['kinds']['cube']['land_success']),(36,30,10))
+        # Exactly at the limits: pads 9, cubes 8, cylinders 8 make 25 landings and 31 missions.
+        numbers,checks=self.tool.judge_validation(self.stage,'validation',self.validation(9,8,8));self.assertTrue(all(row[3] for row in checks))
+        for short in ({'pad':8},{'cube':7},{'cylinder':7}):
+            numbers,checks=self.tool.judge_validation(self.stage,'validation',self.validation(**{**{'pad':10,'cube':10,'cylinder':10},**short}))
+            self.assertEqual([row[0] for row in checks if not row[3]],[f'{next(iter(short))} landings'])
+        # Thirty missions are needed whatever the kinds say, and an approach that touches down fails the gate by itself.
+        records=self.validation(9,8,8,approach=0);numbers,checks=self.tool.judge_validation(self.stage,'validation',records)
+        self.assertEqual([row[0] for row in checks if not row[3]],['mission success'])
+        records=self.validation();records[10]=flight('pad','approach',False,landed=True)
+        self.assertIn('touchdowns in an approach',[row[0] for row in self.tool.judge_validation(self.stage,'validation',records)[1] if not row[3]])
+        records=self.validation();records[0]=flight('pad','land',False,wrong=True);records[1]=flight('pad','land',False,wrong=True);records[12]=flight('cube','land',False,wrong=True)
+        self.assertIn('flights at a wrong object',[row[0] for row in self.tool.judge_validation(self.stage,'validation',records)[1] if not row[3]])
+        records=self.validation();records[0]=flight('pad','land',False,hit='Hedge');records[12]=flight('cube','land',False,hit='BlueCube')
+        self.assertIn('collisions',[row[0] for row in self.tool.judge_validation(self.stage,'validation',records)[1] if not row[3]])
+
+    def test_the_candidate_is_chosen_by_the_fixed_order_and_must_meet_the_pilots_lines(self):
+        def run(cube,cylinder,pad,wrong=0,hit=0):
+            records=[flight('cube','land',i<cube) for i in range(4)]+[flight('cylinder','land',i<cylinder) for i in range(4)]+[flight('pad','land',i<pad) for i in range(4)]
+            records+=[flight(kind,'approach',True) for kind in ('pad','cube','cylinder')]
+            for index in range(wrong):records[index]['summary']['wrong_target']=True
+            for index in range(hit):records[4+index]['summary']['hit']='Wall'
+            return records
+        runs={'baseline':run(0,0,4),'1000':run(3,2,4),'1500':run(3,3,4,wrong=1),'2000':run(3,3,3),'2500':run(3,3,3)}
+        rows,order,checks=self.tool.judge_pilot(self.stage,runs,{'1000':.07,'1500':.06,'2000':.065,'2500':.06})
+        # More landings on cubes and cylinders first; then fewer wrong objects; then pads; then collisions; then the validation loss; then the earlier update.
+        self.assertEqual(order,['2500','2000','1500','1000']);self.assertNotIn('baseline',order);self.assertTrue(all(row[3] for row in checks))
+        rows,order,checks=self.tool.judge_pilot(self.stage,{'1000':run(2,2,4),'2000':run(2,1,4)},{})
+        self.assertEqual(order[0],'1000');self.assertEqual([row[0] for row in checks if not row[3]],['landings on cubes and cylinders'])
+
+    def test_the_regression_compares_with_the_baseline_and_allows_the_spread_of_two_flights(self):
+        def run(success,wrong=0,hit=0):
+            records=[flight('pad','land',index<success) for index in range(27)]+[flight('pad','approach',True) for _ in range(9)]
+            for index in range(wrong):records[index]['summary']['wrong_target']=True
+            for index in range(hit):records[index]['summary']['hit']='Hedge'
+            return records
+        self.assertTrue(all(row[3] for row in self.tool.judge_regression(self.stage,run(24),run(26))[1]))
+        self.assertFalse(all(row[3] for row in self.tool.judge_regression(self.stage,run(23),run(26))[1]))
+        self.assertFalse(all(row[3] for row in self.tool.judge_regression(self.stage,run(26,wrong=3),run(26,wrong=1))[1]))
+        self.assertTrue(all(row[3] for row in self.tool.judge_regression(self.stage,run(26,wrong=2,hit=1),run(26,wrong=1))[1]))
+
+
 class RecordingTests(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):asyncio.get_running_loop().slow_callback_duration=60.
 

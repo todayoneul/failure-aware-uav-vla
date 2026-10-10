@@ -14,6 +14,7 @@
 | 문장만 주고 찾아가기 (방향 힌트 없음) | AeroVLA-OFT로 동작. 처음 보는 시작 32/32, 학습하지 않은 장면 18/20. 처음 보는 물체는 약함 | `.\scripts\run_visual_search_demo.ps1` |
 | 맵에서 물체를 골라 문장으로 보내기 (착륙 또는 접근) | 동작. 동결한 baseline을 직접 조작해 보는 시연 | `.\scripts\run_grounding_film_mission_demo.ps1` |
 | 시작 자세를 직접 정하기, pad가 아닌 평평한 윗면(cube, cylinder)에 착륙 임무 주기 | Simulator·화면·evaluator가 지원. **정책이 그렇게 착륙하도록 배운 것은 아님** | [문서](docs/arbitrary_start_generalized_landing.md) |
+| Cube·cylinder 윗면 착륙을 정책에 가르치기 (Generic Landing) | **Gate 미통과.** 새 시작 36개에서 pad 10/10, cylinder 8/10, cube 6/10(기준 8/10). 실패는 모두 공중 정지. 44m 밖 탐색 학습은 시작하지 않음 | [문서](docs/generic_landing_active_search_v2.md) |
 | Gaussian Blur가 baseline을 어디서 얼마나 무너뜨리는지 측정 (Clean / Low / Medium / High) | 완료. 48개 시작에서 성공 46 → 40 → 24 → 8. Blur에 강하지 않음 | [결과](docs/failure_gaussian_blur.md) |
 | 장애 자동 감지·복구 | 아직 없음 | - |
 
@@ -105,6 +106,10 @@ GIF: [탐색](outputs/examples/generalization/search_g1.gif) · [놓친 뒤 다�
 - **이것은 simulator, 화면, evaluator의 기능입니다.** 모델은 바뀌지 않았고 cube나 cylinder에 내리는 것을 배운 적이 없습니다. 현재 baseline으로 한 번씩 시켜 본 cube, cylinder, cap을 얹은 sphere 착륙은 셋 다 공중에서 멈췄습니다. Evaluator 자체는 결과를 미리 아는 scripted 비행 15개로 확인했습니다(15/15. 첫 run은 13/15였고, 틀린 둘은 scripted pilot이 목표점을 지나쳐 내린 비행이었습니다).
 
 [시작 규칙, 착륙면, 판정, 확인 기록, 한계](docs/arbitrary_start_generalized_landing.md)
+
+**Cube·cylinder 착륙 학습 (통과하지 못함).** 위의 착륙을 정책에 가르치는 학습을 한 번 했습니다. 구조는 그대로 두고 cube·cylinder 착륙 궤적 233 episode를 더해 2,500 update를 돌렸습니다. 녹화한 적 없는 layout의 36개 시작에서 pad 10/10, cylinder 8/10, cube 6/10이었고, 미리 정한 기준(cube 8/10)에 못 미쳤습니다. 실패한 비행은 모두 물체 근처 공중에서 스스로 멈췄습니다. 같은 시작을 한 번 더 날리면 20개 중 5개의 결과가 뒤집힙니다. 시연이 쓰는 모델은 바뀌지 않았고, 이 checkpoint는 baseline으로 올리지 않았습니다. 44m 밖 탐색(Active Search) 학습은 이 gate 뒤에 하기로 했으므로 시작하지 않았습니다.
+
+[Teacher, data, 학습, gate 결과, 실패 분석](docs/generic_landing_active_search_v2.md)
 
 ### 3. 맵에서 목표를 골라 보내기 — Coordinate Goal Mode
 
@@ -206,6 +211,7 @@ src/mission/         지도 좌표, landmark, 미션 상태와 판정
 src/failures/        Gaussian Blur와 control protocol
 src/visual_search/   Visual Search episode, 맵 정의와 기하, 시작 상태 계획, teacher 정책
 src/aerovla_oft/     AeroVLA-OFT 모델과 행동·chunk 규칙
+src/landing/         착륙면, 착륙면으로 읽는 판정, 작은 면에 내리는 teacher
 scripts/             launcher(.ps1), 계획·평가·학습·요약·동결 스크립트
 configs/             비행·미션 한도, landmark, 평가 protocol, OFT 설정
 configs/maps/        맵 파일(장애물, 물체, layout). 고정된 held-out 시작 상태는 configs/generalization_test_spawns.json
@@ -213,12 +219,14 @@ configs/mission/     Interactive Mission Control의 지도(물체 배치, launch
 configs/landing/     착륙면 규칙(어떤 모양에 어떤 면이 있는가)
 configs/experiments/ 시작 계획 파일과 scripted 확인 비행의 계획
 configs/failures/    장애 실험의 고정 조건(Gaussian Blur 강도, 비행 순서, repeat subset)
-tests/               simulator 없이 도는 테스트 (Python 370개 + PowerShell 4개)
+configs/generic_landing/  Generic Landing의 녹화 계획과 pilot·validation·regression 시작 (configs/generic_landing.json에 숫자)
+tests/               simulator 없이 도는 테스트 (Python 383개 + PowerShell 4개)
 docs/                아래 문서
 outputs/examples/    README에 쓰는 실제 화면과 GIF
 outputs/generalization/  동결한 결과 표와 실패 분류 (원자료는 로컬에만)
 outputs/failures/        장애 실험의 표, 실행 기록, 예시 그림 (비행 원자료는 로컬에만)
 outputs/arbitrary_start/ 시작·착륙면 확인의 표와 예시 화면 (비행 원자료는 로컬에만)
+outputs/generic_landing/ Generic Landing의 표와 그림 한 장 (비행, data, checkpoint는 로컬에만)
 ```
 
 ## 문서
@@ -241,6 +249,7 @@ outputs/arbitrary_start/ 시작·착륙면 확인의 표와 예시 화면 (비�
 | [language_vision_grounding_architecture](docs/language_vision_grounding_architecture.md) | 시각 경로 audit, FiLM과 cross-attention 모듈, 같은 시작을 두 번씩 비행하는 pilot, 대조 실험, 새 검증 gate, 동결, canonical test 48의 결과 |
 | [long_range_same_color_grounding](docs/long_range_same_color_grounding.md) | 44m를 넘는 시작에서 같은 색 물체를 고르는 문제: 관측, canonical 범위에서 뺀 이유, 나중에 시도할 후보 |
 | [arbitrary_start_generalized_landing](docs/arbitrary_start_generalized_landing.md) | 임의의 시작 자세와 일반 착륙면: 시작 규칙, 지도·launcher 조작, 시작 planner, rectangle / circle / cap, finalizer와 evaluator의 역할, scripted 확인 비행, 정성 확인, 한계 |
+| [generic_landing_active_search_v2](docs/generic_landing_active_search_v2.md) | Cube·cylinder 착륙 학습(Stage 1): teacher, data, 후보 고르기, validation gate(미통과), 실패한 비행의 분석, stop 규칙과 label의 거리, 기록용 재비행과 regression. Active Search v2(Stage 2)는 시작하지 않음 |
 | [failure_gaussian_blur](docs/failure_gaussian_blur.md) | Gaussian Blur 특성화: 고정한 조건과 순서, 주입 위치와 확인, 강도별·단계별 결과, 실패 분류, 착륙·탐색·목표 선택, paired 비교와 repeat, 선명도 통계, 지연, 다음 단계 |
 | [experiments](docs/experiments.md) | 날짜별 실험 요약 |
 | [failure_plan](docs/failure_plan.md) | 이후 넣을 장애 후보 |
@@ -267,7 +276,8 @@ outputs/arbitrary_start/ 시작·착륙면 확인의 표와 예시 화면 (비�
 - [x] Interactive Mission Control flown by the frozen AeroVLA-OFT baseline (qualitative demonstration)
 - [x] Gaussian Blur robustness characterization of the frozen baseline (Clean / Low / Medium / High, paired on the canonical starts)
 - [x] Arbitrary start poses and generalized landing surfaces in the simulator, the mission interface and the evaluator (infrastructure; no model change)
-- [ ] Active search beyond 44 m and landing on cubes and cylinders (training; not started)
+- [ ] Landing on cubes and cylinders (generic landing): trained once, gate not passed (cube 6 of 10 against 8); the teacher's slow entry sits too close to the stop rule
+- [ ] Active search beyond 44 m (not started; waits for the generic landing gate)
 - [ ] Front-only / Down-only blur ablation, then blur detection and recovery, evaluated on new starts
 - [ ] Unseen-object grounding, turn rate of the executor
 - [ ] Additional failure types

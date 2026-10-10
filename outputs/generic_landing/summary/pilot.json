@@ -1,0 +1,378 @@
+{
+ "rows": [
+  {
+   "candidate": "baseline",
+   "flights": 15,
+   "cube_cylinder_landings": 0,
+   "pad_landings": 4,
+   "wrong_target": 1,
+   "collisions": 1,
+   "approach_touchdowns": 0,
+   "approach_success": 3,
+   "success": 7,
+   "val_l1": null,
+   "failed": [
+    {
+     "id": "glp-41504-blue_cube-near_visible",
+     "task": "land",
+     "reason": "landed",
+     "landed_on": "blue_pad",
+     "collision": null,
+     "wrong_target": true,
+     "final_distance_m": 44.0,
+     "steps": 88
+    },
+    {
+     "id": "glp-41505-red_cube-mid_search",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 8.8,
+     "steps": 46
+    },
+    {
+     "id": "glp-41506-blue_cube-mid_visible",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 47.0,
+     "steps": 187
+    },
+    {
+     "id": "glp-41507-red_cube-far_search",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 7.9,
+     "steps": 50
+    },
+    {
+     "id": "glp-41508-blue_cylinder-near_visible",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 8.0,
+     "steps": 63
+    },
+    {
+     "id": "glp-41509-green_cylinder-mid_search",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 5.9,
+     "steps": 63
+    },
+    {
+     "id": "glp-41510-blue_cylinder-mid_visible",
+     "task": "land",
+     "reason": "collision",
+     "landed_on": null,
+     "collision": "BlueCylinder",
+     "wrong_target": false,
+     "final_distance_m": 4.9,
+     "steps": 37
+    },
+    {
+     "id": "glp-41511-green_cylinder-far_search",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 0.6,
+     "steps": 207
+    }
+   ]
+  },
+  {
+   "candidate": "1000",
+   "flights": 15,
+   "cube_cylinder_landings": 1,
+   "pad_landings": 4,
+   "wrong_target": 0,
+   "collisions": 0,
+   "approach_touchdowns": 0,
+   "approach_success": 3,
+   "success": 8,
+   "val_l1": 0.07356476548923335,
+   "failed": [
+    {
+     "id": "glp-41504-blue_cube-near_visible",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 2.3,
+     "steps": 44
+    },
+    {
+     "id": "glp-41505-red_cube-mid_search",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 10.8,
+     "steps": 42
+    },
+    {
+     "id": "glp-41506-blue_cube-mid_visible",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 45.8,
+     "steps": 72
+    },
+    {
+     "id": "glp-41507-red_cube-far_search",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 10.5,
+     "steps": 47
+    },
+    {
+     "id": "glp-41508-blue_cylinder-near_visible",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 10.1,
+     "steps": 61
+    },
+    {
+     "id": "glp-41509-green_cylinder-mid_search",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 9.9,
+     "steps": 55
+    },
+    {
+     "id": "glp-41510-blue_cylinder-mid_visible",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 9.9,
+     "steps": 31
+    }
+   ]
+  },
+  {
+   "candidate": "1500",
+   "flights": 15,
+   "cube_cylinder_landings": 1,
+   "pad_landings": 4,
+   "wrong_target": 0,
+   "collisions": 0,
+   "approach_touchdowns": 0,
+   "approach_success": 3,
+   "success": 8,
+   "val_l1": 0.0691822285449113,
+   "failed": [
+    {
+     "id": "glp-41505-red_cube-mid_search",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 10.3,
+     "steps": 42
+    },
+    {
+     "id": "glp-41506-blue_cube-mid_visible",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 47.0,
+     "steps": 69
+    },
+    {
+     "id": "glp-41507-red_cube-far_search",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 10.1,
+     "steps": 46
+    },
+    {
+     "id": "glp-41508-blue_cylinder-near_visible",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 10.1,
+     "steps": 66
+    },
+    {
+     "id": "glp-41509-green_cylinder-mid_search",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 9.7,
+     "steps": 55
+    },
+    {
+     "id": "glp-41510-blue_cylinder-mid_visible",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 9.1,
+     "steps": 30
+    },
+    {
+     "id": "glp-41511-green_cylinder-far_search",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 34.4,
+     "steps": 22
+    }
+   ]
+  },
+  {
+   "candidate": "2000",
+   "flights": 15,
+   "cube_cylinder_landings": 6,
+   "pad_landings": 4,
+   "wrong_target": 0,
+   "collisions": 0,
+   "approach_touchdowns": 0,
+   "approach_success": 3,
+   "success": 13,
+   "val_l1": 0.06989049011264191,
+   "failed": [
+    {
+     "id": "glp-41506-blue_cube-mid_visible",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 41.4,
+     "steps": 188
+    },
+    {
+     "id": "glp-41509-green_cylinder-mid_search",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 8.2,
+     "steps": 63
+    }
+   ]
+  },
+  {
+   "candidate": "2500",
+   "flights": 15,
+   "cube_cylinder_landings": 5,
+   "pad_landings": 4,
+   "wrong_target": 0,
+   "collisions": 0,
+   "approach_touchdowns": 0,
+   "approach_success": 3,
+   "success": 12,
+   "val_l1": 0.06759158337144375,
+   "failed": [
+    {
+     "id": "glp-41506-blue_cube-mid_visible",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 1.1,
+     "steps": 180
+    },
+    {
+     "id": "glp-41509-green_cylinder-mid_search",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 8.1,
+     "steps": 62
+    },
+    {
+     "id": "glp-41511-green_cylinder-far_search",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 34.4,
+     "steps": 25
+    }
+   ]
+  }
+ ],
+ "order": [
+  "2000",
+  "2500",
+  "1500",
+  "1000"
+ ],
+ "chosen": "2000",
+ "checks": [
+  [
+   "landings on cubes and cylinders",
+   6,
+   ">= 5 of 8",
+   true
+  ],
+  [
+   "landings on pads",
+   4,
+   ">= 3 of 4",
+   true
+  ],
+  [
+   "touchdowns in an approach",
+   0,
+   "<= 0",
+   true
+  ],
+  [
+   "collisions",
+   0,
+   "<= 2",
+   true
+  ]
+ ],
+ "passed": true
+}
