@@ -1,0 +1,604 @@
+{
+ "description": "Manual smoke flights of the interactive Mission Control with the frozen grounding_film checkpoint, 2026-10-10 (docs/grounding_film_interactive_demo.md). Single flights driven through the viewer's control file; a demonstration, not an evaluation. The raw run folders (outputs/mission_demo_grounding/missions/) stay local. Sessions 1 and 2 used the first arrangement of the map (pads at y 82, cubes at y 56, north launch at (30, 46), 8.5 m from a block cluster; plaza launch at (56, -10) facing the coloured wall). Session 3 uses the arrangement in configs/mission/grounding_film_demo.json, which was changed after seeing sessions 1 and 2. In sessions 1 and 2 the map was captured every 5 s during a flight (0.18 s each); from session 3 on it is not. Session 4 is a launch check of the final code with -MaxSteps 120: the operator script lost its key for the launch change, so the blue cone was asked for from the north launch, 110 m away behind buildings and shown as beyond the validated range.",
+ "sessions": [
+  {
+   "session": 1,
+   "run_folder": "20261010T053731Z-f9aff14e",
+   "status": "STOPPED",
+   "cleanup": {
+    "vehicle": "disarmed on red_pad",
+    "simulator_landing_routine": "not used"
+   },
+   "missions": [
+    {
+     "mission": 1,
+     "launch": "north",
+     "launch_xy": [
+      30.0,
+      46.0
+     ],
+     "target": "blue_pad",
+     "target_xy": [
+      10.0,
+      82.0
+     ],
+     "task": "land",
+     "instruction": "Find the blue landing pad and land on it.",
+     "state": "SUCCESS",
+     "reason": "landed on the named pad; latched and disarmed",
+     "decisions": 64,
+     "start_distance_m": 41.2,
+     "final_distance_m": 1.7,
+     "ended_at": "blue_pad",
+     "policy_stopped_by_itself": true,
+     "yaw_swept_deg": 49,
+     "height_range_m": [
+      2.5,
+      6.0
+     ],
+     "median_decision_s": 0.515,
+     "mean_decision_s": 0.534,
+     "first_decision_s": 1.51,
+     "longest_decision_s": 0.71,
+     "mean_inference_ms": 407,
+     "input_hash_agreement": true,
+     "camera_frames_unchanged": true,
+     "frozen_baseline": "verified",
+     "landing": {
+      "system_land_success": true,
+      "stable_physical_landing": true,
+      "touchdown_success": true,
+      "strict_policy_zero_action": true,
+      "landed_on": "blue_pad",
+      "touchdown_error_m": 1.7,
+      "touchdown_vertical_speed_mps": 0.51,
+      "finalizer_path": [
+       "FLYING",
+       "LANDING_DESCENT",
+       "CONTACT_CANDIDATE",
+       "STABLE_CONTACT",
+       "LANDED_LATCHED",
+       "DISARMED"
+      ]
+     }
+    },
+    {
+     "mission": 2,
+     "launch": "north",
+     "launch_xy": [
+      30.0,
+      46.0
+     ],
+     "target": "blue_pad",
+     "target_xy": [
+      10.0,
+      82.0
+     ],
+     "task": "approach",
+     "instruction": "Approach the blue landing pad.",
+     "state": "SUCCESS",
+     "reason": "stopped in the air beside the named object",
+     "decisions": 89,
+     "start_distance_m": 41.2,
+     "final_distance_m": 10.85,
+     "ended_at": "blue_pad",
+     "policy_stopped_by_itself": true,
+     "yaw_swept_deg": 625,
+     "height_range_m": [
+      5.9,
+      6.1
+     ],
+     "median_decision_s": 0.518,
+     "mean_decision_s": 0.536,
+     "first_decision_s": 0.5,
+     "longest_decision_s": 0.75,
+     "mean_inference_ms": 397,
+     "input_hash_agreement": true,
+     "camera_frames_unchanged": true,
+     "frozen_baseline": "verified",
+     "approach": {
+      "touched_down": false,
+      "finalizer_active": false
+     }
+    },
+    {
+     "mission": 3,
+     "launch": "north",
+     "launch_xy": [
+      30.0,
+      46.0
+     ],
+     "target": "red_pad",
+     "target_xy": [
+      50.0,
+      82.0
+     ],
+     "task": "land",
+     "instruction": "Find the red landing pad and land on it.",
+     "state": "SUCCESS",
+     "reason": "landed on the named pad; latched and disarmed",
+     "decisions": 181,
+     "start_distance_m": 41.2,
+     "final_distance_m": 0.48,
+     "ended_at": "red_pad",
+     "policy_stopped_by_itself": false,
+     "yaw_swept_deg": 531,
+     "height_range_m": [
+      2.6,
+      20.3
+     ],
+     "median_decision_s": 0.52,
+     "mean_decision_s": 0.54,
+     "first_decision_s": 0.7,
+     "longest_decision_s": 0.75,
+     "mean_inference_ms": 398,
+     "input_hash_agreement": true,
+     "camera_frames_unchanged": true,
+     "frozen_baseline": "verified",
+     "landing": {
+      "system_land_success": true,
+      "stable_physical_landing": true,
+      "touchdown_success": true,
+      "strict_policy_zero_action": false,
+      "landed_on": "red_pad",
+      "touchdown_error_m": 0.48,
+      "touchdown_vertical_speed_mps": 0.61,
+      "finalizer_path": [
+       "FLYING",
+       "LANDING_DESCENT",
+       "CONTACT_CANDIDATE",
+       "STABLE_CONTACT",
+       "LANDED_LATCHED",
+       "DISARMED"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "session": 2,
+   "run_folder": "20261010T054558Z-07113d67",
+   "status": "STOPPED",
+   "cleanup": {
+    "vehicle": "hovering at the launch pose",
+    "simulator_landing_routine": "not used",
+    "hover": true
+   },
+   "missions": [
+    {
+     "mission": 1,
+     "launch": "north",
+     "launch_xy": [
+      30.0,
+      46.0
+     ],
+     "target": "blue_cube",
+     "target_xy": [
+      2.0,
+      56.0
+     ],
+     "task": "approach",
+     "instruction": "Approach the blue cube.",
+     "state": "SUCCESS",
+     "reason": "stopped in the air beside the named object",
+     "decisions": 35,
+     "start_distance_m": 29.7,
+     "final_distance_m": 10.0,
+     "ended_at": "blue_cube",
+     "policy_stopped_by_itself": true,
+     "yaw_swept_deg": 105,
+     "height_range_m": [
+      5.9,
+      6.0
+     ],
+     "median_decision_s": 0.506,
+     "mean_decision_s": 0.511,
+     "first_decision_s": 1.69,
+     "longest_decision_s": 0.57,
+     "mean_inference_ms": 413,
+     "input_hash_agreement": true,
+     "camera_frames_unchanged": true,
+     "frozen_baseline": "verified",
+     "approach": {
+      "touched_down": false,
+      "finalizer_active": false
+     }
+    },
+    {
+     "mission": 2,
+     "launch": "plaza",
+     "launch_xy": [
+      56.0,
+      -10.0
+     ],
+     "target": "blue_cone",
+     "target_xy": [
+      91.4,
+      -35.4
+     ],
+     "task": "approach",
+     "instruction": "Approach the blue cone.",
+     "state": "FAILED",
+     "reason": "ran out of decisions before ending the mission",
+     "decisions": 320,
+     "start_distance_m": 43.6,
+     "final_distance_m": 42.45,
+     "ended_at": null,
+     "policy_stopped_by_itself": false,
+     "yaw_swept_deg": 2924,
+     "height_range_m": [
+      5.9,
+      6.2
+     ],
+     "median_decision_s": 0.531,
+     "mean_decision_s": 0.538,
+     "first_decision_s": 0.69,
+     "longest_decision_s": 0.68,
+     "mean_inference_ms": 413,
+     "input_hash_agreement": true,
+     "camera_frames_unchanged": true,
+     "frozen_baseline": "verified",
+     "approach": {
+      "touched_down": false,
+      "finalizer_active": false
+     }
+    },
+    {
+     "mission": 3,
+     "launch": "north",
+     "launch_xy": [
+      30.0,
+      46.0
+     ],
+     "target": "red_pad",
+     "target_xy": [
+      50.0,
+      82.0
+     ],
+     "task": "approach",
+     "instruction": "Approach the red landing pad.",
+     "state": "ABORTED",
+     "reason": "manual abort (R)",
+     "decisions": null,
+     "start_distance_m": null,
+     "final_distance_m": null,
+     "ended_at": null,
+     "policy_stopped_by_itself": null,
+     "yaw_swept_deg": null,
+     "height_range_m": null,
+     "median_decision_s": null,
+     "mean_decision_s": null,
+     "first_decision_s": null,
+     "longest_decision_s": null,
+     "mean_inference_ms": null,
+     "input_hash_agreement": null,
+     "camera_frames_unchanged": true,
+     "frozen_baseline": "verified"
+    }
+   ]
+  },
+  {
+   "session": 3,
+   "run_folder": "20261010T055414Z-26722849",
+   "status": "STOPPED",
+   "cleanup": {
+    "vehicle": "hovering",
+    "simulator_landing_routine": "not used",
+    "hover": true
+   },
+   "missions": [
+    {
+     "mission": 1,
+     "launch": "north",
+     "launch_xy": [
+      30.0,
+      56.0
+     ],
+     "target": "blue_pad",
+     "target_xy": [
+      10.0,
+      92.0
+     ],
+     "task": "land",
+     "instruction": "Find the blue landing pad and land on it.",
+     "state": "SUCCESS",
+     "reason": "landed on the named pad; latched and disarmed",
+     "decisions": 65,
+     "start_distance_m": 41.2,
+     "final_distance_m": 1.79,
+     "ended_at": "blue_pad",
+     "policy_stopped_by_itself": true,
+     "yaw_swept_deg": 50,
+     "height_range_m": [
+      2.5,
+      6.0
+     ],
+     "median_decision_s": 0.514,
+     "mean_decision_s": 0.515,
+     "first_decision_s": 1.3,
+     "longest_decision_s": 0.56,
+     "mean_inference_ms": 398,
+     "input_hash_agreement": true,
+     "camera_frames_unchanged": true,
+     "frozen_baseline": "verified",
+     "landing": {
+      "system_land_success": true,
+      "stable_physical_landing": true,
+      "touchdown_success": true,
+      "strict_policy_zero_action": true,
+      "landed_on": "blue_pad",
+      "touchdown_error_m": 1.79,
+      "touchdown_vertical_speed_mps": 0.59,
+      "finalizer_path": [
+       "FLYING",
+       "LANDING_DESCENT",
+       "CONTACT_CANDIDATE",
+       "STABLE_CONTACT",
+       "LANDED_LATCHED",
+       "DISARMED"
+      ]
+     }
+    },
+    {
+     "mission": 2,
+     "launch": "north",
+     "launch_xy": [
+      30.0,
+      56.0
+     ],
+     "target": "blue_pad",
+     "target_xy": [
+      10.0,
+      92.0
+     ],
+     "task": "approach",
+     "instruction": "Approach the blue landing pad.",
+     "state": "SUCCESS",
+     "reason": "stopped in the air beside the named object",
+     "decisions": 40,
+     "start_distance_m": 41.2,
+     "final_distance_m": 10.86,
+     "ended_at": "blue_pad",
+     "policy_stopped_by_itself": true,
+     "yaw_swept_deg": 49,
+     "height_range_m": [
+      5.9,
+      6.0
+     ],
+     "median_decision_s": 0.511,
+     "mean_decision_s": 0.517,
+     "first_decision_s": 0.5,
+     "longest_decision_s": 0.55,
+     "mean_inference_ms": 390,
+     "input_hash_agreement": true,
+     "camera_frames_unchanged": true,
+     "frozen_baseline": "verified",
+     "approach": {
+      "touched_down": false,
+      "finalizer_active": false
+     }
+    },
+    {
+     "mission": 3,
+     "launch": "north",
+     "launch_xy": [
+      30.0,
+      56.0
+     ],
+     "target": "red_pad",
+     "target_xy": [
+      50.0,
+      92.0
+     ],
+     "task": "land",
+     "instruction": "Find the red landing pad and land on it.",
+     "state": "SUCCESS",
+     "reason": "landed on the named pad; latched and disarmed",
+     "decisions": 106,
+     "start_distance_m": 41.2,
+     "final_distance_m": 2.62,
+     "ended_at": "red_pad",
+     "policy_stopped_by_itself": true,
+     "yaw_swept_deg": 541,
+     "height_range_m": [
+      2.6,
+      6.0
+     ],
+     "median_decision_s": 0.517,
+     "mean_decision_s": 0.523,
+     "first_decision_s": 0.51,
+     "longest_decision_s": 0.58,
+     "mean_inference_ms": 391,
+     "input_hash_agreement": true,
+     "camera_frames_unchanged": true,
+     "frozen_baseline": "verified",
+     "landing": {
+      "system_land_success": true,
+      "stable_physical_landing": true,
+      "touchdown_success": true,
+      "strict_policy_zero_action": true,
+      "landed_on": "red_pad",
+      "touchdown_error_m": 2.62,
+      "touchdown_vertical_speed_mps": 0.6,
+      "finalizer_path": [
+       "FLYING",
+       "LANDING_DESCENT",
+       "CONTACT_CANDIDATE",
+       "STABLE_CONTACT",
+       "LANDED_LATCHED",
+       "DISARMED"
+      ]
+     }
+    },
+    {
+     "mission": 4,
+     "launch": "north",
+     "launch_xy": [
+      30.0,
+      56.0
+     ],
+     "target": "blue_cube",
+     "target_xy": [
+      2.0,
+      66.0
+     ],
+     "task": "approach",
+     "instruction": "Approach the blue cube.",
+     "state": "SUCCESS",
+     "reason": "stopped in the air beside the named object",
+     "decisions": 37,
+     "start_distance_m": 29.7,
+     "final_distance_m": 10.65,
+     "ended_at": "blue_cube",
+     "policy_stopped_by_itself": true,
+     "yaw_swept_deg": 108,
+     "height_range_m": [
+      5.9,
+      6.6
+     ],
+     "median_decision_s": 0.511,
+     "mean_decision_s": 0.517,
+     "first_decision_s": 0.52,
+     "longest_decision_s": 0.59,
+     "mean_inference_ms": 389,
+     "input_hash_agreement": true,
+     "camera_frames_unchanged": true,
+     "frozen_baseline": "verified",
+     "approach": {
+      "touched_down": false,
+      "finalizer_active": false
+     }
+    },
+    {
+     "mission": 5,
+     "launch": "plaza",
+     "launch_xy": [
+      60.0,
+      -36.0
+     ],
+     "target": "blue_cone",
+     "target_xy": [
+      91.4,
+      -35.4
+     ],
+     "task": "approach",
+     "instruction": "Approach the blue cone.",
+     "state": "SUCCESS",
+     "reason": "stopped in the air beside the named object",
+     "decisions": 27,
+     "start_distance_m": 31.4,
+     "final_distance_m": 10.13,
+     "ended_at": "blue_cone",
+     "policy_stopped_by_itself": true,
+     "yaw_swept_deg": 0,
+     "height_range_m": [
+      5.9,
+      6.0
+     ],
+     "median_decision_s": 0.529,
+     "mean_decision_s": 0.53,
+     "first_decision_s": 0.53,
+     "longest_decision_s": 0.58,
+     "mean_inference_ms": 406,
+     "input_hash_agreement": true,
+     "camera_frames_unchanged": true,
+     "frozen_baseline": "verified",
+     "approach": {
+      "touched_down": false,
+      "finalizer_active": false
+     }
+    },
+    {
+     "mission": 6,
+     "launch": "north",
+     "launch_xy": [
+      30.0,
+      56.0
+     ],
+     "target": "green_cylinder",
+     "target_xy": [
+      55.0,
+      30.0
+     ],
+     "task": "approach",
+     "instruction": "Approach the green cylinder.",
+     "state": "SUCCESS",
+     "reason": "stopped in the air beside the named object",
+     "decisions": 66,
+     "start_distance_m": 36.1,
+     "final_distance_m": 10.49,
+     "ended_at": "green_cylinder",
+     "policy_stopped_by_itself": true,
+     "yaw_swept_deg": 372,
+     "height_range_m": [
+      5.9,
+      6.0
+     ],
+     "median_decision_s": 0.517,
+     "mean_decision_s": 0.522,
+     "first_decision_s": 0.51,
+     "longest_decision_s": 0.57,
+     "mean_inference_ms": 401,
+     "input_hash_agreement": true,
+     "camera_frames_unchanged": true,
+     "frozen_baseline": "verified",
+     "approach": {
+      "touched_down": false,
+      "finalizer_active": false
+     }
+    }
+   ]
+  },
+  {
+   "session": 4,
+   "run_folder": "20261010T060923Z-cd3962aa",
+   "status": "STOPPED",
+   "cleanup": {
+    "vehicle": "hovering",
+    "simulator_landing_routine": "not used",
+    "hover": true
+   },
+   "missions": [
+    {
+     "mission": 1,
+     "launch": "north",
+     "launch_xy": [
+      30.0,
+      56.0
+     ],
+     "target": "blue_cone",
+     "target_xy": [
+      91.4,
+      -35.4
+     ],
+     "task": "approach",
+     "instruction": "Approach the blue cone.",
+     "state": "FAILED",
+     "reason": "ran out of decisions before ending the mission",
+     "decisions": 120,
+     "start_distance_m": 110.1,
+     "final_distance_m": 112.45,
+     "ended_at": null,
+     "policy_stopped_by_itself": false,
+     "yaw_swept_deg": 1369,
+     "height_range_m": [
+      5.9,
+      6.0
+     ],
+     "median_decision_s": 0.515,
+     "mean_decision_s": 0.521,
+     "first_decision_s": 1.31,
+     "longest_decision_s": 0.6,
+     "mean_inference_ms": 403,
+     "input_hash_agreement": true,
+     "camera_frames_unchanged": true,
+     "frozen_baseline": "verified",
+     "approach": {
+      "touched_down": false,
+      "finalizer_active": false
+     }
+    }
+   ]
+  }
+ ]
+}

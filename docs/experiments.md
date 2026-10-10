@@ -215,3 +215,17 @@ step마다 멈추는 대신 도착 2초 전에 다음 판단을 시작해 명령
 - **비용:** FiLM은 추론 시간 +4%(216 → 225ms), VRAM 차이 없음(추론 6.94 GiB, 학습 9.88 GiB).
 - **Tests:** Python 260/260, PowerShell 4/4. Gen-v2 지문 그대로.
 - **다음:** Gaussian Blur 준비 완료(실행하지 않음). Depot의 156개와 44m 초과는 계속 별도.
+
+## grounding_film Interactive Mission Control — 2026-10-10
+
+브랜치 `feat/grounding-film-interactive-mission`. 상세: [grounding_film Interactive Mission Control](grounding_film_interactive_demo.md). **학습도 평가도 아니다.** 기존 Mission Control 화면에 동결한 baseline을 연결한 시연이고, canonical test의 47/48은 그대로다.
+
+- **구조:** 미션 한 번은 canonical 평가의 `run_episode` 그대로(관측, 문장, chunk 4개 중 하나 실행, 연속 명령, stop 판정, Landing Finalizer). 동결 파일은 수정하지 않고 `SearchEnv`를 상속해 화면과 로그만 붙였다. 동결 지문(`grounding_film` 30개, `gen_v2` 120개) 그대로.
+- **모델 입력:** Front RGB, Down RGB, 문장 하나. 목표 XYZ·거리·bearing·방향 힌트·지도·표시는 화면과 판정 전용. 모델로 가는 호출은 하나이고 목표를 넘길 parameter가 없다(테스트로 확인).
+- **장면:** 기존 Blocks 지도 그대로에 catalogue의 pad 둘, cube 둘, cylinder 하나를 빈 자리에 spawn. 원래 있던 blue cone, orange ball도 목표. 평지의 launch 자세 두 곳에서 canonical episode와 같은 방식으로 시작(기존 platform은 1.5m 높아 pad 접촉 판정이 어긋난다).
+- **조작:** 지도 클릭/N(물체), T(LAND/APPROACH), G, R(launch 자세로), L(launch 변경). Cube + LAND와 빈 땅 클릭은 시작하지 않는다. Prompt mode(M)는 이 mode에서 없다.
+- **수동 확인(각 1회, 합계 13회: 성공 10, 실패 2, 중단 1):** 최종 배치에서 blue pad 착륙(65 decision), 같은 자세에서 접근(40, 공중 정지), red pad 착륙(106), blue cube 접근(37), blue cone 접근(27), green cylinder 접근(66) 모두 지시대로 끝남. 그 전 배치에서는 5회 중 4회 성공, blue cone 접근 1회 실패(색 블록 벽을 정면으로 본 자세에서 320 decision 동안 망설임). 배치는 이 비행들을 보고 고쳤다. 마지막 code 확인에서는 조작 실수로 110m 밖 건물 뒤의 cone을 지시했고 실패(120 decision).
+- **Decision 주기:** canonical 0.513초. 비행 중 지도 캡처(0.18초)를 5초마다 하던 때는 평균 0.536초에 10번에 한 번 0.7초. 캡처를 없앤 뒤 0.515–0.530초.
+- **기존 데모:** `run_mission_demo.ps1`은 그대로 동작(실행해 확인).
+- **Tests:** Python 291/291, PowerShell 4/4.
+- **하지 않은 것:** 재학습, canonical 검증·test 재실행, Depot 156, Blur 평가.

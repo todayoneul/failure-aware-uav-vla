@@ -12,6 +12,7 @@
 | Gaussian Blur를 실제 모델 입력에 주입 | 동작 | 같은 창에서 B, 1/2/3 |
 | 맵에서 목표를 골라 보내기 (방향 힌트 사용) | 동작. 20m 안 정지는 조건에 따라 0–60% | `.\scripts\run_mission_demo.ps1` |
 | 문장만 주고 찾아가기 (방향 힌트 없음) | AeroVLA-OFT로 동작. 처음 보는 시작 32/32, 학습하지 않은 장면 18/20. 처음 보는 물체는 약함 | `.\scripts\run_visual_search_demo.ps1` |
+| 맵에서 물체를 골라 문장으로 보내기 (착륙 또는 접근) | 동작. 동결한 baseline을 직접 조작해 보는 시연 | `.\scripts\run_grounding_film_mission_demo.ps1` |
 | 장애 자동 감지·복구 | 아직 없음 | - |
 
 모델과 simulator는 저장소에 없습니다. 준비 방법은 [setup](docs/setup.md)에 있습니다.
@@ -77,7 +78,24 @@ GIF: [탐색](outputs/examples/generalization/search_g1.gif) · [놓친 뒤 다�
 
 문서: [pilot — 구조와 학습 가능성](docs/aerovla_oft.md) · [Gen-v1 — 시작 위치·물체·장면 일반화](docs/aerovla_oft_generalization.md) · [Gen-v2 — 실패 분류와 전환 데이터 보강](docs/aerovla_oft_gen_v2.md) · [장거리 held-out 평가](docs/aerovla_oft_long_range.md) · [Gen-v3 — grounding과 착륙(진행 중)](docs/aerovla_oft_gen_v3.md) · [Canonical clean baseline — 44m 이하와 Landing Finalizer](docs/canonical_clean_baseline.md) · [Gen-v3c — hard-negative 보정과 evaluator v2](docs/gen_v3c_hard_negative_grounding.md) · [구조 실험과 canonical baseline 통과 — FiLM, 대조 실험, test 48](docs/language_vision_grounding_architecture.md) · [먼 거리의 같은 색 구분(열린 문제)](docs/long_range_same_color_grounding.md)
 
-### 2. 맵에서 목표를 골라 보내기 — Coordinate Goal Mode
+### 2. 맵에서 물체를 골라 문장으로 보내기 — Interactive grounding_film Mission Control
+
+![Blue pad에 착륙한 미션의 실제 화면: 지도, 모델이 받은 Front/Down 영상과 문장, 행동, finalizer 상태](outputs/examples/grounding_film_mission/land.jpg)
+
+```powershell
+.\scripts\run_grounding_film_mission_demo.ps1
+```
+
+기존 Mission Control 화면에서 동결한 baseline(`grounding_film`)에 미션을 줍니다. 물체를 고르고(지도 클릭 또는 **N**), **T**로 LAND / APPROACH를 정하고, **G**로 시작합니다.
+
+- **Map/target ground truth is visible to the human evaluator but is not sent to the VLA policy.** 모델은 Front RGB, Down RGB, 문장 하나만 받습니다. 목표 좌표, 거리, 방향은 화면과 판정에만 쓰입니다.
+- 비행은 canonical 평가의 loop 그대로입니다. 하강은 모델이 하고, 끝은 Landing Finalizer가 맡습니다. Simulator의 착륙 routine은 쓰지 않습니다.
+- 같은 pad, 같은 자세에서 문장만 바꿔 볼 수 있습니다: G(착륙) → **R** → **T** → G([공중 정지](outputs/examples/grounding_film_mission/approach.jpg)).
+- **시연이지 평가가 아닙니다.** 수동 확인 13회 중 10회 성공, 2회 실패, 1회는 중단입니다. 최종 배치의 여섯 시나리오는 모두 지시대로 끝났고, 실패는 blue cone 접근 두 번입니다(색 블록 벽을 정면으로 본 첫 배치, 그리고 110m 밖 건물 뒤의 cone). Canonical test의 47/48은 그대로입니다.
+
+[구조, 조작, 수동 확인 기록](docs/grounding_film_interactive_demo.md)
+
+### 3. 맵에서 목표를 골라 보내기 — Coordinate Goal Mode
 
 ![Blue cone 미션의 실제 화면: 102m 비행 뒤 모델이 LAND를 내고 목표 3.6m에 착륙](outputs/examples/mission_landmark.png)
 
@@ -100,7 +118,7 @@ GIF: [탐색](outputs/examples/generalization/search_g1.gif) · [놓친 뒤 다�
 
 [조작과 화면 설명](docs/mission_demo.md)
 
-### 3. 장애 주입 — Gaussian Blur
+### 4. 장애 주입 — Gaussian Blur
 
 ![같은 시점의 원본 영상과 실제로 모델에 들어간 흐린 영상](outputs/examples/gaussian_blur_comparison.png)
 
@@ -178,7 +196,8 @@ src/aerovla_oft/     AeroVLA-OFT 모델과 행동·chunk 규칙
 scripts/             launcher(.ps1), 계획·평가·학습·요약·동결 스크립트
 configs/             비행·미션 한도, landmark, 평가 protocol, OFT 설정
 configs/maps/        맵 파일(장애물, 물체, layout). 고정된 held-out 시작 상태는 configs/generalization_test_spawns.json
-tests/               simulator 없이 도는 테스트 (Python 146개 + PowerShell 4개)
+configs/mission/     Interactive Mission Control의 지도(물체 배치, launch 자세)
+tests/               simulator 없이 도는 테스트 (Python 291개 + PowerShell 4개)
 docs/                아래 문서
 outputs/examples/    README에 쓰는 실제 화면과 GIF
 outputs/generalization/  동결한 결과 표와 실패 분류 (원자료는 로컬에만)
@@ -192,6 +211,7 @@ outputs/generalization/  동결한 결과 표와 실패 분류 (원자료는 로
 | [baseline](docs/baseline.md) | 초기 closed loop 측정 |
 | [gaussian_blur_demo](docs/gaussian_blur_demo.md) | Blur 주입 데모 |
 | [mission_demo](docs/mission_demo.md) · [full_map_grounding](docs/full_map_grounding.md) | 미션 데모 조작, 지도와 Inspector |
+| [grounding_film_interactive_demo](docs/grounding_film_interactive_demo.md) | 동결한 baseline으로 나는 Interactive Mission Control: 구조, 모델에 들어가는 것과 아닌 것, 장면과 launch 자세, 조작, 수동 확인 기록, 한계 |
 | [model_evaluation](docs/model_evaluation.md) | 하네스 수정, 69회 평가, 연속 비행, 디코더, 블록 위 목표, 지시문 |
 | [aerovla_oft](docs/aerovla_oft.md) | Visual Search Mode와 AeroVLA-OFT pilot |
 | [aerovla_oft_generalization](docs/aerovla_oft_generalization.md) | 맵 정의, held-out 시작 상태, teacher, Gen-v1의 G0–G4 결과와 대조 시험 |
@@ -224,6 +244,7 @@ outputs/generalization/  동결한 결과 표와 실패 분류 (원자료는 로
 - [x] Continuous flight, grammar-constrained decoding, roof approach
 - [x] Visual Search Mode and the AeroVLA-OFT pilot
 - [x] Visual search from unseen starts and in a held-out scene (Gen-v1), failure taxonomy and transition data (Gen-v2)
+- [x] Interactive Mission Control flown by the frozen AeroVLA-OFT baseline (qualitative demonstration)
 - [ ] Visual Search + Gaussian Blur, measured on fresh held-out starts
 - [ ] Unseen-object grounding, turn rate of the executor
 - [ ] Additional failure types

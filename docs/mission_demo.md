@@ -1,5 +1,7 @@
 # Interactive Mission Runner
 
+> 2026-10-10: 같은 화면을 동결한 AeroVLA-OFT baseline으로 나는 mode가 생겼다 — [grounding_film Interactive Mission Control](grounding_film_interactive_demo.md) (`.\scripts\run_grounding_film_mission_demo.ps1`). 이 문서는 기존 mode(방향 힌트를 쓰는 AeroVLA)의 것이고, 그 동작은 바뀌지 않았다.
+
 > 2026-10-06 후속 업데이트: [Full Map + Target Grounding Inspector](full_map_grounding.md). 기본 Overview는 scene geometry 전체를 fit하는 Top-down으로 변경했고 F/C/WASD와 방향·visibility Inspector를 추가했다. 아래는 최초 미션 실행기의 검증 기록이며 당시 UI/카메라 기본값과 구분한다.
 >
 > **현재 동작은 [Model Self-Evaluation](model_evaluation.md) 이후 바뀌었다.** 미션 종류는 하나(G)이고, 모델 행동을 원래 크기로 실행하며, **모델이 LAND를 출력하면 착륙하고 그 지점의 거리로 성공을 판정**한다. H/L 미션, 0.45m 도착 판정, 전진 0.5m·상하 0.3m·회전 15° 제한, 0.8–4m 고도 이탈 실패는 더 이상 없다. 아래 본문에서 이 항목들을 다루는 부분은 **당시 기록**이다. 현재 조작은 바로 아래 표를 따른다.

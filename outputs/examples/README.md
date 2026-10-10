@@ -47,3 +47,5 @@
 새 `gaussian_blur_*` 두 이미지는 **실제 AeroVLA input injection** 검증에서 가져왔다. 기존 `control_drift.png`와 달리 실제 NF4 model inference를 수행했다. 자동 detection/recovery의 구현이나 성공을 보여주는 자료는 아니다.
 
 `model_evaluation*` 두 장과 `mission_landmark.png`는 2026-10-06 하네스 수정 뒤의 실제 기록이다. 궤적 그림과 입력 모음은 저장된 실제 데이터로 그린 것이고 JPEG로 저장했다. 한 번의 성공 화면이 일반적인 성공률을 뜻하지 않는다. 같은 조건의 반복 결과는 [Model Self-Evaluation](../../docs/model_evaluation.md)에 있다.
+| [grounding_film_mission/land.jpg](grounding_film_mission/land.jpg), `approach.jpg`, `searching.jpg` | `outputs/mission_demo_grounding/`의 관찰 창 export(`current_view.png`), 2026-10-10 세션 3 | Interactive Mission Control을 `grounding_film`으로 비행한 실제 화면: blue pad 착륙(DISARMED), 같은 자세에서의 접근(공중 정지, finalizer 꺼짐), red pad를 찾아 도는 중. Front/Down은 모델이 받은 배열 그대로이고 지도와 표시는 화면 전용 |
+| `grounding_film_mission/manual_smoke.json` | 같은 날 세 세션의 `missions/*/mission-*.json`을 요약 | 수동 확인 13회(네 세션)의 문장, 결과, decision 수, decision 주기, 입력 hash 일치 여부. 시연 기록이며 평가가 아님 |
