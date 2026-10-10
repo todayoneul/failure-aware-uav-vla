@@ -13,6 +13,7 @@
 | 맵에서 목표를 골라 보내기 (방향 힌트 사용) | 동작. 20m 안 정지는 조건에 따라 0–60% | `.\scripts\run_mission_demo.ps1` |
 | 문장만 주고 찾아가기 (방향 힌트 없음) | AeroVLA-OFT로 동작. 처음 보는 시작 32/32, 학습하지 않은 장면 18/20. 처음 보는 물체는 약함 | `.\scripts\run_visual_search_demo.ps1` |
 | 맵에서 물체를 골라 문장으로 보내기 (착륙 또는 접근) | 동작. 동결한 baseline을 직접 조작해 보는 시연 | `.\scripts\run_grounding_film_mission_demo.ps1` |
+| Gaussian Blur가 baseline을 어디서 얼마나 무너뜨리는지 측정 (Clean / Low / Medium / High) | 완료. 48개 시작에서 성공 46 → 40 → 24 → 8. Blur에 강하지 않음 | [결과](docs/failure_gaussian_blur.md) |
 | 장애 자동 감지·복구 | 아직 없음 | - |
 
 모델과 simulator는 저장소에 없습니다. 준비 방법은 [setup](docs/setup.md)에 있습니다.
@@ -71,6 +72,7 @@ G1의 실제 궤적입니다. 위는 Gen-v1, 아래는 Gen-v2이고, 채운 점�
 - ✅ 안정 접촉 finalizer를 포함한 물리적 착륙 — canonical test 착륙 36/36(touchdown, 안정 착륙, latch, disarm). approach 12회에서 켜진 적 없음
 - ✅ 44m 이하 canonical clean baseline — 새 검증 gate와 canonical test 통과. Test는 학습 장면(Field·Lot) 안의 새 배치이고, 새 장면(Depot 156개)은 아직 봉인
 - ⚠️ 44m를 넘는 시작에서 같은 색 물체 사이의 선택 — 열린 한계. Canonical 범위 밖의 별도 과제
+- ⚠️ Gaussian Blur — robustness characterization 완료(Clean / Low / Medium / High). 같은 48개 시작에서 46 → 40 → 24 → 8. 충돌이나 다른 물체 선택은 늘지 않고, 정책이 공중에서 스스로 멈춘다. High에서는 착륙 36회 중 하강을 시작한 비행이 없다. 감지·복구는 아직 없다 ([문서](docs/failure_gaussian_blur.md))
 
 같은 자세에서 문장만 바꾸면 끝이 달라집니다: [착륙](outputs/examples/gen_v3/land.gif) · [접근 후 공중 정지](outputs/examples/gen_v3/approach.gif) · [60m 밖에서 찾아 착륙](outputs/examples/gen_v3/mission_land.gif) · [실패: 먼 파란 목표 앞에서 망설임](outputs/examples/gen_v3/failure_far_blue.gif)
 
@@ -119,6 +121,8 @@ GIF: [탐색](outputs/examples/generalization/search_g1.gif) · [놓친 뒤 다�
 [조작과 화면 설명](docs/mission_demo.md)
 
 ### 4. 장애 주입 — Gaussian Blur
+
+> 동결한 baseline에 대한 정량 측정은 [Gaussian Blur Robustness Characterization](docs/failure_gaussian_blur.md)에 있습니다. Interactive Mission Control(`run_grounding_film_mission_demo.ps1`)에서도 **B**, **1/2/3**으로 같은 blur를 켜 볼 수 있습니다. 아래는 기존 AeroVLA closed loop의 blur 데모입니다.
 
 ![같은 시점의 원본 영상과 실제로 모델에 들어간 흐린 영상](outputs/examples/gaussian_blur_comparison.png)
 
@@ -197,10 +201,12 @@ scripts/             launcher(.ps1), 계획·평가·학습·요약·동결 스�
 configs/             비행·미션 한도, landmark, 평가 protocol, OFT 설정
 configs/maps/        맵 파일(장애물, 물체, layout). 고정된 held-out 시작 상태는 configs/generalization_test_spawns.json
 configs/mission/     Interactive Mission Control의 지도(물체 배치, launch 자세)
-tests/               simulator 없이 도는 테스트 (Python 291개 + PowerShell 4개)
+configs/failures/    장애 실험의 고정 조건(Gaussian Blur 강도, 비행 순서, repeat subset)
+tests/               simulator 없이 도는 테스트 (Python 309개 + PowerShell 4개)
 docs/                아래 문서
 outputs/examples/    README에 쓰는 실제 화면과 GIF
 outputs/generalization/  동결한 결과 표와 실패 분류 (원자료는 로컬에만)
+outputs/failures/        장애 실험의 표, 실행 기록, 예시 그림 (비행 원자료는 로컬에만)
 ```
 
 ## 문서
@@ -222,6 +228,7 @@ outputs/generalization/  동결한 결과 표와 실패 분류 (원자료는 로
 | [gen_v3c_hard_negative_grounding](docs/gen_v3c_hard_negative_grounding.md) | Evaluator v2(위치로 읽는 안정 착륙), hard-negative data와 배치, 보정 학습, pilot, 새 검증 set의 gate 결과, 목표 선택 진단, 다음 후보 |
 | [language_vision_grounding_architecture](docs/language_vision_grounding_architecture.md) | 시각 경로 audit, FiLM과 cross-attention 모듈, 같은 시작을 두 번씩 비행하는 pilot, 대조 실험, 새 검증 gate, 동결, canonical test 48의 결과 |
 | [long_range_same_color_grounding](docs/long_range_same_color_grounding.md) | 44m를 넘는 시작에서 같은 색 물체를 고르는 문제: 관측, canonical 범위에서 뺀 이유, 나중에 시도할 후보 |
+| [failure_gaussian_blur](docs/failure_gaussian_blur.md) | Gaussian Blur 특성화: 고정한 조건과 순서, 주입 위치와 확인, 강도별·단계별 결과, 실패 분류, 착륙·탐색·목표 선택, paired 비교와 repeat, 선명도 통계, 지연, 다음 단계 |
 | [experiments](docs/experiments.md) | 날짜별 실험 요약 |
 | [failure_plan](docs/failure_plan.md) | 이후 넣을 장애 후보 |
 
@@ -245,7 +252,8 @@ outputs/generalization/  동결한 결과 표와 실패 분류 (원자료는 로
 - [x] Visual Search Mode and the AeroVLA-OFT pilot
 - [x] Visual search from unseen starts and in a held-out scene (Gen-v1), failure taxonomy and transition data (Gen-v2)
 - [x] Interactive Mission Control flown by the frozen AeroVLA-OFT baseline (qualitative demonstration)
-- [ ] Visual Search + Gaussian Blur, measured on fresh held-out starts
+- [x] Gaussian Blur robustness characterization of the frozen baseline (Clean / Low / Medium / High, paired on the canonical starts)
+- [ ] Front-only / Down-only blur ablation, then blur detection and recovery, evaluated on new starts
 - [ ] Unseen-object grounding, turn rate of the executor
 - [ ] Additional failure types
 - [ ] Failure detection and basic recovery

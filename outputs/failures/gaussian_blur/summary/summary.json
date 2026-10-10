@@ -1,0 +1,3217 @@
+{
+ "experiment": {
+  "conditions": {
+   "clean": null,
+   "low": {
+    "kernel": 7,
+    "sigma": 1.5
+   },
+   "medium": {
+    "kernel": 15,
+    "sigma": 3.0
+   },
+   "high": {
+    "kernel": 31,
+    "sigma": 6.0
+   }
+  },
+  "starts": "configs/gen_v3_canonical_44m_test.json",
+  "checkpoint": "outputs/aerovla_oft/checkpoints/grounding_film"
+ },
+ "flights": {
+  "clean": 48,
+  "low": 48,
+  "medium": 48,
+  "high": 48
+ },
+ "severity": {
+  "clean": {
+   "mission_success": [
+    46,
+    48
+   ],
+   "acquisition": [
+    47,
+    48
+   ],
+   "correct_grounding": [
+    45,
+    47
+   ],
+   "ended_at_named_object": [
+    46,
+    48
+   ],
+   "wrong_target": [
+    1,
+    48
+   ],
+   "approach": [
+    46,
+    48
+   ],
+   "alignment": [
+    30,
+    36
+   ],
+   "descent": [
+    35,
+    36
+   ],
+   "touchdown": [
+    35,
+    36
+   ],
+   "stable_landing": [
+    35,
+    36
+   ],
+   "system_landing": [
+    35,
+    36
+   ],
+   "strict_zero_action": [
+    34,
+    36
+   ],
+   "end_as_the_sentence_asked": [
+    47,
+    48
+   ],
+   "collision": [
+    0,
+    48
+   ],
+   "timeout": [
+    1,
+    48
+   ]
+  },
+  "low": {
+   "mission_success": [
+    40,
+    48
+   ],
+   "acquisition": [
+    43,
+    48
+   ],
+   "correct_grounding": [
+    39,
+    43
+   ],
+   "ended_at_named_object": [
+    40,
+    48
+   ],
+   "wrong_target": [
+    2,
+    48
+   ],
+   "approach": [
+    40,
+    48
+   ],
+   "alignment": [
+    14,
+    36
+   ],
+   "descent": [
+    31,
+    36
+   ],
+   "touchdown": [
+    31,
+    36
+   ],
+   "stable_landing": [
+    31,
+    36
+   ],
+   "system_landing": [
+    31,
+    36
+   ],
+   "strict_zero_action": [
+    31,
+    36
+   ],
+   "end_as_the_sentence_asked": [
+    43,
+    48
+   ],
+   "collision": [
+    0,
+    48
+   ],
+   "timeout": [
+    0,
+    48
+   ]
+  },
+  "medium": {
+   "mission_success": [
+    24,
+    48
+   ],
+   "acquisition": [
+    42,
+    48
+   ],
+   "correct_grounding": [
+    36,
+    42
+   ],
+   "ended_at_named_object": [
+    34,
+    48
+   ],
+   "wrong_target": [
+    2,
+    48
+   ],
+   "approach": [
+    34,
+    48
+   ],
+   "alignment": [
+    11,
+    36
+   ],
+   "descent": [
+    19,
+    36
+   ],
+   "touchdown": [
+    15,
+    36
+   ],
+   "stable_landing": [
+    15,
+    36
+   ],
+   "system_landing": [
+    15,
+    36
+   ],
+   "strict_zero_action": [
+    16,
+    36
+   ],
+   "end_as_the_sentence_asked": [
+    28,
+    48
+   ],
+   "collision": [
+    0,
+    48
+   ],
+   "timeout": [
+    0,
+    48
+   ]
+  },
+  "high": {
+   "mission_success": [
+    8,
+    48
+   ],
+   "acquisition": [
+    40,
+    48
+   ],
+   "correct_grounding": [
+    26,
+    40
+   ],
+   "ended_at_named_object": [
+    28,
+    48
+   ],
+   "wrong_target": [
+    2,
+    48
+   ],
+   "approach": [
+    31,
+    48
+   ],
+   "alignment": [
+    5,
+    36
+   ],
+   "descent": [
+    0,
+    36
+   ],
+   "touchdown": [
+    0,
+    36
+   ],
+   "stable_landing": [
+    0,
+    36
+   ],
+   "system_landing": [
+    0,
+    36
+   ],
+   "strict_zero_action": [
+    0,
+    36
+   ],
+   "end_as_the_sentence_asked": [
+    10,
+    48
+   ],
+   "collision": [
+    0,
+    48
+   ],
+   "timeout": [
+    2,
+    48
+   ]
+  }
+ },
+ "canonical_measures": {
+  "clean": {
+   "flights": 48,
+   "success": 46,
+   "landings": 36,
+   "landing_success": 35,
+   "approaches": 12,
+   "approach_success": 11,
+   "grounded": 45,
+   "in_view": 47,
+   "terminal_as_asked": 47,
+   "wrong_target": 1,
+   "collisions": 0
+  },
+  "low": {
+   "flights": 48,
+   "success": 40,
+   "landings": 36,
+   "landing_success": 31,
+   "approaches": 12,
+   "approach_success": 9,
+   "grounded": 39,
+   "in_view": 43,
+   "terminal_as_asked": 43,
+   "wrong_target": 2,
+   "collisions": 0
+  },
+  "medium": {
+   "flights": 48,
+   "success": 24,
+   "landings": 36,
+   "landing_success": 15,
+   "approaches": 12,
+   "approach_success": 9,
+   "grounded": 36,
+   "in_view": 42,
+   "terminal_as_asked": 28,
+   "wrong_target": 2,
+   "collisions": 0
+  },
+  "high": {
+   "flights": 48,
+   "success": 8,
+   "landings": 36,
+   "landing_success": 0,
+   "approaches": 12,
+   "approach_success": 8,
+   "grounded": 26,
+   "in_view": 40,
+   "terminal_as_asked": 10,
+   "wrong_target": 2,
+   "collisions": 0
+  }
+ },
+ "retention": {
+  "clean": {
+   "drop_points": 0.0,
+   "retention": 1.0,
+   "landing": {
+    "drop_points": 0.0,
+    "retention": 1.0
+   },
+   "success_rate": 0.958
+  },
+  "low": {
+   "drop_points": -12.5,
+   "retention": 0.87,
+   "landing": {
+    "drop_points": -11.1,
+    "retention": 0.886
+   },
+   "success_rate": 0.833
+  },
+  "medium": {
+   "drop_points": -45.8,
+   "retention": 0.522,
+   "landing": {
+    "drop_points": -55.6,
+    "retention": 0.429
+   },
+   "success_rate": 0.5
+  },
+  "high": {
+   "drop_points": -79.2,
+   "retention": 0.174,
+   "landing": {
+    "drop_points": -97.2,
+    "retention": 0.0
+   },
+   "success_rate": 0.167
+  }
+ },
+ "by_band": {
+  "near": {
+   "clean": [
+    15,
+    16
+   ],
+   "low": [
+    14,
+    16
+   ],
+   "medium": [
+    8,
+    16
+   ],
+   "high": [
+    2,
+    16
+   ]
+  },
+  "mid": {
+   "clean": [
+    16,
+    16
+   ],
+   "low": [
+    14,
+    16
+   ],
+   "medium": [
+    8,
+    16
+   ],
+   "high": [
+    3,
+    16
+   ]
+  },
+  "far": {
+   "clean": [
+    15,
+    16
+   ],
+   "low": [
+    12,
+    16
+   ],
+   "medium": [
+    8,
+    16
+   ],
+   "high": [
+    3,
+    16
+   ]
+  }
+ },
+ "by_band_landing": {
+  "near": {
+   "clean": [
+    12,
+    12
+   ],
+   "low": [
+    11,
+    12
+   ],
+   "medium": [
+    5,
+    12
+   ],
+   "high": [
+    0,
+    12
+   ]
+  },
+  "mid": {
+   "clean": [
+    12,
+    12
+   ],
+   "low": [
+    11,
+    12
+   ],
+   "medium": [
+    5,
+    12
+   ],
+   "high": [
+    0,
+    12
+   ]
+  },
+  "far": {
+   "clean": [
+    11,
+    12
+   ],
+   "low": [
+    9,
+    12
+   ],
+   "medium": [
+    5,
+    12
+   ],
+   "high": [
+    0,
+    12
+   ]
+  }
+ },
+ "by_initial_visibility": {
+  "visible": {
+   "clean": [
+    21,
+    21
+   ],
+   "low": [
+    21,
+    21
+   ],
+   "medium": [
+    15,
+    21
+   ],
+   "high": [
+    3,
+    21
+   ]
+  },
+  "invisible": {
+   "clean": [
+    25,
+    27
+   ],
+   "low": [
+    19,
+    27
+   ],
+   "medium": [
+    9,
+    27
+   ],
+   "high": [
+    5,
+    27
+   ]
+  }
+ },
+ "by_task": {
+  "land": {
+   "clean": [
+    35,
+    36
+   ],
+   "low": [
+    31,
+    36
+   ],
+   "medium": [
+    15,
+    36
+   ],
+   "high": [
+    0,
+    36
+   ]
+  },
+  "approach": {
+   "clean": [
+    11,
+    12
+   ],
+   "low": [
+    9,
+    12
+   ],
+   "medium": [
+    9,
+    12
+   ],
+   "high": [
+    8,
+    12
+   ]
+  }
+ },
+ "by_task_and_initial_visibility": {
+  "land, visible": {
+   "clean": [
+    18,
+    18
+   ],
+   "low": [
+    18,
+    18
+   ],
+   "medium": [
+    12,
+    18
+   ],
+   "high": [
+    0,
+    18
+   ]
+  },
+  "land, invisible": {
+   "clean": [
+    17,
+    18
+   ],
+   "low": [
+    13,
+    18
+   ],
+   "medium": [
+    3,
+    18
+   ],
+   "high": [
+    0,
+    18
+   ]
+  },
+  "approach, visible": {
+   "clean": [
+    3,
+    3
+   ],
+   "low": [
+    3,
+    3
+   ],
+   "medium": [
+    3,
+    3
+   ],
+   "high": [
+    3,
+    3
+   ]
+  },
+  "approach, invisible": {
+   "clean": [
+    8,
+    9
+   ],
+   "low": [
+    6,
+    9
+   ],
+   "medium": [
+    6,
+    9
+   ],
+   "high": [
+    5,
+    9
+   ]
+  }
+ },
+ "by_distractor": {
+  "none": {
+   "clean": [
+    0,
+    0
+   ],
+   "low": [
+    0,
+    0
+   ],
+   "medium": [
+    0,
+    0
+   ],
+   "high": [
+    0,
+    0
+   ]
+  },
+  "same_color": {
+   "clean": [
+    21,
+    22
+   ],
+   "low": [
+    14,
+    22
+   ],
+   "medium": [
+    7,
+    22
+   ],
+   "high": [
+    2,
+    22
+   ]
+  },
+  "same_shape": {
+   "clean": [
+    25,
+    26
+   ],
+   "low": [
+    26,
+    26
+   ],
+   "medium": [
+    17,
+    26
+   ],
+   "high": [
+    6,
+    26
+   ]
+  }
+ },
+ "by_related_object_in_first_view": {
+  "related first": {
+   "clean": [
+    16,
+    17
+   ],
+   "low": [
+    12,
+    17
+   ],
+   "medium": [
+    7,
+    17
+   ],
+   "high": [
+    4,
+    17
+   ]
+  },
+  "no related object first": {
+   "clean": [
+    30,
+    31
+   ],
+   "low": [
+    28,
+    31
+   ],
+   "medium": [
+    17,
+    31
+   ],
+   "high": [
+    4,
+    31
+   ]
+  }
+ },
+ "by_scene": {
+  "field": {
+   "clean": [
+    20,
+    21
+   ],
+   "low": [
+    21,
+    21
+   ],
+   "medium": [
+    12,
+    21
+   ],
+   "high": [
+    4,
+    21
+   ]
+  },
+  "lot": {
+   "clean": [
+    26,
+    27
+   ],
+   "low": [
+    19,
+    27
+   ],
+   "medium": [
+    12,
+    27
+   ],
+   "high": [
+    4,
+    27
+   ]
+  }
+ },
+ "target_selection": {
+  "clean": [
+   {
+    "start_holds": "an object of the same colour and another shape beside the named one or in the first view",
+    "flights": 22,
+    "success": 21,
+    "ended_at_named_object": 21,
+    "ended_at_wrong_object": 1
+   },
+   {
+    "start_holds": "an object of the same shape and another colour beside the named one or in the first view",
+    "flights": 26,
+    "success": 25,
+    "ended_at_named_object": 25,
+    "ended_at_wrong_object": 0
+   },
+   {
+    "start_holds": "a related object in the first view, the named one outside it",
+    "flights": 17,
+    "success": 16,
+    "ended_at_named_object": 16,
+    "ended_at_wrong_object": 1
+   },
+   {
+    "start_holds": "... of the same colour",
+    "flights": 8,
+    "success": 7,
+    "ended_at_named_object": 7,
+    "ended_at_wrong_object": 1
+   },
+   {
+    "start_holds": "... of the same shape",
+    "flights": 9,
+    "success": 9,
+    "ended_at_named_object": 9,
+    "ended_at_wrong_object": 0
+   },
+   {
+    "start_holds": "the two objects exchanged (position swap)",
+    "flights": 6,
+    "success": 6,
+    "ended_at_named_object": 6,
+    "ended_at_wrong_object": 0
+   },
+   {
+    "start_holds": "the neighbour named instead (query)",
+    "flights": 6,
+    "success": 5,
+    "ended_at_named_object": 5,
+    "ended_at_wrong_object": 1
+   },
+   {
+    "start_holds": "the named object outside the first view",
+    "flights": 27,
+    "success": 25,
+    "ended_at_named_object": 25,
+    "ended_at_wrong_object": 1
+   },
+   {
+    "start_holds": "the named object in the first view",
+    "flights": 21,
+    "success": 21,
+    "ended_at_named_object": 21,
+    "ended_at_wrong_object": 0
+   },
+   {
+    "start_holds": "named object lost on the way without a forced turn",
+    "flights": 4,
+    "success": 3,
+    "ended_at_named_object": 3,
+    "ended_at_wrong_object": 0
+   },
+   {
+    "start_holds": "... and seen again",
+    "flights": 4,
+    "success": 3,
+    "ended_at_named_object": 3,
+    "ended_at_wrong_object": 0
+   }
+  ],
+  "low": [
+   {
+    "start_holds": "an object of the same colour and another shape beside the named one or in the first view",
+    "flights": 22,
+    "success": 14,
+    "ended_at_named_object": 14,
+    "ended_at_wrong_object": 2
+   },
+   {
+    "start_holds": "an object of the same shape and another colour beside the named one or in the first view",
+    "flights": 26,
+    "success": 26,
+    "ended_at_named_object": 26,
+    "ended_at_wrong_object": 0
+   },
+   {
+    "start_holds": "a related object in the first view, the named one outside it",
+    "flights": 17,
+    "success": 12,
+    "ended_at_named_object": 12,
+    "ended_at_wrong_object": 2
+   },
+   {
+    "start_holds": "... of the same colour",
+    "flights": 8,
+    "success": 3,
+    "ended_at_named_object": 3,
+    "ended_at_wrong_object": 2
+   },
+   {
+    "start_holds": "... of the same shape",
+    "flights": 9,
+    "success": 9,
+    "ended_at_named_object": 9,
+    "ended_at_wrong_object": 0
+   },
+   {
+    "start_holds": "the two objects exchanged (position swap)",
+    "flights": 6,
+    "success": 3,
+    "ended_at_named_object": 3,
+    "ended_at_wrong_object": 0
+   },
+   {
+    "start_holds": "the neighbour named instead (query)",
+    "flights": 6,
+    "success": 4,
+    "ended_at_named_object": 4,
+    "ended_at_wrong_object": 2
+   },
+   {
+    "start_holds": "the named object outside the first view",
+    "flights": 27,
+    "success": 19,
+    "ended_at_named_object": 19,
+    "ended_at_wrong_object": 2
+   },
+   {
+    "start_holds": "the named object in the first view",
+    "flights": 21,
+    "success": 21,
+    "ended_at_named_object": 21,
+    "ended_at_wrong_object": 0
+   }
+  ],
+  "medium": [
+   {
+    "start_holds": "an object of the same colour and another shape beside the named one or in the first view",
+    "flights": 22,
+    "success": 7,
+    "ended_at_named_object": 11,
+    "ended_at_wrong_object": 2
+   },
+   {
+    "start_holds": "an object of the same shape and another colour beside the named one or in the first view",
+    "flights": 26,
+    "success": 17,
+    "ended_at_named_object": 23,
+    "ended_at_wrong_object": 0
+   },
+   {
+    "start_holds": "a related object in the first view, the named one outside it",
+    "flights": 17,
+    "success": 7,
+    "ended_at_named_object": 10,
+    "ended_at_wrong_object": 2
+   },
+   {
+    "start_holds": "... of the same colour",
+    "flights": 8,
+    "success": 1,
+    "ended_at_named_object": 2,
+    "ended_at_wrong_object": 2
+   },
+   {
+    "start_holds": "... of the same shape",
+    "flights": 9,
+    "success": 6,
+    "ended_at_named_object": 8,
+    "ended_at_wrong_object": 0
+   },
+   {
+    "start_holds": "the two objects exchanged (position swap)",
+    "flights": 6,
+    "success": 1,
+    "ended_at_named_object": 2,
+    "ended_at_wrong_object": 0
+   },
+   {
+    "start_holds": "the neighbour named instead (query)",
+    "flights": 6,
+    "success": 4,
+    "ended_at_named_object": 4,
+    "ended_at_wrong_object": 2
+   },
+   {
+    "start_holds": "the named object outside the first view",
+    "flights": 27,
+    "success": 9,
+    "ended_at_named_object": 15,
+    "ended_at_wrong_object": 2
+   },
+   {
+    "start_holds": "the named object in the first view",
+    "flights": 21,
+    "success": 15,
+    "ended_at_named_object": 19,
+    "ended_at_wrong_object": 0
+   }
+  ],
+  "high": [
+   {
+    "start_holds": "an object of the same colour and another shape beside the named one or in the first view",
+    "flights": 22,
+    "success": 2,
+    "ended_at_named_object": 9,
+    "ended_at_wrong_object": 2
+   },
+   {
+    "start_holds": "an object of the same shape and another colour beside the named one or in the first view",
+    "flights": 26,
+    "success": 6,
+    "ended_at_named_object": 19,
+    "ended_at_wrong_object": 0
+   },
+   {
+    "start_holds": "a related object in the first view, the named one outside it",
+    "flights": 17,
+    "success": 4,
+    "ended_at_named_object": 8,
+    "ended_at_wrong_object": 2
+   },
+   {
+    "start_holds": "... of the same colour",
+    "flights": 8,
+    "success": 1,
+    "ended_at_named_object": 2,
+    "ended_at_wrong_object": 2
+   },
+   {
+    "start_holds": "... of the same shape",
+    "flights": 9,
+    "success": 3,
+    "ended_at_named_object": 6,
+    "ended_at_wrong_object": 0
+   },
+   {
+    "start_holds": "the two objects exchanged (position swap)",
+    "flights": 6,
+    "success": 0,
+    "ended_at_named_object": 2,
+    "ended_at_wrong_object": 0
+   },
+   {
+    "start_holds": "the neighbour named instead (query)",
+    "flights": 6,
+    "success": 3,
+    "ended_at_named_object": 3,
+    "ended_at_wrong_object": 2
+   },
+   {
+    "start_holds": "the named object outside the first view",
+    "flights": 27,
+    "success": 5,
+    "ended_at_named_object": 13,
+    "ended_at_wrong_object": 2
+   },
+   {
+    "start_holds": "the named object in the first view",
+    "flights": 21,
+    "success": 3,
+    "ended_at_named_object": 15,
+    "ended_at_wrong_object": 0
+   },
+   {
+    "start_holds": "named object lost on the way without a forced turn",
+    "flights": 3,
+    "success": 0,
+    "ended_at_named_object": 1,
+    "ended_at_wrong_object": 0
+   },
+   {
+    "start_holds": "... and seen again",
+    "flights": 3,
+    "success": 0,
+    "ended_at_named_object": 1,
+    "ended_at_wrong_object": 0
+   }
+  ]
+ },
+ "landing": {
+  "clean": {
+   "landings": 36,
+   "down_view_saw_the_pad": 35,
+   "over_the_pad": 35,
+   "alignment": 30,
+   "descent": 35,
+   "touchdown": 35,
+   "stable_landing": 35,
+   "system_landing": 35,
+   "strict_zero_action": 34,
+   "correct_pad_touched": 35,
+   "touched_another_pad": 0,
+   "finalizer_latched": 35,
+   "disarmed": 35,
+   "failed_after_alignment": [],
+   "descent_of_those_over_the_pad": [
+    35,
+    35
+   ],
+   "touched_of_those_that_descended": [
+    35,
+    35
+   ],
+   "touchdown_error_m": {
+    "n": 35,
+    "mean": 2.766857142857143,
+    "median": 2.79,
+    "p5": 0.9,
+    "p95": 4.76
+   },
+   "touchdown_vertical_mps": {
+    "n": 35,
+    "mean": 0.6114285714285714,
+    "median": 0.61,
+    "p5": 0.58,
+    "p95": 0.64
+   }
+  },
+  "low": {
+   "landings": 36,
+   "down_view_saw_the_pad": 31,
+   "over_the_pad": 31,
+   "alignment": 14,
+   "descent": 31,
+   "touchdown": 31,
+   "stable_landing": 31,
+   "system_landing": 31,
+   "strict_zero_action": 31,
+   "correct_pad_touched": 31,
+   "touched_another_pad": 0,
+   "finalizer_latched": 31,
+   "disarmed": 31,
+   "failed_after_alignment": [],
+   "descent_of_those_over_the_pad": [
+    31,
+    31
+   ],
+   "touched_of_those_that_descended": [
+    31,
+    31
+   ],
+   "touchdown_error_m": {
+    "n": 31,
+    "mean": 3.893548387096774,
+    "median": 3.8,
+    "p5": 1.83,
+    "p95": 5.99
+   },
+   "touchdown_vertical_mps": {
+    "n": 31,
+    "mean": 0.5987096774193549,
+    "median": 0.61,
+    "p5": 0.56,
+    "p95": 0.67
+   }
+  },
+  "medium": {
+   "landings": 36,
+   "down_view_saw_the_pad": 24,
+   "over_the_pad": 25,
+   "alignment": 11,
+   "descent": 19,
+   "touchdown": 15,
+   "stable_landing": 15,
+   "system_landing": 15,
+   "strict_zero_action": 16,
+   "correct_pad_touched": 16,
+   "touched_another_pad": 0,
+   "finalizer_latched": 16,
+   "disarmed": 16,
+   "failed_after_alignment": [
+    "ct-9500-blue_pad-near_visible",
+    "ct-9514-blue_pad-mid_pair",
+    "ct-9521-blue_pad-far_visible"
+   ],
+   "descent_of_those_over_the_pad": [
+    19,
+    25
+   ],
+   "touched_of_those_that_descended": [
+    16,
+    19
+   ],
+   "touchdown_error_m": {
+    "n": 16,
+    "mean": 4.18625,
+    "median": 4.24,
+    "p5": 1.96,
+    "p95": 7.38
+   },
+   "touchdown_vertical_mps": {
+    "n": 16,
+    "mean": 0.570625,
+    "median": 0.605,
+    "p5": 0.22,
+    "p95": 0.66
+   }
+  },
+  "high": {
+   "landings": 36,
+   "down_view_saw_the_pad": 15,
+   "over_the_pad": 17,
+   "alignment": 5,
+   "descent": 0,
+   "touchdown": 0,
+   "stable_landing": 0,
+   "system_landing": 0,
+   "strict_zero_action": 0,
+   "correct_pad_touched": 0,
+   "touched_another_pad": 0,
+   "finalizer_latched": 0,
+   "disarmed": 0,
+   "failed_after_alignment": [
+    "ct-9500-blue_pad-near_visible",
+    "ct-9507-blue_pad-near_pair2",
+    "ct-9514-blue_pad-mid_pair",
+    "ct-9518-blue_pad-mid_pair2",
+    "ct-9521-blue_pad-far_visible"
+   ],
+   "descent_of_those_over_the_pad": [
+    0,
+    17
+   ],
+   "touched_of_those_that_descended": [
+    0,
+    0
+   ],
+   "touchdown_error_m": null,
+   "touchdown_vertical_mps": null
+  }
+ },
+ "search": {
+  "clean": {
+   "starts_with_the_target_outside_the_first_view": 27,
+   "acquired": 26,
+   "success": 25,
+   "first_view_step": {
+    "n": 26,
+    "mean": 18,
+    "median": 10.0,
+    "p5": 3,
+    "p95": 34
+   },
+   "seconds_to_first_view": {
+    "n": 26,
+    "mean": 8.893385291099548,
+    "median": 5.127569556236267,
+    "p5": 1.5010194778442383,
+    "p95": 17.459940195083618
+   },
+   "yaw_before_first_view_deg": {
+    "n": 26,
+    "mean": 185.96153846153845,
+    "median": 108.0,
+    "p5": 36,
+    "p95": 409
+   },
+   "decisions": {
+    "n": 27,
+    "mean": 73.4074074074074,
+    "median": 67,
+    "p5": 30,
+    "p95": 118
+   }
+  },
+  "low": {
+   "starts_with_the_target_outside_the_first_view": 27,
+   "acquired": 22,
+   "success": 19,
+   "first_view_step": {
+    "n": 22,
+    "mean": 17.136363636363637,
+    "median": 15.0,
+    "p5": 3,
+    "p95": 34
+   },
+   "seconds_to_first_view": {
+    "n": 22,
+    "mean": 8.390209306370128,
+    "median": 7.574211120605469,
+    "p5": 1.5524823665618896,
+    "p95": 16.190515756607056
+   },
+   "yaw_before_first_view_deg": {
+    "n": 22,
+    "mean": 184.13636363636363,
+    "median": 144.5,
+    "p5": 36,
+    "p95": 399
+   },
+   "decisions": {
+    "n": 27,
+    "mean": 50.44444444444444,
+    "median": 52,
+    "p5": 15,
+    "p95": 88
+   }
+  },
+  "medium": {
+   "starts_with_the_target_outside_the_first_view": 27,
+   "acquired": 21,
+   "success": 9,
+   "first_view_step": {
+    "n": 21,
+    "mean": 17.571428571428573,
+    "median": 15,
+    "p5": 3,
+    "p95": 34
+   },
+   "seconds_to_first_view": {
+    "n": 21,
+    "mean": 8.835855029878163,
+    "median": 7.526217937469482,
+    "p5": 1.5371687412261963,
+    "p95": 16.99601459503174
+   },
+   "yaw_before_first_view_deg": {
+    "n": 21,
+    "mean": 187.71428571428572,
+    "median": 179,
+    "p5": 36,
+    "p95": 396
+   },
+   "decisions": {
+    "n": 27,
+    "mean": 44.629629629629626,
+    "median": 52,
+    "p5": 9,
+    "p95": 75
+   }
+  },
+  "high": {
+   "starts_with_the_target_outside_the_first_view": 27,
+   "acquired": 19,
+   "success": 5,
+   "first_view_step": {
+    "n": 19,
+    "mean": 16,
+    "median": 13,
+    "p5": 3,
+    "p95": 54
+   },
+   "seconds_to_first_view": {
+    "n": 19,
+    "mean": 7.951312592155055,
+    "median": 6.525389909744263,
+    "p5": 1.5053870677947998,
+    "p95": 26.68172550201416
+   },
+   "yaw_before_first_view_deg": {
+    "n": 19,
+    "mean": 156.3684210526316,
+    "median": 100,
+    "p5": 31,
+    "p95": 401
+   },
+   "decisions": {
+    "n": 27,
+    "mean": 60.77777777777778,
+    "median": 34,
+    "p5": 4,
+    "p95": 320
+   }
+  }
+ },
+ "own_stops": {
+  "clean": {
+   "own_stop_without_success": 1,
+   "within_the_first_10_decisions": 0,
+   "farther_than_the_success_radius": 1,
+   "landings_stopped_in_the_air": 0,
+   "landings_stopped_in_the_air_over_the_pad": 0,
+   "landings_stopped_in_the_air_within_the_radius": 0,
+   "final_distance_m": {
+    "n": 1,
+    "mean": 39.4,
+    "median": 39.4,
+    "p5": 39.4,
+    "p95": 39.4
+   },
+   "final_height_m": null,
+   "decisions": {
+    "n": 1,
+    "mean": 14,
+    "median": 14,
+    "p5": 14,
+    "p95": 14
+   },
+   "starts": [
+    "ct-9507-blue_pad-near_pair2-find-blue_cube"
+   ]
+  },
+  "low": {
+   "own_stop_without_success": 8,
+   "within_the_first_10_decisions": 1,
+   "farther_than_the_success_radius": 8,
+   "landings_stopped_in_the_air": 5,
+   "landings_stopped_in_the_air_over_the_pad": 0,
+   "landings_stopped_in_the_air_within_the_radius": 0,
+   "final_distance_m": {
+    "n": 8,
+    "mean": 37.5375,
+    "median": 38.2,
+    "p5": 29.8,
+    "p95": 42.6
+   },
+   "final_height_m": {
+    "n": 5,
+    "mean": 7.62,
+    "median": 7.9,
+    "p5": 5.5,
+    "p95": 8.7
+   },
+   "decisions": {
+    "n": 8,
+    "mean": 24.875,
+    "median": 21.0,
+    "p5": 7,
+    "p95": 47
+   },
+   "starts": [
+    "ct-9507-blue_pad-near_pair2-swapped",
+    "ct-9507-blue_pad-near_pair2-find-blue_cube",
+    "ct-9518-blue_pad-mid_pair2-swapped",
+    "ct-9518-blue_pad-mid_pair2-find-blue_cube",
+    "ct-9522-blue_pad-far_search",
+    "ct-9522-blue_pad-far_search-approach",
+    "ct-9528-blue_pad-far_pair2-swapped",
+    "ct-9530-red_pad-far_red_search"
+   ]
+  },
+  "medium": {
+   "own_stop_without_success": 24,
+   "within_the_first_10_decisions": 3,
+   "farther_than_the_success_radius": 14,
+   "landings_stopped_in_the_air": 20,
+   "landings_stopped_in_the_air_over_the_pad": 9,
+   "landings_stopped_in_the_air_within_the_radius": 9,
+   "final_distance_m": {
+    "n": 24,
+    "mean": 22.775,
+    "median": 27.5,
+    "p5": 2.8,
+    "p95": 43.4
+   },
+   "final_height_m": {
+    "n": 20,
+    "mean": 6.505,
+    "median": 6.65,
+    "p5": 2.6,
+    "p95": 8.3
+   },
+   "decisions": {
+    "n": 24,
+    "mean": 35,
+    "median": 39.5,
+    "p5": 8,
+    "p95": 60
+   },
+   "starts": [
+    "ct-9500-blue_pad-near_visible",
+    "ct-9501-blue_pad-near_search",
+    "ct-9503-blue_pad-near_pair-swapped",
+    "ct-9504-blue_pad-near_past",
+    "ct-9506-blue_pad-near_behind",
+    "ct-9507-blue_pad-near_pair2-swapped",
+    "ct-9507-blue_pad-near_pair2-find-blue_cube",
+    "ct-9509-red_pad-near_red_search",
+    "ct-9511-blue_pad-mid_search",
+    "ct-9512-blue_pad-mid_edge",
+    "ct-9514-blue_pad-mid_pair",
+    "ct-9515-blue_pad-mid_past",
+    "ct-9516-blue_pad-mid_visible2",
+    "ct-9517-blue_pad-mid_behind",
+    "ct-9518-blue_pad-mid_pair2-swapped",
+    "ct-9518-blue_pad-mid_pair2-find-blue_cube",
+    "ct-9521-blue_pad-far_visible",
+    "ct-9522-blue_pad-far_search",
+    "ct-9522-blue_pad-far_search-approach",
+    "ct-9524-blue_pad-far_pair-swapped",
+    "ct-9527-blue_pad-far_behind",
+    "ct-9528-blue_pad-far_pair2",
+    "ct-9528-blue_pad-far_pair2-swapped",
+    "ct-9530-red_pad-far_red_search"
+   ]
+  },
+  "high": {
+   "own_stop_without_success": 38,
+   "within_the_first_10_decisions": 7,
+   "farther_than_the_success_radius": 18,
+   "landings_stopped_in_the_air": 36,
+   "landings_stopped_in_the_air_over_the_pad": 15,
+   "landings_stopped_in_the_air_within_the_radius": 20,
+   "final_distance_m": {
+    "n": 38,
+    "mean": 19.263157894736842,
+    "median": 14.35,
+    "p5": 1.2,
+    "p95": 42.8
+   },
+   "final_height_m": {
+    "n": 36,
+    "mean": 6.738888888888889,
+    "median": 6.6,
+    "p5": 5.1,
+    "p95": 8.7
+   },
+   "decisions": {
+    "n": 38,
+    "mean": 38,
+    "median": 27.0,
+    "p5": 4,
+    "p95": 133
+   },
+   "starts": [
+    "ct-9500-blue_pad-near_visible",
+    "ct-9501-blue_pad-near_search",
+    "ct-9502-blue_pad-near_edge",
+    "ct-9503-blue_pad-near_pair",
+    "ct-9503-blue_pad-near_pair-swapped",
+    "ct-9504-blue_pad-near_past",
+    "ct-9505-blue_pad-near_visible2",
+    "ct-9506-blue_pad-near_behind",
+    "ct-9507-blue_pad-near_pair2",
+    "ct-9507-blue_pad-near_pair2-swapped",
+    "ct-9507-blue_pad-near_pair2-find-blue_cube",
+    "ct-9508-red_pad-near_red_visible",
+    "ct-9509-red_pad-near_red_search",
+    "ct-9510-blue_pad-mid_visible",
+    "ct-9511-blue_pad-mid_search",
+    "ct-9512-blue_pad-mid_edge",
+    "ct-9514-blue_pad-mid_pair",
+    "ct-9514-blue_pad-mid_pair-swapped",
+    "ct-9515-blue_pad-mid_past",
+    "ct-9516-blue_pad-mid_visible2",
+    "ct-9517-blue_pad-mid_behind",
+    "ct-9518-blue_pad-mid_pair2",
+    "ct-9518-blue_pad-mid_pair2-swapped",
+    "ct-9518-blue_pad-mid_pair2-find-blue_cube",
+    "ct-9519-red_pad-mid_red_visible",
+    "ct-9520-red_pad-mid_red_search",
+    "ct-9521-blue_pad-far_visible",
+    "ct-9522-blue_pad-far_search",
+    "ct-9523-blue_pad-far_edge",
+    "ct-9524-blue_pad-far_pair",
+    "ct-9524-blue_pad-far_pair-swapped",
+    "ct-9525-blue_pad-far_past",
+    "ct-9526-blue_pad-far_visible2",
+    "ct-9527-blue_pad-far_behind",
+    "ct-9528-blue_pad-far_pair2",
+    "ct-9528-blue_pad-far_pair2-swapped",
+    "ct-9529-red_pad-far_red_visible",
+    "ct-9530-red_pad-far_red_search"
+   ]
+  }
+ },
+ "grounding": {
+  "clean": {
+   "in_view": 47,
+   "grounded": 45,
+   "grounded_on_first_view": 42,
+   "ended_at_named_object": 46,
+   "decisions_in_view": {
+    "n": 47,
+    "mean": 44.93617021276596,
+    "median": 45,
+    "p5": 17,
+    "p95": 74
+   },
+   "not_grounded": [
+    "ct-9500-blue_pad-near_visible-approach",
+    "ct-9527-blue_pad-far_behind"
+   ]
+  },
+  "low": {
+   "in_view": 43,
+   "grounded": 39,
+   "grounded_on_first_view": 37,
+   "ended_at_named_object": 40,
+   "decisions_in_view": {
+    "n": 43,
+    "mean": 39.27906976744186,
+    "median": 39,
+    "p5": 6,
+    "p95": 61
+   },
+   "not_grounded": [
+    "ct-9500-blue_pad-near_visible-approach",
+    "ct-9522-blue_pad-far_search",
+    "ct-9522-blue_pad-far_search-approach",
+    "ct-9528-blue_pad-far_pair2-swapped"
+   ]
+  },
+  "medium": {
+   "in_view": 42,
+   "grounded": 36,
+   "grounded_on_first_view": 36,
+   "ended_at_named_object": 34,
+   "decisions_in_view": {
+    "n": 42,
+    "mean": 38.595238095238095,
+    "median": 41.0,
+    "p5": 5,
+    "p95": 68
+   },
+   "not_grounded": [
+    "ct-9503-blue_pad-near_pair-swapped",
+    "ct-9515-blue_pad-mid_past",
+    "ct-9522-blue_pad-far_search",
+    "ct-9522-blue_pad-far_search-approach",
+    "ct-9527-blue_pad-far_behind",
+    "ct-9528-blue_pad-far_pair2"
+   ]
+  },
+  "high": {
+   "in_view": 40,
+   "grounded": 26,
+   "grounded_on_first_view": 24,
+   "ended_at_named_object": 26,
+   "decisions_in_view": {
+    "n": 40,
+    "mean": 39.35,
+    "median": 34.5,
+    "p5": 4,
+    "p95": 100
+   },
+   "not_grounded": [
+    "ct-9500-blue_pad-near_visible-approach",
+    "ct-9504-blue_pad-near_past",
+    "ct-9505-blue_pad-near_visible2",
+    "ct-9508-red_pad-near_red_visible",
+    "ct-9514-blue_pad-mid_pair-swapped",
+    "ct-9515-blue_pad-mid_past",
+    "ct-9516-blue_pad-mid_visible2",
+    "ct-9517-blue_pad-mid_behind",
+    "ct-9522-blue_pad-far_search-approach",
+    "ct-9524-blue_pad-far_pair",
+    "ct-9525-blue_pad-far_past",
+    "ct-9527-blue_pad-far_behind",
+    "ct-9528-blue_pad-far_pair2",
+    "ct-9528-blue_pad-far_pair2-swapped"
+   ]
+  }
+ },
+ "wrong_targets": [
+  {
+   "condition": "clean",
+   "start": "ct-9507-blue_pad-near_pair2-find-blue_cube",
+   "instruction": "Find the blue cube.",
+   "named": "blue_cube",
+   "went_to": "blue_pad",
+   "relation": "same_color",
+   "landed_on": null,
+   "related_object_in_first_view": [
+    "same_color"
+   ],
+   "target_initially_visible": false,
+   "named_object_ever_seen": false,
+   "band": "near",
+   "task": "approach",
+   "class": "B1_SEARCH_FAILURE",
+   "front_fraction_at_first_view": null,
+   "steps": 14
+  },
+  {
+   "condition": "low",
+   "start": "ct-9507-blue_pad-near_pair2-find-blue_cube",
+   "instruction": "Find the blue cube.",
+   "named": "blue_cube",
+   "went_to": "blue_pad",
+   "relation": "same_color",
+   "landed_on": null,
+   "related_object_in_first_view": [
+    "same_color"
+   ],
+   "target_initially_visible": false,
+   "named_object_ever_seen": false,
+   "band": "near",
+   "task": "approach",
+   "class": "B1_SEARCH_FAILURE",
+   "front_fraction_at_first_view": null,
+   "steps": 16
+  },
+  {
+   "condition": "low",
+   "start": "ct-9518-blue_pad-mid_pair2-find-blue_cube",
+   "instruction": "Find the blue cube.",
+   "named": "blue_cube",
+   "went_to": "blue_pad",
+   "relation": "same_color",
+   "landed_on": null,
+   "related_object_in_first_view": [
+    "same_color"
+   ],
+   "target_initially_visible": false,
+   "named_object_ever_seen": false,
+   "band": "mid",
+   "task": "approach",
+   "class": "B1_SEARCH_FAILURE",
+   "front_fraction_at_first_view": null,
+   "steps": 22
+  },
+  {
+   "condition": "medium",
+   "start": "ct-9507-blue_pad-near_pair2-find-blue_cube",
+   "instruction": "Find the blue cube.",
+   "named": "blue_cube",
+   "went_to": "blue_pad",
+   "relation": "same_color",
+   "landed_on": null,
+   "related_object_in_first_view": [
+    "same_color"
+   ],
+   "target_initially_visible": false,
+   "named_object_ever_seen": false,
+   "band": "near",
+   "task": "approach",
+   "class": "B1_SEARCH_FAILURE",
+   "front_fraction_at_first_view": null,
+   "steps": 39
+  },
+  {
+   "condition": "medium",
+   "start": "ct-9518-blue_pad-mid_pair2-find-blue_cube",
+   "instruction": "Find the blue cube.",
+   "named": "blue_cube",
+   "went_to": "blue_pad",
+   "relation": "same_color",
+   "landed_on": null,
+   "related_object_in_first_view": [
+    "same_color"
+   ],
+   "target_initially_visible": false,
+   "named_object_ever_seen": false,
+   "band": "mid",
+   "task": "approach",
+   "class": "B1_SEARCH_FAILURE",
+   "front_fraction_at_first_view": null,
+   "steps": 23
+  },
+  {
+   "condition": "high",
+   "start": "ct-9507-blue_pad-near_pair2-find-blue_cube",
+   "instruction": "Find the blue cube.",
+   "named": "blue_cube",
+   "went_to": "blue_pad",
+   "relation": "same_color",
+   "landed_on": null,
+   "related_object_in_first_view": [
+    "same_color"
+   ],
+   "target_initially_visible": false,
+   "named_object_ever_seen": false,
+   "band": "near",
+   "task": "approach",
+   "class": "B1_SEARCH_FAILURE",
+   "front_fraction_at_first_view": null,
+   "steps": 51
+  },
+  {
+   "condition": "high",
+   "start": "ct-9518-blue_pad-mid_pair2-find-blue_cube",
+   "instruction": "Find the blue cube.",
+   "named": "blue_cube",
+   "went_to": "blue_pad",
+   "relation": "same_color",
+   "landed_on": null,
+   "related_object_in_first_view": [
+    "same_color"
+   ],
+   "target_initially_visible": false,
+   "named_object_ever_seen": false,
+   "band": "mid",
+   "task": "approach",
+   "class": "B1_SEARCH_FAILURE",
+   "front_fraction_at_first_view": null,
+   "steps": 47
+  }
+ ],
+ "confusions": {
+  "blue_cube -> blue_pad": {
+   "clean": 1,
+   "low": 2,
+   "medium": 2,
+   "high": 2
+  }
+ },
+ "taxonomy": {
+  "clean": {
+   "B1_SEARCH_FAILURE": [
+    "ct-9507-blue_pad-near_pair2-find-blue_cube"
+   ],
+   "B2_GROUNDING_FAILURE": [
+    "ct-9527-blue_pad-far_behind"
+   ],
+   "B3_APPROACH_FAILURE": [],
+   "B4_ALIGNMENT_FAILURE": [],
+   "B5_DESCENT_FAILURE": [],
+   "B6_TOUCHDOWN_FAILURE": [],
+   "B7_STABLE_LANDING_FAILURE": [],
+   "B8_WRONG_TARGET": [],
+   "B9_COLLISION": [],
+   "B10_TIMEOUT": [],
+   "B11_RUNTIME_ERROR": [],
+   "B12_OTHER": []
+  },
+  "low": {
+   "B1_SEARCH_FAILURE": [
+    "ct-9507-blue_pad-near_pair2-swapped",
+    "ct-9507-blue_pad-near_pair2-find-blue_cube",
+    "ct-9518-blue_pad-mid_pair2-swapped",
+    "ct-9518-blue_pad-mid_pair2-find-blue_cube",
+    "ct-9530-red_pad-far_red_search"
+   ],
+   "B2_GROUNDING_FAILURE": [
+    "ct-9522-blue_pad-far_search",
+    "ct-9522-blue_pad-far_search-approach",
+    "ct-9528-blue_pad-far_pair2-swapped"
+   ],
+   "B3_APPROACH_FAILURE": [],
+   "B4_ALIGNMENT_FAILURE": [],
+   "B5_DESCENT_FAILURE": [],
+   "B6_TOUCHDOWN_FAILURE": [],
+   "B7_STABLE_LANDING_FAILURE": [],
+   "B8_WRONG_TARGET": [],
+   "B9_COLLISION": [],
+   "B10_TIMEOUT": [],
+   "B11_RUNTIME_ERROR": [],
+   "B12_OTHER": []
+  },
+  "medium": {
+   "B1_SEARCH_FAILURE": [
+    "ct-9507-blue_pad-near_pair2-swapped",
+    "ct-9507-blue_pad-near_pair2-find-blue_cube",
+    "ct-9518-blue_pad-mid_pair2-swapped",
+    "ct-9518-blue_pad-mid_pair2-find-blue_cube",
+    "ct-9528-blue_pad-far_pair2-swapped",
+    "ct-9530-red_pad-far_red_search"
+   ],
+   "B2_GROUNDING_FAILURE": [
+    "ct-9503-blue_pad-near_pair-swapped",
+    "ct-9515-blue_pad-mid_past",
+    "ct-9522-blue_pad-far_search",
+    "ct-9522-blue_pad-far_search-approach",
+    "ct-9527-blue_pad-far_behind",
+    "ct-9528-blue_pad-far_pair2"
+   ],
+   "B3_APPROACH_FAILURE": [
+    "ct-9516-blue_pad-mid_visible2",
+    "ct-9517-blue_pad-mid_behind"
+   ],
+   "B4_ALIGNMENT_FAILURE": [
+    "ct-9501-blue_pad-near_search",
+    "ct-9504-blue_pad-near_past",
+    "ct-9506-blue_pad-near_behind",
+    "ct-9509-red_pad-near_red_search",
+    "ct-9511-blue_pad-mid_search",
+    "ct-9512-blue_pad-mid_edge",
+    "ct-9524-blue_pad-far_pair-swapped"
+   ],
+   "B5_DESCENT_FAILURE": [
+    "ct-9521-blue_pad-far_visible"
+   ],
+   "B6_TOUCHDOWN_FAILURE": [
+    "ct-9500-blue_pad-near_visible",
+    "ct-9514-blue_pad-mid_pair"
+   ],
+   "B7_STABLE_LANDING_FAILURE": [],
+   "B8_WRONG_TARGET": [],
+   "B9_COLLISION": [],
+   "B10_TIMEOUT": [],
+   "B11_RUNTIME_ERROR": [],
+   "B12_OTHER": []
+  },
+  "high": {
+   "B1_SEARCH_FAILURE": [
+    "ct-9501-blue_pad-near_search",
+    "ct-9507-blue_pad-near_pair2-swapped",
+    "ct-9507-blue_pad-near_pair2-find-blue_cube",
+    "ct-9518-blue_pad-mid_pair2-swapped",
+    "ct-9518-blue_pad-mid_pair2-find-blue_cube",
+    "ct-9522-blue_pad-far_search",
+    "ct-9530-red_pad-far_red_search"
+   ],
+   "B2_GROUNDING_FAILURE": [
+    "ct-9504-blue_pad-near_past",
+    "ct-9505-blue_pad-near_visible2",
+    "ct-9508-red_pad-near_red_visible",
+    "ct-9514-blue_pad-mid_pair-swapped",
+    "ct-9515-blue_pad-mid_past",
+    "ct-9516-blue_pad-mid_visible2",
+    "ct-9517-blue_pad-mid_behind",
+    "ct-9522-blue_pad-far_search-approach",
+    "ct-9524-blue_pad-far_pair",
+    "ct-9525-blue_pad-far_past",
+    "ct-9527-blue_pad-far_behind",
+    "ct-9528-blue_pad-far_pair2",
+    "ct-9528-blue_pad-far_pair2-swapped"
+   ],
+   "B3_APPROACH_FAILURE": [
+    "ct-9526-blue_pad-far_visible2"
+   ],
+   "B4_ALIGNMENT_FAILURE": [
+    "ct-9502-blue_pad-near_edge",
+    "ct-9503-blue_pad-near_pair",
+    "ct-9503-blue_pad-near_pair-swapped",
+    "ct-9506-blue_pad-near_behind",
+    "ct-9509-red_pad-near_red_search",
+    "ct-9510-blue_pad-mid_visible",
+    "ct-9511-blue_pad-mid_search",
+    "ct-9512-blue_pad-mid_edge",
+    "ct-9519-red_pad-mid_red_visible",
+    "ct-9520-red_pad-mid_red_search",
+    "ct-9523-blue_pad-far_edge",
+    "ct-9524-blue_pad-far_pair-swapped",
+    "ct-9529-red_pad-far_red_visible"
+   ],
+   "B5_DESCENT_FAILURE": [
+    "ct-9500-blue_pad-near_visible",
+    "ct-9507-blue_pad-near_pair2",
+    "ct-9514-blue_pad-mid_pair",
+    "ct-9518-blue_pad-mid_pair2",
+    "ct-9521-blue_pad-far_visible"
+   ],
+   "B6_TOUCHDOWN_FAILURE": [],
+   "B7_STABLE_LANDING_FAILURE": [],
+   "B8_WRONG_TARGET": [],
+   "B9_COLLISION": [],
+   "B10_TIMEOUT": [
+    "ct-9503-blue_pad-near_pair-find-red_pad"
+   ],
+   "B11_RUNTIME_ERROR": [],
+   "B12_OTHER": []
+  }
+ },
+ "canonical_stage": {
+  "clean": {
+   "SEARCH (stopped by itself)": 1,
+   "GROUNDING (passed over)": 1
+  },
+  "low": {
+   "SEARCH (stopped by itself)": 5,
+   "GROUNDING (stopped by itself)": 2,
+   "GROUNDING (passed over)": 1
+  },
+  "medium": {
+   "DESCENT (stopped by itself)": 2,
+   "ALIGNMENT (hovered instead of landing)": 5,
+   "GROUNDING (stopped by itself)": 3,
+   "SEARCH (stopped by itself)": 6,
+   "ALIGNMENT (stopped by itself)": 2,
+   "APPROACH (stopped early)": 2,
+   "DESCENT (hovered instead of landing)": 1,
+   "GROUNDING (passed over)": 3
+  },
+  "high": {
+   "DESCENT (hovered instead of landing)": 5,
+   "SEARCH (stopped by itself)": 7,
+   "ALIGNMENT (hovered instead of landing)": 13,
+   "STOP (did not stop)": 1,
+   "GROUNDING (stopped by itself)": 12,
+   "GROUNDING (passed over)": 1,
+   "APPROACH (stopped early)": 1
+  }
+ },
+ "how_flights_ended": {
+  "clean": {
+   "landed": 35,
+   "max_steps": 1,
+   "model_stop": 12
+  },
+  "low": {
+   "landed": 31,
+   "model_stop": 17
+  },
+  "medium": {
+   "landed": 16,
+   "model_stop": 32
+  },
+  "high": {
+   "max_steps": 2,
+   "model_stop": 46
+  }
+ },
+ "apparent_size": {
+  "split_at_front_image_fraction": 0.051795,
+  "starts": {
+   "small": 22,
+   "large": 22
+  },
+  "success": {
+   "small": {
+    "clean": [
+     21,
+     22
+    ],
+    "low": [
+     16,
+     22
+    ],
+    "medium": [
+     11,
+     22
+    ],
+    "high": [
+     3,
+     22
+    ]
+   },
+   "large": {
+    "clean": [
+     22,
+     22
+    ],
+    "low": [
+     21,
+     22
+    ],
+    "medium": [
+     12,
+     22
+    ],
+    "high": [
+     4,
+     22
+    ]
+   }
+  },
+  "first_sighting_fraction_of_successes_and_failures": {
+   "clean": {
+    "success": {
+     "n": 43,
+     "mean": 0.08914069767441861,
+     "median": 0.05348,
+     "p5": 0.01352,
+     "p95": 0.35067
+    },
+    "failure": {
+     "n": 1,
+     "mean": 0.00294,
+     "median": 0.00294,
+     "p5": 0.00294,
+     "p95": 0.00294
+    }
+   },
+   "low": {
+    "success": {
+     "n": 37,
+     "mean": 0.09777810810810811,
+     "median": 0.05563,
+     "p5": 0.01155,
+     "p95": 0.35065
+    },
+    "failure": {
+     "n": 3,
+     "mean": 0.019603333333333334,
+     "median": 0.01281,
+     "p5": 0.01275,
+     "p95": 0.03325
+    }
+   },
+   "medium": {
+    "success": {
+     "n": 23,
+     "mean": 0.10730260869565217,
+     "median": 0.05823,
+     "p5": 0.01155,
+     "p95": 0.35069
+    },
+    "failure": {
+     "n": 16,
+     "mean": 0.073075,
+     "median": 0.053790000000000004,
+     "p5": 0.01195,
+     "p95": 0.35063
+    }
+   },
+   "high": {
+    "success": {
+     "n": 7,
+     "mean": 0.10107142857142858,
+     "median": 0.05877,
+     "p5": 0.02938,
+     "p95": 0.35069
+    },
+    "failure": {
+     "n": 32,
+     "mean": 0.0919709375,
+     "median": 0.053974999999999995,
+     "p5": 0.01155,
+     "p95": 0.35073
+    }
+   }
+  }
+ },
+ "image_quality": {
+  "clean": {
+   "input": {
+    "front": {
+     "laplacian_variance": {
+      "n": 3109,
+      "mean": 696.9389887633124,
+      "median": 467.05107470508665,
+      "p5": 272.6686457246542,
+      "p95": 1647.8524317496922
+     },
+     "gradient_magnitude": {
+      "n": 3109,
+      "mean": 39.39799645205096,
+      "median": 34.49391026022788,
+      "p5": 27.3367534694929,
+      "p95": 62.148292860312104
+     },
+     "local_contrast": {
+      "n": 3109,
+      "mean": 18.479317672672533,
+      "median": 17.71825742700952,
+      "p5": 14.531489404509612,
+      "p95": 24.170818401752555
+     }
+    },
+    "down": {
+     "laplacian_variance": {
+      "n": 3109,
+      "mean": 446.9492159449842,
+      "median": 3.565354502759874,
+      "p5": 3.3937637768685818,
+      "p95": 2668.4122567027807
+     },
+     "gradient_magnitude": {
+      "n": 3109,
+      "mean": 17.84316178442649,
+      "median": 3.212298490308993,
+      "p5": 2.2720197127409456,
+      "p95": 72.71376650012165
+     },
+     "local_contrast": {
+      "n": 3109,
+      "mean": 6.525261476569587,
+      "median": 1.5939092836778972,
+      "p5": 1.0100474131518231,
+      "p95": 23.76163736995897
+     }
+    }
+   },
+   "raw": {
+    "front": {
+     "laplacian_variance": {
+      "n": 3109,
+      "mean": 696.9389887633124,
+      "median": 467.05107470508665,
+      "p5": 272.6686457246542,
+      "p95": 1647.8524317496922
+     },
+     "gradient_magnitude": {
+      "n": 3109,
+      "mean": 39.39799645205096,
+      "median": 34.49391026022788,
+      "p5": 27.3367534694929,
+      "p95": 62.148292860312104
+     },
+     "local_contrast": {
+      "n": 3109,
+      "mean": 18.479317672672533,
+      "median": 17.71825742700952,
+      "p5": 14.531489404509612,
+      "p95": 24.170818401752555
+     }
+    },
+    "down": {
+     "laplacian_variance": {
+      "n": 3109,
+      "mean": 446.9492159449842,
+      "median": 3.565354502759874,
+      "p5": 3.3937637768685818,
+      "p95": 2668.4122567027807
+     },
+     "gradient_magnitude": {
+      "n": 3109,
+      "mean": 17.84316178442649,
+      "median": 3.212298490308993,
+      "p5": 2.2720197127409456,
+      "p95": 72.71376650012165
+     },
+     "local_contrast": {
+      "n": 3109,
+      "mean": 6.525261476569587,
+      "median": 1.5939092836778972,
+      "p5": 1.0100474131518231,
+      "p95": 23.76163736995897
+     }
+    }
+   }
+  },
+  "low": {
+   "input": {
+    "front": {
+     "laplacian_variance": {
+      "n": 2293,
+      "mean": 19.143939296026623,
+      "median": 17.654743775725365,
+      "p5": 13.71284008747898,
+      "p95": 29.661136284237728
+     },
+     "gradient_magnitude": {
+      "n": 2293,
+      "mean": 30.162877890059658,
+      "median": 29.137003424324867,
+      "p5": 23.35157980531333,
+      "p95": 39.77462283252829
+     },
+     "local_contrast": {
+      "n": 2293,
+      "mean": 15.818313269544433,
+      "median": 15.592720922904341,
+      "p5": 12.906294485760624,
+      "p95": 19.20381206571959
+     }
+    },
+    "down": {
+     "laplacian_variance": {
+      "n": 2293,
+      "mean": 8.029793691215914,
+      "median": 1.2662336295470595,
+      "p5": 0.8143741653766483,
+      "p95": 35.09942233469337
+     },
+     "gradient_magnitude": {
+      "n": 2293,
+      "mean": 12.746617334390379,
+      "median": 3.825054038934019,
+      "p5": 1.589747968485967,
+      "p95": 43.07472866458403
+     },
+     "local_contrast": {
+      "n": 2293,
+      "mean": 5.483214353467168,
+      "median": 2.2862595299192305,
+      "p5": 0.9462835740836031,
+      "p95": 16.706191780931075
+     }
+    }
+   },
+   "raw": {
+    "front": {
+     "laplacian_variance": {
+      "n": 2293,
+      "mean": 754.7708057721786,
+      "median": 605.1266728152987,
+      "p5": 275.04275515303016,
+      "p95": 1673.3074592417106
+     },
+     "gradient_magnitude": {
+      "n": 2293,
+      "mean": 40.92253764248978,
+      "median": 37.95314613234955,
+      "p5": 27.57231038180452,
+      "p95": 61.79514097343505
+     },
+     "local_contrast": {
+      "n": 2293,
+      "mean": 18.881297603686033,
+      "median": 18.38063019751178,
+      "p5": 14.686583889981643,
+      "p95": 24.159026569442737
+     }
+    },
+    "down": {
+     "laplacian_variance": {
+      "n": 2293,
+      "mean": 553.1290263096606,
+      "median": 6.363431537291035,
+      "p5": 3.4064546190202236,
+      "p95": 2938.04770556069
+     },
+     "gradient_magnitude": {
+      "n": 2293,
+      "mean": 21.5153683050845,
+      "median": 4.478963442438636,
+      "p5": 2.273243864984346,
+      "p95": 80.99590716446365
+     },
+     "local_contrast": {
+      "n": 2293,
+      "mean": 7.718307767410545,
+      "median": 2.427397833877671,
+      "p5": 1.010521705084578,
+      "p95": 25.795856361338526
+     }
+    }
+   }
+  },
+  "medium": {
+   "input": {
+    "front": {
+     "laplacian_variance": {
+      "n": 2213,
+      "mean": 3.711179524287981,
+      "median": 3.680756669258699,
+      "p5": 3.0763919034507126,
+      "p95": 4.451809879159555
+     },
+     "gradient_magnitude": {
+      "n": 2213,
+      "mean": 22.67186965355605,
+      "median": 22.20277673664573,
+      "p5": 18.786271777138246,
+      "p95": 27.6607712042388
+     },
+     "local_contrast": {
+      "n": 2213,
+      "mean": 12.803270143051764,
+      "median": 12.567388163558613,
+      "p5": 10.677383177917589,
+      "p95": 15.498454637289958
+     }
+    },
+    "down": {
+     "laplacian_variance": {
+      "n": 2213,
+      "mean": 1.601840425120377,
+      "median": 1.062118058791384,
+      "p5": 0.7635033742990345,
+      "p95": 3.893920060247183
+     },
+     "gradient_magnitude": {
+      "n": 2213,
+      "mean": 7.288506038248539,
+      "median": 2.5710745449980195,
+      "p5": 1.4925020358565466,
+      "p95": 22.613940092718128
+     },
+     "local_contrast": {
+      "n": 2213,
+      "mean": 3.796503218120797,
+      "median": 1.5316572736404157,
+      "p5": 0.9142634232485776,
+      "p95": 10.937265611893878
+     }
+    }
+   },
+   "raw": {
+    "front": {
+     "laplacian_variance": {
+      "n": 2213,
+      "mean": 706.8041817798936,
+      "median": 531.3359729179647,
+      "p5": 261.1227244734764,
+      "p95": 1571.8226692965254
+     },
+     "gradient_magnitude": {
+      "n": 2213,
+      "mean": 39.10655155144257,
+      "median": 35.64687250182146,
+      "p5": 27.272401209571353,
+      "p95": 58.7879591863169
+     },
+     "local_contrast": {
+      "n": 2213,
+      "mean": 18.384653818518917,
+      "median": 17.8142471369472,
+      "p5": 14.399414934900308,
+      "p95": 23.66888949500082
+     }
+    },
+    "down": {
+     "laplacian_variance": {
+      "n": 2213,
+      "mean": 554.8934593519336,
+      "median": 3.8139941988047212,
+      "p5": 3.412214814685285,
+      "p95": 3127.8115377426147
+     },
+     "gradient_magnitude": {
+      "n": 2213,
+      "mean": 19.6242907902782,
+      "median": 3.315931285860172,
+      "p5": 2.270700496787654,
+      "p95": 78.70207227856554
+     },
+     "local_contrast": {
+      "n": 2213,
+      "mean": 6.987185812055928,
+      "median": 1.671280737796632,
+      "p5": 1.0074870925229917,
+      "p95": 24.882979238723276
+     }
+    }
+   }
+  },
+  "high": {
+   "input": {
+    "front": {
+     "laplacian_variance": {
+      "n": 2472,
+      "mean": 1.6655462332237339,
+      "median": 1.661810762132518,
+      "p5": 1.4073009283747524,
+      "p95": 1.97805355489254
+     },
+     "gradient_magnitude": {
+      "n": 2472,
+      "mean": 15.310625779127408,
+      "median": 15.138812261508683,
+      "p5": 12.283365766071645,
+      "p95": 19.31434543781554
+     },
+     "local_contrast": {
+      "n": 2472,
+      "mean": 8.779701762767152,
+      "median": 8.683634457085539,
+      "p5": 7.066672603194597,
+      "p95": 11.089471612051504
+     }
+    },
+    "down": {
+     "laplacian_variance": {
+      "n": 2472,
+      "mean": 0.9721973585568611,
+      "median": 0.9750975049100816,
+      "p5": 0.7084654830396175,
+      "p95": 1.6019588178023696
+     },
+     "gradient_magnitude": {
+      "n": 2472,
+      "mean": 3.16617379429153,
+      "median": 2.166994880201197,
+      "p5": 1.4031935378554545,
+      "p95": 8.868310013316208
+     },
+     "local_contrast": {
+      "n": 2472,
+      "mean": 1.8633918967032244,
+      "median": 1.2794584155426831,
+      "p5": 0.85562779392252,
+      "p95": 5.118648253509845
+     }
+    }
+   },
+   "raw": {
+    "front": {
+     "laplacian_variance": {
+      "n": 2472,
+      "mean": 545.4703368184595,
+      "median": 414.4928957693046,
+      "p5": 219.81648348271847,
+      "p95": 1296.8837146162987
+     },
+     "gradient_magnitude": {
+      "n": 2472,
+      "mean": 34.73012984332132,
+      "median": 32.07927654103408,
+      "p5": 25.400650300102548,
+      "p95": 51.835938694815326
+     },
+     "local_contrast": {
+      "n": 2472,
+      "mean": 17.088778706139898,
+      "median": 16.653509312877432,
+      "p5": 13.306843758866327,
+      "p95": 22.611273002137608
+     }
+    },
+    "down": {
+     "laplacian_variance": {
+      "n": 2472,
+      "mean": 239.05689481620843,
+      "median": 3.5417171984445304,
+      "p5": 3.4277786219026893,
+      "p95": 1931.567563100718
+     },
+     "gradient_magnitude": {
+      "n": 2472,
+      "mean": 9.412512056428518,
+      "median": 3.1078563694371777,
+      "p5": 2.274437685358021,
+      "p95": 51.82465965281395
+     },
+     "local_contrast": {
+      "n": 2472,
+      "mean": 3.5373279568555525,
+      "median": 1.5277177721564152,
+      "p5": 1.0031591083328815,
+      "p95": 16.044869874356106
+     }
+    }
+   }
+  }
+ },
+ "latency": {
+  "clean": {
+   "blur_ms": {
+    "n": 3109,
+    "mean": 0.003503866512638381,
+    "median": 0.0030690007406519726,
+    "p5": 0.002288999894517474,
+    "p95": 0.004181999884167453
+   },
+   "inference_ms": {
+    "n": 3109,
+    "mean": 393.69923716950876,
+    "median": 390.2255430002697,
+    "p5": 374.9085230001583,
+    "p95": 421.73847400044906
+   },
+   "decision_cycle_s": {
+    "n": 3061,
+    "mean": 0.5114364527520417,
+    "median": 0.5067915680001533,
+    "p5": 0.4978503679994901,
+    "p95": 0.5378413939997699
+   }
+  },
+  "low": {
+   "blur_ms": {
+    "n": 2293,
+    "mean": 0.28645980549654954,
+    "median": 0.2582619999884628,
+    "p5": 0.22681799964630045,
+    "p95": 0.40721999994275393
+   },
+   "inference_ms": {
+    "n": 2293,
+    "mean": 392.98120149019775,
+    "median": 389.3235969999296,
+    "p5": 375.4765049998241,
+    "p95": 421.025768000618
+   },
+   "decision_cycle_s": {
+    "n": 2245,
+    "mean": 0.5108290985269477,
+    "median": 0.5058706169998004,
+    "p5": 0.49794538199967064,
+    "p95": 0.5374163380001846
+   }
+  },
+  "medium": {
+   "blur_ms": {
+    "n": 2213,
+    "mean": 0.46406216719203036,
+    "median": 0.42772699998749886,
+    "p5": 0.3873729997394548,
+    "p95": 0.6771259995730361
+   },
+   "inference_ms": {
+    "n": 2213,
+    "mean": 393.55626258697663,
+    "median": 390.01085199993213,
+    "p5": 374.4969360000141,
+    "p95": 421.5770720002183
+   },
+   "decision_cycle_s": {
+    "n": 2165,
+    "mean": 0.5120409625847573,
+    "median": 0.5070494200001576,
+    "p5": 0.4980014239999946,
+    "p95": 0.5390081719999671
+   }
+  },
+  "high": {
+   "blur_ms": {
+    "n": 2472,
+    "mean": 1.1589918871272107,
+    "median": 1.1002665000887646,
+    "p5": 0.9384510003656032,
+    "p95": 1.557702000354766
+   },
+   "inference_ms": {
+    "n": 2472,
+    "mean": 392.0734579676344,
+    "median": 388.7109789998249,
+    "p5": 374.85780699989846,
+    "p95": 418.12120899976435
+   },
+   "decision_cycle_s": {
+    "n": 2424,
+    "mean": 0.5111377636984326,
+    "median": 0.506497265500002,
+    "p5": 0.49800657700006923,
+    "p95": 0.5367389299999559
+   }
+  }
+ },
+ "input_checks": {
+  "clean": {
+   "decisions": 3109,
+   "front_input_identical_to_raw": 3109,
+   "down_input_identical_to_raw": 3109
+  },
+  "low": {
+   "decisions": 2293,
+   "front_input_identical_to_raw": 0,
+   "down_input_identical_to_raw": 0
+  },
+  "medium": {
+   "decisions": 2213,
+   "front_input_identical_to_raw": 0,
+   "down_input_identical_to_raw": 0
+  },
+  "high": {
+   "decisions": 2472,
+   "front_input_identical_to_raw": 0,
+   "down_input_identical_to_raw": 0
+  }
+ },
+ "laplacian_variance_separation_auroc": {
+  "clean vs low": {
+   "front": 1.0,
+   "down": 0.7673570407481508
+  },
+  "low vs medium": {
+   "front": 1.0,
+   "down": 0.6554980097189643
+  },
+  "medium vs high": {
+   "front": 1.0,
+   "down": 0.6968162717510679
+  }
+ },
+ "paired": {
+  "clean -> low": {
+   "S_S": 39,
+   "S_F": 7,
+   "F_S": 1,
+   "F_F": 1,
+   "mcnemar_exact_p": 0.0703125
+  },
+  "clean -> medium": {
+   "S_S": 24,
+   "S_F": 22,
+   "F_S": 0,
+   "F_F": 2,
+   "mcnemar_exact_p": 4.76837158203125e-07
+  },
+  "clean -> high": {
+   "S_S": 8,
+   "S_F": 38,
+   "F_S": 0,
+   "F_F": 2,
+   "mcnemar_exact_p": 7.275957614183426e-12
+  }
+ },
+ "onset": {
+  "NONE": [
+   "ct-9500-blue_pad-near_visible-approach",
+   "ct-9501-blue_pad-near_search-approach",
+   "ct-9510-blue_pad-mid_visible-approach",
+   "ct-9511-blue_pad-mid_search-approach",
+   "ct-9514-blue_pad-mid_pair-find-red_pad",
+   "ct-9521-blue_pad-far_visible-approach",
+   "ct-9524-blue_pad-far_pair-find-red_pad",
+   "ct-9528-blue_pad-far_pair2-find-blue_cube"
+  ],
+  "LOW": [
+   "ct-9507-blue_pad-near_pair2-swapped",
+   "ct-9518-blue_pad-mid_pair2-swapped",
+   "ct-9518-blue_pad-mid_pair2-find-blue_cube",
+   "ct-9522-blue_pad-far_search",
+   "ct-9522-blue_pad-far_search-approach",
+   "ct-9528-blue_pad-far_pair2-swapped",
+   "ct-9530-red_pad-far_red_search"
+  ],
+  "MEDIUM": [
+   "ct-9500-blue_pad-near_visible",
+   "ct-9501-blue_pad-near_search",
+   "ct-9503-blue_pad-near_pair-swapped",
+   "ct-9504-blue_pad-near_past",
+   "ct-9506-blue_pad-near_behind",
+   "ct-9509-red_pad-near_red_search",
+   "ct-9511-blue_pad-mid_search",
+   "ct-9512-blue_pad-mid_edge",
+   "ct-9514-blue_pad-mid_pair",
+   "ct-9515-blue_pad-mid_past",
+   "ct-9516-blue_pad-mid_visible2",
+   "ct-9517-blue_pad-mid_behind",
+   "ct-9521-blue_pad-far_visible",
+   "ct-9524-blue_pad-far_pair-swapped",
+   "ct-9528-blue_pad-far_pair2"
+  ],
+  "HIGH": [
+   "ct-9502-blue_pad-near_edge",
+   "ct-9503-blue_pad-near_pair",
+   "ct-9503-blue_pad-near_pair-find-red_pad",
+   "ct-9505-blue_pad-near_visible2",
+   "ct-9507-blue_pad-near_pair2",
+   "ct-9508-red_pad-near_red_visible",
+   "ct-9510-blue_pad-mid_visible",
+   "ct-9514-blue_pad-mid_pair-swapped",
+   "ct-9518-blue_pad-mid_pair2",
+   "ct-9519-red_pad-mid_red_visible",
+   "ct-9520-red_pad-mid_red_search",
+   "ct-9523-blue_pad-far_edge",
+   "ct-9524-blue_pad-far_pair",
+   "ct-9525-blue_pad-far_past",
+   "ct-9526-blue_pad-far_visible2",
+   "ct-9529-red_pad-far_red_visible"
+  ],
+  "CLEAN": [
+   "ct-9507-blue_pad-near_pair2-find-blue_cube",
+   "ct-9527-blue_pad-far_behind"
+  ]
+ },
+ "non_monotonic": [
+  "ct-9527-blue_pad-far_behind"
+ ],
+ "first_failed_stage_of_starts_clean_succeeded": {
+  "low": {
+   "B1_SEARCH_FAILURE": 4,
+   "B2_GROUNDING_FAILURE": 3,
+   "B3_APPROACH_FAILURE": 0,
+   "B4_ALIGNMENT_FAILURE": 0,
+   "B5_DESCENT_FAILURE": 0,
+   "B6_TOUCHDOWN_FAILURE": 0,
+   "B7_STABLE_LANDING_FAILURE": 0,
+   "B8_WRONG_TARGET": 0,
+   "B9_COLLISION": 0,
+   "B10_TIMEOUT": 0,
+   "B11_RUNTIME_ERROR": 0,
+   "B12_OTHER": 0
+  },
+  "medium": {
+   "B1_SEARCH_FAILURE": 5,
+   "B2_GROUNDING_FAILURE": 5,
+   "B3_APPROACH_FAILURE": 2,
+   "B4_ALIGNMENT_FAILURE": 7,
+   "B5_DESCENT_FAILURE": 1,
+   "B6_TOUCHDOWN_FAILURE": 2,
+   "B7_STABLE_LANDING_FAILURE": 0,
+   "B8_WRONG_TARGET": 0,
+   "B9_COLLISION": 0,
+   "B10_TIMEOUT": 0,
+   "B11_RUNTIME_ERROR": 0,
+   "B12_OTHER": 0
+  },
+  "high": {
+   "B1_SEARCH_FAILURE": 6,
+   "B2_GROUNDING_FAILURE": 12,
+   "B3_APPROACH_FAILURE": 1,
+   "B4_ALIGNMENT_FAILURE": 13,
+   "B5_DESCENT_FAILURE": 5,
+   "B6_TOUCHDOWN_FAILURE": 0,
+   "B7_STABLE_LANDING_FAILURE": 0,
+   "B8_WRONG_TARGET": 0,
+   "B9_COLLISION": 0,
+   "B10_TIMEOUT": 1,
+   "B11_RUNTIME_ERROR": 0,
+   "B12_OTHER": 0
+  }
+ },
+ "position_in_start": {
+  "clean": {
+   "0": [
+    12,
+    12
+   ],
+   "1": [
+    11,
+    12
+   ],
+   "2": [
+    12,
+    12
+   ],
+   "3": [
+    11,
+    12
+   ]
+  },
+  "low": {
+   "0": [
+    12,
+    12
+   ],
+   "1": [
+    8,
+    12
+   ],
+   "2": [
+    8,
+    12
+   ],
+   "3": [
+    12,
+    12
+   ]
+  },
+  "medium": {
+   "0": [
+    3,
+    12
+   ],
+   "1": [
+    8,
+    12
+   ],
+   "2": [
+    9,
+    12
+   ],
+   "3": [
+    4,
+    12
+   ]
+  },
+  "high": {
+   "0": [
+    2,
+    12
+   ],
+   "1": [
+    3,
+    12
+   ],
+   "2": [
+    2,
+    12
+   ],
+   "3": [
+    1,
+    12
+   ]
+  }
+ },
+ "clean_reproducibility": {
+  "historical": "47/48",
+  "this_run": "46/48",
+  "same_outcome": 47,
+  "succeeded_before_failed_now": [
+   "ct-9527-blue_pad-far_behind"
+  ],
+  "failed_before_succeeded_now": []
+ },
+ "repeat": {
+  "starts": [
+   "ct-9507-blue_pad-near_pair2",
+   "ct-9521-blue_pad-far_visible-approach",
+   "ct-9522-blue_pad-far_search-approach",
+   "ct-9508-red_pad-near_red_visible",
+   "ct-9502-blue_pad-near_edge",
+   "ct-9503-blue_pad-near_pair-swapped",
+   "ct-9511-blue_pad-mid_search",
+   "ct-9524-blue_pad-far_pair-swapped",
+   "ct-9529-red_pad-far_red_visible",
+   "ct-9503-blue_pad-near_pair",
+   "ct-9505-blue_pad-near_visible2",
+   "ct-9500-blue_pad-near_visible-approach"
+  ],
+  "by_condition": {
+   "clean": {
+    "starts": 12,
+    "2/2": 12,
+    "1/2": 0,
+    "0/2": 0,
+    "flights_succeeded": 24,
+    "flights": 24
+   },
+   "low": {
+    "starts": 12,
+    "2/2": 11,
+    "1/2": 0,
+    "0/2": 1,
+    "flights_succeeded": 22,
+    "flights": 24
+   },
+   "medium": {
+    "starts": 12,
+    "2/2": 7,
+    "1/2": 1,
+    "0/2": 4,
+    "flights_succeeded": 15,
+    "flights": 24
+   },
+   "high": {
+    "starts": 12,
+    "2/2": 2,
+    "1/2": 0,
+    "0/2": 10,
+    "flights_succeeded": 4,
+    "flights": 24
+   }
+  },
+  "by_start": {
+   "ct-9507-blue_pad-near_pair2": {
+    "clean": "2/2",
+    "low": "2/2",
+    "medium": "2/2",
+    "high": "0/2"
+   },
+   "ct-9521-blue_pad-far_visible-approach": {
+    "clean": "2/2",
+    "low": "2/2",
+    "medium": "2/2",
+    "high": "2/2"
+   },
+   "ct-9522-blue_pad-far_search-approach": {
+    "clean": "2/2",
+    "low": "0/2",
+    "medium": "0/2",
+    "high": "0/2"
+   },
+   "ct-9508-red_pad-near_red_visible": {
+    "clean": "2/2",
+    "low": "2/2",
+    "medium": "2/2",
+    "high": "0/2"
+   },
+   "ct-9502-blue_pad-near_edge": {
+    "clean": "2/2",
+    "low": "2/2",
+    "medium": "2/2",
+    "high": "0/2"
+   },
+   "ct-9503-blue_pad-near_pair-swapped": {
+    "clean": "2/2",
+    "low": "2/2",
+    "medium": "0/2",
+    "high": "0/2"
+   },
+   "ct-9511-blue_pad-mid_search": {
+    "clean": "2/2",
+    "low": "2/2",
+    "medium": "0/2",
+    "high": "0/2"
+   },
+   "ct-9524-blue_pad-far_pair-swapped": {
+    "clean": "2/2",
+    "low": "2/2",
+    "medium": "0/2",
+    "high": "0/2"
+   },
+   "ct-9529-red_pad-far_red_visible": {
+    "clean": "2/2",
+    "low": "2/2",
+    "medium": "2/2",
+    "high": "0/2"
+   },
+   "ct-9503-blue_pad-near_pair": {
+    "clean": "2/2",
+    "low": "2/2",
+    "medium": "1/2",
+    "high": "0/2"
+   },
+   "ct-9505-blue_pad-near_visible2": {
+    "clean": "2/2",
+    "low": "2/2",
+    "medium": "2/2",
+    "high": "0/2"
+   },
+   "ct-9500-blue_pad-near_visible-approach": {
+    "clean": "2/2",
+    "low": "2/2",
+    "medium": "2/2",
+    "high": "2/2"
+   }
+  },
+  "second_flight": {
+   "clean": {
+    "mission_success": [
+     12,
+     12
+    ],
+    "acquisition": [
+     12,
+     12
+    ],
+    "correct_grounding": [
+     11,
+     12
+    ],
+    "ended_at_named_object": [
+     12,
+     12
+    ],
+    "wrong_target": [
+     0,
+     12
+    ],
+    "approach": [
+     12,
+     12
+    ],
+    "alignment": [
+     8,
+     9
+    ],
+    "descent": [
+     9,
+     9
+    ],
+    "touchdown": [
+     9,
+     9
+    ],
+    "stable_landing": [
+     9,
+     9
+    ],
+    "system_landing": [
+     9,
+     9
+    ],
+    "strict_zero_action": [
+     9,
+     9
+    ],
+    "end_as_the_sentence_asked": [
+     12,
+     12
+    ],
+    "collision": [
+     0,
+     12
+    ],
+    "timeout": [
+     0,
+     12
+    ]
+   },
+   "low": {
+    "mission_success": [
+     11,
+     12
+    ],
+    "acquisition": [
+     12,
+     12
+    ],
+    "correct_grounding": [
+     10,
+     12
+    ],
+    "ended_at_named_object": [
+     11,
+     12
+    ],
+    "wrong_target": [
+     0,
+     12
+    ],
+    "approach": [
+     11,
+     12
+    ],
+    "alignment": [
+     5,
+     9
+    ],
+    "descent": [
+     9,
+     9
+    ],
+    "touchdown": [
+     9,
+     9
+    ],
+    "stable_landing": [
+     9,
+     9
+    ],
+    "system_landing": [
+     9,
+     9
+    ],
+    "strict_zero_action": [
+     9,
+     9
+    ],
+    "end_as_the_sentence_asked": [
+     12,
+     12
+    ],
+    "collision": [
+     0,
+     12
+    ],
+    "timeout": [
+     0,
+     12
+    ]
+   },
+   "medium": {
+    "mission_success": [
+     7,
+     12
+    ],
+    "acquisition": [
+     12,
+     12
+    ],
+    "correct_grounding": [
+     11,
+     12
+    ],
+    "ended_at_named_object": [
+     11,
+     12
+    ],
+    "wrong_target": [
+     0,
+     12
+    ],
+    "approach": [
+     11,
+     12
+    ],
+    "alignment": [
+     5,
+     9
+    ],
+    "descent": [
+     5,
+     9
+    ],
+    "touchdown": [
+     5,
+     9
+    ],
+    "stable_landing": [
+     5,
+     9
+    ],
+    "system_landing": [
+     5,
+     9
+    ],
+    "strict_zero_action": [
+     5,
+     9
+    ],
+    "end_as_the_sentence_asked": [
+     8,
+     12
+    ],
+    "collision": [
+     0,
+     12
+    ],
+    "timeout": [
+     0,
+     12
+    ]
+   },
+   "high": {
+    "mission_success": [
+     2,
+     12
+    ],
+    "acquisition": [
+     12,
+     12
+    ],
+    "correct_grounding": [
+     7,
+     12
+    ],
+    "ended_at_named_object": [
+     8,
+     12
+    ],
+    "wrong_target": [
+     0,
+     12
+    ],
+    "approach": [
+     10,
+     12
+    ],
+    "alignment": [
+     1,
+     9
+    ],
+    "descent": [
+     0,
+     9
+    ],
+    "touchdown": [
+     0,
+     9
+    ],
+    "stable_landing": [
+     0,
+     9
+    ],
+    "system_landing": [
+     0,
+     9
+    ],
+    "strict_zero_action": [
+     0,
+     9
+    ],
+    "end_as_the_sentence_asked": [
+     2,
+     12
+    ],
+    "collision": [
+     0,
+     12
+    ],
+    "timeout": [
+     1,
+     12
+    ]
+   }
+  },
+  "agreement": {
+   "clean": 12,
+   "low": 12,
+   "medium": 11,
+   "high": 12
+  }
+ },
+ "runtime": {
+  "attempts": 242,
+  "harness_errors": [
+   {
+    "phase": "main",
+    "start": "ct-9517-blue_pad-mid_behind",
+    "condition": "low",
+    "attempt": 1,
+    "outcome": "runtime_error",
+    "error": "pynng.exceptions.Closed: Object closed",
+    "recorded_as": null
+   },
+   {
+    "phase": "main",
+    "start": "ct-9517-blue_pad-mid_behind",
+    "condition": "clean",
+    "attempt": null,
+    "outcome": "set_aside_as_runtime_error",
+    "error": "the simulator did not answer the disarm call (connection lost at the end of the flight; the next flight raised Object closed and the simulator was restarted)",
+    "recorded_as": {
+     "success": false,
+     "reason": "landed",
+     "steps": 68,
+     "landed_on": "blue_pad",
+     "stable_physical_landing": true,
+     "system_land_success": false
+    }
+   }
+  ],
+  "flights_never_completed": []
+ }
+}

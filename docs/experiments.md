@@ -229,3 +229,23 @@ step마다 멈추는 대신 도착 2초 전에 다음 판단을 시작해 명령
 - **기존 데모:** `run_mission_demo.ps1`은 그대로 동작(실행해 확인).
 - **Tests:** Python 291/291, PowerShell 4/4.
 - **하지 않은 것:** 재학습, canonical 검증·test 재실행, Depot 156, Blur 평가.
+
+## Gaussian Blur robustness characterization — 2026-10-10
+
+브랜치 `exp/failure-gaussian-blur-characterization`. 상세: [Gaussian Blur Robustness Characterization](failure_gaussian_blur.md). 표: `outputs/failures/gaussian_blur/summary/`. **측정만 했다.** 학습, 감지, 복구는 없다. 동결 지문은 launch 전후 8번 모두 그대로.
+
+- **조건:** 정책이 받는 Front·Down RGB에 Gaussian Blur. Clean / Low 7×7 σ1.5 / Medium 15×15 σ3.0 / High 31×31 σ6.0. 비행 전에 config와 repeat subset을 commit(`90a1850`).
+- **비행:** canonical test의 48개 시작 × 4조건 = 192회(시작마다 조건 순서를 다르게, 각 조건이 1–4번째로 12번씩), 계획만 보고 고른 12개 시작을 한 번 더 48회. 비행은 canonical `run_episode` 그대로이고 `BlurEnv.observe`가 frame 둘만 바꾼다. Ground truth, finalizer, evaluator는 blur 전의 장면을 읽는다.
+- **확인:** clean 3,109 decision 모두 raw = model input, blur 조건 6,978 decision 모두 raw ≠ model input. 정책이 받은 배열과 기록된 hash가 모든 decision에서 일치.
+- **Mission success:** 46 / 40 / 24 / 8 (of 48). 착륙 35 / 31 / 15 / 0 (of 36), 접근 11 / 9 / 9 / 8 (of 12). 충돌 0, wrong target 1 / 2 / 2 / 2.
+- **실패 방식:** 정책이 공중에서 스스로 정지 행동을 낸다. 성공이 아닌 정지 1 / 8 / 24 / 38. High의 착륙 36회는 전부 공중 정지(15회는 pad 바로 위)이고 하강을 시작한 비행이 없다.
+- **단계:** Low는 search·grounding만(Lot 장면의 목표가 첫 화면에 없는 시작 18 → 11), 착륙은 그대로. Medium부터 착륙이 가장 큰 몫(pad 위에 간 것 중 하강 시작 19/25, high 0/17).
+- **거리:** 세 구간이 거의 같다(15/14/8/2, 16/14/8/3, 15/12/8/3).
+- **Paired:** clean 대비 잃은 시작 7 / 22 / 38, 얻은 시작 1 / 0 / 0. Repeat은 48쌍 중 47쌍이 같은 결과.
+- **Clean 재현:** 예전 47/48, 이번 46/48, 47개 시작이 같은 결과.
+- **선명도(분석 전용):** Front의 Laplacian variance 중앙값 467 / 17.7 / 3.7 / 1.7로 네 조건이 겹치지 않는다. Down은 겹친다.
+- **지연:** blur 처리 1.1ms 이하, decision 주기 0.511초로 네 조건 같음.
+- **Runtime:** simulator 연결이 한 번 끊겨 두 비행을 다시 비행(하나는 자동, 하나는 disarm 응답이 없던 clean 비행을 기록을 남기고 따로 뺀 뒤). Simulator 창은 띄우고 비행(세션이 끊긴 상태에서 숨긴 simulator가 멈춤).
+- **Interactive:** `run_grounding_film_mission_demo.ps1`의 B, 1/2/3이 같은 주입기를 쓰고 화면에 강도·kernel·sigma를 표시. 정성 확인 두 세션에서 clean·low 착륙, medium은 pad 위 정지, high는 26–28m 앞 정지.
+- **Tests:** Python 309/309, PowerShell 4/4.
+- **다음:** Front만 / Down만 blur하는 ablation, 그다음 detector와 recovery. 이 48개 시작은 더 이상 held-out이 아니므로 recovery는 새 시작에서 평가한다.

@@ -1,0 +1,8 @@
+{"phase":"main","utc":"2026-10-10T10:48:45.1530043Z","when":"before launch 1","result":{"files":30,"changed":[],"missing":[],"added":[]},"passed":true}
+{"phase":"main","utc":"2026-10-10T11:50:16.9958428Z","when":"after launch 1","result":{"files":30,"changed":[],"missing":[],"added":[]},"passed":true}
+{"phase":"main","utc":"2026-10-10T11:50:17.3517684Z","when":"before launch 2","result":{"files":30,"changed":[],"missing":[],"added":[]},"passed":true}
+{"phase":"main","utc":"2026-10-10T12:48:15.0545292Z","when":"after launch 2","result":{"files":30,"changed":[],"missing":[],"added":[]},"passed":true}
+{"phase":"repeat","utc":"2026-10-10T12:48:33.1582796Z","when":"before launch 1","result":{"files":30,"changed":[],"missing":[],"added":[]},"passed":true}
+{"phase":"repeat","utc":"2026-10-10T13:18:11.8658511Z","when":"after launch 1","result":{"files":30,"changed":[],"missing":[],"added":[]},"passed":true}
+{"phase":"main","utc":"2026-10-10T13:18:31.4304338Z","when":"before launch 1","result":{"files":30,"changed":[],"missing":[],"added":[]},"passed":true}
+{"phase":"main","utc":"2026-10-10T13:19:56.9992433Z","when":"after launch 1","result":{"files":30,"changed":[],"missing":[],"added":[]},"passed":true}

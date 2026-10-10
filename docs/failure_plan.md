@@ -1,5 +1,7 @@
 # Failure 기능 개발 계획
 
+> 2026-10-10: Gaussian Blur가 동결한 AeroVLA-OFT baseline을 어디서 얼마나 무너뜨리는지 측정했다 — [Gaussian Blur Robustness Characterization](failure_gaussian_blur.md). 감지와 복구는 아직 없다. 아래 표는 그 전의 계획이다.
+
 목표는 simulator를 보면서 장애를 직접 켜고 드론 반응을 관찰하는 재미있는 텀프로젝트다. **Gaussian Blur는 실제 AeroVLA 입력에 연결해 구현했다.** 나머지는 개발 후보이며 자동 감지·복구는 아직 없다. 기존 model-free blur/drift prototype와 새 live input injection은 구별한다. [실행 안내](gaussian_blur_demo.md).
 
 ## Visual failures
