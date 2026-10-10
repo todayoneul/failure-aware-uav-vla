@@ -1,7 +1,7 @@
 {
   "id": "blocks",
   "name": "Blocks (Mission Control)",
-  "description": "The interactive Mission Control map with objects an AeroVLA-OFT sentence can name. The map is Project AirSim Blocks as shipped, with its own blue cone and orange ball; the pads, the cubes and the cylinder are the shared catalogue's objects (configs/targets/objects.json), added at run time on open ground. No terrain, building or wall is added or moved. Blocks is one of the scenes the model was trained in; this arrangement of objects is new. Read by src/visual_search/maps.load_map like the maps under configs/maps/, and kept outside that folder because it belongs to a demonstration, not to an evaluation.",
+  "description": "The interactive Mission Control map with objects an AeroVLA-OFT sentence can name. The map is Project AirSim Blocks as shipped, with its own blue cone and orange ball; the pads, the cubes and the cylinder are the shared catalogue's objects (configs/targets/objects.json), added at run time on open ground. No terrain, building or wall is added or moved; the one structure of this file is a flat plate on the orange ball, and it exists only in the layout `mission_cap`. Blocks is one of the scenes the model was trained in; this arrangement of objects is new. Read by src/visual_search/maps.load_map like the maps under configs/maps/, and kept outside that folder because it belongs to a demonstration, not to an evaluation.",
   "scene": "scene_basic_drone.jsonc",
   "obstacles": "../maps/blocks.obstacles.json",
   "catalogue": "../targets/objects.json",
@@ -9,13 +9,30 @@
   "area": {"x": [-38.0, 118.0], "y": [-118.0, 114.0]},
   "altitude": {"start_m": [5.0, 9.0], "ceiling_m": 14.0},
   "lighting": null,
-  "structures": [],
+  "structures": [
+    {"name": "OrangeBallCap", "shape": "cylinder", "size_m": [6.0, 6.0, 1.2], "position": [91.15, 32.1], "color": [0.95, 0.95, 0.95], "lift_m": 8.7,
+     "layouts": ["mission_cap"], "obstacle": false,
+     "note": "A flat round plate on the map's own orange ball, in the layout `mission_cap` only. The ball is 10 m across and its top is 9.7 m above the ground; 3 m from its axis its surface lies 1.0 m below the top, so a plate of 3 m radius standing from 8.7 m to 9.9 m rests on the ball all round and has a flat top 0.2 m above it. Not an obstacle of its own: it stands inside the ball's footprint."}
+  ],
+  "landing_caps": {
+    "description": "Objects given a flat top they do not have by themselves (configs/landing/surfaces.json, `cap`): layout -> object -> the structure that is the plate. Only in `mission_cap`; in `mission` the orange ball is a sphere and nothing can land on it.",
+    "mission_cap": {"orange_ball": "OrangeBallCap"}
+  },
   "objects": {
     "blue_cone": {"noun": "the blue cone", "native": "Cone_5", "size_m": [10.0, 10.0, 10.0], "attributes": {"color": "blue", "shape": "cone"}},
     "orange_ball": {"noun": "the orange ball", "native": "OrangeBall", "size_m": [10.0, 10.0, 9.7], "attributes": {"color": "orange", "shape": "ball"}}
   },
   "layouts": {
     "mission": {
+      "blue_pad": [10.0, 92.0],
+      "red_pad": [50.0, 92.0],
+      "blue_cube": [2.0, 66.0],
+      "red_cube": [58.0, 66.0],
+      "blue_cone": "native",
+      "green_cylinder": [55.0, 30.0],
+      "orange_ball": "native"
+    },
+    "mission_cap": {
       "blue_pad": [10.0, 92.0],
       "red_pad": [50.0, 92.0],
       "blue_cube": [2.0, 66.0],
@@ -38,6 +55,11 @@
       {"id": "plaza", "name": "South plaza", "xy": [60.0, -36.0], "yaw_deg": 0.0,
        "note": "The map's own blue cone straight ahead, between the grey blocks."}
     ],
-    "click_margin_m": 1.0
+    "click_margin_m": 1.0,
+    "start": {
+      "description": "A start placed by the user (S on the map, or -StartX / -StartY / -StartYaw / -StartHeight of the launcher) instead of a preset launch. It is flown exactly as a preset is: the scene is loaded with the vehicle at that place and heading, and it climbs to that height (src/mission/start.py). The rule a start has to meet takes every number from where it already exists and none is written here: clearance from every obstacle and object as a planned evaluation start keeps it (configs/visual_search.json, generalization.start_margin_m), a height between the executor's floor (configs/flight_limits.json, minimum_clearance_m) and the map's ceiling (altitude.ceiling_m above), on open ground inside the map's area. A preset or a start without a height starts at the evaluation's cruise height (configs/visual_search.json, cruise_height_m). The two steps below are how far one key press moves the height and the heading.",
+      "height_step_m": 1.0,
+      "yaw_step_deg": 15.0
+    }
   }
 }

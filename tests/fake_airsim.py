@@ -10,7 +10,7 @@ import math
 from pathlib import Path
 import numpy as np
 from scipy.spatial.transform import Rotation
-from src.visual_search.maps import MapGeometry
+from src.visual_search.maps import MapGeometry,structures
 
 REST=.19
 TICK=.5
@@ -21,6 +21,16 @@ class FakeSim:
         self.map=map_config;self.geometry=MapGeometry(map_config,layout);self.ground=map_config['ground_z']
         self.stamp=1_000_000;self.callbacks={};self.calls=[];self.spawned=[];self.loads=0;self.captures=0
         self.x=self.y=0.;self.z=self.ground-REST;self.yaw=0.;self.velocity=[0.,0.,0.];self.held=False
+        # What can be touched: every object of the layout, and every added structure (a plate standing on an object is one).
+        # A cylinder is round; everything else is its bounding box.
+        self.solids=[]
+        for target,item in self.geometry.objects.items():
+            spec=map_config['objects'][target]
+            self.solids.append({'name':spec.get('object') or spec.get('native'),'centre':item['centre'],'size':item['size_m'][:2],'top':item['size_m'][2],
+                                'round':spec.get('shape')=='cylinder'})
+        for item in structures(map_config,layout):
+            self.solids.append({'name':item['name'],'centre':item['position'],'size':item['size_m'][:2],'top':item.get('lift_m',0.)+item['size_m'][2],
+                                'round':item['shape']=='cylinder'})
 
     def now(self):
         self.stamp+=1_000_000;return self.stamp
@@ -30,13 +40,13 @@ class FakeSim:
         self.yaw=math.radians(float(origin['rpy-deg'].split()[2]));self.velocity=[0.,0.,0.];self.held=False;self.loads+=1
 
     def objects_at(self,x,y):
-        """(simulator name, top z) of every object whose footprint holds a point."""
+        """(simulator name, top z) of everything whose footprint holds a point, the highest first."""
         found=[]
-        for target,item in self.geometry.objects.items():
-            (cx,cy),(sx,sy,height)=item['centre'],item['size_m']
-            if abs(x-cx)<=sx/2 and abs(y-cy)<=sy/2:
-                spec=self.map['objects'][target];found.append((spec.get('object') or spec.get('native'),self.ground-height))
-        return found
+        for item in self.solids:
+            (cx,cy),(sx,sy)=item['centre'],item['size']
+            inside=math.hypot(x-cx,y-cy)<=sx/2 if item['round'] else abs(x-cx)<=sx/2 and abs(y-cy)<=sy/2
+            if inside:found.append((item['name'],self.ground-item['top']))
+        return sorted(found,key=lambda entry:entry[1])
 
     def contact(self,name):
         self.held=True;self.velocity=[0.,0.,0.]
@@ -142,4 +152,19 @@ def fly_to(sim,point,descend=False,stop=True,yaw_max=.21,arrive_m=12.):
             return [0.,.25,0.]
         if distance>arrive_m:return [min(1.,distance-arrive_m+.05),0.,0.]
         return [0.,0.,0.] if stop else [0.,0.,yaw_max]
+    return script
+
+
+def land_on(sim,point,top_m,yaw_max=.21,descend=True):
+    """A script that climbs above a surface `top_m` above the ground, flies over a point and comes down on it (or, with
+    `descend` off, stops in the air over it). Like `fly_to`, it reads the fake vehicle's own state."""
+    def script(_):
+        height=sim.ground-REST-sim.z;dx,dy=point[0]-sim.x,point[1]-sim.y;distance=math.hypot(dx,dy)
+        if sim.held:return [0.,0.,0.]
+        if distance>.1:
+            if height<top_m+2.75:return [0.,-min(.5,top_m+3.-height),0.]
+            turn=math.atan2(math.sin(math.atan2(dy,dx)-sim.yaw),math.cos(math.atan2(dy,dx)-sim.yaw))
+            if abs(turn)>.02:return [0.,0.,max(-yaw_max,min(yaw_max,turn))]
+            return [max(.1,min(1.,distance)),0.,0.]
+        return [0.,.25,0.] if descend else [0.,0.,0.]
     return script

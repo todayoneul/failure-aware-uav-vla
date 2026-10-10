@@ -38,6 +38,11 @@
 !/outputs/failures/gaussian_blur/summary/
 !/outputs/failures/gaussian_blur/examples/
 !/outputs/failures/gaussian_blur/config/
+# Arbitrary start and landing surfaces: the checks' records and small pictures (the flights themselves stay local).
+!/outputs/arbitrary_start/
+/outputs/arbitrary_start/*
+!/outputs/arbitrary_start/summary/
+!/outputs/arbitrary_start/examples/
 
 # Downloaded simulator, datasets and model weights.
 /assets/

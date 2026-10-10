@@ -14,7 +14,7 @@ import numpy as np
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
 from scripts.blur_demo_viewer import read_input_pair
 from src.failures.control import read_control,write_control
-from src.mission.control import mission_key,request_selection
+from src.mission.control import mission_key,request_selection,request_start_pose,ARROWS
 from src.mission.geometry import world_to_pixel
 
 OUT=ROOT/'outputs/mission_demo';WINDOW='MISSION CONTROL | Map target + AeroVLA'
@@ -180,9 +180,10 @@ def main(output=None):
     control=read_control(OUT/'control.json');telemetry={};packet=None;map_image=None;images={};saved=set();last_export=0
     # An AeroVLA-OFT policy has its own canvas: what the model is given, apart from what only the evaluator knows.
     grounding=control.get('policy')=='grounding-film';overlay=False;chase_stamp=None;buttons=MISSION_BUTTONS+VIEW_BUTTONS+BLUR_BUTTONS;window=WINDOW
+    drag=None
     if grounding:
         import scripts.grounding_mission_view as view
-        buttons=view.BUTTONS;window=view.WINDOW
+        buttons=view.BUTTONS;window=view.WINDOW;drag=view.StartDrag()
     cv2.namedWindow(window,cv2.WINDOW_NORMAL);cv2.resizeWindow(window,1332,936);cv2.moveWindow(window,20,20)
     def send(key):
         nonlocal control,overlay
@@ -191,6 +192,19 @@ def main(output=None):
         log_control('mission viewer key/button',{'key':key,'request_id':control.get('mission_request_id')})
     def mouse(event,x,y,*_):
         nonlocal control
+        if grounding and control.get('start_mode') and packet is not None and control.get('main_view')!='chase':
+            # A start is being placed: the map takes the press, the drag and the release; the buttons work as ever.
+            pixel=map_pixel(x,y,packet['camera']);left,top,width,height=MAP_RECT;iw,ih=view.INSET
+            if pixel is not None and x<left+iw+8 and y>=top+height-ih-8:pixel=None
+            if event==cv2.EVENT_LBUTTONDOWN and pixel is not None:drag.press(pixel);return
+            if event==cv2.EVENT_MOUSEMOVE:drag.move(pixel);return
+            if event==cv2.EVENT_LBUTTONUP:
+                gesture=drag.release(pixel)
+                if gesture:
+                    control=request_start_pose(read_control(OUT/'control.json'),packet['frame_id'],*gesture);write_control(OUT/'control.json',control)
+                    log_control('mission viewer start placement',{'frame_id':packet['frame_id'],'pixel':gesture[0],'heading_pixel':gesture[1],
+                                                                  'request_id':control.get('mission_request_id')})
+                return
         if event!=cv2.EVENT_LBUTTONDOWN:return
         if packet is not None and not (grounding and control.get('main_view')=='chase'):
             pixel=map_pixel(x,y,packet['camera'])
@@ -232,7 +246,7 @@ def main(output=None):
             images['visibility']=(telemetry.get('preview_visibility') if preview else telemetry.get('target_visibility') if telemetry.get('visibility_step')==telemetry.get('input_step') else None) or {}
             if map_image is not None:
                 images['chase']=render_map(map_image,packet,telemetry)
-                if grounding:view.annotate_map(images['chase'],packet,telemetry)
+                if grounding:view.annotate_map(images['chase'],packet,telemetry,drag.preview() if control.get('start_mode') else None)
             canvas=view.render(telemetry,control,images,overlay) if grounding else render_canvas(telemetry,control,images)
             cv2.imshow(window,canvas)
             if map_image is not None and time.monotonic()-last_export>1:
@@ -241,7 +255,10 @@ def main(output=None):
             label={'TARGET_SELECTED':'target_selected','NAVIGATING':'navigating','SUCCESS':'mission_success','FAILED':'mission_failed'}.get(status)
             if label and label not in saved and map_image is not None:
                 cv2.imwrite(str(OUT/f'{label}.png'),canvas);saved.add(label)
-            key=cv2.waitKey(40)&0xff
+            if grounding:
+                # The arrow keys pan the map (S places a start for this policy); they arrive as codes of more than one byte.
+                code=cv2.waitKeyEx(40);key=code if code in ARROWS else 255 if code==-1 else code&0xff
+            else:key=cv2.waitKey(40)&0xff
             if key!=255:send(key)
             if cv2.getWindowProperty(window,cv2.WND_PROP_VISIBLE)<1:send(ord('q'))
     finally:cv2.destroyAllWindows()

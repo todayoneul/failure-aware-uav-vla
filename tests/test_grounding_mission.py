@@ -32,7 +32,10 @@ class DemoSceneTests(unittest.TestCase):
             for key in ('object_id','noun','color','shape','position','landable'):self.assertIsNotNone(item[key],(item['object_id'],key))
             self.assertEqual(item['noun'],catalogue[item['object_id']]['noun'])
             self.assertEqual((item['color'],item['shape']),tuple(catalogue[item['object_id']]['attributes'].values()))
-        self.assertEqual([item['object_id'] for item in targets if item['landable']],['blue_pad','red_pad'])
+        # What may be landed on is what has a landing surface: the pads, the cubes and the cylinder; not the cone or the ball.
+        self.assertEqual([item['object_id'] for item in targets if item['landable']],['blue_pad','red_pad','blue_cube','red_cube','green_cylinder'])
+        self.assertEqual({item['object_id']:item['surface']['surface'] for item in targets},
+                         {'blue_pad':'rectangle','red_pad':'rectangle','blue_cube':'rectangle','red_cube':'rectangle','blue_cone':'none','green_cylinder':'circle','orange_ball':'none'})
         # Objects added to the map are the catalogue's own: same size, same colour, same shape.
         for name,spec in scene['objects'].items():
             if 'native' not in spec:self.assertEqual(spec,catalogue[name])
@@ -41,7 +44,10 @@ class DemoSceneTests(unittest.TestCase):
     def test_nothing_is_added_to_the_map_but_objects_on_open_ground(self):
         from src.visual_search.maps import MapGeometry,scene_objects
         config,scene,targets=demo();geometry=MapGeometry(scene,'mission')
-        self.assertEqual(scene['structures'],[]);self.assertIsNone(scene['lighting'])
+        from src.visual_search.maps import structures
+        # (The one structure of the map file is the plate on the orange ball, and it belongs to the layout `mission_cap` alone.)
+        self.assertEqual(structures(scene,'mission'),[]);self.assertEqual([item['name'] for item in structures(scene,'mission_cap')],['OrangeBallCap'])
+        self.assertIsNone(scene['lighting'])
         blocks=[box for box in geometry.boxes if box['name'] not in geometry.objects]
         for item in targets:
             if item['native']:continue
@@ -107,12 +113,17 @@ class SentenceTests(unittest.TestCase):
                 # The sentence alone says whether the finalizer is armed.
                 self.assertEqual(landing_requested(text),task=='land',text)
 
-    def test_a_landing_on_something_that_is_not_a_pad_and_a_target_that_is_not_an_object_are_refused(self):
+    def test_a_landing_on_something_without_a_landing_surface_and_a_target_that_is_not_an_object_are_refused(self):
         from src.mission import semantic
         config,scene,targets=demo();by={item['object_id']:item for item in targets}
-        self.assertEqual(semantic.refusal(by['blue_cube'],'land'),'Selected object is not landable. Use APPROACH or select a landing pad.')
-        with self.assertRaisesRegex(ValueError,'not landable'):semantic.check_start(by['blue_cube'],'land')
-        self.assertIsNone(semantic.refusal(by['blue_cube'],'approach'));self.assertIsNone(semantic.refusal(by['blue_pad'],'land'))
+        for name in ('orange_ball','blue_cone'):
+            self.assertEqual(semantic.refusal(by[name],'land'),'Selected object has no valid landing surface. Use APPROACH.')
+            with self.assertRaisesRegex(ValueError,'no valid landing surface'):semantic.check_start(by[name],'land')
+            self.assertIsNone(semantic.refusal(by[name],'approach'))
+        for name in ('blue_pad','blue_cube','green_cylinder'):self.assertIsNone(semantic.refusal(by[name],'land'))
+        self.assertEqual(semantic.sentence(config,scene,by['blue_cube'],'land'),'Find the blue cube and land on it.')
+        self.assertEqual(semantic.sentence(config,scene,by['green_cylinder'],'land'),'Find the green cylinder and land on it.')
+        self.assertEqual(semantic.sentence(config,scene,by['orange_ball'],'approach'),'Approach the orange ball.')
         self.assertEqual(semantic.refusal(None,'land'),'grounding_film requires a semantic object target. Select a configured landmark/object.')
         with self.assertRaisesRegex(ValueError,'semantic object target'):semantic.check_start(None,'approach')
 
@@ -223,17 +234,20 @@ class FeedTests(unittest.TestCase):
 
 class Flight:
     """One mission of the interactive runner's own parts over the fake simulator: MissionEnv, WatchedPolicy, the canonical loop."""
-    def __init__(self,directory,blur=False):
+    def __init__(self,directory,blur=False,launch=None,layout='mission'):
         from src.failures.control import write_control
         from src.mission import oft_runner
         from src.mission.control import default_mission_control,mission_key
         from src.mission.feed import Feed
         from tests.fake_airsim import FakeSim,FakeClient
-        self.runner=oft_runner;self.config,self.scene,self.targets=demo();self.by={item['object_id']:item for item in self.targets}
+        from src.mission import semantic
+        self.runner=oft_runner;self.config,self.scene,self.targets=demo();self.launch=launch
+        if layout!='mission':self.scene['mission']['layout']=layout;self.targets=semantic.semantic_targets(self.scene)
+        self.by={item['object_id']:item for item in self.targets}
         self.oft=json.loads((ROOT/'configs/aerovla_oft.json').read_text(encoding='utf-8'))
         self.output=Path(directory);control=default_mission_control('grounding-film')
         write_control(self.output/'control.json',mission_key(control,ord('b')) if blur else control)
-        self.sim=FakeSim(self.scene,'mission');self.feed=Feed(self.output);self.watch=oft_runner.Watch(self.feed,320)
+        self.sim=FakeSim(self.scene,layout);self.feed=Feed(self.output);self.watch=oft_runner.Watch(self.feed,320)
         self.env=oft_runner.MissionEnv(FakeClient(self.sim),self.config,self.oft,self.output,self.watch)
 
     async def fly(self,target,task,script,told=None):
@@ -241,7 +255,8 @@ class Flight:
         from tests.fake_airsim import ScriptedModel,world_class,drone_class
         import scripts.visual_search as canonical
         named=self.by[told or target];text=semantic.sentence(self.config,self.scene,named,task);launch=self.scene['mission']['launches'][0]
-        episode=semantic.mission_episode(semantic.DEMO,self.scene,named,task,text,launch,1,320)
+        launch=self.launch or launch
+        episode=semantic.mission_episode(semantic.DEMO,self.scene,named,task,text,launch,1,320,self.config['cruise_height_m'])
         self.model=ScriptedModel(script(self.sim) if callable(script) else script,self.oft);self.text=text;self.finalizers=[]
         async def no_wait(_):return None
         clock=types.SimpleNamespace(sleep=no_wait,wait_for=asyncio.wait_for)
@@ -253,6 +268,8 @@ class Flight:
             arguments=argparse.Namespace(policy='oft',finalizer='on',live=False,output=str(self.output),set=None,model_name='test')
             with self.runner.watched_finalizer(listen):
                 self.summary,self.steps=await canonical.run_episode(self.env,episode,self.runner.WatchedPolicy(self.model,self.watch),arguments,None)
+        from src.landing import evaluator
+        self.reading=evaluator.read(self.summary,self.env.surfaces,self.env.landing,self.steps)
         self.restored=canonical.LandingFinalizer
         self.feed.close();return self.summary
 
@@ -401,15 +418,13 @@ class ScriptedFeed:
     def close(self):pass
 
 
-class SessionTests(unittest.IsolatedAsyncioTestCase):
-    async def asyncSetUp(self):asyncio.get_running_loop().slow_callback_duration=60.
-
+class SessionHarness:
     async def session(self,operator,scripts):
         """Run the interactive runner's main loop with the fake simulator and a scripted operator."""
         from src.mission import oft_runner
         from tests.fake_airsim import FakeSim,FakeClient,ScriptedModel,world_class,drone_class
         import scripts.visual_search as canonical
-        config,scene,targets=demo();self.by={item['object_id']:item for item in targets};sim=FakeSim(scene,'mission');self.sim=sim
+        config,scene,targets=demo();self.by={item['object_id']:item for item in targets};sim=FakeSim(scene,getattr(self,'options',{}).get('layout') or 'mission');self.sim=sim
         oft=json.loads((ROOT/'configs/aerovla_oft.json').read_text(encoding='utf-8'));oft['grounding']={'type':'film','position':'before_projector','hidden_dim':512}
         feed=ScriptedFeed(operator);self.feed=feed;models=[]
         def script(index):
@@ -429,7 +444,9 @@ class SessionTests(unittest.IsolatedAsyncioTestCase):
                  patch.object(canonical,'World',world_class(sim)),patch.object(canonical,'Drone',drone_class(sim)), \
                  patch.object(canonical,'matched_camera_images',sim.camera),patch.object(oft_runner,'matched_camera_images',sim.camera), \
                  patch.object(canonical,'asyncio',clock),patch('builtins.print'):
-                await oft_runner.main(argparse.Namespace(host='fake',checkpoint=str(checkpoint),steps=0,demo=None,run_token='test'))
+                options=dict(host='fake',checkpoint=str(checkpoint),steps=0,demo=None,run_token='test',layout=None,start_x=None,start_y=None,start_yaw=None,start_height=None)
+                options.update(getattr(self,'options',{}))
+                await oft_runner.main(argparse.Namespace(**options))
             folder=next((output/'missions').iterdir())
             self.missions=[json.loads(line) for line in (folder/'missions.jsonl').read_text().splitlines()] if (folder/'missions.jsonl').exists() else []
             self.records=[json.loads(path.read_text()) for path in sorted(folder.glob('mission-*.json'))]
@@ -438,7 +455,7 @@ class SessionTests(unittest.IsolatedAsyncioTestCase):
 
     def operator(self,plan):
         """Keys pressed when the session reaches a state: a list of (state the mission must be in, keys or a map click)."""
-        from src.mission.control import mission_key,request_selection
+        from src.mission.control import mission_key,request_selection,request_start_pose
         steps=list(plan);self.messages=[];self.seen=[]
         def press(control,telemetry):
             mission=telemetry.get('mission') or {};self.seen.append(json.loads(json.dumps({'mission':mission,'message':telemetry.get('control_message')})))
@@ -450,9 +467,15 @@ class SessionTests(unittest.IsolatedAsyncioTestCase):
             if wanted=='NAVIGATING' and telemetry.get('step',0)<5:return None
             steps.pop(0)
             for key in keys:
-                control=request_selection(control,1,list(key)) if isinstance(key,tuple) else mission_key(control,ord(key))
+                # A tuple is a map click on a target; a dictionary is a start placed on the map (pressed at, released at).
+                if isinstance(key,dict):control=request_start_pose(control,1,key['pixel'],key.get('heading'))
+                else:control=request_selection(control,1,list(key)) if isinstance(key,tuple) else mission_key(control,ord(key))
             return control
         return press
+
+
+class SessionTests(SessionHarness,unittest.IsolatedAsyncioTestCase):
+    async def asyncSetUp(self):asyncio.get_running_loop().slow_callback_duration=60.
 
     async def test_land_then_reset_then_approach_from_the_same_pose(self):
         from tests.fake_airsim import fly_to
@@ -482,17 +505,18 @@ class SessionTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(feed.telemetry['status'],'STOPPED');self.assertEqual(feed.telemetry['policy']['prompt_mode'],'instruction-only')
         self.assertEqual(feed.telemetry['failure']['failure_enabled'],False)
 
-    async def test_bare_ground_and_a_landing_on_a_cube_never_start_a_mission(self):
-        cube=demo()[2][2]['position'];self.clicks={(100,100):[30.,70.,-1.],(200,200):cube}
+    async def test_bare_ground_and_a_landing_on_the_sphere_never_start_a_mission(self):
+        cube=demo()[2][6]['position'];self.clicks={(100,100):[30.,70.,-1.],(200,200):cube}
         plan=[('IDLE',[(100,100)]),('IDLE','g'),('IDLE',[(200,200)]),('TARGET_SELECTED','g'),('TARGET_SELECTED','q')]
         feed=await self.session(self.operator(plan),[lambda sim:(lambda index:[0.,0.,0.])])
         messages=[item['message'] for item in self.seen if item['message']]
         self.assertIn('grounding_film requires a semantic object target. Select a configured landmark/object.',messages)
-        self.assertIn('Selected object is not landable. Use APPROACH or select a landing pad.',messages)
+        self.assertIn('Selected object has no valid landing surface. Use APPROACH.',messages)
         self.assertEqual(self.missions,[]);self.assertEqual(self.model.calls,[]);self.assertNotIn('NAVIGATING',feed.states)
-        # The cube stays selected, the display says why G will not start, and APPROACH would.
-        self.assertEqual(feed.telemetry['mission']['target']['object_id'],'blue_cube')
-        self.assertEqual(feed.telemetry['mission']['refusal'],'Selected object is not landable. Use APPROACH or select a landing pad.')
+        # The ball stays selected, the display says why G will not start, and APPROACH would.
+        self.assertEqual(feed.telemetry['mission']['target']['object_id'],'orange_ball')
+        self.assertEqual(feed.telemetry['mission']['refusal'],'Selected object has no valid landing surface. Use APPROACH.')
+        self.assertEqual((feed.telemetry['mission']['target']['surface']['surface'],feed.telemetry['mission']['target']['landable']),('none',False))
 
     async def test_r_during_a_flight_records_it_as_aborted_and_returns_to_the_launch_pose(self):
         from tests.fake_airsim import fly_to
@@ -528,7 +552,7 @@ class ViewerTests(unittest.TestCase):
         images={'front':frame,'down':frame,'chase':np.zeros((360,640,3),np.uint8),'chase_cam':np.zeros((360,640,3),np.uint8),'verified':True}
         flying=render(self.telemetry(),control,images);self.assertEqual(flying.shape,(1040,1480,3))
         idle=self.telemetry(mission={'state':'IDLE','target':None,'task':'land','success_radius_m':15.,'refusal':'x'},model_input=None,evaluator=None,inference=None,executed=None,finalizer=None)
-        refused=self.telemetry();refused['mission'].update(state='TARGET_SELECTED',refusal='Selected object is not landable. Use APPROACH or select a landing pad.')
+        refused=self.telemetry();refused['mission'].update(state='TARGET_SELECTED',refusal='Selected object has no valid landing surface. Use APPROACH.')
         done=self.telemetry(contact={'touchdown_on':'blue_pad','touchdown_offset_m':[1.,2.],'collision':None},disarmed=True,input_verified=True)
         done['mission'].update(state='SUCCESS',result={'success':True,'text':'landed on the named pad; latched and disarmed','selected':'blue_pad','stopped':False,'steps':80})
         done['finalizer']={'active':True,'state':'DISARMED','path':['FLYING','LANDING_DESCENT','CONTACT_CANDIDATE','STABLE_CONTACT','LANDED_LATCHED','DISARMED'],'finalizer_triggered':True}

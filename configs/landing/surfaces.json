@@ -1,0 +1,24 @@
+{
+  "description": "Which objects have a surface a vehicle can land on, and how that surface is bounded (src/landing/surface.py, docs/arbitrary_start_generalized_landing.md). The canonical evaluation knows one landing surface, the top of a pad (configs/targets/landing_pads.json); this file generalises that rule to other flat tops without changing it. No size is written here: a surface is read from the object's own geometry (its bounding size in configs/targets/objects.json or in the map file), and the two numbers the rule needs are taken from the landing rule that already exists. For a pad the result is the canonical landing region, to the millimetre; the loader refuses a rule under which it would not be.",
+  "margin": {
+    "from": "configs/targets/landing_pads.json vehicle.half_span_m",
+    "why": "the usable region is the flat top shrunk by the vehicle's half-span on every side, so that the whole vehicle stands on the surface when its centre is inside. This is how the pad's own landing region was derived (pad half-width 7.0 m minus 0.4 m = 6.6 m)."
+  },
+  "minimum_usable": {
+    "from": "configs/targets/landing_pads.json teacher.align_radius_m",
+    "why": "the canonical descent starts once the vehicle is within this distance of the middle of the surface. A top whose usable region does not reach that far from its middle in every direction cannot hold the place a canonical descent may come down at, and is not offered as a landing surface."
+  },
+  "shapes": {
+    "description": "By an object's shape (its `attributes.shape`, or the shape of its mesh when it has no attributes). `rectangle`: the flat top is the object's bounding rectangle. `circle`: the flat top is a disc of the object's radius. `none`: no flat top.",
+    "pad": {"surface": "rectangle"},
+    "cube": {"surface": "rectangle"},
+    "box": {"surface": "rectangle"},
+    "cylinder": {"surface": "circle"},
+    "ball": {"surface": "none", "why": "the top of a sphere is curved: the flat area under a vehicle is a point, and a vehicle resting there would say nothing true about landing"},
+    "cone": {"surface": "none", "why": "a cone ends in a point"},
+    "pyramid": {"surface": "none", "why": "a pyramid ends in a point"}
+  },
+  "cap": {
+    "description": "An object without a flat top can be given one: a flat plate standing on it, declared in the map file as `landing_caps: {layout: {object: structure name}}`, where the structure is one of the map's own `structures` for that layout (a cylinder for a round plate, a box for a rectangular one). The surface is then the plate's top, bounded by the plate; the object underneath is unchanged and touching it anywhere else is a collision. An object with a cap is a different thing to look at than the object without one, so a cap belongs to a layout and is never assumed."
+  }
+}

@@ -1,0 +1,130 @@
+{
+ "description": "Recorded flights read again by the surface evaluator (src/landing/evaluator.py) against the canonical summary each was recorded with (scripts/surface_regression.py). Every landing surface of these runs is a pad. `same` counts the flights whose result, landing region, decision of the touchdown, touchdown speed, object landed on and collision are read as they were recorded.",
+ "evaluator": "generalized_surface_v1",
+ "total": {
+  "flights": 341,
+  "land": 256,
+  "touchdowns": 179,
+  "landings_with_touchdown": 179,
+  "landings_read_as_success": 175,
+  "same": 341,
+  "approach": 85
+ },
+ "runs": [
+  {
+   "run": "outputs/visual_search/arch_film_test",
+   "flights": 48,
+   "land": 36,
+   "touchdowns": 36,
+   "landings_with_touchdown": 36,
+   "landings_read_as_success": 36,
+   "same": 48,
+   "approach": 12,
+   "different": []
+  },
+  {
+   "run": "outputs/visual_search/arch_film_validation",
+   "flights": 36,
+   "land": 27,
+   "touchdowns": 26,
+   "landings_with_touchdown": 26,
+   "landings_read_as_success": 25,
+   "same": 36,
+   "approach": 9,
+   "different": []
+  },
+  {
+   "run": "outputs/visual_search/arch_film_validation_repeat",
+   "flights": 17,
+   "land": 13,
+   "touchdowns": 12,
+   "landings_with_touchdown": 12,
+   "landings_read_as_success": 10,
+   "same": 17,
+   "approach": 4,
+   "different": []
+  },
+  {
+   "run": "outputs/failures/gaussian_blur/clean",
+   "flights": 48,
+   "land": 36,
+   "touchdowns": 35,
+   "landings_with_touchdown": 35,
+   "landings_read_as_success": 35,
+   "same": 48,
+   "approach": 12,
+   "different": []
+  },
+  {
+   "run": "outputs/failures/gaussian_blur/low",
+   "flights": 48,
+   "land": 36,
+   "touchdowns": 31,
+   "landings_with_touchdown": 31,
+   "landings_read_as_success": 31,
+   "same": 48,
+   "approach": 12,
+   "different": []
+  },
+  {
+   "run": "outputs/failures/gaussian_blur/medium",
+   "flights": 48,
+   "land": 36,
+   "same": 48,
+   "approach": 12,
+   "touchdowns": 16,
+   "landings_with_touchdown": 16,
+   "landings_read_as_success": 15,
+   "different": []
+  },
+  {
+   "run": "outputs/failures/gaussian_blur/high",
+   "flights": 48,
+   "land": 36,
+   "same": 48,
+   "approach": 12,
+   "different": []
+  },
+  {
+   "run": "outputs/failures/gaussian_blur/repeat/clean",
+   "flights": 12,
+   "land": 9,
+   "touchdowns": 9,
+   "landings_with_touchdown": 9,
+   "landings_read_as_success": 9,
+   "same": 12,
+   "approach": 3,
+   "different": []
+  },
+  {
+   "run": "outputs/failures/gaussian_blur/repeat/low",
+   "flights": 12,
+   "land": 9,
+   "touchdowns": 9,
+   "landings_with_touchdown": 9,
+   "landings_read_as_success": 9,
+   "same": 12,
+   "approach": 3,
+   "different": []
+  },
+  {
+   "run": "outputs/failures/gaussian_blur/repeat/medium",
+   "flights": 12,
+   "land": 9,
+   "touchdowns": 5,
+   "landings_with_touchdown": 5,
+   "landings_read_as_success": 5,
+   "same": 12,
+   "approach": 3,
+   "different": []
+  },
+  {
+   "run": "outputs/failures/gaussian_blur/repeat/high",
+   "flights": 12,
+   "land": 9,
+   "same": 12,
+   "approach": 3,
+   "different": []
+  }
+ ]
+}

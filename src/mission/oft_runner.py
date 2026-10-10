@@ -8,11 +8,17 @@ them is written again here. This module watches the loop through the environment
 the policy, and adds what an interactive session needs around it.
 
 What the policy receives is what `policy_inputs` builds: the Front frame, the Down frame and one sentence. The selected
-object's place, its distance and bearing, the map and its markers are used here for the display, the score and the log;
-`WatchedPolicy.infer` has no parameter through which they could pass.
+object's place, its distance and bearing, its landing surface, the start the user placed, the map and its markers are used
+here for the display, the score and the log; `WatchedPolicy.infer` has no parameter through which they could pass.
+
+A flight starts where the user says: at a preset launch of the map file, or at a place, heading and height chosen on the
+map (S) or given to the launcher. Either way it starts as an evaluation episode starts, from the episode's own start
+fields (src/mission/start.py).
 
 A landing is flown by the policy and ended by the canonical finalizer. The simulator's own landing routine is not called
-anywhere in this mode, not even when the session is closed with the vehicle in the air.
+anywhere in this mode, not even when the session is closed with the vehicle in the air. What may be landed on is any
+object with a landing surface (src/landing/surface.py), and a landing is read with that surface's own region
+(src/landing/evaluator.py); the finalizer is told nothing of either.
 """
 import os
 os.environ['HF_HUB_OFFLINE']='1';os.environ['TRANSFORMERS_OFFLINE']='1'
@@ -36,7 +42,10 @@ import scripts.visual_search as canonical
 from scripts.visual_search import SearchEnv,run_episode,MANIFEST
 from src.integration.blur_demo_support import DemoQuit
 from src.integration.projectairsim_observation_adapter import adapt_state
+from src.landing import evaluator
+from src.landing.env import SurfaceContacts
 from src.mission import semantic
+from src.mission import start as starts
 from src.mission.checkpoint import inspect
 from src.mission.control import pending_requests,TASKS,GROUNDING,INSTRUCTION_ONLY
 from src.mission.feed import Feed,sha256
@@ -45,7 +54,7 @@ from src.mission.scene import OverviewScene
 from src.visual_search.episodes import load_config,relative_target
 
 MODEL_INPUT='Front RGB + Down RGB + Instruction ONLY'
-NOT_SENT=('target XYZ','distance','bearing','direction hint','overview','marker')
+NOT_SENT=('target XYZ','distance','bearing','direction hint','overview','marker','start pose','landing surface')
 CONNECTION_WORDS=('Connection','closed','NNG','Timed out','timed out')
 
 
@@ -227,11 +236,17 @@ class Watch:
         self.telemetry['disarmed']=bool(ok)
 
 
-class MissionEnv(SearchEnv):
-    """The canonical environment with a display watching it. Every override calls the canonical method and changes nothing in
-    what it does, except `close`: a flight that ends in the air is left hovering there."""
+class MissionEnv(SurfaceContacts,SearchEnv):
+    """The canonical environment with a display watching it. Every override calls the method below it and changes nothing
+    in what it does, except `close`: a flight that ends in the air is left hovering there. (`SurfaceContacts` reads a contact
+    with any landing surface the way the canonical environment reads one with a pad: src/landing/env.py.)"""
     def __init__(self,client,config,oft,output,watch):
-        super().__init__(client,config,oft,output);self.watch=watch;self._drone=None;self.semantic=None;self.last_state=None
+        super().__init__(client,config,oft,output);self.watch=watch;self._drone=None;self.semantic=None;self.last_state=None;self.reached=None
+
+    async def reset(self,episode):
+        await super().reset(episode)
+        # Where the vehicle is once the canonical start is done, beside where the episode asked it to be: for the log.
+        self.reached=starts.reached(self.state(),self.ground_z)
 
     @property
     def drone(self):return self._drone
@@ -291,6 +306,10 @@ def run_folder(token):
 
 async def main(args):
     config=load_config();demo_path=Path(args.demo) if args.demo else semantic.DEMO;demo=semantic.load_demo(demo_path);settings=demo['mission']
+    if args.layout:
+        if args.layout not in demo['layouts']:raise SystemExit(f'No layout {args.layout!r} in {demo_path.name}: '+', '.join(demo['layouts']))
+        settings['layout']=args.layout
+    layout=settings['layout']
     checkpoint=Path(args.checkpoint or settings['checkpoint']);checkpoint=checkpoint if checkpoint.is_absolute() else ROOT/checkpoint
     # The launcher has compared the frozen baseline's fingerprints on the Windows side; started without it, that is done here.
     recorded=OUT/'checkpoint-check.json'
@@ -298,7 +317,16 @@ async def main(args):
     if check['problems']:raise SystemExit('; '.join(check['problems']))
     saved=json.loads((checkpoint/'manifest.json').read_text(encoding='utf-8'))['config']
     limit=args.steps or config['gen_v3']['max_ticks'];radius=config['success_radius_m'];canonical_range=config['canonical']['max_start_m']
-    targets=semantic.semantic_targets(demo);launches=settings['launches'];launch=launches[0]
+    cruise=config['cruise_height_m'];steps_of=settings['start'];start_rule=starts.rule(config,demo)
+    targets=semantic.semantic_targets(demo);launches=settings['launches'];launch=launches[0];clicked=None
+    given={'x':args.start_x,'y':args.start_y,'yaw_deg':args.start_yaw,'height_m':args.start_height}
+    if any(value is not None for value in given.values()):
+        # A start given to the launcher: the first preset with whatever was given in its place. Refused here if it may not be flown.
+        chosen=semantic.start_of(launch,cruise).moved(**{key:value for key,value in given.items() if value is not None})
+        try:starts.check(chosen,demo,layout,config)
+        except ValueError as error:raise SystemExit(str(error))
+        launch=semantic.custom_launch(chosen)
+    start_check=starts.validate(semantic.start_of(launch,cruise),demo,layout,config)
     feed=Feed(OUT);watch=Watch(feed,limit);folder=run_folder(args.run_token)
     policy_info={'mode':GROUNDING,'model':checkpoint.name,'name':saved.get('name'),'checkpoint':check['checkpoint'],
                  'grounding':(saved.get('grounding') or {}).get('type','none'),'frozen':check['frozen']['state'],'warnings':check['warnings'],
@@ -307,6 +335,18 @@ async def main(args):
                  'simulator_landing_routine':'not used'}
     client=None;env=None;loader=None;overview=None;target=None;index=-1;task='land';mission_id=0;ready=None;vehicle='on the ground'
     state_name='IDLE';reason=None;result=None;flown=None;program_status='RUNNING';history=[];last_preview=last_hover=0.;preview_counter=0
+    placing=False;scene_start=None
+
+    def wanted_start():return semantic.start_of(launch,cruise)
+
+    def start_view():
+        """The start as the display and the log are told it: what is asked for, whether it may be flown, and where the vehicle is."""
+        wanted=wanted_start();applied=scene_start==wanted;got=env.reached if env is not None and applied else None
+        return {**wanted.to_dict(),'source':'custom' if launch.get('custom') else 'preset','id':launch['id'],'name':launch['name'],
+                'valid':start_check['valid'],'reasons':start_check['reasons'],'clearance_m':start_check['facts'].get('clearance_m'),
+                'nearest':start_check['facts'].get('nearest'),'placing':placing,'applied':applied,
+                'reached':got.to_dict() if got else None,'reproduction':starts.reproduction(wanted,got) if got else None,
+                'spawn':env.spawn if env is not None and applied else None,'height_bounds_m':start_rule['height_m'],'clearance_rule_m':start_rule['clearance_m']}
 
     def snapshot(state=None):
         waiting=state_name in ('IDLE','TARGET_SELECTED');refused=semantic.refusal(target,task) if waiting else None
@@ -323,18 +363,34 @@ async def main(args):
 
     def show(phase=None,state=None,**fields):
         state=state if state is not None else watch.telemetry.get('state')
-        watch.update(mission=snapshot(state),policy=policy_info,launch=dict(launch,index=launches.index(launch),count=len(launches)),
-                     targets=targets,**({'phase':phase} if phase else {}),**({'state':state} if state is not None else {}),**fields)
+        preset=launches.index(launch) if launch in launches else None
+        watch.update(mission=snapshot(state),policy=policy_info,launch=dict(launch,index=preset,count=len(launches)),start=start_view(),
+                     targets=targets,layout=layout,**({'phase':phase} if phase else {}),**({'state':state} if state is not None else {}),**fields)
+
+    def choose_start(chosen,point=None):
+        """Take a start the user placed or changed: it becomes the start of the next mission if it may be flown."""
+        nonlocal launch,start_check,clicked
+        clicked=point if point is not None else clicked
+        launch=semantic.custom_launch(chosen);start_check=starts.validate(chosen,demo,layout,config,surface_point=clicked)
+        return None if start_check['valid'] else 'INVALID START. Reason: '+'; '.join(start_check['reasons'])
+
+    def refuse_invalid_start():
+        if not start_check['valid']:raise ValueError('INVALID START. Reason: '+'; '.join(start_check['reasons']))
 
     async def prepare(wanted=None):
-        """Start as an evaluation episode starts: the scene loaded with the vehicle at the launch pose, take-off, climb to the
-        cruise height. The object named here only prepares the evaluator's view of it; a mission to another object prepares again."""
-        nonlocal ready,vehicle
+        """Start as an evaluation episode starts: the scene loaded with the vehicle at the start's place and heading, take-off,
+        climb to the start's height. The object named here only prepares the evaluator's view of it; a mission to another object
+        prepares again."""
+        nonlocal ready,vehicle,scene_start,start_check
         chosen=wanted or targets[0]
         show(f'Loading the scene: take-off at {launch["name"]}');feed.flush(1.)
-        episode=semantic.mission_episode(demo_path,demo,chosen,'approach',semantic.sentence(config,demo,chosen,'approach'),launch,mission_id,limit)
+        episode=semantic.mission_episode(demo_path,demo,chosen,'approach',semantic.sentence(config,demo,chosen,'approach'),launch,mission_id,limit,cruise)
         await env.reset(episode);env.semantic=chosen
-        ready=(launch['id'],chosen['object_id']);vehicle='hovering at the launch pose'
+        scene_start=wanted_start();ready=(scene_start,chosen['object_id']);vehicle='hovering at the start pose'
+        if not env.spawn['on_ground']:
+            # Every height of a flight is counted from where the vehicle rests at the start; off the ground no flight is read rightly.
+            start_check={'valid':False,'facts':start_check['facts'],
+                         'reasons':[f'the vehicle did not come to rest on the ground (its rest height is {env.spawn["error_m"]:+.2f} m from the ground\'s)']}
         watch.reset_flight();watch.telemetry.update(ground_z=env.ground_z)
         if overview is not None:
             # The map of the scene just loaded is taken now, so that a flight starting next does not pay for it.
@@ -347,18 +403,25 @@ async def main(args):
         with (folder/'missions.jsonl').open('a',encoding='utf-8') as file:file.write(json.dumps(brief)+'\n')
 
     async def fly():
-        """One mission: the canonical episode loop from the launch pose, watched."""
+        """One mission: the canonical episode loop from the start pose, watched."""
         nonlocal mission_id,ready,vehicle,state_name,reason,result,flown
+        if ready!=(wanted_start(),target['object_id']):
+            await prepare(target);refuse_invalid_start()
         text=semantic.sentence(config,demo,target,task);mission_id+=1;flown=(task,text)
-        episode=semantic.mission_episode(demo_path,demo,target,task,text,launch,mission_id,limit)
-        if ready!=(launch['id'],target['object_id']):await prepare(target)
+        episode=semantic.mission_episode(demo_path,demo,target,task,text,launch,mission_id,limit,cruise)
         ready=None;env.semantic=target;watch.reset_flight();state_name='NAVIGATING';reason=None;result=None;vehicle='flying'
         show('AeroVLA-OFT flight',control_message=None,disarmed=None)
         arguments=argparse.Namespace(policy='oft',finalizer='on',live=False,output=str(OUT),set=None,model_name=saved.get('name'))
+        wanted=wanted_start()
         entry={'mission_id':mission_id,'started_epoch':time.time(),'checkpoint':check['checkpoint'],'model':policy_info['loaded'],
                'frozen_baseline':check['frozen']['state'],'target_object':target['object_id'],'target_noun':target['noun'],'target':target,
-               'task':task,'instruction':text,'launch':launch,'model_input':MODEL_INPUT,'not_sent_to_model':list(NOT_SENT)}
-        summary=None;steps=[];error=None;back=False
+               'task':task,'instruction':text,'launch':launch,'layout':layout,'model_input':MODEL_INPUT,'not_sent_to_model':list(NOT_SENT),
+               # The start, in the canonical fields and as it was reached; the same four numbers start the same flight again.
+               **wanted.episode_fields(),'start':start_view(),
+               'reproduce':'.\\scripts\\run_grounding_film_mission_demo.ps1 '+' '.join(
+                   f'-{name} {value:g}' for name,value in (('StartX',wanted.x),('StartY',wanted.y),('StartYaw',wanted.yaw_deg),('StartHeight',wanted.height_m)))
+                   +(f' -Layout {layout}' if args.layout else '')}
+        summary=None;steps=[];error=None;back=False;reading=None
         try:
             with watched_finalizer(watch.finalizer):
                 summary,steps=await run_episode(env,episode,WatchedPolicy(loader.model,watch),arguments,None)
@@ -374,13 +437,15 @@ async def main(args):
             if any(word in error for word in CONNECTION_WORDS):raise
             await env.close();state_name='FAILED';reason='runtime_error';vehicle='unknown'
         if summary is not None:
-            result=semantic.outcome(summary);state_name='SUCCESS' if result['success'] else 'FAILED';reason=result['text']
+            # A landing is read with the landing region of the surface that was touched; an approach by the canonical evaluator alone.
+            reading=evaluator.read(summary,env.surfaces,env.landing,steps)
+            result=semantic.outcome(summary,reading);state_name='SUCCESS' if result['success'] else 'FAILED';reason=result['text']
             final=(summary.get('finalizer') or {})
             vehicle=('disarmed on '+str(summary.get('landed_on'))) if final.get('disarm_triggered') else \
                     'held by a contact' if summary.get('landed') or summary.get('hit') else 'hovering'
         agreed=bool(steps) and len(steps)<=len(watch.inputs) and all(step['input_sha256']==seen['input_sha256'] for step,seen in zip(steps,watch.inputs))
         record({**entry,'state':state_name,'reason':reason,'success':bool(result and result['success']),'outcome':result,'summary':summary,
-                'error':error,'steps':steps,'model_inputs':list(watch.inputs),
+                'surface_landing':reading,'error':error,'steps':steps,'model_inputs':list(watch.inputs),
                 # The hashes the canonical loop logged for what it gave the policy, against those of what the display was given.
                 'input_hash_agreement':agreed if steps else None,
                 'camera_frames_unchanged':all(item['camera_frames_unchanged'] for item in watch.inputs) if watch.inputs else None,
@@ -389,10 +454,10 @@ async def main(args):
                 'mean_decision_s':summary.get('mean_decision_s') if summary else None})
         print(f'MISSION {mission_id} {target["object_id"]} {task} -> {state_name}: {reason}',flush=True)
         if back:
-            # R was the request: the aborted flight is on record, and the scene goes back to the launch pose with its target kept.
+            # R was the request: the aborted flight is on record, and the scene goes back to the start pose with its target kept.
             await prepare(target);state_name='TARGET_SELECTED';reason=None
-            show(state=env.state(),control_message=f'Mission {mission_id} aborted; back at the launch pose');return
-        show('Mission '+state_name+' - R returns to the launch pose',state=env.state(),input_verified=agreed if steps else None,
+            show(state=env.state(),control_message=f'Mission {mission_id} aborted; back at the start pose');return
+        show('Mission '+state_name+' - R returns to the start pose',state=env.state(),input_verified=agreed if steps else None,
              control_message=error.strip().splitlines()[-1] if error else None)
 
     try:
@@ -431,16 +496,44 @@ async def main(args):
                             raise ValueError(semantic.NOT_SEMANTIC)
                         target=chosen;index=targets.index(chosen);state_name='TARGET_SELECTED';result=None;reason=None
                     elif action=='launch':
-                        launch=launches[(launches.index(launch)+1)%len(launches)]
+                        # The next preset of the map file; a start the user placed is put away.
+                        launch=launches[(launches.index(launch)+1)%len(launches) if launch in launches else 0];placing=False;clicked=None
+                        start_check=starts.validate(wanted_start(),demo,layout,config)
                         await prepare(target);state_name='TARGET_SELECTED' if target else 'IDLE';result=None;reason=None
-                    elif action=='reset':
-                        if ready is None:
-                            # After a flight: the scene and the vehicle go back to the launch pose; the target stays for the next run.
+                    elif action=='start_mode':
+                        placing=bool(request['on'])
+                        if not placing and start_check['valid'] and scene_start!=wanted_start():
+                            # S again: the vehicle is put at the start that was placed, so that what its cameras show there can be seen.
                             await prepare(target)
+                        if not placing and not start_check['valid']:message='INVALID START. Reason: '+'; '.join(start_check['reasons'])
+                    elif action=='start_pose':
+                        if not placing:raise ValueError('Press S to place a start: until then a map click selects a target')
+                        point=overview.point_at(request['frame_id'],request['pixel'])
+                        if point is None:raise ValueError('INVALID START. Reason: no ground under the click')
+                        current=wanted_start();facing=current.yaw_deg
+                        if request.get('heading_pixel'):
+                            toward=overview.point_at(request['frame_id'],request['heading_pixel'])
+                            turned=starts.heading(point,toward) if toward is not None else None
+                            if turned is None:message='The heading could not be read from the drag; the yaw is kept'
+                            else:facing=round(turned,1)
+                        note=choose_start(starts.StartState(round(point[0],2),round(point[1],2),facing,current.height_m),point);message=note or message
+                    elif action in ('start_height','start_yaw'):
+                        if not placing:raise ValueError('Press S to place a start before changing its height or heading')
+                        current=wanted_start()
+                        if action=='start_height':chosen,message=starts.step_height(current,request['step'],demo,config,steps_of['height_step_m'])
+                        else:chosen=current.moved(yaw_deg=starts.wrap_deg(current.yaw_deg+request['step']*steps_of['yaw_step_deg']))
+                        note=choose_start(chosen);message=note or message
+                    elif action=='reset':
+                        placing=False
+                        if ready is None or ready[0]!=wanted_start():
+                            # After a flight, or with a start that was placed and not flown to yet: the scene and the vehicle go to
+                            # the start pose; the target stays for the next run.
+                            refuse_invalid_start();await prepare(target)
                         else:target=None
                         state_name='TARGET_SELECTED' if target else 'IDLE';result=None;reason=None
                     elif action=='start':
-                        semantic.check_start(target,task)
+                        placing=False
+                        semantic.check_start(target,task);refuse_invalid_start()
                         while loader.model is None and not loader.error:
                             show('Loading the checkpoint (first mission waits for it)');await asyncio.sleep(.3)
                             if feed.control['quit']:raise DemoQuit('Exit requested')
@@ -463,6 +556,7 @@ async def main(args):
                     watch.telemetry.update(preview_files=files,preview_hashes={name:sha256(frame) for name,frame in frames.items()},preview_visibility=visibility)
                 last_preview=now
             waiting={'IDLE':'Click a semantic object or press N','TARGET_SELECTED':'T chooses LAND / APPROACH; G starts'}.get(state_name)
+            if placing and waiting:waiting='START PLACEMENT: click the map for the start, drag for its heading; [ ] height, J K yaw; S when done'
             show(waiting,state=env.state())
             await asyncio.sleep(.1)
     except DemoQuit:
@@ -480,7 +574,7 @@ async def main(args):
             try:client.disconnect()
             except Exception:pass
         (folder/'session.json').write_text(json.dumps({'status':program_status,'missions':len(history),'cleanup':cleanup,'policy':policy_info,
-                                                       'run_token':args.run_token}),encoding='utf-8')
+                                                       'run_token':args.run_token,'layout':layout}),encoding='utf-8')
         watch.update(status=program_status,phase='Finished',cleanup=cleanup,mission=snapshot())
         feed.close()
     if program_status=='FAIL':raise SystemExit(1)
@@ -491,6 +585,10 @@ if __name__=='__main__':
     parser.add_argument('--mission-demo',action='store_true');parser.add_argument('--checkpoint',help='AeroVLA-OFT checkpoint directory; default: the frozen baseline')
     parser.add_argument('--steps',type=int,default=0,help='decisions per mission; default: the evaluation budget')
     parser.add_argument('--demo',help='interactive map file; default configs/mission/grounding_film_demo.json');parser.add_argument('--run-token')
+    parser.add_argument('--layout',help="layout of the map file; default: the map's own (mission_cap adds a landing cap to the orange ball)")
+    parser.add_argument('--start-x',type=float,help='start a session at this place instead of the first preset launch (metres, map frame)')
+    parser.add_argument('--start-y',type=float);parser.add_argument('--start-yaw',type=float,help='degrees: 0 faces +x, 90 faces +y')
+    parser.add_argument('--start-height',type=float,help='metres above the ground at the start')
     arguments=parser.parse_args()
     if not 0<=arguments.steps<=400:parser.error('--steps within 1..400')
     asyncio.run(main(arguments))

@@ -73,7 +73,7 @@ def initialize_run_output(path):
              'chase_latest.png','comparison.png','launcher-cleanup.json'}
     names.update({'mission-results.json','mission-steps.jsonl','mission-decisions.jsonl','overview.json','overview_0.png','overview_1.png',
                   'overview_top.png','overview_elevated.png','scene-geometry.json','target_selected.png',
-                  'navigating.png','mission_success.png','mission_failed.png','current_view.png','checkpoint-check.json'})
+                  'navigating.png','mission_success.png','mission_failed.png','current_view.png','checkpoint-check.json','start-check.json'})
     names.update(f'{prefix}_{camera}.png' for prefix in ('normal','blur','restored','input_a','input_b','raw_a','raw_b')
                  for camera in ('front','down'))
     names.update(f'preview_{slot}_{camera}.png' for slot in (0,1) for camera in ('front','down'))
