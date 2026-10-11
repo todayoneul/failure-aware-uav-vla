@@ -4,7 +4,8 @@
   surface_flights.py --host H --plan FILE --output DIR --policy oft --checkpoint DIR [--limit N]
                                                                           the same starts flown by an AeroVLA-OFT checkpoint
   surface_flights.py --host H --plan FILE --set train --output DIR --policy teacher [--record ROOT] [--finalizer off]
-                                                                          flown by the privileged teacher (src/landing/teacher.py);
+                                                                          flown by the privileged teacher (src/landing/teacher.py;
+                                                                          --teacher stop_safe: the teacher of stage 1b);
                                                                           with --record, kept as training episodes
 
 A flight is the canonical evaluation's own: `SearchEnv.reset` and `run_episode` of scripts/visual_search.py, from the
@@ -77,11 +78,11 @@ def start_checks(episode,env,tolerance):
 
 
 @contextlib.contextmanager
-def surface_teacher(canonical,env):
+def surface_teacher(canonical,env,kind='surface'):
     """For the length of one flight the teacher the canonical loop builds is the one that knows landing surfaces."""
     from src.landing.teacher import teacher_class
     original=canonical.SearchTeacher
-    canonical.SearchTeacher=teacher_class(lambda:env.surfaces[env.target])
+    canonical.SearchTeacher=teacher_class(lambda:env.surfaces[env.target],kind)
     try:yield
     finally:canonical.SearchTeacher=original
 
@@ -123,7 +124,7 @@ async def fly(args):
         model=AeroVLAOFT(canonical.MANIFEST,oft,checkpoint=args.checkpoint)
 
     def save():
-        results_path.write_text(json.dumps({'plan':str(args.plan),'set':args.set,'policy':args.policy,'checkpoint':args.checkpoint,'model_name':args.model_name,
+        results_path.write_text(json.dumps({'plan':str(args.plan),'set':args.set,'policy':args.policy,'teacher':getattr(args,'teacher','surface') if args.policy=='teacher' else None,'checkpoint':args.checkpoint,'model_name':args.model_name,
                                             'finalizer':args.finalizer,'evaluator':evaluator.VERSION,'start_tolerance':tolerance,'episodes':done},indent=1),encoding='utf-8')
 
     client=None;env=None;status=0
@@ -151,7 +152,7 @@ async def fly(args):
                 if kept and (record_root/rel).exists():shutil.rmtree(record_root/rel)
                 clock=time.time();stamp=env.drone.get_ground_truth_kinematics()['time_stamp']
                 if args.policy=='teacher':
-                    with surface_teacher(canonical,env):summary,steps=await canonical.run_episode(env,episode,None,arguments,kept)
+                    with surface_teacher(canonical,env,getattr(args,'teacher','surface')):summary,steps=await canonical.run_episode(env,episode,None,arguments,kept)
                 else:
                     if args.policy=='oft':policy=model
                     else:
@@ -207,6 +208,7 @@ if __name__=='__main__':
     parser.add_argument('--policy',choices=('controlled','oft','teacher'),default='controlled');parser.add_argument('--checkpoint');parser.add_argument('--model-name')
     parser.add_argument('--finalizer',choices=('on','off'),default='on',help='off: as the recorded episodes were flown, the teacher ends its own landing')
     parser.add_argument('--record',help='with --policy teacher: dataset folder the flights are recorded into')
+    parser.add_argument('--teacher',choices=('surface','stop_safe'),default='surface',help='with --policy teacher: the teacher of stage 1 (surface) or of stage 1b (stop_safe)')
     parser.add_argument('--only',nargs='+',help='episode ids to fly');parser.add_argument('--skip',type=int,default=0);parser.add_argument('--limit',type=int,default=0)
     parser.add_argument('--real-time-minimum',type=float,default=REAL_TIME_MINIMUM,help='a recorded flight whose simulator ran slower than this share of real time is rejected')
     parser.add_argument('--again',action='store_true',help='fly everything again instead of keeping what results.json already holds')

@@ -11,6 +11,10 @@ Everything is fixed in configs/generic_landing.json. A start is accepted only if
 (src/mission/start.validate), the object is in a free line from it, the straight track to it is clear, and the teacher
 (src/landing/teacher.py) lands from it in a dry run on the map's boxes. The checks are flown in layouts no episode was
 recorded in, and every start keeps its distance from every earlier start of its scene.
+
+Stage 1b (configs/generic_landing_stage1b.json) draws the same make-up again from new seeds, with its own teacher, its own
+folder and its own episode names; its starts also keep their distance from every start of stage 1. A stage's
+configuration names what differs (`folder`, `prefix`, `teacher.class`, `previous`); without those it is stage 1.
 """
 import json
 import math
@@ -34,8 +38,26 @@ PILOT_ROWS=(('near',True),('mid',False),('mid',True),('far',False))
 VALIDATION_ROWS=(('near',True),('near',False),('near',True),('mid',False),('mid',True),('mid',False),('mid',True),('far',False),('far',True),('far',False))
 
 
+PREFIXES={'train':'gl','val':'glval','pilot':'glp','validation':'glv','regression':'glr'}
+
+
 def load(path=None):
-    return json.loads(Path(path or CONFIG).read_text(encoding='utf-8'))
+    path=Path(path or CONFIG);return json.loads((path if path.is_absolute() else ROOT/path).read_text(encoding='utf-8'))
+
+
+def folder_of(stage):return ROOT/stage['folder'] if stage.get('folder') else FOLDER
+def files_of(stage):return {name:folder_of(stage)/f'{name}.json' for name in ('pilot','validation','regression')}
+def train_plan_of(stage):return folder_of(stage)/'train_plan.json'
+def prefix_of(stage,name):return stage.get('prefix',{}).get(name,PREFIXES[name])
+def teacher_of(stage):return stage.get('teacher',{}).get('class','surface')
+
+
+def previous_files(stage):
+    """The plans and sets of the stages this one follows."""
+    files=[]
+    while stage.get('previous'):
+        stage=load(stage['previous']);files+=list(files_of(stage).values())+[train_plan_of(stage)]
+    return files
 
 
 def earlier_points(*files):
@@ -76,7 +98,7 @@ def draw(config,oft,stage,scene,layout,target,band,visible,seed,split,name,exclu
                  'start_direction_deg':round(direction,2),'instruction_id':stage['instructions']['land'],
                  'instruction':instruction_for_id(config,scene,target,stage['instructions']['land']),'task':'land','max_ticks':stage['max_ticks'],
                  'initially_visible':visible,'others_in_view':view['others_in_view']}
-        plan=rollout(config,oft,scene,layout,episode,surface)
+        plan=rollout(config,oft,scene,layout,episode,surface,kind=teacher_of(stage))
         if plan['reason']!='teacher_stop' or not plan['landed']:continue
         episode['plan']={'ticks':plan['ticks'],'clearance_m':round(plan['clearance_m'],2),'climbed_m':round(plan['climbed_m'],2),
                          'acquired_tick':plan['acquired_tick'],'states':plan['states']}
@@ -89,7 +111,7 @@ def approach_twin(config,oft,stage,scene,episode):
     twin={key:value for key,value in episode.items() if key!='plan'}
     twin.update(id=f'{episode["id"]}-approach',task='approach',instruction_id=stage['instructions']['approach'],twin_of=episode['id'],
                 instruction=instruction_for_id(config,scene,episode['target'],stage['instructions']['approach']))
-    plan=rollout(config,oft,scene,episode['layout'],twin,SurfaceSet(scene,episode['layout'])[episode['target']])
+    plan=rollout(config,oft,scene,episode['layout'],twin,SurfaceSet(scene,episode['layout'])[episode['target']],kind=teacher_of(stage))
     if plan['reason']!='teacher_stop' or plan['landed']:return None
     twin['plan']={'ticks':plan['ticks'],'clearance_m':round(plan['clearance_m'],2),'climbed_m':round(plan['climbed_m'],2),
                   'acquired_tick':plan['acquired_tick'],'states':plan['states']}
@@ -134,12 +156,12 @@ def spread(count,total):
 
 
 def build_pilot(config,oft,stage,points):
-    episodes,_=_build(config,oft,stage,'pilot','glp',stage['layouts']['evaluation'][:2],PILOT_ROWS,{2},stage['seeds']['pilot'][0],points)
+    episodes,_=_build(config,oft,stage,'pilot',prefix_of(stage,'pilot'),stage['layouts']['evaluation'][:2],PILOT_ROWS,{2},stage['seeds']['pilot'][0],points)
     return episodes
 
 
 def build_validation(config,oft,stage,points):
-    episodes,_=_build(config,oft,stage,'validation','glv',stage['layouts']['evaluation'][2:],VALIDATION_ROWS,{1,4},stage['seeds']['validation'][0],points)
+    episodes,_=_build(config,oft,stage,'validation',prefix_of(stage,'validation'),stage['layouts']['evaluation'][2:],VALIDATION_ROWS,{1,4},stage['seeds']['validation'][0],points)
     return episodes
 
 
@@ -150,7 +172,7 @@ def build_regression(config,oft,stage,points):
     first view) has little room left: the set is drawn from the first of the seeds 43000, 43100, 43200, ... that gives one."""
     first,last=stage['seeds']['regression']
     for seed in range(first,last,100):
-        try:episodes=gen_v3c.build_validation(config,oft,seed=seed,points=list(points),split='regression',prefix='glr')
+        try:episodes=gen_v3c.build_validation(config,oft,seed=seed,points=list(points),split='regression',prefix=prefix_of(stage,'regression'))
         except RuntimeError:continue
         for episode in episodes:episode['set']='regression'
         points+=[(episode['map'],episode['start_xy']) for episode in episodes if not episode.get('twin_of')]
@@ -163,7 +185,7 @@ def build_training(config,oft,stage,points):
     plan={}
     for split,land,twins in (('train',stage['training']['land_per_kind'],stage['training']['approach_twins_per_kind']),
                              ('val',stage['training']['val_land_per_kind'],stage['training']['val_approach_twins_per_kind'])):
-        plan[split],_=_build(config,oft,stage,split,'gl' if split=='train' else 'glval',stage['layouts']['train'],rows_for(land),spread(twins,land),stage['seeds'][split][0],points)
+        plan[split],_=_build(config,oft,stage,split,prefix_of(stage,split),stage['layouts']['train'],rows_for(land),spread(twins,land),stage['seeds'][split][0],points)
     return plan
 
 
@@ -173,6 +195,13 @@ def describe(stage,which,episodes):
                        'configs/generic_landing.json.',
           'regression':'Generic landing, regression starts: a fresh set with the make-up of the canonical validation (every start at most 44 m from a pad or an '
                        'object the baseline was trained to reach), flown by the frozen baseline and by the checkpoint that passed the validation.'}
+    if stage.get('stage'):
+        # A later stage: the same make-up from new seeds, behind that stage's own configuration.
+        text={name:words.replace('Generic landing,',f'Generic landing, stage {stage["stage"]},').replace('configs/generic_landing.json',str(stage.get('file','its configuration')))
+              for name,words in text.items()}
+        return {'description':text[which]+f' Written before any episode of stage {stage["stage"]} was recorded. Flown in layouts of the two training scenes that no '
+                              'episode was recorded in; seeds and starts are disjoint from every earlier plan and set, those of the stages before it included.',
+                'seeds':stage['seeds'][which],'bands_m':stage['bands_m'],'episodes':episodes}
     return {'description':text[which]+' Written before any generic landing episode was recorded. Flown in layouts of the two training scenes that no episode was '
                           'recorded in; seeds and starts are disjoint from every earlier plan and set.',
             'seeds':stage['seeds'][which],'bands_m':stage['bands_m'],'episodes':episodes}

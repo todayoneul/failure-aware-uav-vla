@@ -1,0 +1,130 @@
+{
+  "description": "Phase B, stage 1b: stop-safe generic landing (docs/generic_landing_stage1b_stop_safe_teacher.md). Stage 1 (configs/generic_landing.json) did not pass its gate: cube landings 6 of 10 against 8, every failure the policy's own stop in the air. Its teacher labelled the last metres over a small top with a level step of 0.15 m, 1.9 times what the flight loop reads as a stop. Stage 1b asks one thing: were the teacher's labels before the touchdown in conflict with the student's stop, and does a landing become reliable when that conflict is taken out? One thing is changed, the teacher's labels of a landing; the start checkpoint, the architecture, what is trained, the schedule, the share of new data, the earlier data, the candidates, the evaluator, the finalizer, the stop rule and every number of the stage 1 gate are the ones of stage 1. Everything in this file was fixed before any episode of stage 1b was recorded. Stage 1's configuration, data, checkpoints, results and report stay as they are. Active search (stage 2) is not started by this stage, whatever its result.",
+  "stage": "1b",
+  "previous": "configs/generic_landing.json",
+  "folder": "configs/generic_landing_stage1b",
+  "prefix": {"train": "g1b", "val": "g1bval", "pilot": "g1bp", "validation": "g1bv", "regression": "g1br"},
+  "start_checkpoint": "outputs/aerovla_oft/checkpoints/grounding_film",
+  "checkpoint": "outputs/aerovla_oft/checkpoints/generic_landing_v1",
+  "checkpoint_note": "Made only if every gate of this stage is passed.",
+  "run": "outputs/aerovla_oft/checkpoints/generic_landing_stage1b_run",
+  "dataset": {
+    "added": "generic_landing_1b_added",
+    "merged": "generic_landing_1b",
+    "replay": ["generalization_v1", "generalization_v2_added", "generalization_v3_added", "generalization_v3b_added", "generalization_v3c_added"],
+    "not_used": ["generic_landing_added"],
+    "not_used_note": "The 233 episodes of stage 1 carry the labels this stage takes out. None of them is in the training data of stage 1b."
+  },
+  "scenes": ["field", "lot"],
+  "layouts": {
+    "train": ["a", "b", "c", "d", "k", "l", "m", "n"],
+    "evaluation": ["t", "u", "p", "q", "r", "s"],
+    "note": "As in stage 1: episodes are recorded in the eight layouts of each scene that earlier episodes were recorded in, every check flies in the six that no episode was ever recorded in. All of it is the two training scenes: a new layout or a new start here is not a new scene."
+  },
+  "seeds": {"train": [50000, 50999], "val": [51000, 51199], "pilot": [51500, 51599], "validation": [52000, 52999], "regression": [53000, 53999]},
+  "seeds_note": "Every plan, set and dataset of the repository was read for the seeds it uses: 0-24999, 30000-31002 and 40000-43999 are taken. Nothing has used 50000 and up. Every start also keeps its distance from every earlier start of its scene, those of stage 1 included (two exceptions, written down before the sets were drawn: see regression.may_be_near_from and training.may_be_near_from).",
+  "separation_m": 6.0,
+  "targets": {"pad": ["blue_pad", "red_pad"], "cube": ["blue_cube", "red_cube"], "cylinder": ["blue_cylinder", "green_cylinder"]},
+  "bands_m": {"near": [10.0, 20.0], "mid": [20.0, 32.0], "far": [32.0, 44.0]},
+  "height_m": [3.0, 12.0],
+  "first_view": {"visible_deg": [0.0, 25.0], "invisible_deg": [60.0, 180.0]},
+  "instructions": {"land": "land", "approach": "approach"},
+  "max_ticks": 320,
+  "training": {
+    "description": "The make-up of stage 1, drawn again from new seeds: per kind of surface 54 landings (27 for each of its two objects; 18 in each band; half with the object in the first view) and 16 of those starts flown again with the sentence that asks for an approach. 3 x 70 = 210 episodes and 24 for the validation loss. No start beyond 44 m, no hidden target, no new object.",
+    "land_per_kind": 54,
+    "approach_twins_per_kind": 16,
+    "val_land_per_kind": 6,
+    "val_approach_twins_per_kind": 2,
+    "may_be_near": ["configs/generic_landing/train_plan.json"],
+    "may_be_near_from": "The recorded starts of this stage are drawn from new seeds and none is a start of stage 1, but they need not keep 6 m from stage 1's recorded starts: those episodes are not in this stage's data, and with them kept away from there is no room left close to the pads (a landing start 10-20 m from a pad with the pad in the first view cannot be drawn in any of the sixteen recording layouts). They keep 6 m from every other earlier start and from every check start of this stage."
+  },
+  "stop_safety": {
+    "description": "What the student's stop is, read from the code and not from a report. src/aerovla_oft/spec.is_stop: an action is a stop when every axis is within stop_threshold (0.08) of its range: forward 0.08 m, down 0.08 m, yaw 0.0336 rad, in physical units after the output is clipped to its bounds. scripts/visual_search.run_episode: the policy predicts four actions, the first is flown, and a new chunk is predicted at every decision; stop_ticks (4) decisions in a row whose flown action is a stop end the flight (a decision that is not a stop sets the count back to zero; a contact the finalizer is still judging is waited for). The teacher's own flights are ended by the same lines. stop_ratio (src/landing/stop_safety.py) is an action's largest axis as a multiple of that axis's limit: 1 or less is a stop.",
+    "safe_ratio": 3.0,
+    "safe_ratio_from": "Every recorded pad landing of the canonical teacher (17,233 labels before a touchdown in the Gen-v3, v3b and v3c data and 3,259 in stage 1's own pad landings) is at least 3.125 times the stop rule: its smallest label is the final descent of 0.25 m. The student lands on pads (10 of 10, 26 of 27). Stage 1's cube and cylinder landings went down to 1.875 (a level step of 0.15 m), 2,217 of their 9,049 labels were below 3.0, and those are the landings that stopped in the air. 3.0 holds every surface to the margin the pad teacher always had. 2.0 would let a level step of 0.16 m through, which is the label that failed.",
+    "near_stop_ratio": 2.0,
+    "near_stop_ratio_from": "For counting only: stop_ticks labels in a row below this are a run that comes close to ending a flight. 2.0 and not 1.5, so that stage 1's 0.15 m steps (1.875) are counted.",
+    "applies_to": "Every label of a landing before the touchdown: none may be a stop, none may be below safe_ratio, and no stop_ticks of them in a row may be stops. A landing's stop is allowed only once the vehicle stands on the surface. An approach ends with a stop in the air near the object, and the canonical teacher slows down toward it on purpose (down to 0.2 m, 2.5 times the stop rule, at the place where stopping is right); its labels are counted and reported, they may not be a stop before the teacher's own stop, and they are not held to safe_ratio. The canonical approach teacher is not changed.",
+    "gate": "No episode is recorded before the teacher's dry runs of every planned landing and its fifteen flights in the simulator keep the rule, and no update is trained before the recorded labels keep it."
+  },
+  "teacher": {
+    "class": "stop_safe",
+    "description": "src/landing/teacher.StopSafeTeacher: the canonical teacher, and while a landing's target is in view the climb of stage 1 with one change and the entry of stage 1 replaced. Climb: within the canonical glide distance and lower than the top plus the fly-in height (a pad: the canonical slow height; a smaller top: the canonical commit height plus 0.5 m), it goes up; near the object and not yet clear_above_top_m over the top it does so in place, and once it is clear it moves in while it climbs, so that the end of the climb and the level flight share the forward motion. Entry over a top smaller than a pad: it slows down from far out (ease_gain_per_m per metre left) to entry_forward_m and no further, and the descent starts at the canonical radii, as over a pad. Stage 1 shrank those radii with the surface and crept in at 0.15 m. A pad from the heights the earlier data was flown at is flown exactly as the canonical teacher flies it.",
+    "entry_forward_m": 0.35,
+    "entry_forward_from": "The canonical align radius (1.75 m) flown in about the time the vehicle lags behind a command (2.4 s, 4.8 decisions): told to descend at that radius, the vehicle coasts to about the middle. 4.4 times the stop rule's forward limit.",
+    "ease_gain_per_m": 0.05,
+    "ease_gain_from": "stage 1's: 0.1 m/s per metre left, about one over four times the lag. The entry speed is reached 7 m from the middle.",
+    "clear_above_top_m": 1.0,
+    "clear_above_top_from": "More than the 0.8 m the start rule keeps clear of anything and more than twice the vehicle's half-span (0.4 m).",
+    "search": "canonical: turn right until the object is in view, climb when something close fills the view. No part of the search knows where the target is.",
+    "approach": "canonical, unchanged."
+  },
+  "teacher_pilot": {
+    "description": "Before anything is recorded the teacher flies the fifteen pilot starts in the simulator with the finalizer (five per kind of surface: four landings and one approach twin; near, mid and far; low and high starts, most of the landings needing a climb).",
+    "pass": {"success_min": 15, "of": 15, "collisions_max": 0, "wrong_target_max": 0, "stop_safety_violations_max": 0}
+  },
+  "fine_tune": {
+    "description": "Stage 1's, unchanged: from the frozen baseline with its architecture; the correction LoRA, the action head and the FiLM module are trained; 2,500 updates of 4 frames at 5e-5 (the module at the same rate); 45 % of the drawn frames from the new generic landing episodes of stage 1b and 55 % from everything the baseline was trained on. Not continued from stage 1's checkpoint.",
+    "updates": 2500,
+    "learning_rate": 5e-05,
+    "grounding_learning_rate": 5e-05,
+    "batch_size": 1,
+    "gradient_accumulation": 4,
+    "share": 0.45,
+    "eval_every": 250,
+    "eval_samples": 600,
+    "balance": 3.0,
+    "boost": {"small_visible": 2, "selection": 3},
+    "select_band": 0.02,
+    "val_file": "val_mix",
+    "candidates": [1000, 1500, 2000, 2500]
+  },
+  "pilot": {
+    "description": "Fifteen new starts flown once by the frozen baseline and by each of the four candidates: for each kind of surface four landings (one near, two mid, one far; two with the object in the first view) and one approach twin. Stage 1's pilot starts are spent and are not flown. The candidate that goes on is chosen by `order`, each line breaking a tie of the line before. It goes on to the validation set only if it meets `pass`.",
+    "land_per_kind": 4,
+    "approach_twins_per_kind": 1,
+    "order": ["landings on cubes and cylinders (more)", "flights that stop by themselves in the air during a landing (fewer)", "landings on pads (more)", "flights that end at a wrong object (fewer)", "collisions (fewer)", "validation L1 at that update (lower)", "the earlier update"],
+    "pass": {"cube_cylinder_landings_min": 5, "cube_cylinder_landings_of": 8, "pad_landings_min": 3, "pad_landings_of": 4, "approach_touchdowns_max": 0, "collisions_max": 2},
+    "pass_from": "stage 1's lines, unchanged"
+  },
+  "validation": {
+    "description": "A new set of the make-up of stage 1's: thirty landing starts (ten for each kind of surface: three near, four mid, three far; five with the object in the first view) and six of them flown again as approaches (two per kind): 36 flights, new seeds, new starts, in the layouts no episode was recorded in. Stage 1's validation starts are spent and are not flown. The gates are judged on the first flight of every start. `smoke` is flown first and stops the chain if it is not met.",
+    "land_per_kind": 10,
+    "approach_twins_per_kind": 2,
+    "smoke": {"starts_per_kind": 3, "success_min": 6, "of": 9, "collisions_max": 1},
+    "gates": {
+      "success_min": 30, "of": 36,
+      "land_system_success_min": 24, "land_of": 30,
+      "pad_land_min": 9, "cube_land_min": 8, "cylinder_land_min": 8, "per_kind_of": 10,
+      "wrong_target_max": 2,
+      "collisions_max": 1,
+      "approach_touchdowns_max": 0
+    },
+    "gates_from": "stage 1's numbers, none lowered: overall 30 of 36; landings 80 %; pad landings 90 %, cube 80 %, cylinder 80 % (of ten: 9, 8, 8); at most two flights at a wrong object, one collision, no touchdown in an approach.",
+    "repeat": {
+      "description": "Stage 1's second flights flipped five of twenty starts, so one flight of a start no longer passes a kind of surface. Every cube and cylinder landing start of the validation set is flown a second time by the same checkpoint (20 flights), whatever the first flights gave. Per kind: the first flights still have to give 8 of 10, the two flights together 16 of 20, and at most one start may fail both times.",
+      "kinds": ["cube", "cylinder"],
+      "aggregate_min": 16, "aggregate_of": 20,
+      "both_failed_max": 1,
+      "first_flight_min": 8, "first_flight_of": 10
+    }
+  },
+  "regression": {
+    "description": "What the baseline could do inside 44 m must still be there. A new set with the make-up of the canonical validation (pad landings, approaches, a same-colour or same-shape object in the first view, the pad outside the first view, the far band) is drawn in the evaluation layouts from the first of the seeds 53000, 53100, ... that gives one, and flown once by the frozen baseline and once by the chosen checkpoint. Stage 1's regression flights are not used for this.",
+    "success_below_baseline_max": 2,
+    "landings_below_baseline_max": 2,
+    "wrong_target_above_baseline_max": 1,
+    "collisions_above_baseline_max": 0,
+    "approach_touchdowns_max": 0,
+    "may_be_near": ["configs/generic_landing/regression.json"],
+    "may_be_near_from": "Every start of this stage keeps 6 m from every earlier start of its scene, with one exception written down before the set was drawn: the regression set need not keep away from the starts of stage 1's regression set, which it replaces. Those starts were never recorded and were flown only by stage 1's candidate and the baseline. With them kept away from, none of the ten seeds of the range gives a set: the row with a pad of the other colour close by in the first view (10-20 m) has no room left in these layouts after three sets of this make-up. The set still keeps its distance from every recorded start and from every other check start.",
+    "from": "the plan of the stage: at most two missions fewer than the baseline, no collision more, no touchdown in an approach; pad landings and wrong objects within what one checkpoint's two flights of one set differ by (stage 1's numbers)."
+  },
+  "failure_classes": {
+    "description": "How a failed landing is named (scripts/generic_landing.py). First how it ended, then, for a flight that stopped by itself in the air, where in the landing the vehicle was at its last decision, read from its position against the canonical radii and the fly-in height and not from any output of the policy.",
+    "ends": {"AIR_SELF_STOP": "the policy's own stop with no contact", "COLLISION": "a contact that is not a landing surface from above", "TIMEOUT": "the decision limit", "TARGET_SELECTION": "ended at or on another object", "TOUCHDOWN": "a contact with the named surface outside its usable region or too fast", "STABILITY": "a contact inside the region that did not become a standing, latched landing", "OTHER": "anything else"},
+    "phases": {"SURFACE_APPROACH": "farther than the arrival distance (12 m)", "CLIMB": "within it, not over the object, lower than the fly-in height", "ALIGNMENT": "at the fly-in height or over the object, not yet where the descent starts", "DESCENT": "where the canonical teacher descends (within the align radius, or low over the top within the commit radius)"}
+  },
+  "ceiling": "The executor is not changed in this stage. Flights above the 14 m of the start rule are counted and reported."
+}

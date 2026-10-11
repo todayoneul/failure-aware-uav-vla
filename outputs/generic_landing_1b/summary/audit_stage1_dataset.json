@@ -1,0 +1,1654 @@
+{
+ "rule": {
+  "safe_ratio": 3.0,
+  "near_stop_ratio": 2.0,
+  "stop_ticks": 4,
+  "stop_limits": {
+   "forward_m": 0.08,
+   "down_m": 0.08,
+   "yaw_rad": 0.0336
+  }
+ },
+ "total": {
+  "actions": 14739,
+  "terminal": 932,
+  "nonterminal": 13807,
+  "forced": 0,
+  "nonterminal_stop": 0,
+  "below_safe": 2307,
+  "stop_windows": 0,
+  "near_stop_windows": 1184,
+  "terminal_not_a_stop": 0,
+  "episodes": 233
+ },
+ "by": {
+  "band": {
+   "APPROACH 10-20 m": {
+    "actions": 354,
+    "terminal": 84,
+    "nonterminal": 270,
+    "forced": 0,
+    "nonterminal_stop": 0,
+    "below_safe": 40,
+    "stop_windows": 0,
+    "near_stop_windows": 0,
+    "terminal_not_a_stop": 0,
+    "episodes": 21,
+    "stop_ratio": {
+     "n": 270,
+     "min": 2.5,
+     "p5": 2.5,
+     "median": 6.25,
+     "p95": 12.175
+    }
+   },
+   "APPROACH 20-32 m": {
+    "actions": 647,
+    "terminal": 72,
+    "nonterminal": 575,
+    "forced": 0,
+    "nonterminal_stop": 0,
+    "below_safe": 29,
+    "stop_windows": 0,
+    "near_stop_windows": 0,
+    "terminal_not_a_stop": 0,
+    "episodes": 18,
+    "stop_ratio": {
+     "n": 575,
+     "min": 2.5,
+     "p5": 2.981,
+     "median": 10.914,
+     "p95": 12.492
+    }
+   },
+   "APPROACH 32-44 m": {
+    "actions": 714,
+    "terminal": 60,
+    "nonterminal": 654,
+    "forced": 0,
+    "nonterminal_stop": 0,
+    "below_safe": 21,
+    "stop_windows": 0,
+    "near_stop_windows": 0,
+    "terminal_not_a_stop": 0,
+    "episodes": 15,
+    "stop_ratio": {
+     "n": 654,
+     "min": 2.5,
+     "p5": 4.824,
+     "median": 12.389,
+     "p95": 12.498
+    }
+   },
+   "LAND 10-20 m": {
+    "actions": 3631,
+    "terminal": 236,
+    "nonterminal": 3395,
+    "forced": 0,
+    "nonterminal_stop": 0,
+    "below_safe": 757,
+    "stop_windows": 0,
+    "near_stop_windows": 406,
+    "terminal_not_a_stop": 0,
+    "episodes": 59,
+    "stop_ratio": {
+     "n": 3395,
+     "min": 1.875,
+     "p5": 1.875,
+     "median": 5.234,
+     "p95": 12.381
+    }
+   },
+   "LAND 20-32 m": {
+    "actions": 4255,
+    "terminal": 240,
+    "nonterminal": 4015,
+    "forced": 0,
+    "nonterminal_stop": 0,
+    "below_safe": 733,
+    "stop_windows": 0,
+    "near_stop_windows": 391,
+    "terminal_not_a_stop": 0,
+    "episodes": 60,
+    "stop_ratio": {
+     "n": 4015,
+     "min": 1.875,
+     "p5": 1.875,
+     "median": 6.25,
+     "p95": 12.487
+    }
+   },
+   "LAND 32-44 m": {
+    "actions": 5138,
+    "terminal": 240,
+    "nonterminal": 4898,
+    "forced": 0,
+    "nonterminal_stop": 0,
+    "below_safe": 727,
+    "stop_windows": 0,
+    "near_stop_windows": 387,
+    "terminal_not_a_stop": 0,
+    "episodes": 60,
+    "stop_ratio": {
+     "n": 4898,
+     "min": 1.875,
+     "p5": 1.875,
+     "median": 6.25,
+     "p95": 12.496
+    }
+   }
+  },
+  "kind": {
+   "cube APPROACH": {
+    "actions": 566,
+    "terminal": 72,
+    "nonterminal": 494,
+    "forced": 0,
+    "nonterminal_stop": 0,
+    "below_safe": 30,
+    "stop_windows": 0,
+    "near_stop_windows": 0,
+    "terminal_not_a_stop": 0,
+    "episodes": 18,
+    "stop_ratio": {
+     "n": 494,
+     "min": 2.5,
+     "p5": 2.53,
+     "median": 9.638,
+     "p95": 12.496
+    }
+   },
+   "cube LAND": {
+    "actions": 4792,
+    "terminal": 236,
+    "nonterminal": 4556,
+    "forced": 0,
+    "nonterminal_stop": 0,
+    "below_safe": 1120,
+    "stop_windows": 0,
+    "near_stop_windows": 599,
+    "terminal_not_a_stop": 0,
+    "episodes": 59,
+    "stop_ratio": {
+     "n": 4556,
+     "min": 1.875,
+     "p5": 1.875,
+     "median": 5.775,
+     "p95": 12.488
+    }
+   },
+   "cylinder APPROACH": {
+    "actions": 541,
+    "terminal": 72,
+    "nonterminal": 469,
+    "forced": 0,
+    "nonterminal_stop": 0,
+    "below_safe": 24,
+    "stop_windows": 0,
+    "near_stop_windows": 0,
+    "terminal_not_a_stop": 0,
+    "episodes": 18,
+    "stop_ratio": {
+     "n": 469,
+     "min": 2.5,
+     "p5": 2.882,
+     "median": 11.483,
+     "p95": 12.496
+    }
+   },
+   "cylinder LAND": {
+    "actions": 4733,
+    "terminal": 240,
+    "nonterminal": 4493,
+    "forced": 0,
+    "nonterminal_stop": 0,
+    "below_safe": 1097,
+    "stop_windows": 0,
+    "near_stop_windows": 585,
+    "terminal_not_a_stop": 0,
+    "episodes": 60,
+    "stop_ratio": {
+     "n": 4493,
+     "min": 1.875,
+     "p5": 1.875,
+     "median": 5.598,
+     "p95": 12.488
+    }
+   },
+   "pad APPROACH": {
+    "actions": 608,
+    "terminal": 72,
+    "nonterminal": 536,
+    "forced": 0,
+    "nonterminal_stop": 0,
+    "below_safe": 36,
+    "stop_windows": 0,
+    "near_stop_windows": 0,
+    "terminal_not_a_stop": 0,
+    "episodes": 18,
+    "stop_ratio": {
+     "n": 536,
+     "min": 2.5,
+     "p5": 2.5,
+     "median": 11.564,
+     "p95": 12.497
+    }
+   },
+   "pad LAND": {
+    "actions": 3499,
+    "terminal": 240,
+    "nonterminal": 3259,
+    "forced": 0,
+    "nonterminal_stop": 0,
+    "below_safe": 0,
+    "stop_windows": 0,
+    "near_stop_windows": 0,
+    "terminal_not_a_stop": 0,
+    "episodes": 60,
+    "stop_ratio": {
+     "n": 3259,
+     "min": 3.125,
+     "p5": 3.125,
+     "median": 11.143,
+     "p95": 12.496
+    }
+   }
+  },
+  "state": {
+   "APPROACH ALIGN": {
+    "nonterminal": 49,
+    "below_safe": 0,
+    "near_stop": 0,
+    "nonterminal_stop": 0,
+    "stop_ratio": {
+     "n": 49,
+     "min": 6.25,
+     "p5": 6.25,
+     "median": 6.25,
+     "p95": 6.25
+    }
+   },
+   "APPROACH APPROACH": {
+    "nonterminal": 1084,
+    "below_safe": 90,
+    "near_stop": 0,
+    "nonterminal_stop": 0,
+    "stop_ratio": {
+     "n": 1084,
+     "min": 2.5,
+     "p5": 2.5,
+     "median": 12.303,
+     "p95": 12.497
+    }
+   },
+   "APPROACH SEARCH": {
+    "nonterminal": 366,
+    "below_safe": 0,
+    "near_stop": 0,
+    "nonterminal_stop": 0,
+    "stop_ratio": {
+     "n": 366,
+     "min": 6.25,
+     "p5": 6.25,
+     "median": 6.25,
+     "p95": 6.25
+    }
+   },
+   "LAND ALIGN": {
+    "nonterminal": 79,
+    "below_safe": 0,
+    "near_stop": 0,
+    "nonterminal_stop": 0,
+    "stop_ratio": {
+     "n": 79,
+     "min": 6.25,
+     "p5": 6.25,
+     "median": 6.25,
+     "p95": 6.25
+    }
+   },
+   "LAND APPROACH": {
+    "nonterminal": 2832,
+    "below_safe": 0,
+    "near_stop": 0,
+    "nonterminal_stop": 0,
+    "stop_ratio": {
+     "n": 2832,
+     "min": 6.25,
+     "p5": 7.621,
+     "median": 12.376,
+     "p95": 12.497
+    }
+   },
+   "LAND CLIMB": {
+    "nonterminal": 1233,
+    "below_safe": 0,
+    "near_stop": 0,
+    "nonterminal_stop": 0,
+    "stop_ratio": {
+     "n": 1233,
+     "min": 3.139,
+     "p5": 6.25,
+     "median": 12.438,
+     "p95": 12.498
+    }
+   },
+   "LAND DESCENT": {
+    "nonterminal": 2478,
+    "below_safe": 0,
+    "near_stop": 0,
+    "nonterminal_stop": 0,
+    "stop_ratio": {
+     "n": 2478,
+     "min": 3.125,
+     "p5": 3.125,
+     "median": 3.125,
+     "p95": 6.25
+    }
+   },
+   "LAND SEARCH": {
+    "nonterminal": 1067,
+    "below_safe": 0,
+    "near_stop": 0,
+    "nonterminal_stop": 0,
+    "stop_ratio": {
+     "n": 1067,
+     "min": 6.25,
+     "p5": 6.25,
+     "median": 6.25,
+     "p95": 6.25
+    }
+   },
+   "LAND SURFACE_APPROACH": {
+    "nonterminal": 4619,
+    "below_safe": 2217,
+    "near_stop": 1541,
+    "nonterminal_stop": 0,
+    "stop_ratio": {
+     "n": 4619,
+     "min": 1.875,
+     "p5": 1.875,
+     "median": 3.176,
+     "p95": 12.461
+    }
+   }
+  },
+  "task": {
+   "APPROACH": {
+    "actions": 1715,
+    "terminal": 216,
+    "nonterminal": 1499,
+    "forced": 0,
+    "nonterminal_stop": 0,
+    "below_safe": 90,
+    "stop_windows": 0,
+    "near_stop_windows": 0,
+    "terminal_not_a_stop": 0,
+    "episodes": 54,
+    "stop_ratio": {
+     "n": 1499,
+     "min": 2.5,
+     "p5": 2.5,
+     "median": 10.977,
+     "p95": 12.496
+    }
+   },
+   "LAND": {
+    "actions": 13024,
+    "terminal": 716,
+    "nonterminal": 12308,
+    "forced": 0,
+    "nonterminal_stop": 0,
+    "below_safe": 2217,
+    "stop_windows": 0,
+    "near_stop_windows": 1184,
+    "terminal_not_a_stop": 0,
+    "episodes": 179,
+    "stop_ratio": {
+     "n": 12308,
+     "min": 1.875,
+     "p5": 1.875,
+     "median": 6.25,
+     "p95": 12.492
+    }
+   }
+  }
+ },
+ "checks": [
+  {
+   "what": "landing labels before the touchdown that are a stop",
+   "count": 0,
+   "allowed": 0,
+   "passed": true
+  },
+  {
+   "what": "landing labels before the touchdown below 3.0 x the stop rule",
+   "count": 2217,
+   "allowed": 0,
+   "passed": false
+  },
+  {
+   "what": "runs of 4 stops before the touchdown of a landing",
+   "count": 0,
+   "allowed": 0,
+   "passed": true
+  },
+  {
+   "what": "approach labels that are a stop before the teacher's own stop",
+   "count": 0,
+   "allowed": 0,
+   "passed": true
+  },
+  {
+   "what": "runs of 4 stops before the stop of an approach",
+   "count": 0,
+   "allowed": 0,
+   "passed": true
+  }
+ ],
+ "passed": false,
+ "episodes_that_break_the_rule": 119,
+ "examples": [
+  {
+   "id": "gl-40070-blue_cube-near_visible",
+   "task": "land",
+   "kind": "cube",
+   "nonterminal_stop": 0,
+   "below_safe": 19,
+   "stop_windows": 0,
+   "examples": [
+    {
+     "step": 27,
+     "state": "final",
+     "action": [
+      0.2322,
+      0.0,
+      -0.003
+     ],
+     "ratio": 2.903
+    },
+    {
+     "step": 28,
+     "state": "final",
+     "action": [
+      0.2177,
+      0.0,
+      -0.0021
+     ],
+     "ratio": 2.721
+    },
+    {
+     "step": 29,
+     "state": "final",
+     "action": [
+      0.204,
+      0.0,
+      -0.0034
+     ],
+     "ratio": 2.55
+    },
+    {
+     "step": 30,
+     "state": "final",
+     "action": [
+      0.1904,
+      0.0,
+      -0.0045
+     ],
+     "ratio": 2.38
+    },
+    {
+     "step": 31,
+     "state": "final",
+     "action": [
+      0.1786,
+      0.0,
+      -0.004
+     ],
+     "ratio": 2.233
+    }
+   ]
+  },
+  {
+   "id": "gl-40071-red_cube-near_search",
+   "task": "land",
+   "kind": "cube",
+   "nonterminal_stop": 0,
+   "below_safe": 19,
+   "stop_windows": 0,
+   "examples": [
+    {
+     "step": 39,
+     "state": "final",
+     "action": [
+      0.2263,
+      0.0,
+      0.0035
+     ],
+     "ratio": 2.829
+    },
+    {
+     "step": 40,
+     "state": "final",
+     "action": [
+      0.2123,
+      0.0,
+      0.0019
+     ],
+     "ratio": 2.654
+    },
+    {
+     "step": 41,
+     "state": "final",
+     "action": [
+      0.1985,
+      0.0,
+      -0.0011
+     ],
+     "ratio": 2.481
+    },
+    {
+     "step": 42,
+     "state": "final",
+     "action": [
+      0.1851,
+      0.0,
+      -0.0033
+     ],
+     "ratio": 2.314
+    },
+    {
+     "step": 43,
+     "state": "final",
+     "action": [
+      0.1728,
+      0.0,
+      -0.0013
+     ],
+     "ratio": 2.161
+    }
+   ]
+  },
+  {
+   "id": "gl-40072-blue_cube-mid_visible",
+   "task": "land",
+   "kind": "cube",
+   "nonterminal_stop": 0,
+   "below_safe": 18,
+   "stop_windows": 0,
+   "examples": [
+    {
+     "step": 33,
+     "state": "final",
+     "action": [
+      0.2398,
+      0.0,
+      0.0008
+     ],
+     "ratio": 2.997
+    },
+    {
+     "step": 34,
+     "state": "final",
+     "action": [
+      0.2218,
+      0.0,
+      0.0008
+     ],
+     "ratio": 2.773
+    },
+    {
+     "step": 35,
+     "state": "final",
+     "action": [
+      0.2051,
+      0.0,
+      -0.0022
+     ],
+     "ratio": 2.564
+    },
+    {
+     "step": 36,
+     "state": "final",
+     "action": [
+      0.1893,
+      0.0,
+      0.0026
+     ],
+     "ratio": 2.366
+    },
+    {
+     "step": 37,
+     "state": "final",
+     "action": [
+      0.1755,
+      0.0,
+      0.0006
+     ],
+     "ratio": 2.194
+    }
+   ]
+  },
+  {
+   "id": "gl-40073-red_cube-mid_search",
+   "task": "land",
+   "kind": "cube",
+   "nonterminal_stop": 0,
+   "below_safe": 19,
+   "stop_windows": 0,
+   "examples": [
+    {
+     "step": 49,
+     "state": "final",
+     "action": [
+      0.2321,
+      0.0,
+      -0.0006
+     ],
+     "ratio": 2.902
+    },
+    {
+     "step": 50,
+     "state": "final",
+     "action": [
+      0.2154,
+      0.0,
+      0.0036
+     ],
+     "ratio": 2.692
+    },
+    {
+     "step": 51,
+     "state": "final",
+     "action": [
+      0.2002,
+      0.0,
+      0.0037
+     ],
+     "ratio": 2.502
+    },
+    {
+     "step": 52,
+     "state": "final",
+     "action": [
+      0.1866,
+      0.0,
+      -0.0038
+     ],
+     "ratio": 2.332
+    },
+    {
+     "step": 53,
+     "state": "final",
+     "action": [
+      0.1736,
+      0.0,
+      -0.0056
+     ],
+     "ratio": 2.17
+    }
+   ]
+  },
+  {
+   "id": "gl-40074-blue_cube-far_visible",
+   "task": "land",
+   "kind": "cube",
+   "nonterminal_stop": 0,
+   "below_safe": 18,
+   "stop_windows": 0,
+   "examples": [
+    {
+     "step": 48,
+     "state": "final",
+     "action": [
+      0.2266,
+      0.0,
+      -0.0008
+     ],
+     "ratio": 2.833
+    },
+    {
+     "step": 49,
+     "state": "final",
+     "action": [
+      0.2113,
+      0.0,
+      -0.0034
+     ],
+     "ratio": 2.641
+    },
+    {
+     "step": 50,
+     "state": "final",
+     "action": [
+      0.1969,
+      0.0,
+      -0.004
+     ],
+     "ratio": 2.461
+    },
+    {
+     "step": 51,
+     "state": "final",
+     "action": [
+      0.1836,
+      0.0,
+      0.0015
+     ],
+     "ratio": 2.294
+    },
+    {
+     "step": 52,
+     "state": "final",
+     "action": [
+      0.1714,
+      0.0,
+      0.0051
+     ],
+     "ratio": 2.142
+    }
+   ]
+  },
+  {
+   "id": "gl-40075-red_cube-far_search",
+   "task": "land",
+   "kind": "cube",
+   "nonterminal_stop": 0,
+   "below_safe": 18,
+   "stop_windows": 0,
+   "examples": [
+    {
+     "step": 73,
+     "state": "final",
+     "action": [
+      0.2365,
+      0.0,
+      0.0016
+     ],
+     "ratio": 2.956
+    },
+    {
+     "step": 74,
+     "state": "final",
+     "action": [
+      0.2184,
+      0.0,
+      0.0029
+     ],
+     "ratio": 2.73
+    },
+    {
+     "step": 75,
+     "state": "final",
+     "action": [
+      0.2022,
+      0.0,
+      0.0047
+     ],
+     "ratio": 2.528
+    },
+    {
+     "step": 76,
+     "state": "final",
+     "action": [
+      0.1872,
+      0.0,
+      -0.004
+     ],
+     "ratio": 2.34
+    },
+    {
+     "step": 77,
+     "state": "final",
+     "action": [
+      0.1735,
+      0.0,
+      -0.0069
+     ],
+     "ratio": 2.168
+    }
+   ]
+  },
+  {
+   "id": "gl-40076-blue_cube-near_search",
+   "task": "land",
+   "kind": "cube",
+   "nonterminal_stop": 0,
+   "below_safe": 19,
+   "stop_windows": 0,
+   "examples": [
+    {
+     "step": 33,
+     "state": "final",
+     "action": [
+      0.2326,
+      0.0,
+      0.0035
+     ],
+     "ratio": 2.907
+    },
+    {
+     "step": 34,
+     "state": "final",
+     "action": [
+      0.2182,
+      0.0,
+      -0.0024
+     ],
+     "ratio": 2.727
+    },
+    {
+     "step": 35,
+     "state": "final",
+     "action": [
+      0.2042,
+      0.0,
+      -0.0041
+     ],
+     "ratio": 2.553
+    },
+    {
+     "step": 36,
+     "state": "final",
+     "action": [
+      0.1915,
+      0.0,
+      0.0001
+     ],
+     "ratio": 2.394
+    },
+    {
+     "step": 37,
+     "state": "final",
+     "action": [
+      0.1785,
+      0.0,
+      0.0015
+     ],
+     "ratio": 2.231
+    }
+   ]
+  },
+  {
+   "id": "gl-40077-red_cube-near_visible",
+   "task": "land",
+   "kind": "cube",
+   "nonterminal_stop": 0,
+   "below_safe": 21,
+   "stop_windows": 0,
+   "examples": [
+    {
+     "step": 35,
+     "state": "final",
+     "action": [
+      0.2321,
+      0.0,
+      0.003
+     ],
+     "ratio": 2.901
+    },
+    {
+     "step": 36,
+     "state": "final",
+     "action": [
+      0.2176,
+      0.0,
+      0.0036
+     ],
+     "ratio": 2.72
+    },
+    {
+     "step": 37,
+     "state": "final",
+     "action": [
+      0.2057,
+      0.0,
+      0.0025
+     ],
+     "ratio": 2.572
+    },
+    {
+     "step": 38,
+     "state": "final",
+     "action": [
+      0.1941,
+      0.0,
+      -0.0008
+     ],
+     "ratio": 2.426
+    },
+    {
+     "step": 39,
+     "state": "final",
+     "action": [
+      0.1827,
+      0.0,
+      -0.0013
+     ],
+     "ratio": 2.284
+    }
+   ]
+  },
+  {
+   "id": "gl-40078-blue_cube-mid_search",
+   "task": "land",
+   "kind": "cube",
+   "nonterminal_stop": 0,
+   "below_safe": 18,
+   "stop_windows": 0,
+   "examples": [
+    {
+     "step": 50,
+     "state": "final",
+     "action": [
+      0.2291,
+      0.0,
+      0.002
+     ],
+     "ratio": 2.864
+    },
+    {
+     "step": 51,
+     "state": "final",
+     "action": [
+      0.2149,
+      0.0,
+      0.0051
+     ],
+     "ratio": 2.686
+    },
+    {
+     "step": 52,
+     "state": "final",
+     "action": [
+      0.2,
+      0.0,
+      0.0032
+     ],
+     "ratio": 2.5
+    },
+    {
+     "step": 53,
+     "state": "final",
+     "action": [
+      0.1862,
+      0.0,
+      0.0011
+     ],
+     "ratio": 2.328
+    },
+    {
+     "step": 54,
+     "state": "final",
+     "action": [
+      0.1727,
+      0.0,
+      0.0016
+     ],
+     "ratio": 2.158
+    }
+   ]
+  },
+  {
+   "id": "gl-40079-red_cube-mid_visible",
+   "task": "land",
+   "kind": "cube",
+   "nonterminal_stop": 0,
+   "below_safe": 19,
+   "stop_windows": 0,
+   "examples": [
+    {
+     "step": 35,
+     "state": "final",
+     "action": [
+      0.2321,
+      0.0,
+      0.0009
+     ],
+     "ratio": 2.901
+    },
+    {
+     "step": 36,
+     "state": "final",
+     "action": [
+      0.2166,
+      0.0,
+      -0.0004
+     ],
+     "ratio": 2.708
+    },
+    {
+     "step": 37,
+     "state": "final",
+     "action": [
+      0.201,
+      0.0,
+      -0.0007
+     ],
+     "ratio": 2.512
+    },
+    {
+     "step": 38,
+     "state": "final",
+     "action": [
+      0.1864,
+      0.0,
+      0.0015
+     ],
+     "ratio": 2.33
+    },
+    {
+     "step": 39,
+     "state": "final",
+     "action": [
+      0.1738,
+      0.0,
+      0.0001
+     ],
+     "ratio": 2.173
+    }
+   ]
+  },
+  {
+   "id": "gl-40080-blue_cube-far_search",
+   "task": "land",
+   "kind": "cube",
+   "nonterminal_stop": 0,
+   "below_safe": 20,
+   "stop_windows": 0,
+   "examples": [
+    {
+     "step": 72,
+     "state": "final",
+     "action": [
+      0.2344,
+      0.0,
+      -0.0025
+     ],
+     "ratio": 2.93
+    },
+    {
+     "step": 73,
+     "state": "final",
+     "action": [
+      0.2182,
+      0.0,
+      -0.0034
+     ],
+     "ratio": 2.727
+    },
+    {
+     "step": 74,
+     "state": "final",
+     "action": [
+      0.2032,
+      0.0,
+      -0.004
+     ],
+     "ratio": 2.539
+    },
+    {
+     "step": 75,
+     "state": "final",
+     "action": [
+      0.1892,
+      0.0,
+      -0.0051
+     ],
+     "ratio": 2.364
+    },
+    {
+     "step": 76,
+     "state": "final",
+     "action": [
+      0.1761,
+      0.0,
+      -0.0041
+     ],
+     "ratio": 2.201
+    }
+   ]
+  },
+  {
+   "id": "gl-40081-red_cube-far_visible",
+   "task": "land",
+   "kind": "cube",
+   "nonterminal_stop": 0,
+   "below_safe": 18,
+   "stop_windows": 0,
+   "examples": [
+    {
+     "step": 42,
+     "state": "final",
+     "action": [
+      0.2225,
+      0.0,
+      0.0033
+     ],
+     "ratio": 2.782
+    },
+    {
+     "step": 43,
+     "state": "final",
+     "action": [
+      0.2073,
+      0.0,
+      0.0042
+     ],
+     "ratio": 2.591
+    },
+    {
+     "step": 44,
+     "state": "final",
+     "action": [
+      0.1924,
+      0.0,
+      0.0052
+     ],
+     "ratio": 2.405
+    },
+    {
+     "step": 45,
+     "state": "final",
+     "action": [
+      0.179,
+      0.0,
+      0.003
+     ],
+     "ratio": 2.238
+    },
+    {
+     "step": 46,
+     "state": "final",
+     "action": [
+      0.1661,
+      0.0,
+      -0.0058
+     ],
+     "ratio": 2.077
+    }
+   ]
+  },
+  {
+   "id": "gl-40082-blue_cube-near_visible",
+   "task": "land",
+   "kind": "cube",
+   "nonterminal_stop": 0,
+   "below_safe": 19,
+   "stop_windows": 0,
+   "examples": [
+    {
+     "step": 21,
+     "state": "final",
+     "action": [
+      0.2254,
+      0.0,
+      0.0001
+     ],
+     "ratio": 2.818
+    },
+    {
+     "step": 22,
+     "state": "final",
+     "action": [
+      0.2114,
+      0.0,
+      0.0008
+     ],
+     "ratio": 2.642
+    },
+    {
+     "step": 23,
+     "state": "final",
+     "action": [
+      0.1977,
+      0.0,
+      0.0013
+     ],
+     "ratio": 2.471
+    },
+    {
+     "step": 24,
+     "state": "final",
+     "action": [
+      0.1842,
+      0.0,
+      0.0027
+     ],
+     "ratio": 2.303
+    },
+    {
+     "step": 25,
+     "state": "final",
+     "action": [
+      0.1723,
+      0.0,
+      0.0047
+     ],
+     "ratio": 2.154
+    }
+   ]
+  },
+  {
+   "id": "gl-40083-red_cube-near_search",
+   "task": "land",
+   "kind": "cube",
+   "nonterminal_stop": 0,
+   "below_safe": 20,
+   "stop_windows": 0,
+   "examples": [
+    {
+     "step": 38,
+     "state": "final",
+     "action": [
+      0.2397,
+      0.0,
+      0.0021
+     ],
+     "ratio": 2.997
+    },
+    {
+     "step": 39,
+     "state": "final",
+     "action": [
+      0.2244,
+      0.0,
+      0.0025
+     ],
+     "ratio": 2.805
+    },
+    {
+     "step": 40,
+     "state": "final",
+     "action": [
+      0.2105,
+      0.0,
+      -0.0027
+     ],
+     "ratio": 2.631
+    },
+    {
+     "step": 41,
+     "state": "final",
+     "action": [
+      0.1961,
+      0.0,
+      -0.0044
+     ],
+     "ratio": 2.452
+    },
+    {
+     "step": 42,
+     "state": "final",
+     "action": [
+      0.1833,
+      0.0,
+      0.0024
+     ],
+     "ratio": 2.292
+    }
+   ]
+  },
+  {
+   "id": "gl-40084-blue_cube-mid_visible",
+   "task": "land",
+   "kind": "cube",
+   "nonterminal_stop": 0,
+   "below_safe": 18,
+   "stop_windows": 0,
+   "examples": [
+    {
+     "step": 32,
+     "state": "final",
+     "action": [
+      0.2357,
+      0.0,
+      0.0024
+     ],
+     "ratio": 2.947
+    },
+    {
+     "step": 33,
+     "state": "final",
+     "action": [
+      0.2178,
+      0.0,
+      -0.0001
+     ],
+     "ratio": 2.723
+    },
+    {
+     "step": 34,
+     "state": "final",
+     "action": [
+      0.2021,
+      0.0,
+      -0.0032
+     ],
+     "ratio": 2.526
+    },
+    {
+     "step": 35,
+     "state": "final",
+     "action": [
+      0.188,
+      0.0,
+      0.0
+     ],
+     "ratio": 2.35
+    },
+    {
+     "step": 36,
+     "state": "final",
+     "action": [
+      0.1728,
+      0.0,
+      0.0037
+     ],
+     "ratio": 2.16
+    }
+   ]
+  },
+  {
+   "id": "gl-40085-red_cube-mid_search",
+   "task": "land",
+   "kind": "cube",
+   "nonterminal_stop": 0,
+   "below_safe": 19,
+   "stop_windows": 0,
+   "examples": [
+    {
+     "step": 71,
+     "state": "final",
+     "action": [
+      0.2363,
+      0.0,
+      0.0018
+     ],
+     "ratio": 2.953
+    },
+    {
+     "step": 72,
+     "state": "final",
+     "action": [
+      0.2201,
+      0.0,
+      0.0006
+     ],
+     "ratio": 2.751
+    },
+    {
+     "step": 73,
+     "state": "final",
+     "action": [
+      0.2034,
+      0.0,
+      -0.0025
+     ],
+     "ratio": 2.543
+    },
+    {
+     "step": 74,
+     "state": "final",
+     "action": [
+      0.1894,
+      0.0,
+      0.0008
+     ],
+     "ratio": 2.367
+    },
+    {
+     "step": 75,
+     "state": "final",
+     "action": [
+      0.176,
+      0.0,
+      0.0027
+     ],
+     "ratio": 2.2
+    }
+   ]
+  },
+  {
+   "id": "gl-40086-blue_cube-far_visible",
+   "task": "land",
+   "kind": "cube",
+   "nonterminal_stop": 0,
+   "below_safe": 19,
+   "stop_windows": 0,
+   "examples": [
+    {
+     "step": 40,
+     "state": "final",
+     "action": [
+      0.2353,
+      0.0,
+      0.0024
+     ],
+     "ratio": 2.941
+    },
+    {
+     "step": 41,
+     "state": "final",
+     "action": [
+      0.2188,
+      0.0,
+      -0.0023
+     ],
+     "ratio": 2.735
+    },
+    {
+     "step": 42,
+     "state": "final",
+     "action": [
+      0.2033,
+      0.0,
+      -0.0027
+     ],
+     "ratio": 2.541
+    },
+    {
+     "step": 43,
+     "state": "final",
+     "action": [
+      0.1886,
+      0.0,
+      0.0016
+     ],
+     "ratio": 2.358
+    },
+    {
+     "step": 44,
+     "state": "final",
+     "action": [
+      0.1748,
+      0.0,
+      0.0049
+     ],
+     "ratio": 2.184
+    }
+   ]
+  },
+  {
+   "id": "gl-40087-red_cube-far_search",
+   "task": "land",
+   "kind": "cube",
+   "nonterminal_stop": 0,
+   "below_safe": 19,
+   "stop_windows": 0,
+   "examples": [
+    {
+     "step": 62,
+     "state": "final",
+     "action": [
+      0.2393,
+      0.0,
+      0.0036
+     ],
+     "ratio": 2.992
+    },
+    {
+     "step": 63,
+     "state": "final",
+     "action": [
+      0.2231,
+      0.0,
+      0.0006
+     ],
+     "ratio": 2.788
+    },
+    {
+     "step": 64,
+     "state": "final",
+     "action": [
+      0.2082,
+      0.0,
+      -0.0033
+     ],
+     "ratio": 2.603
+    },
+    {
+     "step": 65,
+     "state": "final",
+     "action": [
+      0.1935,
+      0.0,
+      -0.004
+     ],
+     "ratio": 2.419
+    },
+    {
+     "step": 66,
+     "state": "final",
+     "action": [
+      0.1801,
+      0.0,
+      0.0017
+     ],
+     "ratio": 2.251
+    }
+   ]
+  },
+  {
+   "id": "gl-40089-red_cube-near_visible",
+   "task": "land",
+   "kind": "cube",
+   "nonterminal_stop": 0,
+   "below_safe": 20,
+   "stop_windows": 0,
+   "examples": [
+    {
+     "step": 34,
+     "state": "final",
+     "action": [
+      0.2272,
+      0.0,
+      0.0025
+     ],
+     "ratio": 2.84
+    },
+    {
+     "step": 35,
+     "state": "final",
+     "action": [
+      0.2159,
+      0.0,
+      0.0022
+     ],
+     "ratio": 2.699
+    },
+    {
+     "step": 36,
+     "state": "final",
+     "action": [
+      0.2034,
+      0.0,
+      0.0032
+     ],
+     "ratio": 2.543
+    },
+    {
+     "step": 37,
+     "state": "final",
+     "action": [
+      0.1897,
+      0.0,
+      0.0042
+     ],
+     "ratio": 2.371
+    },
+    {
+     "step": 38,
+     "state": "final",
+     "action": [
+      0.1783,
+      0.0,
+      0.004
+     ],
+     "ratio": 2.229
+    }
+   ]
+  },
+  {
+   "id": "gl-40090-blue_cube-mid_search",
+   "task": "land",
+   "kind": "cube",
+   "nonterminal_stop": 0,
+   "below_safe": 18,
+   "stop_windows": 0,
+   "examples": [
+    {
+     "step": 50,
+     "state": "final",
+     "action": [
+      0.2263,
+      0.0,
+      0.0014
+     ],
+     "ratio": 2.829
+    },
+    {
+     "step": 51,
+     "state": "final",
+     "action": [
+      0.2118,
+      0.0,
+      0.0039
+     ],
+     "ratio": 2.648
+    },
+    {
+     "step": 52,
+     "state": "final",
+     "action": [
+      0.1968,
+      0.0,
+      0.0007
+     ],
+     "ratio": 2.46
+    },
+    {
+     "step": 53,
+     "state": "final",
+     "action": [
+      0.183,
+      0.0,
+      -0.0037
+     ],
+     "ratio": 2.288
+    },
+    {
+     "step": 54,
+     "state": "final",
+     "action": [
+      0.1698,
+      0.0,
+      -0.005
+     ],
+     "ratio": 2.122
+    }
+   ]
+  }
+ ],
+ "what": "datasets/projectairsim_visual_search/generic_landing_added"
+}
