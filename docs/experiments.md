@@ -283,3 +283,23 @@ step마다 멈추는 대신 도착 2초 전에 다음 판단을 시작해 명령
 - **기록용 (gate 뒤, 판정과 무관):** 같은 cube·cylinder 20개 시작의 두 번째 비행은 cube 5/10, cylinder 6/10이고 20개 중 5개가 뒤집혔다. 44m 안 regression 36개는 update 2000 35/36, baseline 35/36(pad 착륙 26/27 대 27/27, wrong target 0, 충돌 0). 잃은 하나는 41.7m 탐색 시작에서 첫 decision부터 stop을 낸 비행.
 - **Tests:** Python 383/383, PowerShell 4/4.
 - **다음:** 자동으로 시작하지 않는다. 권하는 것은 느린 진입의 label을 stop 규칙에서 떼어 놓도록 teacher를 고치고, Stage 1을 새 validation set으로 다시 판정하는 것.
+
+## Generic Landing Stage 1b (stop-safe teacher) — 2026-10-11
+
+브랜치 `exp/generic-landing-stage1b-stop-safe-teacher`. 상세: [Stage 1b — Stop-Safe Generic Landing](generic_landing_stage1b_stop_safe_teacher.md). 표: `outputs/generic_landing_1b/summary/`. **통과하지 못했다(cube 첫 비행 7/10, 기준 8; regression 충돌 2, baseline 0). Stage 2는 시작하지 않았다.** Stage 1의 기록은 그대로다. Canonical 48 재평가와 Depot 비행은 없다. 동결 지문 두 개는 simulator를 띄울 때마다 전후로 그대로.
+
+- **질문:** teacher가 touchdown 전에 준 label이 student의 stop과 부딪치고 있었는가, 그 충돌을 없애면 cube·cylinder 착륙이 안정적으로 배워지는가. 바꾼 것은 착륙 teacher의 label뿐.
+- **Stop (코드에서 읽음):** `spec.is_stop`(전진 0.08m, 상하 0.08m, 회전 0.0336 rad 이하)이 비행한 행동(chunk의 첫 행동)에 4 decision 연속이면 종료. Teacher 비행도 같은 줄.
+- **규칙 (녹화 전 commit `97e7d59`):** 착륙의 touchdown 전 label은 stop이 아니고 stop 규칙의 3.0배 이상, stop 4연속 구간 없음. 3.0은 pad 착륙 teacher의 최소(3.125)에서 왔다. 권장값 2.0은 실패한 0.15m와 같은 0.16m를 통과시켜 쓰지 않았다. Approach의 감속 label(최소 2.5)은 세기만 한다.
+- **Label:** Stage 1의 착륙 label 12,308개 중 3.0 미만 2,217, 최소 1.875. Stage 1b의 11,157개 중 3.0 미만 0, 최소 3.125.
+- **Teacher:** 작은 면 위 진입 속도 하한 0.15 → 0.35m, 하강 반경은 canonical 1.75m, 윗면을 1m 벗어나면 전진하며 상승. Simulator pilot 15/15, 착륙 위치 cube·cylinder 0.07–0.21m.
+- **Data:** 새 seed(50000번대)로 234개 계획, 231개 녹화(cube 근접 시작 3개는 teacher가 끝내지 못함). Stage 1의 233 episode는 학습에 0개. 기존 data와 합쳐 1,391 episode.
+- **학습:** Stage 1의 일정 그대로. `grounding_film`에서 2,500 update. Validation L1 0.1255 → 0.0657.
+- **Pilot (새 15개 시작):** cube·cylinder 착륙 baseline 0/8, 1000: 4, 1500: 6, **2000: 7**, 2500: 7. 공중 정지 8 / 3 / 0 / 0 / 0. Update 2000 선택.
+- **Validation gate (새 36개 시작):** success 33/36, system landing 27/30, pad 10/10, **cube 7/10**, cylinder 10/10, wrong target 0, 충돌 0, approach twin 6/6. Cube 줄에서 실패.
+- **Repeat gate (cube·cylinder 20개 시작을 한 번 더):** cube 7 → 9 (합 16/20, 둘 다 실패 1), cylinder 10 → 10 (합 20/20). Cube의 첫 비행 줄에서 실패. 뒤집힌 시작 2개(Stage 1은 5개).
+- **실패의 모양:** 공중 정지는 cube·cylinder 40번의 비행 중 15 → 1. 남은 cube 실패 넷은 덜 오르고 들어가 가장자리에 내림, 가운데 전 모서리에서 하강, 윗면 1–2m 위에서 하강을 끝내지 못함.
+- **정책이 비행한 행동:** stop인 decision의 비율이 상승 5.7% → 0.9%, 정렬 13.0% → 3.8%. 하강(label이 같은 구간)은 줄지 않음.
+- **Regression (새 36개 시작):** success 33/36 (baseline 34), pad 착륙 24/27 (25), wrong target 1 (2), **충돌 2 (0)**. 파란 pad를 찾으라는 문장에 파란 cone으로 올라가 부딪힌 비행 둘, 파란 cube에 내린 비행 하나.
+- **Tests:** Python 410/410, PowerShell 4/4.
+- **다음:** 자동으로 시작하지 않는다. 후보는 cube 위의 하강 자리와 마지막 하강을 가르치는 회복 label, 같은 색 물체가 먼저 보이는 착륙 시작을 data에 넣는 것.

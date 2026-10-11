@@ -1,0 +1,541 @@
+{
+ "description": "Flown after the gates of stage 1b were judged. They judge nothing.",
+ "stage_1_checkpoint_on_the_stage_1b_validation_starts": {
+  "what": "Stage 1's checkpoint (update 2000, trained on stage 1's labels) on the twenty cube and cylinder landing starts of the stage 1b validation set, once.",
+  "by_kind": {
+   "cube": {
+    "stage_1_checkpoint": 6,
+    "stage_1b_first_flight": 7,
+    "of": 10
+   },
+   "cylinder": {
+    "stage_1_checkpoint": 5,
+    "stage_1b_first_flight": 10,
+    "of": 10
+   }
+  },
+  "failed_by_end": {
+   "AIR_SELF_STOP": 7,
+   "COLLISION": 0,
+   "TIMEOUT": 0,
+   "TARGET_SELECTION": 1,
+   "TOUCHDOWN": 1,
+   "STABILITY": 0,
+   "OTHER": 0
+  },
+  "air_self_stops_by_phase": {
+   "SEARCH": 0,
+   "SURFACE_APPROACH": 0,
+   "CLIMB": 5,
+   "ALIGNMENT": 2,
+   "DESCENT": 0
+  },
+  "flown_actions": {
+   "kinds": [
+    "cube",
+    "cylinder"
+   ],
+   "flights": {
+    "flights": 20,
+    "with_a_stop_decision": 20,
+    "with_two_in_a_row": 10,
+    "with_three_in_a_row": 10,
+    "ended_by_four": 8
+   },
+   "by_phase": {
+    "SEARCH": {
+     "n": 450,
+     "min": 0.122,
+     "p5": 3.174,
+     "median": 6.25,
+     "p95": 6.25,
+     "stops": 4,
+     "share_stop": 0.0089,
+     "share_below_2": 0.0222,
+     "share_below_3": 0.0467
+    },
+    "SURFACE_APPROACH": {
+     "n": 499,
+     "min": 0.781,
+     "p5": 4.98,
+     "median": 12.28,
+     "p95": 12.451,
+     "stops": 1,
+     "share_stop": 0.002,
+     "share_below_2": 0.008,
+     "share_below_3": 0.012
+    },
+    "CLIMB": {
+     "n": 449,
+     "min": 0.076,
+     "p5": 0.772,
+     "median": 3.564,
+     "p95": 6.683,
+     "stops": 37,
+     "share_stop": 0.0824,
+     "share_below_2": 0.2383,
+     "share_below_3": 0.3764
+    },
+    "ALIGNMENT": {
+     "n": 327,
+     "min": 0.081,
+     "p5": 0.476,
+     "median": 2.49,
+     "p95": 5.286,
+     "stops": 34,
+     "share_stop": 0.104,
+     "share_below_2": 0.3456,
+     "share_below_3": 0.6269
+    },
+    "DESCENT": {
+     "n": 200,
+     "min": 0.004,
+     "p5": 0.571,
+     "median": 3.076,
+     "p95": 3.784,
+     "stops": 21,
+     "share_stop": 0.105,
+     "share_below_2": 0.37,
+     "share_below_3": 0.455
+    },
+    "ALL": {
+     "n": 1925,
+     "min": 0.004,
+     "p5": 0.989,
+     "median": 5.811,
+     "p95": 12.402,
+     "stops": 97,
+     "share_stop": 0.0504,
+     "share_below_2": 0.16,
+     "share_below_3": 0.2556
+    }
+   }
+  },
+  "pairs": [
+   {
+    "id": "g1bv-52406-blue_cube-near_visible",
+    "kind": "cube",
+    "stage_1_checkpoint": true,
+    "stage_1b_first_flight": true,
+    "end": null,
+    "phase": null,
+    "touchdown_error_m": 1.05,
+    "highest_m": 11.0,
+    "decisions": 58
+   },
+   {
+    "id": "g1bv-52407-red_cube-near_search",
+    "kind": "cube",
+    "stage_1_checkpoint": false,
+    "stage_1b_first_flight": false,
+    "end": "AIR_SELF_STOP",
+    "phase": "ALIGNMENT",
+    "touchdown_error_m": null,
+    "highest_m": 12.8,
+    "decisions": 96
+   },
+   {
+    "id": "g1bv-52409-blue_cube-near_visible",
+    "kind": "cube",
+    "stage_1_checkpoint": true,
+    "stage_1b_first_flight": true,
+    "end": null,
+    "phase": null,
+    "touchdown_error_m": 1.76,
+    "highest_m": 10.5,
+    "decisions": 62
+   },
+   {
+    "id": "g1bv-52410-red_cube-mid_search",
+    "kind": "cube",
+    "stage_1_checkpoint": false,
+    "stage_1b_first_flight": true,
+    "end": "AIR_SELF_STOP",
+    "phase": "ALIGNMENT",
+    "touchdown_error_m": null,
+    "highest_m": 10.4,
+    "decisions": 177
+   },
+   {
+    "id": "g1bv-52411-blue_cube-mid_visible",
+    "kind": "cube",
+    "stage_1_checkpoint": false,
+    "stage_1b_first_flight": false,
+    "end": "TOUCHDOWN",
+    "phase": "CLIMB",
+    "touchdown_error_m": 4.45,
+    "highest_m": 9.0,
+    "decisions": 83
+   },
+   {
+    "id": "g1bv-52412-red_cube-mid_search",
+    "kind": "cube",
+    "stage_1_checkpoint": false,
+    "stage_1b_first_flight": false,
+    "end": "AIR_SELF_STOP",
+    "phase": "CLIMB",
+    "touchdown_error_m": null,
+    "highest_m": 8.9,
+    "decisions": 39
+   },
+   {
+    "id": "g1bv-52413-blue_cube-mid_visible",
+    "kind": "cube",
+    "stage_1_checkpoint": true,
+    "stage_1b_first_flight": true,
+    "end": null,
+    "phase": null,
+    "touchdown_error_m": 3.3,
+    "highest_m": 10.1,
+    "decisions": 279
+   },
+   {
+    "id": "g1bv-52414-red_cube-far_search",
+    "kind": "cube",
+    "stage_1_checkpoint": true,
+    "stage_1b_first_flight": true,
+    "end": null,
+    "phase": null,
+    "touchdown_error_m": 2.61,
+    "highest_m": 11.4,
+    "decisions": 93
+   },
+   {
+    "id": "g1bv-52415-blue_cube-far_visible",
+    "kind": "cube",
+    "stage_1_checkpoint": true,
+    "stage_1b_first_flight": true,
+    "end": null,
+    "phase": null,
+    "touchdown_error_m": 2.05,
+    "highest_m": 10.3,
+    "decisions": 126
+   },
+   {
+    "id": "g1bv-52416-red_cube-far_search",
+    "kind": "cube",
+    "stage_1_checkpoint": true,
+    "stage_1b_first_flight": true,
+    "end": null,
+    "phase": null,
+    "touchdown_error_m": 1.7,
+    "highest_m": 11.4,
+    "decisions": 93
+   },
+   {
+    "id": "g1bv-52417-blue_cylinder-near_visible",
+    "kind": "cylinder",
+    "stage_1_checkpoint": true,
+    "stage_1b_first_flight": true,
+    "end": null,
+    "phase": null,
+    "touchdown_error_m": 2.27,
+    "highest_m": 11.6,
+    "decisions": 96
+   },
+   {
+    "id": "g1bv-52421-green_cylinder-near_search",
+    "kind": "cylinder",
+    "stage_1_checkpoint": false,
+    "stage_1b_first_flight": true,
+    "end": "TARGET_SELECTION",
+    "phase": "SEARCH",
+    "touchdown_error_m": null,
+    "highest_m": 13.1,
+    "decisions": 82
+   },
+   {
+    "id": "g1bv-52422-blue_cylinder-near_visible",
+    "kind": "cylinder",
+    "stage_1_checkpoint": true,
+    "stage_1b_first_flight": true,
+    "end": null,
+    "phase": null,
+    "touchdown_error_m": 1.46,
+    "highest_m": 12.4,
+    "decisions": 69
+   },
+   {
+    "id": "g1bv-52424-green_cylinder-mid_search",
+    "kind": "cylinder",
+    "stage_1_checkpoint": false,
+    "stage_1b_first_flight": true,
+    "end": "AIR_SELF_STOP",
+    "phase": "CLIMB",
+    "touchdown_error_m": null,
+    "highest_m": 11.4,
+    "decisions": 80
+   },
+   {
+    "id": "g1bv-52427-blue_cylinder-mid_visible",
+    "kind": "cylinder",
+    "stage_1_checkpoint": true,
+    "stage_1b_first_flight": true,
+    "end": null,
+    "phase": null,
+    "touchdown_error_m": 2.46,
+    "highest_m": 11.3,
+    "decisions": 150
+   },
+   {
+    "id": "g1bv-52428-green_cylinder-mid_search",
+    "kind": "cylinder",
+    "stage_1_checkpoint": false,
+    "stage_1b_first_flight": true,
+    "end": "AIR_SELF_STOP",
+    "phase": "CLIMB",
+    "touchdown_error_m": null,
+    "highest_m": 10.7,
+    "decisions": 87
+   },
+   {
+    "id": "g1bv-52429-blue_cylinder-mid_visible",
+    "kind": "cylinder",
+    "stage_1_checkpoint": true,
+    "stage_1b_first_flight": true,
+    "end": null,
+    "phase": null,
+    "touchdown_error_m": 1.1,
+    "highest_m": 12.8,
+    "decisions": 107
+   },
+   {
+    "id": "g1bv-52430-green_cylinder-far_search",
+    "kind": "cylinder",
+    "stage_1_checkpoint": false,
+    "stage_1b_first_flight": true,
+    "end": "AIR_SELF_STOP",
+    "phase": "CLIMB",
+    "touchdown_error_m": null,
+    "highest_m": 10.5,
+    "decisions": 82
+   },
+   {
+    "id": "g1bv-52431-blue_cylinder-far_visible",
+    "kind": "cylinder",
+    "stage_1_checkpoint": true,
+    "stage_1b_first_flight": true,
+    "end": null,
+    "phase": null,
+    "touchdown_error_m": 2.13,
+    "highest_m": 11.6,
+    "decisions": 98
+   },
+   {
+    "id": "g1bv-52432-green_cylinder-far_search",
+    "kind": "cylinder",
+    "stage_1_checkpoint": false,
+    "stage_1b_first_flight": true,
+    "end": "AIR_SELF_STOP",
+    "phase": "CLIMB",
+    "touchdown_error_m": null,
+    "highest_m": 9.7,
+    "decisions": 89
+   }
+  ]
+ },
+ "teacher_on_the_validation_starts": {
+  "what": "The stage 1b teacher on the 36 validation starts in the simulator, with the finalizer.",
+  "flights": 36,
+  "success": 36,
+  "land": 30,
+  "land_success": 30,
+  "approach": 6,
+  "approach_success": 6,
+  "wrong_target": 0,
+  "collisions": 0,
+  "approach_touchdowns": 0,
+  "timeouts": 0,
+  "stopped_in_air": 0,
+  "not_finished": [],
+  "labels_keep_the_stop_rule": true,
+  "touchdown_error_m": {
+   "pad": [
+    0.41,
+    1.04
+   ],
+   "cube": [
+    0.06,
+    0.36
+   ],
+   "cylinder": [
+    0.05,
+    0.28
+   ]
+  }
+ },
+ "stage_1b_candidate_on_the_regression_starts_again": {
+  "what": "The stage 1b candidate on the 36 regression starts a second time.",
+  "flights": 36,
+  "success": 33,
+  "land": 27,
+  "land_success": 24,
+  "approach": 9,
+  "approach_success": 9,
+  "wrong_target": 1,
+  "collisions": 2,
+  "approach_touchdowns": 0,
+  "timeouts": 0,
+  "stopped_in_air": 0,
+  "first_flight_of_the_candidate": {
+   "flights": 36,
+   "success": 33,
+   "land": 27,
+   "land_success": 24,
+   "approach": 9,
+   "approach_success": 9,
+   "wrong_target": 1,
+   "collisions": 2,
+   "approach_touchdowns": 0,
+   "timeouts": 0,
+   "stopped_in_air": 0
+  },
+  "baseline": {
+   "flights": 36,
+   "success": 34,
+   "land": 27,
+   "land_success": 25,
+   "approach": 9,
+   "approach_success": 9,
+   "wrong_target": 2,
+   "collisions": 0,
+   "approach_touchdowns": 0,
+   "timeouts": 0,
+   "stopped_in_air": 2
+  },
+  "not_a_success_or_a_collision_or_a_wrong_object": [
+   {
+    "id": "g1br-53101-blue_pad-near_search",
+    "role": "search",
+    "success": false,
+    "reason": "landed",
+    "landed_on": "blue_cube",
+    "collision": null,
+    "wrong_target": true,
+    "candidate_first_flight": {
+     "success": false,
+     "collision": null,
+     "landed_on": "blue_cube",
+     "wrong_target": true
+    }
+   },
+   {
+    "id": "g1br-53471-blue_pad-near_pair-swapped",
+    "role": "swap",
+    "success": false,
+    "reason": "collision",
+    "landed_on": null,
+    "collision": "SceneBlueCone",
+    "wrong_target": false,
+    "candidate_first_flight": {
+     "success": false,
+     "collision": "SceneBlueCone",
+     "landed_on": null,
+     "wrong_target": false
+    }
+   },
+   {
+    "id": "g1br-53479-blue_pad-mid_past_color",
+    "role": "past_color",
+    "success": false,
+    "reason": "collision",
+    "landed_on": null,
+    "collision": "SceneBlueCone",
+    "wrong_target": false,
+    "candidate_first_flight": {
+     "success": false,
+     "collision": "SceneBlueCone",
+     "landed_on": null,
+     "wrong_target": false
+    }
+   }
+  ]
+ },
+ "stage_1_checkpoint_on_the_regression_starts": {
+  "what": "Stage 1's checkpoint (update 2000) on the 36 regression starts of stage 1b, once.",
+  "flights": 36,
+  "success": 35,
+  "land": 27,
+  "land_success": 26,
+  "approach": 9,
+  "approach_success": 9,
+  "wrong_target": 1,
+  "collisions": 0,
+  "approach_touchdowns": 0,
+  "timeouts": 0,
+  "stopped_in_air": 1,
+  "first_flight_of_the_candidate": {
+   "flights": 36,
+   "success": 33,
+   "land": 27,
+   "land_success": 24,
+   "approach": 9,
+   "approach_success": 9,
+   "wrong_target": 1,
+   "collisions": 2,
+   "approach_touchdowns": 0,
+   "timeouts": 0,
+   "stopped_in_air": 0
+  },
+  "baseline": {
+   "flights": 36,
+   "success": 34,
+   "land": 27,
+   "land_success": 25,
+   "approach": 9,
+   "approach_success": 9,
+   "wrong_target": 2,
+   "collisions": 0,
+   "approach_touchdowns": 0,
+   "timeouts": 0,
+   "stopped_in_air": 2
+  },
+  "not_a_success_or_a_collision_or_a_wrong_object": [
+   {
+    "id": "g1br-53101-blue_pad-near_search",
+    "role": "search",
+    "success": true,
+    "reason": "landed",
+    "landed_on": "blue_pad",
+    "collision": null,
+    "wrong_target": false,
+    "candidate_first_flight": {
+     "success": false,
+     "collision": null,
+     "landed_on": "blue_cube",
+     "wrong_target": true
+    }
+   },
+   {
+    "id": "g1br-53471-blue_pad-near_pair-swapped",
+    "role": "swap",
+    "success": false,
+    "reason": "model_stop",
+    "landed_on": null,
+    "collision": null,
+    "wrong_target": true,
+    "candidate_first_flight": {
+     "success": false,
+     "collision": "SceneBlueCone",
+     "landed_on": null,
+     "wrong_target": false
+    }
+   },
+   {
+    "id": "g1br-53479-blue_pad-mid_past_color",
+    "role": "past_color",
+    "success": true,
+    "reason": "landed",
+    "landed_on": "blue_pad",
+    "collision": null,
+    "wrong_target": false,
+    "candidate_first_flight": {
+     "success": false,
+     "collision": "SceneBlueCone",
+     "landed_on": null,
+     "wrong_target": false
+    }
+   }
+  ]
+ }
+}

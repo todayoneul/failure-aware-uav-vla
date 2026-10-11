@@ -1,0 +1,73 @@
+{
+ "description": "Flights above the ceiling of the start rule. The executor is not changed in stage 1b.",
+ "stage 1b validation": {
+  "limit_m": 14.0,
+  "flights": 36,
+  "over": 1,
+  "highest_m": 14.6,
+  "episodes": [
+   {
+    "id": "g1bv-52427-blue_cylinder-mid_visible",
+    "highest_m": 14.6,
+    "success": true
+   }
+  ]
+ },
+ "stage 1b second flights": {
+  "limit_m": 14.0,
+  "flights": 20,
+  "over": 2,
+  "highest_m": 16.1,
+  "episodes": [
+   {
+    "id": "g1bv-52427-blue_cylinder-mid_visible",
+    "highest_m": 16.1,
+    "success": true
+   },
+   {
+    "id": "g1bv-52430-green_cylinder-far_search",
+    "highest_m": 14.2,
+    "success": true
+   }
+  ]
+ },
+ "stage 1 validation": {
+  "limit_m": 14.0,
+  "flights": 36,
+  "over": 2,
+  "highest_m": 18.1,
+  "episodes": [
+   {
+    "id": "glv-42013-red_cube-near_search",
+    "highest_m": 16.5,
+    "success": false
+   },
+   {
+    "id": "glv-42010-blue_pad-far_visible",
+    "highest_m": 18.1,
+    "success": true
+   }
+  ]
+ },
+ "stage 1 second flights": {
+  "limit_m": 14.0,
+  "flights": 20,
+  "over": 0,
+  "highest_m": 12.7,
+  "episodes": []
+ },
+ "stage 1b regression": {
+  "limit_m": 14.0,
+  "flights": 36,
+  "over": 0,
+  "highest_m": 9.6,
+  "episodes": []
+ },
+ "stage 1b pilot (chosen)": {
+  "limit_m": 14.0,
+  "flights": 15,
+  "over": 0,
+  "highest_m": 13.8,
+  "episodes": []
+ }
+}

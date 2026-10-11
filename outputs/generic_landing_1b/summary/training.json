@@ -1,0 +1,241 @@
+{
+ "description": "Stage 1b: the data that was recorded and the training run (configs/generic_landing_stage1b.json, fine_tune; the schedule of stage 1).",
+ "recorded": {
+  "episodes": 231,
+  "train_episodes": 207,
+  "val_episodes": 24,
+  "dropped_episodes": {},
+  "samples": 13485,
+  "train_samples": 12156,
+  "val_samples": 1329,
+  "tasks": {
+   "approach": 54,
+   "land": 177
+  },
+  "by_target_episodes": {
+   "blue_cube": 38,
+   "blue_cylinder": 39,
+   "blue_pad": 39,
+   "green_cylinder": 39,
+   "red_cube": 37,
+   "red_pad": 39
+  },
+  "start_distance_m": {
+   "0-12 m": 31,
+   "12-20 m": 47,
+   "20-30 m": 61,
+   "30-40 m": 64,
+   "40-50 m": 28
+  },
+  "start_height_m": {
+   "10-11 m": 20,
+   "11-12 m": 28,
+   "3-4 m": 38,
+   "4-5 m": 20,
+   "5-6 m": 20,
+   "6-7 m": 26,
+   "7-8 m": 23,
+   "8-9 m": 35,
+   "9-10 m": 21
+  },
+  "by_teacher_state": {
+   "align": 138,
+   "approach": 3919,
+   "climb": 1302,
+   "descend": 2453,
+   "final": 3287,
+   "landed": 708,
+   "search": 1462,
+   "stop": 216
+  },
+  "labels_outside_action_bounds": 0
+ },
+ "merged": {
+  "episodes": 1391,
+  "train_episodes": 1248,
+  "val_episodes": 143,
+  "samples": 70814,
+  "train_samples": 63796,
+  "val_samples": 7018,
+  "sources": {
+   "generalization_v1": 292,
+   "generalization_v2_added": 153,
+   "generalization_v3_added": 414,
+   "generalization_v3b_added": 193,
+   "generalization_v3c_added": 108,
+   "generic_landing_1b_added": 231
+  }
+ },
+ "stage_1_episodes_in_the_data": 0,
+ "run": {
+  "init": "outputs/aerovla_oft/checkpoints/grounding_film",
+  "planned_updates": 2500,
+  "batch_size": 1,
+  "gradient_accumulation": 4,
+  "learning_rate": 5e-05,
+  "grounding_learning_rate": 5e-05,
+  "share_of_draws": {
+   "generic_landing_1b_added": 0.45
+  },
+  "frames_by_source": {
+   "generic_landing_1b_added": 12156,
+   "None": 51640
+  },
+  "boost": {
+   "small_visible": 2.0,
+   "selection": 3.0
+  },
+  "balance": 3.0,
+  "parameters": {
+   "lora": 39976960,
+   "head": 14716931,
+   "grounding": 4338432
+  },
+  "peak_allocated_GiB": 9.889997482299805,
+  "train_seconds": 5636.293267965317,
+  "gpu": "NVIDIA GeForce RTX 5070"
+ },
+ "start_checkpoint_on_validation_mix": {
+  "l1": 0.12546410010244774,
+  "behaviour": {
+   "grounding_accuracy": 0.9070294784580499,
+   "terminal_accuracy": 0.5371900826446281,
+   "all": 0.7883333333333333,
+   "terminal_accuracy_land": 0.4270833333333333,
+   "terminal_accuracy_approach": 0.96,
+   "score": 0.722109780551339
+  }
+ },
+ "validation_curve": [
+  {
+   "update": 250,
+   "val_l1": 0.08722421762766316,
+   "behaviour": {
+    "grounding_accuracy": 0.9387755102040817,
+    "terminal_accuracy": 0.7933884297520661,
+    "all": 0.8633333333333333,
+    "terminal_accuracy_land": 0.75,
+    "terminal_accuracy_approach": 0.96,
+    "score": 0.866081969978074
+   },
+   "saved_candidate": null
+  },
+  {
+   "update": 500,
+   "val_l1": 0.0772369927802356,
+   "behaviour": {
+    "grounding_accuracy": 0.9229024943310657,
+    "terminal_accuracy": 0.9090909090909091,
+    "all": 0.8716666666666667,
+    "terminal_accuracy_land": 0.8854166666666666,
+    "terminal_accuracy_approach": 1.0,
+    "score": 0.9159967017109873
+   },
+   "saved_candidate": null
+  },
+  {
+   "update": 750,
+   "val_l1": 0.0773253975205201,
+   "behaviour": {
+    "grounding_accuracy": 0.9002267573696145,
+    "terminal_accuracy": 0.9421487603305785,
+    "all": 0.8666666666666667,
+    "terminal_accuracy_land": 0.9270833333333334,
+    "terminal_accuracy_approach": 1.0,
+    "score": 0.9211877588500965
+   },
+   "saved_candidate": null
+  },
+  {
+   "update": 1000,
+   "val_l1": 0.07504501079344966,
+   "behaviour": {
+    "grounding_accuracy": 0.909297052154195,
+    "terminal_accuracy": 0.9421487603305785,
+    "all": 0.8733333333333333,
+    "terminal_accuracy_land": 0.9270833333333334,
+    "terminal_accuracy_approach": 1.0,
+    "score": 0.9257229062423867
+   },
+   "saved_candidate": 1000
+  },
+  {
+   "update": 1250,
+   "val_l1": 0.07360907887845922,
+   "behaviour": {
+    "grounding_accuracy": 0.9206349206349206,
+    "terminal_accuracy": 0.9338842975206612,
+    "all": 0.88,
+    "terminal_accuracy_land": 0.9375,
+    "terminal_accuracy_approach": 0.92,
+    "score": 0.9272596090777909
+   },
+   "saved_candidate": null
+  },
+  {
+   "update": 1500,
+   "val_l1": 0.06985455687021992,
+   "behaviour": {
+    "grounding_accuracy": 0.9251700680272109,
+    "terminal_accuracy": 0.8677685950413223,
+    "all": 0.8816666666666667,
+    "terminal_accuracy_land": 0.8541666666666666,
+    "terminal_accuracy_approach": 0.92,
+    "score": 0.8964693315342667
+   },
+   "saved_candidate": 1500
+  },
+  {
+   "update": 1750,
+   "val_l1": 0.0657880582093397,
+   "behaviour": {
+    "grounding_accuracy": 0.9115646258503401,
+    "terminal_accuracy": 0.9338842975206612,
+    "all": 0.895,
+    "terminal_accuracy_land": 0.9375,
+    "terminal_accuracy_approach": 0.92,
+    "score": 0.9227244616855006
+   },
+   "saved_candidate": null
+  },
+  {
+   "update": 2000,
+   "val_l1": 0.06587881650203296,
+   "behaviour": {
+    "grounding_accuracy": 0.9115646258503401,
+    "terminal_accuracy": 0.9256198347107438,
+    "all": 0.9,
+    "terminal_accuracy_land": 0.9270833333333334,
+    "terminal_accuracy_approach": 0.92,
+    "score": 0.918592230280542
+   },
+   "saved_candidate": 2000
+  },
+  {
+   "update": 2250,
+   "val_l1": 0.06618855060534164,
+   "behaviour": {
+    "grounding_accuracy": 0.8843537414965986,
+    "terminal_accuracy": 0.9421487603305785,
+    "all": 0.9,
+    "terminal_accuracy_land": 0.9375,
+    "terminal_accuracy_approach": 0.96,
+    "score": 0.9132512509135886
+   },
+   "saved_candidate": null
+  },
+  {
+   "update": 2499,
+   "val_l1": 0.06571191719088043,
+   "behaviour": {
+    "grounding_accuracy": 0.8684807256235828,
+    "terminal_accuracy": 0.9421487603305785,
+    "all": 0.885,
+    "terminal_accuracy_land": 0.9375,
+    "terminal_accuracy_approach": 0.96,
+    "score": 0.9053147429770807
+   },
+   "saved_candidate": 2500
+  }
+ ]
+}

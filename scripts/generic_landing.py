@@ -286,9 +286,9 @@ def main():
         if args.output:write(where(args.output),result)
         return
     if args.command=='repeat':
-        table,checks=judge_repeat(stage,flights(args.run),flights(args.again))
-        for kind,row in table.items():print(kind,json.dumps(row))
-        passed=lines(checks);result={'table':table,'checks':checks,'passed':passed}
+        pairs,checks=judge_repeat(stage,flights(args.run),flights(args.again))
+        for kind,row in pairs.items():print(kind,json.dumps(row))
+        passed=lines(checks);result={'table':pairs,'checks':checks,'passed':passed}
         if args.output:write(where(args.output),result)
         print('PASSED' if passed else 'NOT PASSED');raise SystemExit(0 if passed else 1)
     if args.command=='table':

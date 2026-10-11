@@ -1,0 +1,77 @@
+{
+ "description": "The recorded landing labels of stage 1 (233 episodes) and of stage 1b, measured with the same tool and the same rule.",
+ "old": "stage 1, datasets/projectairsim_visual_search/generic_landing_added",
+ "new": "stage 1b, datasets/projectairsim_visual_search/generic_landing_1b_added",
+ "rule": {
+  "safe_ratio": 3.0,
+  "near_stop_ratio": 2.0,
+  "stop_ticks": 4,
+  "stop_limits": {
+   "forward_m": 0.08,
+   "down_m": 0.08,
+   "yaw_rad": 0.0336
+  }
+ },
+ "rows": [
+  {
+   "metric": "landing labels before the touchdown",
+   "old": 12308,
+   "new": 11157
+  },
+  {
+   "metric": "of them a stop",
+   "old": 0,
+   "new": 0
+  },
+  {
+   "metric": "below the margin",
+   "old": 2217,
+   "new": 0
+  },
+  {
+   "metric": "runs of stops before the touchdown",
+   "old": 0,
+   "new": 0
+  },
+  {
+   "metric": "runs near a stop before the touchdown",
+   "old": 1184,
+   "new": 0
+  },
+  {
+   "metric": "smallest stop ratio",
+   "old": 1.875,
+   "new": 3.125
+  },
+  {
+   "metric": "stop ratio at the 5th percentile",
+   "old": 1.875,
+   "new": 3.125
+  },
+  {
+   "metric": "median stop ratio",
+   "old": 6.25,
+   "new": 6.25
+  },
+  {
+   "metric": "SURFACE_APPROACH: labels / below the margin / near a stop",
+   "old": "4619 / 2217 / 1541",
+   "new": "3287 / 0 / 0"
+  },
+  {
+   "metric": "ALIGN: labels / below the margin / near a stop",
+   "old": "79 / 0 / 0",
+   "new": "111 / 0 / 0"
+  },
+  {
+   "metric": "CLIMB: labels / below the margin / near a stop",
+   "old": "1233 / 0 / 0",
+   "new": "1277 / 0 / 0"
+  },
+  {
+   "metric": "DESCENT: labels / below the margin / near a stop",
+   "old": "2478 / 0 / 0",
+   "new": "2453 / 0 / 0"
+  }
+ ]
+}

@@ -1,0 +1,36 @@
+{
+ "description": "Stage 1b: the recording of the planned episodes by the stage 1b teacher (finalizer off, three simulators side by side). An episode is kept only if the teacher did what the sentence asked by the surface evaluator, stopped by itself and the simulator kept at least 0.8 of real time.",
+ "flights": 234,
+ "kept": 231,
+ "not_kept": [
+  {
+   "id": "g1b-50072-red_cube-near_search",
+   "reason": "max_steps",
+   "teacher_did_it": false,
+   "real_time_factor": 0.9897843015895306,
+   "decisions": 320,
+   "final_distance_m": 11.2
+  },
+  {
+   "id": "g1b-50088-red_cube-near_search",
+   "reason": "max_steps",
+   "teacher_did_it": false,
+   "real_time_factor": 0.9805097569309023,
+   "decisions": 320,
+   "final_distance_m": 10.4
+  },
+  {
+   "id": "g1b-50093-blue_cube-near_search",
+   "reason": "max_steps",
+   "teacher_did_it": false,
+   "real_time_factor": 0.9706025530885535,
+   "decisions": 320,
+   "final_distance_m": 11.4
+  }
+ ],
+ "episodes_in_the_dataset": 231,
+ "real_time_factor": {
+  "minimum": 0.8938071213688946,
+  "median": 0.9786051404553826
+ }
+}
