@@ -1,0 +1,1079 @@
+{
+ "description": "Flights that ended by the policy's own stop in the air, read decision by decision, and the labels the recorded data holds near where each ended.",
+ "flights": [
+  {
+   "checkpoint": "1000",
+   "id": "g1cp-63006-red_cube-mid_edge",
+   "reason": "model_stop",
+   "decisions": 108,
+   "surface": {
+    "object": "red_cube",
+    "top_m": 8.0,
+    "usable_half_extent_m": [
+     3.6,
+     3.6
+    ]
+   },
+   "end": {
+    "height_m": 8.21,
+    "above_top_m": 0.21,
+    "distance_from_the_middle_m": 2.76,
+    "offset_from_the_middle_m": [
+     2.3,
+     -1.53
+    ],
+    "over_the_footprint": true,
+    "bearing_of_the_middle_deg": 118.0,
+    "front_camera_sees_it": false,
+    "down_camera_sees_it": true
+   },
+   "last_twelve": [
+    {
+     "step": 96,
+     "above_top_m": 3.12,
+     "distance_m": 2.7,
+     "forward_m": 0.0,
+     "down_m": 0.41,
+     "yaw_rad": 0.0021,
+     "stop_ratio": 5.13,
+     "forced": false
+    },
+    {
+     "step": 97,
+     "above_top_m": 2.63,
+     "distance_m": 2.72,
+     "forward_m": 0.0,
+     "down_m": 0.449,
+     "yaw_rad": 0.0022,
+     "stop_ratio": 5.62,
+     "forced": false
+    },
+    {
+     "step": 98,
+     "above_top_m": 2.19,
+     "distance_m": 2.75,
+     "forward_m": 0.0,
+     "down_m": 0.418,
+     "yaw_rad": 0.0019,
+     "stop_ratio": 5.22,
+     "forced": false
+    },
+    {
+     "step": 99,
+     "above_top_m": 1.75,
+     "distance_m": 2.76,
+     "forward_m": 0.0,
+     "down_m": 0.354,
+     "yaw_rad": 0.0024,
+     "stop_ratio": 4.42,
+     "forced": false
+    },
+    {
+     "step": 100,
+     "above_top_m": 1.3,
+     "distance_m": 2.76,
+     "forward_m": 0.0,
+     "down_m": 0.065,
+     "yaw_rad": -0.0013,
+     "stop_ratio": 0.82,
+     "forced": false
+    },
+    {
+     "step": 101,
+     "above_top_m": 0.94,
+     "distance_m": 2.76,
+     "forward_m": 0.0,
+     "down_m": 0.117,
+     "yaw_rad": -0.0001,
+     "stop_ratio": 1.46,
+     "forced": false
+    },
+    {
+     "step": 102,
+     "above_top_m": 0.75,
+     "distance_m": 2.76,
+     "forward_m": 0.0,
+     "down_m": 0.025,
+     "yaw_rad": -0.0001,
+     "stop_ratio": 0.31,
+     "forced": false
+    },
+    {
+     "step": 103,
+     "above_top_m": 0.61,
+     "distance_m": 2.76,
+     "forward_m": 0.0,
+     "down_m": 0.204,
+     "yaw_rad": 0.0009,
+     "stop_ratio": 2.55,
+     "forced": false
+    },
+    {
+     "step": 104,
+     "above_top_m": 0.52,
+     "distance_m": 2.76,
+     "forward_m": 0.0,
+     "down_m": 0.061,
+     "yaw_rad": -0.0007,
+     "stop_ratio": 0.76,
+     "forced": false
+    },
+    {
+     "step": 105,
+     "above_top_m": 0.38,
+     "distance_m": 2.76,
+     "forward_m": 0.0,
+     "down_m": 0.063,
+     "yaw_rad": -0.0004,
+     "stop_ratio": 0.79,
+     "forced": false
+    },
+    {
+     "step": 106,
+     "above_top_m": 0.28,
+     "distance_m": 2.76,
+     "forward_m": 0.0,
+     "down_m": -0.001,
+     "yaw_rad": -0.0005,
+     "stop_ratio": 0.01,
+     "forced": false
+    },
+    {
+     "step": 107,
+     "above_top_m": 0.21,
+     "distance_m": 2.76,
+     "forward_m": 0.0,
+     "down_m": -0.001,
+     "yaw_rad": -0.0007,
+     "stop_ratio": 0.02,
+     "forced": false
+    }
+   ],
+   "last_four_stop_ratios": [
+    0.76,
+    0.79,
+    0.01,
+    0.02
+   ],
+   "decisions_since_the_descent_began": 23,
+   "sign_flips": 0,
+   "descent_began": {
+    "distance_m": 2.94,
+    "above_top_m": 7.59
+   },
+   "largest_forward_command_of_the_last_twelve_m": 0.0,
+   "largest_turn_command_of_the_last_twelve_rad": 0.0024,
+   "recorded_labels_near_the_end": [
+    {
+     "data": "generic_landing_1b_added",
+     "labels_within_0.4_m_and_0.6_m_of_height": 0,
+     "descend": 0,
+     "climb": 0,
+     "with_the_middle_45_deg_or_more_off_the_nose": 0
+    },
+    {
+     "data": "generic_landing_1c_added",
+     "labels_within_0.4_m_and_0.6_m_of_height": 0,
+     "descend": 0,
+     "climb": 0,
+     "with_the_middle_45_deg_or_more_off_the_nose": 0
+    }
+   ]
+  },
+  {
+   "checkpoint": "1000",
+   "id": "g1cp-63009-blue_cube-near_stall",
+   "reason": "model_stop",
+   "decisions": 54,
+   "surface": {
+    "object": "blue_cube",
+    "top_m": 8.0,
+    "usable_half_extent_m": [
+     3.6,
+     3.6
+    ]
+   },
+   "end": {
+    "height_m": 9.87,
+    "above_top_m": 1.87,
+    "distance_from_the_middle_m": 5.38,
+    "offset_from_the_middle_m": [
+     2.4,
+     -4.81
+    ],
+    "over_the_footprint": false,
+    "bearing_of_the_middle_deg": 77.5,
+    "front_camera_sees_it": false,
+    "down_camera_sees_it": true
+   },
+   "last_twelve": [
+    {
+     "step": 42,
+     "above_top_m": 3.3,
+     "distance_m": 5.37,
+     "forward_m": 0.002,
+     "down_m": 0.121,
+     "yaw_rad": -0.0008,
+     "stop_ratio": 1.51,
+     "forced": false
+    },
+    {
+     "step": 43,
+     "above_top_m": 3.13,
+     "distance_m": 5.37,
+     "forward_m": 0.0,
+     "down_m": 0.146,
+     "yaw_rad": -0.0003,
+     "stop_ratio": 1.82,
+     "forced": false
+    },
+    {
+     "step": 44,
+     "above_top_m": 2.98,
+     "distance_m": 5.38,
+     "forward_m": 0.0,
+     "down_m": 0.122,
+     "yaw_rad": -0.0008,
+     "stop_ratio": 1.53,
+     "forced": false
+    },
+    {
+     "step": 45,
+     "above_top_m": 2.84,
+     "distance_m": 5.38,
+     "forward_m": 0.0,
+     "down_m": 0.219,
+     "yaw_rad": 0.0004,
+     "stop_ratio": 2.73,
+     "forced": false
+    },
+    {
+     "step": 46,
+     "above_top_m": 2.7,
+     "distance_m": 5.38,
+     "forward_m": 0.0,
+     "down_m": 0.189,
+     "yaw_rad": 0.0001,
+     "stop_ratio": 2.37,
+     "forced": false
+    },
+    {
+     "step": 47,
+     "above_top_m": 2.52,
+     "distance_m": 5.38,
+     "forward_m": 0.0,
+     "down_m": 0.165,
+     "yaw_rad": -0.0002,
+     "stop_ratio": 2.06,
+     "forced": false
+    },
+    {
+     "step": 48,
+     "above_top_m": 2.33,
+     "distance_m": 5.38,
+     "forward_m": 0.002,
+     "down_m": 0.047,
+     "yaw_rad": -0.0006,
+     "stop_ratio": 0.59,
+     "forced": false
+    },
+    {
+     "step": 49,
+     "above_top_m": 2.17,
+     "distance_m": 5.38,
+     "forward_m": 0.0,
+     "down_m": 0.125,
+     "yaw_rad": -0.0015,
+     "stop_ratio": 1.56,
+     "forced": false
+    },
+    {
+     "step": 50,
+     "above_top_m": 2.07,
+     "distance_m": 5.38,
+     "forward_m": 0.0,
+     "down_m": 0.03,
+     "yaw_rad": -0.0021,
+     "stop_ratio": 0.38,
+     "forced": false
+    },
+    {
+     "step": 51,
+     "above_top_m": 1.96,
+     "distance_m": 5.38,
+     "forward_m": 0.0,
+     "down_m": -0.004,
+     "yaw_rad": -0.0021,
+     "stop_ratio": 0.06,
+     "forced": false
+    },
+    {
+     "step": 52,
+     "above_top_m": 1.9,
+     "distance_m": 5.38,
+     "forward_m": 0.0,
+     "down_m": 0.018,
+     "yaw_rad": -0.0015,
+     "stop_ratio": 0.22,
+     "forced": false
+    },
+    {
+     "step": 53,
+     "above_top_m": 1.87,
+     "distance_m": 5.38,
+     "forward_m": 0.0,
+     "down_m": 0.028,
+     "yaw_rad": -0.0015,
+     "stop_ratio": 0.34,
+     "forced": false
+    }
+   ],
+   "last_four_stop_ratios": [
+    0.38,
+    0.06,
+    0.22,
+    0.34
+   ],
+   "decisions_since_the_descent_began": 21,
+   "sign_flips": 0,
+   "descent_began": {
+    "distance_m": 5.74,
+    "above_top_m": 4.62
+   },
+   "largest_forward_command_of_the_last_twelve_m": 0.002,
+   "largest_turn_command_of_the_last_twelve_rad": 0.0021,
+   "recorded_labels_near_the_end": [
+    {
+     "data": "generic_landing_1b_added",
+     "labels_within_0.4_m_and_0.6_m_of_height": 0,
+     "descend": 0,
+     "climb": 0,
+     "with_the_middle_45_deg_or_more_off_the_nose": 0
+    },
+    {
+     "data": "generic_landing_1c_added",
+     "labels_within_0.4_m_and_0.6_m_of_height": 4,
+     "descend": 0,
+     "climb": 4,
+     "with_the_middle_45_deg_or_more_off_the_nose": 0
+    }
+   ]
+  },
+  {
+   "checkpoint": "1500",
+   "id": "g1cp-63006-red_cube-mid_edge",
+   "reason": "model_stop",
+   "decisions": 106,
+   "surface": {
+    "object": "red_cube",
+    "top_m": 8.0,
+    "usable_half_extent_m": [
+     3.6,
+     3.6
+    ]
+   },
+   "end": {
+    "height_m": 9.38,
+    "above_top_m": 1.38,
+    "distance_from_the_middle_m": 2.6,
+    "offset_from_the_middle_m": [
+     1.81,
+     -1.86
+    ],
+    "over_the_footprint": true,
+    "bearing_of_the_middle_deg": 116.1,
+    "front_camera_sees_it": false,
+    "down_camera_sees_it": true
+   },
+   "last_twelve": [
+    {
+     "step": 94,
+     "above_top_m": 3.48,
+     "distance_m": 2.54,
+     "forward_m": 0.0,
+     "down_m": 0.24,
+     "yaw_rad": -0.0071,
+     "stop_ratio": 3.0,
+     "forced": false
+    },
+    {
+     "step": 95,
+     "above_top_m": 3.08,
+     "distance_m": 2.53,
+     "forward_m": 0.0,
+     "down_m": 0.123,
+     "yaw_rad": -0.0068,
+     "stop_ratio": 1.54,
+     "forced": false
+    },
+    {
+     "step": 96,
+     "above_top_m": 2.77,
+     "distance_m": 2.54,
+     "forward_m": 0.0,
+     "down_m": 0.198,
+     "yaw_rad": -0.0038,
+     "stop_ratio": 2.48,
+     "forced": false
+    },
+    {
+     "step": 97,
+     "above_top_m": 2.57,
+     "distance_m": 2.57,
+     "forward_m": 0.0,
+     "down_m": 0.14,
+     "yaw_rad": -0.0024,
+     "stop_ratio": 1.75,
+     "forced": false
+    },
+    {
+     "step": 98,
+     "above_top_m": 2.37,
+     "distance_m": 2.6,
+     "forward_m": 0.0,
+     "down_m": 0.166,
+     "yaw_rad": -0.0045,
+     "stop_ratio": 2.08,
+     "forced": false
+    },
+    {
+     "step": 99,
+     "above_top_m": 2.21,
+     "distance_m": 2.6,
+     "forward_m": 0.0,
+     "down_m": 0.138,
+     "yaw_rad": -0.0023,
+     "stop_ratio": 1.72,
+     "forced": false
+    },
+    {
+     "step": 100,
+     "above_top_m": 2.05,
+     "distance_m": 2.6,
+     "forward_m": 0.0,
+     "down_m": 0.277,
+     "yaw_rad": -0.0012,
+     "stop_ratio": 3.47,
+     "forced": false
+    },
+    {
+     "step": 101,
+     "above_top_m": 1.89,
+     "distance_m": 2.6,
+     "forward_m": 0.0,
+     "down_m": 0.146,
+     "yaw_rad": -0.0013,
+     "stop_ratio": 1.82,
+     "forced": false
+    },
+    {
+     "step": 102,
+     "above_top_m": 1.67,
+     "distance_m": 2.6,
+     "forward_m": 0.0,
+     "down_m": -0.0,
+     "yaw_rad": -0.0029,
+     "stop_ratio": 0.09,
+     "forced": false
+    },
+    {
+     "step": 103,
+     "above_top_m": 1.5,
+     "distance_m": 2.6,
+     "forward_m": 0.0,
+     "down_m": 0.035,
+     "yaw_rad": -0.0014,
+     "stop_ratio": 0.43,
+     "forced": false
+    },
+    {
+     "step": 104,
+     "above_top_m": 1.43,
+     "distance_m": 2.6,
+     "forward_m": 0.0,
+     "down_m": -0.004,
+     "yaw_rad": -0.0016,
+     "stop_ratio": 0.05,
+     "forced": false
+    },
+    {
+     "step": 105,
+     "above_top_m": 1.38,
+     "distance_m": 2.6,
+     "forward_m": 0.012,
+     "down_m": -0.005,
+     "yaw_rad": -0.0007,
+     "stop_ratio": 0.15,
+     "forced": false
+    }
+   ],
+   "last_four_stop_ratios": [
+    0.09,
+    0.43,
+    0.05,
+    0.15
+   ],
+   "decisions_since_the_descent_began": 21,
+   "sign_flips": 0,
+   "descent_began": {
+    "distance_m": 2.93,
+    "above_top_m": 6.89
+   },
+   "largest_forward_command_of_the_last_twelve_m": 0.012,
+   "largest_turn_command_of_the_last_twelve_rad": 0.0071,
+   "recorded_labels_near_the_end": [
+    {
+     "data": "generic_landing_1b_added",
+     "labels_within_0.4_m_and_0.6_m_of_height": 0,
+     "descend": 0,
+     "climb": 0,
+     "with_the_middle_45_deg_or_more_off_the_nose": 0
+    },
+    {
+     "data": "generic_landing_1c_added",
+     "labels_within_0.4_m_and_0.6_m_of_height": 5,
+     "descend": 1,
+     "climb": 4,
+     "with_the_middle_45_deg_or_more_off_the_nose": 0
+    }
+   ]
+  },
+  {
+   "checkpoint": "1500",
+   "id": "g1cp-63009-blue_cube-near_stall",
+   "reason": "model_stop",
+   "decisions": 60,
+   "surface": {
+    "object": "blue_cube",
+    "top_m": 8.0,
+    "usable_half_extent_m": [
+     3.6,
+     3.6
+    ]
+   },
+   "end": {
+    "height_m": 10.13,
+    "above_top_m": 2.13,
+    "distance_from_the_middle_m": 5.49,
+    "offset_from_the_middle_m": [
+     2.17,
+     -5.05
+    ],
+    "over_the_footprint": false,
+    "bearing_of_the_middle_deg": 70.1,
+    "front_camera_sees_it": false,
+    "down_camera_sees_it": true
+   },
+   "last_twelve": [
+    {
+     "step": 48,
+     "above_top_m": 2.35,
+     "distance_m": 5.49,
+     "forward_m": 0.0,
+     "down_m": 0.128,
+     "yaw_rad": 0.0338,
+     "stop_ratio": 1.6,
+     "forced": false
+    },
+    {
+     "step": 49,
+     "above_top_m": 2.23,
+     "distance_m": 5.49,
+     "forward_m": 0.0,
+     "down_m": 0.076,
+     "yaw_rad": -0.0013,
+     "stop_ratio": 0.95,
+     "forced": false
+    },
+    {
+     "step": 50,
+     "above_top_m": 2.12,
+     "distance_m": 5.49,
+     "forward_m": 0.0,
+     "down_m": 0.021,
+     "yaw_rad": 0.0788,
+     "stop_ratio": 2.34,
+     "forced": false
+    },
+    {
+     "step": 51,
+     "above_top_m": 2.02,
+     "distance_m": 5.49,
+     "forward_m": 0.0,
+     "down_m": -0.001,
+     "yaw_rad": 0.0365,
+     "stop_ratio": 1.09,
+     "forced": false
+    },
+    {
+     "step": 52,
+     "above_top_m": 1.98,
+     "distance_m": 5.49,
+     "forward_m": 0.0,
+     "down_m": 0.012,
+     "yaw_rad": -0.0046,
+     "stop_ratio": 0.16,
+     "forced": false
+    },
+    {
+     "step": 53,
+     "above_top_m": 1.95,
+     "distance_m": 5.49,
+     "forward_m": 0.0,
+     "down_m": -0.097,
+     "yaw_rad": -0.0001,
+     "stop_ratio": 1.21,
+     "forced": false
+    },
+    {
+     "step": 54,
+     "above_top_m": 1.95,
+     "distance_m": 5.49,
+     "forward_m": 0.0,
+     "down_m": 0.004,
+     "yaw_rad": -0.0019,
+     "stop_ratio": 0.06,
+     "forced": false
+    },
+    {
+     "step": 55,
+     "above_top_m": 1.99,
+     "distance_m": 5.49,
+     "forward_m": 0.004,
+     "down_m": -0.085,
+     "yaw_rad": -0.0005,
+     "stop_ratio": 1.06,
+     "forced": false
+    },
+    {
+     "step": 56,
+     "above_top_m": 2.01,
+     "distance_m": 5.49,
+     "forward_m": 0.0,
+     "down_m": -0.021,
+     "yaw_rad": -0.0028,
+     "stop_ratio": 0.27,
+     "forced": false
+    },
+    {
+     "step": 57,
+     "above_top_m": 2.07,
+     "distance_m": 5.49,
+     "forward_m": 0.0,
+     "down_m": -0.034,
+     "yaw_rad": -0.0019,
+     "stop_ratio": 0.43,
+     "forced": false
+    },
+    {
+     "step": 58,
+     "above_top_m": 2.1,
+     "distance_m": 5.49,
+     "forward_m": 0.0,
+     "down_m": 0.042,
+     "yaw_rad": -0.0035,
+     "stop_ratio": 0.52,
+     "forced": false
+    },
+    {
+     "step": 59,
+     "above_top_m": 2.13,
+     "distance_m": 5.49,
+     "forward_m": 0.0,
+     "down_m": -0.002,
+     "yaw_rad": -0.0027,
+     "stop_ratio": 0.08,
+     "forced": false
+    }
+   ],
+   "last_four_stop_ratios": [
+    0.27,
+    0.43,
+    0.52,
+    0.08
+   ],
+   "decisions_since_the_descent_began": 28,
+   "sign_flips": 1,
+   "descent_began": {
+    "distance_m": 6.01,
+    "above_top_m": 5.19
+   },
+   "largest_forward_command_of_the_last_twelve_m": 0.004,
+   "largest_turn_command_of_the_last_twelve_rad": 0.0788,
+   "recorded_labels_near_the_end": [
+    {
+     "data": "generic_landing_1b_added",
+     "labels_within_0.4_m_and_0.6_m_of_height": 0,
+     "descend": 0,
+     "climb": 0,
+     "with_the_middle_45_deg_or_more_off_the_nose": 0
+    },
+    {
+     "data": "generic_landing_1c_added",
+     "labels_within_0.4_m_and_0.6_m_of_height": 2,
+     "descend": 0,
+     "climb": 2,
+     "with_the_middle_45_deg_or_more_off_the_nose": 0
+    }
+   ]
+  },
+  {
+   "checkpoint": "2000",
+   "id": "g1cp-63006-red_cube-mid_edge",
+   "reason": "model_stop",
+   "decisions": 102,
+   "surface": {
+    "object": "red_cube",
+    "top_m": 8.0,
+    "usable_half_extent_m": [
+     3.6,
+     3.6
+    ]
+   },
+   "end": {
+    "height_m": 9.07,
+    "above_top_m": 1.07,
+    "distance_from_the_middle_m": 2.82,
+    "offset_from_the_middle_m": [
+     2.37,
+     -1.52
+    ],
+    "over_the_footprint": true,
+    "bearing_of_the_middle_deg": 117.9,
+    "front_camera_sees_it": false,
+    "down_camera_sees_it": true
+   },
+   "last_twelve": [
+    {
+     "step": 90,
+     "above_top_m": 4.23,
+     "distance_m": 2.63,
+     "forward_m": 0.002,
+     "down_m": 0.492,
+     "yaw_rad": 0.0,
+     "stop_ratio": 6.15,
+     "forced": false
+    },
+    {
+     "step": 91,
+     "above_top_m": 3.74,
+     "distance_m": 2.66,
+     "forward_m": 0.004,
+     "down_m": 0.41,
+     "yaw_rad": 0.0005,
+     "stop_ratio": 5.13,
+     "forced": false
+    },
+    {
+     "step": 92,
+     "above_top_m": 3.25,
+     "distance_m": 2.68,
+     "forward_m": 0.004,
+     "down_m": 0.422,
+     "yaw_rad": 0.0004,
+     "stop_ratio": 5.27,
+     "forced": false
+    },
+    {
+     "step": 93,
+     "above_top_m": 2.81,
+     "distance_m": 2.71,
+     "forward_m": 0.004,
+     "down_m": 0.369,
+     "yaw_rad": -0.0,
+     "stop_ratio": 4.61,
+     "forced": false
+    },
+    {
+     "step": 94,
+     "above_top_m": 2.38,
+     "distance_m": 2.74,
+     "forward_m": 0.002,
+     "down_m": 0.26,
+     "yaw_rad": -0.0009,
+     "stop_ratio": 3.25,
+     "forced": false
+    },
+    {
+     "step": 95,
+     "above_top_m": 1.99,
+     "distance_m": 2.75,
+     "forward_m": 0.004,
+     "down_m": 0.113,
+     "yaw_rad": 0.0037,
+     "stop_ratio": 1.42,
+     "forced": false
+    },
+    {
+     "step": 96,
+     "above_top_m": 1.69,
+     "distance_m": 2.76,
+     "forward_m": 0.006,
+     "down_m": 0.205,
+     "yaw_rad": -0.0008,
+     "stop_ratio": 2.56,
+     "forced": false
+    },
+    {
+     "step": 97,
+     "above_top_m": 1.49,
+     "distance_m": 2.78,
+     "forward_m": 0.004,
+     "down_m": 0.113,
+     "yaw_rad": -0.0009,
+     "stop_ratio": 1.42,
+     "forced": false
+    },
+    {
+     "step": 98,
+     "above_top_m": 1.29,
+     "distance_m": 2.82,
+     "forward_m": 0.0,
+     "down_m": -0.005,
+     "yaw_rad": -0.0026,
+     "stop_ratio": 0.08,
+     "forced": false
+    },
+    {
+     "step": 99,
+     "above_top_m": 1.15,
+     "distance_m": 2.82,
+     "forward_m": 0.0,
+     "down_m": 0.005,
+     "yaw_rad": -0.0014,
+     "stop_ratio": 0.07,
+     "forced": false
+    },
+    {
+     "step": 100,
+     "above_top_m": 1.1,
+     "distance_m": 2.82,
+     "forward_m": 0.0,
+     "down_m": 0.0,
+     "yaw_rad": -0.0014,
+     "stop_ratio": 0.04,
+     "forced": false
+    },
+    {
+     "step": 101,
+     "above_top_m": 1.07,
+     "distance_m": 2.82,
+     "forward_m": 0.0,
+     "down_m": -0.003,
+     "yaw_rad": -0.0026,
+     "stop_ratio": 0.08,
+     "forced": false
+    }
+   ],
+   "last_four_stop_ratios": [
+    0.08,
+    0.07,
+    0.04,
+    0.08
+   ],
+   "decisions_since_the_descent_began": 17,
+   "sign_flips": 0,
+   "descent_began": {
+    "distance_m": 2.93,
+    "above_top_m": 5.91
+   },
+   "largest_forward_command_of_the_last_twelve_m": 0.006,
+   "largest_turn_command_of_the_last_twelve_rad": 0.0037,
+   "recorded_labels_near_the_end": [
+    {
+     "data": "generic_landing_1b_added",
+     "labels_within_0.4_m_and_0.6_m_of_height": 0,
+     "descend": 0,
+     "climb": 0,
+     "with_the_middle_45_deg_or_more_off_the_nose": 0
+    },
+    {
+     "data": "generic_landing_1c_added",
+     "labels_within_0.4_m_and_0.6_m_of_height": 4,
+     "descend": 0,
+     "climb": 4,
+     "with_the_middle_45_deg_or_more_off_the_nose": 0
+    }
+   ]
+  },
+  {
+   "checkpoint": "2000",
+   "id": "g1cp-63009-blue_cube-near_stall",
+   "reason": "model_stop",
+   "decisions": 53,
+   "surface": {
+    "object": "blue_cube",
+    "top_m": 8.0,
+    "usable_half_extent_m": [
+     3.6,
+     3.6
+    ]
+   },
+   "end": {
+    "height_m": 10.35,
+    "above_top_m": 2.35,
+    "distance_from_the_middle_m": 5.44,
+    "offset_from_the_middle_m": [
+     2.22,
+     -4.97
+    ],
+    "over_the_footprint": false,
+    "bearing_of_the_middle_deg": 75.2,
+    "front_camera_sees_it": false,
+    "down_camera_sees_it": true
+   },
+   "last_twelve": [
+    {
+     "step": 41,
+     "above_top_m": 3.71,
+     "distance_m": 5.45,
+     "forward_m": 0.0,
+     "down_m": 0.239,
+     "yaw_rad": -0.0004,
+     "stop_ratio": 2.99,
+     "forced": false
+    },
+    {
+     "step": 42,
+     "above_top_m": 3.54,
+     "distance_m": 5.43,
+     "forward_m": 0.008,
+     "down_m": 0.083,
+     "yaw_rad": -0.0009,
+     "stop_ratio": 1.04,
+     "forced": false
+    },
+    {
+     "step": 43,
+     "above_top_m": 3.35,
+     "distance_m": 5.44,
+     "forward_m": 0.0,
+     "down_m": 0.141,
+     "yaw_rad": -0.0006,
+     "stop_ratio": 1.76,
+     "forced": false
+    },
+    {
+     "step": 44,
+     "above_top_m": 3.22,
+     "distance_m": 5.44,
+     "forward_m": 0.0,
+     "down_m": 0.157,
+     "yaw_rad": -0.0013,
+     "stop_ratio": 1.97,
+     "forced": false
+    },
+    {
+     "step": 45,
+     "above_top_m": 3.08,
+     "distance_m": 5.44,
+     "forward_m": 0.0,
+     "down_m": 0.184,
+     "yaw_rad": -0.0007,
+     "stop_ratio": 2.29,
+     "forced": false
+    },
+    {
+     "step": 46,
+     "above_top_m": 2.93,
+     "distance_m": 5.44,
+     "forward_m": 0.0,
+     "down_m": 0.1,
+     "yaw_rad": -0.0015,
+     "stop_ratio": 1.25,
+     "forced": false
+    },
+    {
+     "step": 47,
+     "above_top_m": 2.76,
+     "distance_m": 5.44,
+     "forward_m": 0.0,
+     "down_m": 0.045,
+     "yaw_rad": -0.0027,
+     "stop_ratio": 0.57,
+     "forced": false
+    },
+    {
+     "step": 48,
+     "above_top_m": 2.64,
+     "distance_m": 5.44,
+     "forward_m": 0.0,
+     "down_m": 0.096,
+     "yaw_rad": -0.0011,
+     "stop_ratio": 1.2,
+     "forced": false
+    },
+    {
+     "step": 49,
+     "above_top_m": 2.56,
+     "distance_m": 5.44,
+     "forward_m": 0.002,
+     "down_m": 0.074,
+     "yaw_rad": -0.0004,
+     "stop_ratio": 0.93,
+     "forced": false
+    },
+    {
+     "step": 50,
+     "above_top_m": 2.47,
+     "distance_m": 5.44,
+     "forward_m": 0.002,
+     "down_m": 0.014,
+     "yaw_rad": -0.0007,
+     "stop_ratio": 0.17,
+     "forced": false
+    },
+    {
+     "step": 51,
+     "above_top_m": 2.39,
+     "distance_m": 5.44,
+     "forward_m": 0.0,
+     "down_m": 0.067,
+     "yaw_rad": -0.0017,
+     "stop_ratio": 0.84,
+     "forced": false
+    },
+    {
+     "step": 52,
+     "above_top_m": 2.35,
+     "distance_m": 5.44,
+     "forward_m": 0.0,
+     "down_m": 0.069,
+     "yaw_rad": -0.0024,
+     "stop_ratio": 0.87,
+     "forced": false
+    }
+   ],
+   "last_four_stop_ratios": [
+    0.93,
+    0.17,
+    0.84,
+    0.87
+   ],
+   "decisions_since_the_descent_began": 21,
+   "sign_flips": 0,
+   "descent_began": {
+    "distance_m": 5.99,
+    "above_top_m": 5.08
+   },
+   "largest_forward_command_of_the_last_twelve_m": 0.008,
+   "largest_turn_command_of_the_last_twelve_rad": 0.0027,
+   "recorded_labels_near_the_end": [
+    {
+     "data": "generic_landing_1b_added",
+     "labels_within_0.4_m_and_0.6_m_of_height": 0,
+     "descend": 0,
+     "climb": 0,
+     "with_the_middle_45_deg_or_more_off_the_nose": 0
+    },
+    {
+     "data": "generic_landing_1c_added",
+     "labels_within_0.4_m_and_0.6_m_of_height": 3,
+     "descend": 0,
+     "climb": 3,
+     "with_the_middle_45_deg_or_more_off_the_nose": 0
+    }
+   ]
+  }
+ ]
+}

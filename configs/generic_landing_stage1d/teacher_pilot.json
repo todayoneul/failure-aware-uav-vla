@@ -1,0 +1,1946 @@
+{
+ "description": "Generic landing, stage 1d, teacher_pilot: twenty forced cube landings (five for each state) the teacher flies before anything is recorded. Written before any episode of stage 1d was recorded (C:\\Users\\leegy\\Desktop\\drone\\configs\\generic_landing_stage1d.json). Flown in layouts of the two training scenes that no episode was recorded in; seeds and starts are disjoint from every earlier plan and set.",
+ "seeds": [
+  81500,
+  81999
+ ],
+ "bands_m": {
+  "near": [
+   10.0,
+   20.0
+  ],
+  "mid": [
+   20.0,
+   32.0
+  ],
+  "far": [
+   32.0,
+   44.0
+  ]
+ },
+ "episodes": [
+  {
+   "id": "g1dt-81500-blue_cube-near_low_hover",
+   "split": "teacher_pilot",
+   "seed": 81500,
+   "map": "field",
+   "layout": "r",
+   "target": "blue_cube",
+   "kind": "near_low_hover",
+   "case": "near_low_hover",
+   "band": "near",
+   "surface": "rectangle",
+   "surface_kind": "cube",
+   "sector": "front",
+   "strategy": "right",
+   "start_xy": [
+    -2907.84,
+    2952.73
+   ],
+   "start_yaw_deg": 122.92,
+   "start_height_m": 6.97,
+   "target_bearing_deg": -8.75,
+   "start_distance_m": 10.16,
+   "start_direction_deg": 294.17,
+   "instruction_id": "land",
+   "instruction": "Find the blue cube and land on it.",
+   "task": "land",
+   "max_ticks": 320,
+   "initially_visible": true,
+   "others_in_view": [],
+   "pushes": [
+    {
+     "when": "edge",
+     "from_m": 6.32,
+     "min_above_m": 1.0,
+     "miss_m": 1.54,
+     "side": -1,
+     "forward_m": 0.25,
+     "ticks": 60
+    },
+    {
+     "when": "low_hover",
+     "within_m": 4.04,
+     "hold_m": 1.1,
+     "hold_ticks": 4,
+     "band_m": 0.15,
+     "gain": 0.2,
+     "down_m": 0.4,
+     "ticks": 60
+    }
+   ],
+   "recovery": "low_hover",
+   "plan": {
+    "ticks": 62,
+    "clearance_m": 44.13,
+    "climbed_m": 4.5,
+    "acquired_tick": 0,
+    "states": {
+     "climb": 10,
+     "final": 19,
+     "align": 9,
+     "descend": 20,
+     "landed": 4
+    },
+    "forced": [
+     {
+      "when": "edge",
+      "distance_m": 6.04,
+      "above_top_m": 3.47
+     },
+     {
+      "when": "low_hover",
+      "distance_m": 1.83,
+      "above_top_m": 3.47
+     }
+    ],
+    "let_go": [
+     {
+      "distance_m": 1.83,
+      "above_top_m": 3.47,
+      "state": "align"
+     },
+     {
+      "distance_m": 1.83,
+      "above_top_m": 1.24,
+      "state": "descend"
+     }
+    ]
+   },
+   "state": "D1 CENTERED_LOW_HOVER",
+   "set": "teacher_pilot"
+  },
+  {
+   "id": "g1dt-81501-red_cube-near_low_hover",
+   "split": "teacher_pilot",
+   "seed": 81501,
+   "map": "lot",
+   "layout": "r",
+   "target": "red_cube",
+   "kind": "near_low_hover",
+   "case": "near_low_hover",
+   "band": "near",
+   "surface": "rectangle",
+   "surface_kind": "cube",
+   "sector": "right",
+   "strategy": "right",
+   "start_xy": [
+    2977.54,
+    -3006.26
+   ],
+   "start_yaw_deg": 34.7,
+   "start_height_m": 10.69,
+   "target_bearing_deg": 89.11,
+   "start_distance_m": 13.55,
+   "start_direction_deg": 303.83,
+   "instruction_id": "land",
+   "instruction": "Find the red cube and land on it.",
+   "task": "land",
+   "max_ticks": 320,
+   "initially_visible": false,
+   "others_in_view": [
+    {
+     "name": "blue_pad",
+     "bearing_deg": -13.3,
+     "distance_m": 99.3
+    },
+    {
+     "name": "blue_cone",
+     "bearing_deg": 12.0,
+     "distance_m": 91.1
+    }
+   ],
+   "pushes": [
+    {
+     "when": "edge",
+     "from_m": 7.04,
+     "min_above_m": 1.0,
+     "miss_m": 1.33,
+     "side": 1,
+     "forward_m": 0.25,
+     "ticks": 60
+    },
+    {
+     "when": "low_hover",
+     "within_m": 3.83,
+     "hold_m": 0.54,
+     "hold_ticks": 5,
+     "band_m": 0.15,
+     "gain": 0.2,
+     "down_m": 0.4,
+     "ticks": 60
+    }
+   ],
+   "recovery": "low_hover",
+   "plan": {
+    "ticks": 69,
+    "clearance_m": 25.14,
+    "climbed_m": 0.81,
+    "acquired_tick": 5,
+    "states": {
+     "search": 5,
+     "climb": 2,
+     "approach": 2,
+     "final": 28,
+     "align": 6,
+     "descend": 22,
+     "landed": 4
+    },
+    "forced": [
+     {
+      "when": "edge",
+      "distance_m": 6.72,
+      "above_top_m": 3.5
+     },
+     {
+      "when": "low_hover",
+      "distance_m": 1.62,
+      "above_top_m": 3.0
+     }
+    ],
+    "let_go": [
+     {
+      "distance_m": 1.62,
+      "above_top_m": 3.5,
+      "state": "descend"
+     },
+     {
+      "distance_m": 1.62,
+      "above_top_m": 0.68,
+      "state": "descend"
+     }
+    ]
+   },
+   "state": "D1 CENTERED_LOW_HOVER",
+   "set": "teacher_pilot"
+  },
+  {
+   "id": "g1dt-81503-blue_cube-mid_low_hover",
+   "split": "teacher_pilot",
+   "seed": 81503,
+   "map": "lot",
+   "layout": "s",
+   "target": "blue_cube",
+   "kind": "mid_low_hover",
+   "case": "mid_low_hover",
+   "band": "mid",
+   "surface": "rectangle",
+   "surface_kind": "cube",
+   "sector": "front",
+   "strategy": "right",
+   "start_xy": [
+    3067.25,
+    -3072.01
+   ],
+   "start_yaw_deg": 40.98,
+   "start_height_m": 10.58,
+   "target_bearing_deg": 18.94,
+   "start_distance_m": 25.44,
+   "start_direction_deg": 239.93,
+   "instruction_id": "land",
+   "instruction": "Find the blue cube and land on it.",
+   "task": "land",
+   "max_ticks": 320,
+   "initially_visible": true,
+   "others_in_view": [],
+   "pushes": [
+    {
+     "when": "edge",
+     "from_m": 5.79,
+     "min_above_m": 1.0,
+     "miss_m": 1.93,
+     "side": 1,
+     "forward_m": 0.25,
+     "ticks": 60
+    },
+    {
+     "when": "low_hover",
+     "within_m": 4.43,
+     "hold_m": 0.52,
+     "hold_ticks": 8,
+     "band_m": 0.15,
+     "gain": 0.2,
+     "down_m": 0.4,
+     "ticks": 60
+    }
+   ],
+   "recovery": "low_hover",
+   "plan": {
+    "ticks": 80,
+    "clearance_m": 38.18,
+    "climbed_m": 0.92,
+    "acquired_tick": 0,
+    "states": {
+     "approach": 15,
+     "climb": 3,
+     "final": 22,
+     "align": 12,
+     "descend": 24,
+     "landed": 4
+    },
+    "forced": [
+     {
+      "when": "edge",
+      "distance_m": 5.52,
+      "above_top_m": 3.5
+     },
+     {
+      "when": "low_hover",
+      "distance_m": 2.13,
+      "above_top_m": 3.5
+     }
+    ],
+    "let_go": [
+     {
+      "distance_m": 2.13,
+      "above_top_m": 3.5,
+      "state": "align"
+     },
+     {
+      "distance_m": 2.13,
+      "above_top_m": 0.64,
+      "state": "descend"
+     }
+    ]
+   },
+   "state": "D1 CENTERED_LOW_HOVER",
+   "set": "teacher_pilot"
+  },
+  {
+   "id": "g1dt-81504-red_cube-mid_low_hover",
+   "split": "teacher_pilot",
+   "seed": 81504,
+   "map": "lot",
+   "layout": "s",
+   "target": "red_cube",
+   "kind": "mid_low_hover",
+   "case": "mid_low_hover",
+   "band": "mid",
+   "surface": "rectangle",
+   "surface_kind": "cube",
+   "sector": "left",
+   "strategy": "right",
+   "start_xy": [
+    2986.45,
+    -3017.91
+   ],
+   "start_yaw_deg": -155.19,
+   "start_height_m": 8.7,
+   "target_bearing_deg": -79.13,
+   "start_distance_m": 28.2,
+   "start_direction_deg": 305.68,
+   "instruction_id": "land",
+   "instruction": "Find the red cube and land on it.",
+   "task": "land",
+   "max_ticks": 320,
+   "initially_visible": false,
+   "others_in_view": [],
+   "pushes": [
+    {
+     "when": "edge",
+     "from_m": 5.96,
+     "min_above_m": 1.0,
+     "miss_m": 1.07,
+     "side": 1,
+     "forward_m": 0.25,
+     "ticks": 60
+    },
+    {
+     "when": "low_hover",
+     "within_m": 3.57,
+     "hold_m": 1.72,
+     "hold_ticks": 4,
+     "band_m": 0.15,
+     "gain": 0.2,
+     "down_m": 0.4,
+     "ticks": 60
+    }
+   ],
+   "recovery": "low_hover",
+   "plan": {
+    "ticks": 102,
+    "clearance_m": 18.55,
+    "climbed_m": 2.8,
+    "acquired_tick": 21,
+    "states": {
+     "search": 21,
+     "approach": 14,
+     "climb": 6,
+     "final": 29,
+     "align": 3,
+     "descend": 25,
+     "landed": 4
+    },
+    "forced": [
+     {
+      "when": "edge",
+      "distance_m": 5.7,
+      "above_top_m": 3.5
+     },
+     {
+      "when": "low_hover",
+      "distance_m": 1.27,
+      "above_top_m": 3.0
+     }
+    ],
+    "let_go": [
+     {
+      "distance_m": 1.27,
+      "above_top_m": 3.5,
+      "state": "descend"
+     },
+     {
+      "distance_m": 1.27,
+      "above_top_m": 1.86,
+      "state": "descend"
+     }
+    ]
+   },
+   "state": "D1 CENTERED_LOW_HOVER",
+   "set": "teacher_pilot"
+  },
+  {
+   "id": "g1dt-81505-blue_cube-far_low_hover",
+   "split": "teacher_pilot",
+   "seed": 81505,
+   "map": "field",
+   "layout": "t",
+   "target": "blue_cube",
+   "kind": "far_low_hover",
+   "case": "far_low_hover",
+   "band": "far",
+   "surface": "rectangle",
+   "surface_kind": "cube",
+   "sector": "front",
+   "strategy": "right",
+   "start_xy": [
+    -3110.22,
+    3003.78
+   ],
+   "start_yaw_deg": -57.58,
+   "start_height_m": 3.26,
+   "target_bearing_deg": 21.8,
+   "start_distance_m": 37.25,
+   "start_direction_deg": 144.23,
+   "instruction_id": "land",
+   "instruction": "Find the blue cube and land on it.",
+   "task": "land",
+   "max_ticks": 320,
+   "initially_visible": true,
+   "others_in_view": [
+    {
+     "name": "blue_pad",
+     "bearing_deg": -7.1,
+     "distance_m": 70.6
+    },
+    {
+     "name": "blue_cylinder",
+     "bearing_deg": 34.1,
+     "distance_m": 185.5
+    }
+   ],
+   "pushes": [
+    {
+     "when": "edge",
+     "from_m": 7.32,
+     "min_above_m": 1.0,
+     "miss_m": 1.49,
+     "side": -1,
+     "forward_m": 0.25,
+     "ticks": 60
+    },
+    {
+     "when": "low_hover",
+     "within_m": 3.99,
+     "hold_m": 1.75,
+     "hold_ticks": 8,
+     "band_m": 0.15,
+     "gain": 0.2,
+     "down_m": 0.4,
+     "ticks": 60
+    }
+   ],
+   "recovery": "low_hover",
+   "plan": {
+    "ticks": 95,
+    "clearance_m": 30.43,
+    "climbed_m": 8.0,
+    "acquired_tick": 0,
+    "states": {
+     "approach": 14,
+     "climb": 16,
+     "final": 26,
+     "align": 9,
+     "descend": 26,
+     "landed": 4
+    },
+    "forced": [
+     {
+      "when": "edge",
+      "distance_m": 7.29,
+      "above_top_m": 3.26
+     },
+     {
+      "when": "low_hover",
+      "distance_m": 1.78,
+      "above_top_m": 3.26
+     }
+    ],
+    "let_go": [
+     {
+      "distance_m": 1.78,
+      "above_top_m": 3.26,
+      "state": "align"
+     },
+     {
+      "distance_m": 1.78,
+      "above_top_m": 1.88,
+      "state": "descend"
+     }
+    ]
+   },
+   "state": "D1 CENTERED_LOW_HOVER",
+   "set": "teacher_pilot"
+  },
+  {
+   "id": "g1dt-81507-red_cube-far_descent_decay",
+   "split": "teacher_pilot",
+   "seed": 81507,
+   "map": "field",
+   "layout": "u",
+   "target": "red_cube",
+   "kind": "far_descent_decay",
+   "case": "far_descent_decay",
+   "band": "far",
+   "surface": "rectangle",
+   "surface_kind": "cube",
+   "sector": "front_left",
+   "strategy": "right",
+   "start_xy": [
+    -2950.62,
+    3103.68
+   ],
+   "start_yaw_deg": -19.97,
+   "start_height_m": 9.98,
+   "target_bearing_deg": -65.58,
+   "start_distance_m": 33.78,
+   "start_direction_deg": 94.45,
+   "instruction_id": "land",
+   "instruction": "Find the red cube and land on it.",
+   "task": "land",
+   "max_ticks": 320,
+   "initially_visible": false,
+   "others_in_view": [],
+   "pushes": [
+    {
+     "when": "edge",
+     "from_m": 6.41,
+     "min_above_m": 1.0,
+     "miss_m": 2.31,
+     "side": 1,
+     "forward_m": 0.25,
+     "ticks": 60
+    },
+    {
+     "when": "descent_decay",
+     "within_m": 4.81,
+     "from_m": 2.75,
+     "down_m": 0.3,
+     "start_m": 0.25,
+     "ratio": 0.6,
+     "decay_ticks": 8,
+     "ticks": 40
+    }
+   ],
+   "recovery": "descent_decay",
+   "plan": {
+    "ticks": 104,
+    "clearance_m": 36.12,
+    "climbed_m": 1.5,
+    "acquired_tick": 22,
+    "states": {
+     "search": 22,
+     "align": 15,
+     "approach": 22,
+     "climb": 4,
+     "final": 20,
+     "descend": 17,
+     "landed": 4
+    },
+    "forced": [
+     {
+      "when": "edge",
+      "distance_m": 6.31,
+      "above_top_m": 3.48
+     },
+     {
+      "when": "descent_decay",
+      "distance_m": 2.57,
+      "above_top_m": 3.48
+     }
+    ],
+    "let_go": [
+     {
+      "distance_m": 2.57,
+      "above_top_m": 3.48,
+      "state": "align"
+     },
+     {
+      "distance_m": 2.57,
+      "above_top_m": 1.97,
+      "state": "descend"
+     }
+    ]
+   },
+   "state": "D2 CENTERED_DESCENT_DECAY",
+   "set": "teacher_pilot"
+  },
+  {
+   "id": "g1dt-81509-blue_cube-near_descent_decay",
+   "split": "teacher_pilot",
+   "seed": 81509,
+   "map": "lot",
+   "layout": "u",
+   "target": "blue_cube",
+   "kind": "near_descent_decay",
+   "case": "near_descent_decay",
+   "band": "near",
+   "surface": "rectangle",
+   "surface_kind": "cube",
+   "sector": "behind_left",
+   "strategy": "right",
+   "start_xy": [
+    3045.57,
+    -2930.92
+   ],
+   "start_yaw_deg": -3.41,
+   "start_height_m": 6.86,
+   "target_bearing_deg": -118.12,
+   "start_distance_m": 10.65,
+   "start_direction_deg": 58.47,
+   "instruction_id": "land",
+   "instruction": "Find the blue cube and land on it.",
+   "task": "land",
+   "max_ticks": 320,
+   "initially_visible": false,
+   "others_in_view": [],
+   "pushes": [
+    {
+     "when": "edge",
+     "from_m": 6.68,
+     "min_above_m": 1.0,
+     "miss_m": 0.83,
+     "side": -1,
+     "forward_m": 0.25,
+     "ticks": 60
+    },
+    {
+     "when": "descent_decay",
+     "within_m": 3.33,
+     "from_m": 2.37,
+     "down_m": 0.3,
+     "start_m": 0.19,
+     "ratio": 0.64,
+     "decay_ticks": 8,
+     "ticks": 40
+    }
+   ],
+   "recovery": "descent_decay",
+   "plan": {
+    "ticks": 77,
+    "clearance_m": 36.23,
+    "climbed_m": 4.5,
+    "acquired_tick": 17,
+    "states": {
+     "search": 17,
+     "climb": 9,
+     "final": 26,
+     "descend": 21,
+     "landed": 4
+    },
+    "forced": [
+     {
+      "when": "edge",
+      "distance_m": 6.36,
+      "above_top_m": 3.36
+     },
+     {
+      "when": "descent_decay",
+      "distance_m": 1.04,
+      "above_top_m": 2.86
+     }
+    ],
+    "let_go": [
+     {
+      "distance_m": 1.04,
+      "above_top_m": 3.36,
+      "state": "descend"
+     },
+     {
+      "distance_m": 1.04,
+      "above_top_m": 1.75,
+      "state": "descend"
+     }
+    ]
+   },
+   "state": "D2 CENTERED_DESCENT_DECAY",
+   "set": "teacher_pilot"
+  },
+  {
+   "id": "g1dt-81511-red_cube-near_descent_decay",
+   "split": "teacher_pilot",
+   "seed": 81511,
+   "map": "field",
+   "layout": "p",
+   "target": "red_cube",
+   "kind": "near_descent_decay",
+   "case": "near_descent_decay",
+   "band": "near",
+   "surface": "rectangle",
+   "surface_kind": "cube",
+   "sector": "front",
+   "strategy": "right",
+   "start_xy": [
+    -2991.69,
+    2961.08
+   ],
+   "start_yaw_deg": 111.07,
+   "start_height_m": 4.72,
+   "target_bearing_deg": 21.9,
+   "start_distance_m": 12.19,
+   "start_direction_deg": 312.97,
+   "instruction_id": "land",
+   "instruction": "Find the red cube and land on it.",
+   "task": "land",
+   "max_ticks": 320,
+   "initially_visible": true,
+   "others_in_view": [
+    {
+     "name": "blue_pad",
+     "bearing_deg": -22.0,
+     "distance_m": 108.9
+    }
+   ],
+   "pushes": [
+    {
+     "when": "edge",
+     "from_m": 7.47,
+     "min_above_m": 1.0,
+     "miss_m": 0.66,
+     "side": -1,
+     "forward_m": 0.25,
+     "ticks": 60
+    },
+    {
+     "when": "descent_decay",
+     "within_m": 3.16,
+     "from_m": 2.39,
+     "down_m": 0.3,
+     "start_m": 0.3,
+     "ratio": 0.7,
+     "decay_ticks": 5,
+     "ticks": 40
+    }
+   ],
+   "recovery": "descent_decay",
+   "plan": {
+    "ticks": 64,
+    "clearance_m": 28.84,
+    "climbed_m": 6.78,
+    "acquired_tick": 0,
+    "states": {
+     "climb": 14,
+     "final": 28,
+     "descend": 18,
+     "landed": 4
+    },
+    "forced": [
+     {
+      "when": "edge",
+      "distance_m": 7.14,
+      "above_top_m": 3.5
+     },
+     {
+      "when": "descent_decay",
+      "distance_m": 0.93,
+      "above_top_m": 3.0
+     }
+    ],
+    "let_go": [
+     {
+      "distance_m": 0.93,
+      "above_top_m": 3.5,
+      "state": "descend"
+     },
+     {
+      "distance_m": 0.93,
+      "above_top_m": 1.27,
+      "state": "descend"
+     }
+    ]
+   },
+   "state": "D2 CENTERED_DESCENT_DECAY",
+   "set": "teacher_pilot"
+  },
+  {
+   "id": "g1dt-81513-blue_cube-mid_descent_decay",
+   "split": "teacher_pilot",
+   "seed": 81513,
+   "map": "lot",
+   "layout": "p",
+   "target": "blue_cube",
+   "kind": "mid_descent_decay",
+   "case": "mid_descent_decay",
+   "band": "mid",
+   "surface": "rectangle",
+   "surface_kind": "cube",
+   "sector": "behind_right",
+   "strategy": "right",
+   "start_xy": [
+    3110.24,
+    -3051.75
+   ],
+   "start_yaw_deg": 28.9,
+   "start_height_m": 11.62,
+   "target_bearing_deg": 147.79,
+   "start_distance_m": 30.29,
+   "start_direction_deg": 356.68,
+   "instruction_id": "land",
+   "instruction": "Find the blue cube and land on it.",
+   "task": "land",
+   "max_ticks": 320,
+   "initially_visible": false,
+   "others_in_view": [],
+   "pushes": [
+    {
+     "when": "edge",
+     "from_m": 6.83,
+     "min_above_m": 1.0,
+     "miss_m": 2.12,
+     "side": -1,
+     "forward_m": 0.25,
+     "ticks": 60
+    },
+    {
+     "when": "descent_decay",
+     "within_m": 4.62,
+     "from_m": 2.22,
+     "down_m": 0.3,
+     "start_m": 0.23,
+     "ratio": 0.63,
+     "decay_ticks": 8,
+     "ticks": 40
+    }
+   ],
+   "recovery": "descent_decay",
+   "plan": {
+    "ticks": 90,
+    "clearance_m": 38.63,
+    "climbed_m": 0.0,
+    "acquired_tick": 9,
+    "states": {
+     "search": 9,
+     "align": 15,
+     "approach": 22,
+     "final": 22,
+     "climb": 1,
+     "descend": 17,
+     "landed": 4
+    },
+    "forced": [
+     {
+      "when": "edge",
+      "distance_m": 6.76,
+      "above_top_m": 3.62
+     },
+     {
+      "when": "descent_decay",
+      "distance_m": 2.4,
+      "above_top_m": 3.62
+     }
+    ],
+    "let_go": [
+     {
+      "distance_m": 2.4,
+      "above_top_m": 3.62,
+      "state": "align"
+     },
+     {
+      "distance_m": 2.4,
+      "above_top_m": 1.51,
+      "state": "descend"
+     }
+    ]
+   },
+   "state": "D2 CENTERED_DESCENT_DECAY",
+   "set": "teacher_pilot"
+  },
+  {
+   "id": "g1dt-81515-red_cube-mid_descent_decay",
+   "split": "teacher_pilot",
+   "seed": 81515,
+   "map": "field",
+   "layout": "q",
+   "target": "red_cube",
+   "kind": "mid_descent_decay",
+   "case": "mid_descent_decay",
+   "band": "mid",
+   "surface": "rectangle",
+   "surface_kind": "cube",
+   "sector": "front",
+   "strategy": "right",
+   "start_xy": [
+    -3025.26,
+    2968.01
+   ],
+   "start_yaw_deg": 21.68,
+   "start_height_m": 3.91,
+   "target_bearing_deg": -17.18,
+   "start_distance_m": 25.34,
+   "start_direction_deg": 184.51,
+   "instruction_id": "land",
+   "instruction": "Find the red cube and land on it.",
+   "task": "land",
+   "max_ticks": 320,
+   "initially_visible": true,
+   "others_in_view": [],
+   "pushes": [
+    {
+     "when": "edge",
+     "from_m": 5.97,
+     "min_above_m": 1.0,
+     "miss_m": 1.26,
+     "side": 1,
+     "forward_m": 0.25,
+     "ticks": 60
+    },
+    {
+     "when": "descent_decay",
+     "within_m": 3.76,
+     "from_m": 2.51,
+     "down_m": 0.3,
+     "start_m": 0.21,
+     "ratio": 0.65,
+     "decay_ticks": 7,
+     "ticks": 40
+    }
+   ],
+   "recovery": "descent_decay",
+   "plan": {
+    "ticks": 71,
+    "clearance_m": 26.57,
+    "climbed_m": 7.5,
+    "acquired_tick": 0,
+    "states": {
+     "approach": 2,
+     "climb": 15,
+     "final": 27,
+     "align": 5,
+     "descend": 18,
+     "landed": 4
+    },
+    "forced": [
+     {
+      "when": "edge",
+      "distance_m": 5.79,
+      "above_top_m": 3.41
+     },
+     {
+      "when": "descent_decay",
+      "distance_m": 1.47,
+      "above_top_m": 2.91
+     }
+    ],
+    "let_go": [
+     {
+      "distance_m": 1.47,
+      "above_top_m": 3.41,
+      "state": "descend"
+     },
+     {
+      "distance_m": 1.47,
+      "above_top_m": 1.74,
+      "state": "descend"
+     }
+    ]
+   },
+   "state": "D2 CENTERED_DESCENT_DECAY",
+   "set": "teacher_pilot"
+  },
+  {
+   "id": "g1dt-81516-blue_cube-far_edge_low",
+   "split": "teacher_pilot",
+   "seed": 81516,
+   "map": "field",
+   "layout": "q",
+   "target": "blue_cube",
+   "kind": "far_edge_low",
+   "case": "far_edge_low",
+   "band": "far",
+   "surface": "rectangle",
+   "surface_kind": "cube",
+   "sector": "behind_right",
+   "strategy": "right",
+   "start_xy": [
+    -2869.01,
+    2962.12
+   ],
+   "start_yaw_deg": 65.16,
+   "start_height_m": 7.68,
+   "target_bearing_deg": 115.0,
+   "start_distance_m": 42.99,
+   "start_direction_deg": 0.15,
+   "instruction_id": "land",
+   "instruction": "Find the blue cube and land on it.",
+   "task": "land",
+   "max_ticks": 320,
+   "initially_visible": false,
+   "others_in_view": [],
+   "pushes": [
+    {
+     "when": "edge",
+     "from_m": 7.07,
+     "min_above_m": 1.0,
+     "miss_m": 4.22,
+     "side": 1,
+     "forward_m": 0.3,
+     "ticks": 60
+    },
+    {
+     "when": "low_hover",
+     "within_m": 6.72,
+     "hold_m": 1.62,
+     "hold_ticks": 4,
+     "band_m": 0.15,
+     "gain": 0.2,
+     "down_m": 0.4,
+     "ticks": 60
+    }
+   ],
+   "recovery": "edge_low",
+   "plan": {
+    "ticks": 113,
+    "clearance_m": 36.85,
+    "climbed_m": 3.82,
+    "acquired_tick": 7,
+    "states": {
+     "search": 7,
+     "align": 15,
+     "approach": 26,
+     "climb": 27,
+     "final": 22,
+     "descend": 12,
+     "landed": 4
+    },
+    "forced": [
+     {
+      "when": "edge",
+      "distance_m": 6.76,
+      "above_top_m": 3.5
+     },
+     {
+      "when": "low_hover",
+      "distance_m": 4.45,
+      "above_top_m": 3.5
+     }
+    ],
+    "let_go": [
+     {
+      "distance_m": 4.45,
+      "above_top_m": 3.5,
+      "state": "align"
+     },
+     {
+      "distance_m": 4.45,
+      "above_top_m": 1.75,
+      "state": "climb"
+     }
+    ]
+   },
+   "state": "D3 EDGE_LOW",
+   "set": "teacher_pilot"
+  },
+  {
+   "id": "g1dt-81517-red_cube-far_edge_low",
+   "split": "teacher_pilot",
+   "seed": 81517,
+   "map": "lot",
+   "layout": "q",
+   "target": "red_cube",
+   "kind": "far_edge_low",
+   "case": "far_edge_low",
+   "band": "far",
+   "surface": "rectangle",
+   "surface_kind": "cube",
+   "sector": "front_left",
+   "strategy": "right",
+   "start_xy": [
+    3047.88,
+    -3006.8
+   ],
+   "start_yaw_deg": 82.29,
+   "start_height_m": 8.89,
+   "target_bearing_deg": -23.3,
+   "start_distance_m": 42.94,
+   "start_direction_deg": 238.99,
+   "instruction_id": "land",
+   "instruction": "Find the red cube and land on it.",
+   "task": "land",
+   "max_ticks": 320,
+   "initially_visible": true,
+   "others_in_view": [
+    {
+     "name": "blue_cylinder",
+     "bearing_deg": 14.4,
+     "distance_m": 67.3
+    }
+   ],
+   "pushes": [
+    {
+     "when": "edge",
+     "from_m": 7.59,
+     "min_above_m": 1.0,
+     "miss_m": 4.32,
+     "side": 1,
+     "forward_m": 0.3,
+     "ticks": 60
+    },
+    {
+     "when": "low_hover",
+     "within_m": 6.82,
+     "hold_m": 1.54,
+     "hold_ticks": 2,
+     "band_m": 0.15,
+     "gain": 0.2,
+     "down_m": 0.4,
+     "ticks": 60
+    }
+   ],
+   "recovery": "edge_low",
+   "plan": {
+    "ticks": 104,
+    "clearance_m": 12.48,
+    "climbed_m": 2.61,
+    "acquired_tick": 0,
+    "states": {
+     "approach": 30,
+     "climb": 22,
+     "final": 19,
+     "align": 17,
+     "descend": 12,
+     "landed": 4
+    },
+    "forced": [
+     {
+      "when": "edge",
+      "distance_m": 7.58,
+      "above_top_m": 3.39
+     },
+     {
+      "when": "low_hover",
+      "distance_m": 4.54,
+      "above_top_m": 3.39
+     }
+    ],
+    "let_go": [
+     {
+      "distance_m": 4.54,
+      "above_top_m": 3.39,
+      "state": "align"
+     },
+     {
+      "distance_m": 4.54,
+      "above_top_m": 1.67,
+      "state": "climb"
+     }
+    ]
+   },
+   "state": "D3 EDGE_LOW",
+   "set": "teacher_pilot"
+  },
+  {
+   "id": "g1dt-81519-blue_cube-near_edge_low",
+   "split": "teacher_pilot",
+   "seed": 81519,
+   "map": "lot",
+   "layout": "r",
+   "target": "blue_cube",
+   "kind": "near_edge_low",
+   "case": "near_edge_low",
+   "band": "near",
+   "surface": "rectangle",
+   "surface_kind": "cube",
+   "sector": "front",
+   "strategy": "right",
+   "start_xy": [
+    3085.19,
+    -3059.37
+   ],
+   "start_yaw_deg": 99.31,
+   "start_height_m": 9.79,
+   "target_bearing_deg": 19.67,
+   "start_distance_m": 10.71,
+   "start_direction_deg": 298.98,
+   "instruction_id": "land",
+   "instruction": "Find the blue cube and land on it.",
+   "task": "land",
+   "max_ticks": 320,
+   "initially_visible": true,
+   "others_in_view": [
+    {
+     "name": "blue_pad",
+     "bearing_deg": 0.3,
+     "distance_m": 90.7
+    },
+    {
+     "name": "blue_cone",
+     "bearing_deg": 11.4,
+     "distance_m": 127.6
+    }
+   ],
+   "pushes": [
+    {
+     "when": "edge",
+     "from_m": 8.06,
+     "min_above_m": 1.0,
+     "miss_m": 4.45,
+     "side": -1,
+     "forward_m": 0.3,
+     "ticks": 60
+    },
+    {
+     "when": "low_hover",
+     "within_m": 6.95,
+     "hold_m": 1.41,
+     "hold_ticks": 4,
+     "band_m": 0.15,
+     "gain": 0.2,
+     "down_m": 0.4,
+     "ticks": 60
+    }
+   ],
+   "recovery": "edge_low",
+   "plan": {
+    "ticks": 70,
+    "clearance_m": 37.38,
+    "climbed_m": 1.71,
+    "acquired_tick": 0,
+    "states": {
+     "climb": 22,
+     "final": 14,
+     "align": 17,
+     "search": 1,
+     "descend": 12,
+     "landed": 4
+    },
+    "forced": [
+     {
+      "when": "edge",
+      "distance_m": 8.02,
+      "above_top_m": 3.29
+     },
+     {
+      "when": "low_hover",
+      "distance_m": 4.7,
+      "above_top_m": 3.29
+     }
+    ],
+    "let_go": [
+     {
+      "distance_m": 4.7,
+      "above_top_m": 3.29,
+      "state": "align"
+     },
+     {
+      "distance_m": 4.7,
+      "above_top_m": 1.54,
+      "state": "climb"
+     }
+    ]
+   },
+   "state": "D3 EDGE_LOW",
+   "set": "teacher_pilot"
+  },
+  {
+   "id": "g1dt-81520-red_cube-near_edge_low",
+   "split": "teacher_pilot",
+   "seed": 81520,
+   "map": "lot",
+   "layout": "r",
+   "target": "red_cube",
+   "kind": "near_edge_low",
+   "case": "near_edge_low",
+   "band": "near",
+   "surface": "rectangle",
+   "surface_kind": "cube",
+   "sector": "behind_right",
+   "strategy": "right",
+   "start_xy": [
+    2973.28,
+    -2980.81
+   ],
+   "start_yaw_deg": 129.39,
+   "start_height_m": 8.36,
+   "target_bearing_deg": 127.59,
+   "start_distance_m": 14.56,
+   "start_direction_deg": 76.97,
+   "instruction_id": "land",
+   "instruction": "Find the red cube and land on it.",
+   "task": "land",
+   "max_ticks": 320,
+   "initially_visible": false,
+   "others_in_view": [
+    {
+     "name": "green_cylinder",
+     "bearing_deg": 14.3,
+     "distance_m": 72.3
+    }
+   ],
+   "pushes": [
+    {
+     "when": "edge",
+     "from_m": 7.64,
+     "min_above_m": 1.0,
+     "miss_m": 4.84,
+     "side": -1,
+     "forward_m": 0.3,
+     "ticks": 60
+    },
+    {
+     "when": "low_hover",
+     "within_m": 7.34,
+     "hold_m": 1.87,
+     "hold_ticks": 2,
+     "band_m": 0.15,
+     "gain": 0.2,
+     "down_m": 0.4,
+     "ticks": 60
+    }
+   ],
+   "recovery": "edge_low",
+   "plan": {
+    "ticks": 81,
+    "clearance_m": 24.89,
+    "climbed_m": 3.14,
+    "acquired_tick": 8,
+    "states": {
+     "search": 9,
+     "climb": 21,
+     "final": 22,
+     "align": 13,
+     "descend": 12,
+     "landed": 4
+    },
+    "forced": [
+     {
+      "when": "edge",
+      "distance_m": 7.29,
+      "above_top_m": 3.36
+     },
+     {
+      "when": "low_hover",
+      "distance_m": 5.11,
+      "above_top_m": 3.36
+     }
+    ],
+    "let_go": [
+     {
+      "distance_m": 5.11,
+      "above_top_m": 3.36,
+      "state": "align"
+     },
+     {
+      "distance_m": 5.11,
+      "above_top_m": 2.0,
+      "state": "climb"
+     }
+    ]
+   },
+   "state": "D3 EDGE_LOW",
+   "set": "teacher_pilot"
+  },
+  {
+   "id": "g1dt-81521-blue_cube-mid_edge_low",
+   "split": "teacher_pilot",
+   "seed": 81521,
+   "map": "field",
+   "layout": "s",
+   "target": "blue_cube",
+   "kind": "mid_edge_low",
+   "case": "mid_edge_low",
+   "band": "mid",
+   "surface": "rectangle",
+   "surface_kind": "cube",
+   "sector": "front",
+   "strategy": "right",
+   "start_xy": [
+    -2965.7,
+    2930.9
+   ],
+   "start_yaw_deg": -9.8,
+   "start_height_m": 6.29,
+   "target_bearing_deg": 7.79,
+   "start_distance_m": 25.72,
+   "start_direction_deg": 178.0,
+   "instruction_id": "land",
+   "instruction": "Find the blue cube and land on it.",
+   "task": "land",
+   "max_ticks": 320,
+   "initially_visible": true,
+   "others_in_view": [
+    {
+     "name": "blue_pad",
+     "bearing_deg": 39.9,
+     "distance_m": 62.1
+    }
+   ],
+   "pushes": [
+    {
+     "when": "edge",
+     "from_m": 7.62,
+     "min_above_m": 1.0,
+     "miss_m": 4.09,
+     "side": -1,
+     "forward_m": 0.3,
+     "ticks": 60
+    },
+    {
+     "when": "low_hover",
+     "within_m": 6.59,
+     "hold_m": 1.64,
+     "hold_ticks": 3,
+     "band_m": 0.15,
+     "gain": 0.2,
+     "down_m": 0.4,
+     "ticks": 60
+    }
+   ],
+   "recovery": "edge_low",
+   "plan": {
+    "ticks": 85,
+    "clearance_m": 39.63,
+    "climbed_m": 5.0,
+    "acquired_tick": 0,
+    "states": {
+     "approach": 6,
+     "climb": 26,
+     "final": 20,
+     "align": 17,
+     "descend": 12,
+     "landed": 4
+    },
+    "forced": [
+     {
+      "when": "edge",
+      "distance_m": 7.54,
+      "above_top_m": 3.29
+     },
+     {
+      "when": "low_hover",
+      "distance_m": 4.34,
+      "above_top_m": 3.29
+     }
+    ],
+    "let_go": [
+     {
+      "distance_m": 4.34,
+      "above_top_m": 3.29,
+      "state": "align"
+     },
+     {
+      "distance_m": 4.34,
+      "above_top_m": 1.78,
+      "state": "climb"
+     }
+    ]
+   },
+   "state": "D3 EDGE_LOW",
+   "set": "teacher_pilot"
+  },
+  {
+   "id": "g1dt-81522-red_cube-mid_edge_drift",
+   "split": "teacher_pilot",
+   "seed": 81522,
+   "map": "lot",
+   "layout": "s",
+   "target": "red_cube",
+   "kind": "mid_edge_drift",
+   "case": "mid_edge_drift",
+   "band": "mid",
+   "surface": "rectangle",
+   "surface_kind": "cube",
+   "sector": "behind_right",
+   "strategy": "right",
+   "start_xy": [
+    2976.79,
+    -2969.18
+   ],
+   "start_yaw_deg": 122.63,
+   "start_height_m": 5.58,
+   "target_bearing_deg": 132.64,
+   "start_distance_m": 26.7,
+   "start_direction_deg": 75.27,
+   "instruction_id": "land",
+   "instruction": "Find the red cube and land on it.",
+   "task": "land",
+   "max_ticks": 320,
+   "initially_visible": false,
+   "others_in_view": [
+    {
+     "name": "red_pad",
+     "bearing_deg": 30.6,
+     "distance_m": 69.2
+    }
+   ],
+   "pushes": [
+    {
+     "when": "edge",
+     "from_m": 5.55,
+     "min_above_m": 1.0,
+     "miss_m": 0.63,
+     "side": -1,
+     "forward_m": 0.25,
+     "ticks": 60
+    },
+    {
+     "when": "edge_drift",
+     "within_m": 3.13,
+     "from_m": 1.36,
+     "down_m": 0.3,
+     "out_m": 3.82,
+     "forward_m": 0.3,
+     "ticks": 50
+    }
+   ],
+   "recovery": "edge_drift",
+   "plan": {
+    "ticks": 124,
+    "clearance_m": 21.49,
+    "climbed_m": 5.92,
+    "acquired_tick": 8,
+    "states": {
+     "search": 8,
+     "align": 8,
+     "approach": 6,
+     "climb": 23,
+     "final": 38,
+     "descend": 37,
+     "landed": 4
+    },
+    "forced": [
+     {
+      "when": "edge",
+      "distance_m": 5.39,
+      "above_top_m": 3.5
+     },
+     {
+      "when": "edge_drift",
+      "distance_m": 0.91,
+      "above_top_m": 3.0
+     }
+    ],
+    "let_go": [
+     {
+      "distance_m": 0.91,
+      "above_top_m": 3.5,
+      "state": "descend"
+     },
+     {
+      "distance_m": 3.88,
+      "above_top_m": 1.2,
+      "state": "climb"
+     }
+    ]
+   },
+   "state": "D4 EDGE_AFTER_PARTIAL_DESCENT",
+   "set": "teacher_pilot"
+  },
+  {
+   "id": "g1dt-81523-blue_cube-far_edge_drift",
+   "split": "teacher_pilot",
+   "seed": 81523,
+   "map": "field",
+   "layout": "t",
+   "target": "blue_cube",
+   "kind": "far_edge_drift",
+   "case": "far_edge_drift",
+   "band": "far",
+   "surface": "rectangle",
+   "surface_kind": "cube",
+   "sector": "front",
+   "strategy": "right",
+   "start_xy": [
+    -3052.66,
+    3013.44
+   ],
+   "start_yaw_deg": -134.58,
+   "start_height_m": 8.69,
+   "target_bearing_deg": 3.57,
+   "start_distance_m": 41.66,
+   "start_direction_deg": 48.98,
+   "instruction_id": "land",
+   "instruction": "Find the blue cube and land on it.",
+   "task": "land",
+   "max_ticks": 320,
+   "initially_visible": true,
+   "others_in_view": [
+    {
+     "name": "blue_pad",
+     "bearing_deg": 24.2,
+     "distance_m": 78.4
+    }
+   ],
+   "pushes": [
+    {
+     "when": "edge",
+     "from_m": 7.04,
+     "min_above_m": 1.0,
+     "miss_m": 0.37,
+     "side": -1,
+     "forward_m": 0.25,
+     "ticks": 60
+    },
+    {
+     "when": "edge_drift",
+     "within_m": 2.87,
+     "from_m": 2.29,
+     "down_m": 0.3,
+     "out_m": 3.92,
+     "forward_m": 0.3,
+     "ticks": 50
+    }
+   ],
+   "recovery": "edge_drift",
+   "plan": {
+    "ticks": 129,
+    "clearance_m": 42.42,
+    "climbed_m": 2.81,
+    "acquired_tick": 0,
+    "states": {
+     "approach": 26,
+     "climb": 16,
+     "final": 39,
+     "descend": 34,
+     "align": 10,
+     "landed": 4
+    },
+    "forced": [
+     {
+      "when": "edge",
+      "distance_m": 6.74,
+      "above_top_m": 3.5
+     },
+     {
+      "when": "edge_drift",
+      "distance_m": 0.62,
+      "above_top_m": 3.0
+     }
+    ],
+    "let_go": [
+     {
+      "distance_m": 0.62,
+      "above_top_m": 3.5,
+      "state": "descend"
+     },
+     {
+      "distance_m": 4.0,
+      "above_top_m": 2.1,
+      "state": "climb"
+     }
+    ]
+   },
+   "state": "D4 EDGE_AFTER_PARTIAL_DESCENT",
+   "set": "teacher_pilot"
+  },
+  {
+   "id": "g1dt-81524-red_cube-far_edge_drift",
+   "split": "teacher_pilot",
+   "seed": 81524,
+   "map": "lot",
+   "layout": "t",
+   "target": "red_cube",
+   "kind": "far_edge_drift",
+   "case": "far_edge_drift",
+   "band": "far",
+   "surface": "rectangle",
+   "surface_kind": "cube",
+   "sector": "behind",
+   "strategy": "right",
+   "start_xy": [
+    3019.92,
+    -2900.96
+   ],
+   "start_yaw_deg": 105.99,
+   "start_height_m": 9.05,
+   "target_bearing_deg": -168.77,
+   "start_distance_m": 43.9,
+   "start_direction_deg": 117.22,
+   "instruction_id": "land",
+   "instruction": "Find the red cube and land on it.",
+   "task": "land",
+   "max_ticks": 320,
+   "initially_visible": false,
+   "others_in_view": [],
+   "pushes": [
+    {
+     "when": "edge",
+     "from_m": 7.16,
+     "min_above_m": 1.0,
+     "miss_m": 1.01,
+     "side": -1,
+     "forward_m": 0.25,
+     "ticks": 60
+    },
+    {
+     "when": "edge_drift",
+     "within_m": 3.51,
+     "from_m": 1.87,
+     "down_m": 0.3,
+     "out_m": 3.99,
+     "forward_m": 0.3,
+     "ticks": 50
+    }
+   ],
+   "recovery": "edge_drift",
+   "plan": {
+    "ticks": 146,
+    "clearance_m": 23.92,
+    "climbed_m": 2.45,
+    "acquired_tick": 13,
+    "states": {
+     "search": 13,
+     "align": 12,
+     "approach": 30,
+     "climb": 15,
+     "final": 38,
+     "descend": 34,
+     "landed": 4
+    },
+    "forced": [
+     {
+      "when": "edge",
+      "distance_m": 6.82,
+      "above_top_m": 3.5
+     },
+     {
+      "when": "edge_drift",
+      "distance_m": 1.3,
+      "above_top_m": 3.0
+     }
+    ],
+    "let_go": [
+     {
+      "distance_m": 1.3,
+      "above_top_m": 3.5,
+      "state": "descend"
+     },
+     {
+      "distance_m": 4.05,
+      "above_top_m": 1.8,
+      "state": "climb"
+     }
+    ]
+   },
+   "state": "D4 EDGE_AFTER_PARTIAL_DESCENT",
+   "set": "teacher_pilot"
+  },
+  {
+   "id": "g1dt-81528-blue_cube-near_edge_drift",
+   "split": "teacher_pilot",
+   "seed": 81528,
+   "map": "lot",
+   "layout": "p",
+   "target": "blue_cube",
+   "kind": "near_edge_drift",
+   "case": "near_edge_drift",
+   "band": "near",
+   "surface": "rectangle",
+   "surface_kind": "cube",
+   "sector": "left",
+   "strategy": "right",
+   "start_xy": [
+    3067.57,
+    -3046.25
+   ],
+   "start_yaw_deg": 63.68,
+   "start_height_m": 6.84,
+   "target_bearing_deg": -80.47,
+   "start_distance_m": 12.98,
+   "start_direction_deg": 163.23,
+   "instruction_id": "land",
+   "instruction": "Find the blue cube and land on it.",
+   "task": "land",
+   "max_ticks": 320,
+   "initially_visible": false,
+   "others_in_view": [
+    {
+     "name": "blue_cylinder",
+     "bearing_deg": 24.5,
+     "distance_m": 76.3
+    }
+   ],
+   "pushes": [
+    {
+     "when": "edge",
+     "from_m": 6.21,
+     "min_above_m": 1.0,
+     "miss_m": 1.12,
+     "side": -1,
+     "forward_m": 0.25,
+     "ticks": 60
+    },
+    {
+     "when": "edge_drift",
+     "within_m": 3.62,
+     "from_m": 2.17,
+     "down_m": 0.3,
+     "out_m": 4.18,
+     "forward_m": 0.3,
+     "ticks": 50
+    }
+   ],
+   "recovery": "edge_drift",
+   "plan": {
+    "ticks": 121,
+    "clearance_m": 26.45,
+    "climbed_m": 4.6,
+    "acquired_tick": 20,
+    "states": {
+     "search": 20,
+     "climb": 20,
+     "final": 33,
+     "align": 12,
+     "descend": 32,
+     "landed": 4
+    },
+    "forced": [
+     {
+      "when": "edge",
+      "distance_m": 5.99,
+      "above_top_m": 3.34
+     },
+     {
+      "when": "edge_drift",
+      "distance_m": 1.33,
+      "above_top_m": 2.84
+     }
+    ],
+    "let_go": [
+     {
+      "distance_m": 1.33,
+      "above_top_m": 3.34,
+      "state": "descend"
+     },
+     {
+      "distance_m": 4.22,
+      "above_top_m": 1.94,
+      "state": "climb"
+     }
+    ]
+   },
+   "state": "D4 EDGE_AFTER_PARTIAL_DESCENT",
+   "set": "teacher_pilot"
+  },
+  {
+   "id": "g1dt-81530-red_cube-near_edge_drift",
+   "split": "teacher_pilot",
+   "seed": 81530,
+   "map": "field",
+   "layout": "p",
+   "target": "red_cube",
+   "kind": "near_edge_drift",
+   "case": "near_edge_drift",
+   "band": "near",
+   "surface": "rectangle",
+   "surface_kind": "cube",
+   "sector": "front",
+   "strategy": "right",
+   "start_xy": [
+    -3011.76,
+    2960.84
+   ],
+   "start_yaw_deg": 46.52,
+   "start_height_m": 3.18,
+   "target_bearing_deg": -8.6,
+   "start_distance_m": 14.91,
+   "start_direction_deg": 217.91,
+   "instruction_id": "land",
+   "instruction": "Find the red cube and land on it.",
+   "task": "land",
+   "max_ticks": 320,
+   "initially_visible": true,
+   "others_in_view": [
+    {
+     "name": "blue_pad",
+     "bearing_deg": 32.2,
+     "distance_m": 111.3
+    },
+    {
+     "name": "blue_cone",
+     "bearing_deg": 13.2,
+     "distance_m": 126.4
+    }
+   ],
+   "pushes": [
+    {
+     "when": "edge",
+     "from_m": 6.91,
+     "min_above_m": 1.0,
+     "miss_m": 0.52,
+     "side": 1,
+     "forward_m": 0.25,
+     "ticks": 60
+    },
+    {
+     "when": "edge_drift",
+     "within_m": 3.02,
+     "from_m": 1.93,
+     "down_m": 0.3,
+     "out_m": 4.25,
+     "forward_m": 0.3,
+     "ticks": 50
+    }
+   ],
+   "recovery": "edge_drift",
+   "plan": {
+    "ticks": 111,
+    "clearance_m": 29.0,
+    "climbed_m": 8.32,
+    "acquired_tick": 0,
+    "states": {
+     "climb": 28,
+     "final": 34,
+     "descend": 35,
+     "align": 10,
+     "landed": 4
+    },
+    "forced": [
+     {
+      "when": "edge",
+      "distance_m": 6.57,
+      "above_top_m": 3.5
+     },
+     {
+      "when": "edge_drift",
+      "distance_m": 0.79,
+      "above_top_m": 3.0
+     }
+    ],
+    "let_go": [
+     {
+      "distance_m": 0.79,
+      "above_top_m": 3.5,
+      "state": "descend"
+     },
+     {
+      "distance_m": 4.3,
+      "above_top_m": 1.8,
+      "state": "climb"
+     }
+    ]
+   },
+   "state": "D4 EDGE_AFTER_PARTIAL_DESCENT",
+   "set": "teacher_pilot"
+  }
+ ]
+}

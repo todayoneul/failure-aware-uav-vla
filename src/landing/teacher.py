@@ -47,6 +47,24 @@ data never held the way out of one.
                the object without the height (`under_climb`), over its edge beside the middle (`edge`), coming down
                before the middle (`premature`), or lifted again during the last metres (`stall`). The frames after the
                push carry the teacher's way out: up, to the middle, down, and down without a pause.
+
+`FinalDescentTeacher` (stage 1d) is the stage 1c teacher with the end of a descent that goes on moved outward, and
+`RecoveryPushes` knows three more forced moves for the last two metres over a top. The later checkpoints of stage 1c
+stopped in the air 0.2-2.3 m over a cube with the middle abeam of them: the place where the stage 1c teacher's label
+turns from 'down' into 'up' (2.675 m from the middle), in a state no recorded frame held
+(docs/generic_landing_stage1d_final_descent.md). A student sees one pair of pictures and nothing of what it did before,
+so the teacher's rule is one of place, not of memory:
+
+    commit     within the canonical align radius of the middle: down (DESCENT_COMMIT)
+    continue   low over a small top (the canonical commit height or less) and within the hard recovery radius, which is
+               the end of the usable top less the drift of a descent: down, whatever brought the vehicle there and
+               wherever the middle is (DESCENT_CONTINUE). A touchdown there is inside the region.
+    recover    low and beyond that radius, or beside the top: no descent. Up - in place only beside the top and lower
+               than the clearance over it, otherwise up and in (RECOVER_CLEARANCE) - then at the height it flies in at to
+               the middle (RECENTER) and down again.
+
+The band between the two radii is the hysteresis: a vehicle that flies in does not descend before the align radius, a
+vehicle that is low does not stop descending before the hard recovery radius.
 """
 import json
 import math
@@ -55,6 +73,7 @@ from src.visual_search.generalization import SearchTeacher,geometric_view,Pushes
 from src.visual_search.maps import MapGeometry,load_landing
 
 STAGE1B=Path(__file__).resolve().parents[2]/'configs/generic_landing_stage1b.json'
+STAGE1D=Path(__file__).resolve().parents[2]/'configs/generic_landing_stage1d.json'
 
 EASE_GAIN=.05        # forward metres per decision for each metre left over a small surface: 0.1 per second, about 1 / (4 x the lag)
 LEVEL_BAND_M=.25     # a vehicle this little below the height it needs is high enough
@@ -115,6 +134,10 @@ class StopSafeTeacher(SearchTeacher):
         self.climb_within=self.landing['glide_distance_m'];self.hold_within=config['arrive_distance_m']
         self.entry=rule['entry_forward_m'];self.ease=rule['ease_gain_per_m'];self.clear=rule['clear_above_top_m']
 
+    def holds(self,view,distance,above):
+        """Does a vehicle that has to climb do so where it is? Near the object and not yet clear of its top."""
+        return distance<=self.hold_within and above<self.clear
+
     def act(self,view):
         action,state=super().act(view)
         landing=view.get('task')=='land' and self.surface is not None and self.surface.landable
@@ -131,7 +154,7 @@ class StopSafeTeacher(SearchTeacher):
             forward=min(self.forward_max*max(0.,1-abs(bearing)/self.settings['centre_deg']),max(self.entry,self.ease*distance))
         if distance<=self.climb_within and above<self.over_m-LEVEL_BAND_M and view['height_m']<self.ceiling-.25:
             # Lower than it flies in at. Not yet clear of the top and near the object: up, in place. Clear of it: up and in.
-            hold=distance<=self.hold_within and above<self.clear
+            hold=self.holds(view,distance,above)
             return [0. if hold else forward,-min(self.down_max,self.over_m-above),yaw],'climb'
         if not self.small:return action,state
         return [forward,action[1],yaw],('approach' if distance>self.config['arrive_distance_m'] else 'final') if forward>.05 else 'align'
@@ -150,7 +173,45 @@ class RecoveryTeacher(StopSafeTeacher):
         if self.small:self.landing=dict(self.landing,commit_radius_m=abort_radius(self.landing,surface))
 
 
+def final_descent_rule(path=None):
+    """The numbers of the stage 1d teacher (configs/generic_landing_stage1d.json, `teacher`)."""
+    return json.loads(Path(path or STAGE1D).read_text(encoding='utf-8'))['teacher']
+
+
+def hard_recovery_radius(surface,margin_m):
+    """How far from the middle of a small top a vehicle that is low over it goes on descending: the end of the usable top
+    less the horizontal drift of the last metres of a descent."""
+    return surface.usable_reach_m-margin_m
+
+
+class FinalDescentTeacher(RecoveryTeacher):
+    """Stage 1d: the stage 1c teacher with the descent that goes on reaching to the hard recovery radius, and with no
+    climb in place over the top itself (there is no side to fly into there). `final`: the numbers of stage 1d."""
+    def __init__(self,config,oft,strategy='right',ceiling_m=14.,landing=None,surface=None,rule=None,final=None):
+        super().__init__(config,oft,strategy,ceiling_m,landing,surface,rule);final=final or final_descent_rule()
+        self.align=self.landing['align_radius_m'];self.hard=self.landing['commit_radius_m']
+        if self.small:self.hard=hard_recovery_radius(surface,final['drift_margin_m']);self.landing=dict(self.landing,commit_radius_m=self.hard)
+
+    def holds(self,view,distance,above):
+        return super().holds(view,distance,above) and not (self.small and view.get('over'))
+
+
+def descent_phase(state,view,teacher):
+    """The name of what a landing teacher's decision is, for records and tests (the label itself is the action). A place
+    and a state, never a memory: DESCENT_COMMIT (down, within the align radius), DESCENT_CONTINUE (down, farther out),
+    RECOVER_CLEARANCE (up near the object), RECENTER (to the middle near the object), TOUCHDOWN, or the state itself."""
+    if state=='landed':return 'TOUCHDOWN'
+    near=view['distance_m']<=teacher.config['arrive_distance_m']
+    if state=='descend':return 'DESCENT_COMMIT' if view['distance_m']<=teacher.landing['align_radius_m'] else 'DESCENT_CONTINUE'
+    if state=='climb' and near:return 'RECOVER_CLEARANCE'
+    if state in ('final','align') and near:return 'RECENTER'
+    return state.upper()
+
+
 FORCED=('under_climb','edge','premature','stall')
+# Stage 1d: the last two metres over a top. An episode of stage 1d carries an `edge` item (which sets how far from the middle
+# the vehicle is) and one of these.
+FINAL=('low_hover','descent_decay','edge_drift')
 
 
 class RecoveryPushes(Pushes):
@@ -164,10 +225,18 @@ class RecoveryPushes(Pushes):
         premature    within `from_m`: down (and slowly on) to `floor_m` over the top
         stall        coming down, `below_m` over the top or lower: up again by `up_m` a decision for `ticks` decisions
 
+    Stage 1d adds three for the last metres, each due at a place too (`within_m` of the middle, over the top or beside it):
+
+        low_hover      down to `hold_m` over the top and held there, nearly still, for `hold_ticks` decisions
+        descent_decay  down to `from_m` over the top, then a descent that dies away: `start_m` a decision, each decision
+                       `ratio` of the one before, for `decay_ticks` decisions
+        edge_drift     down to `from_m` over the top, then level and straight on until the vehicle is `out_m` from the
+                       middle with the middle behind it
+
     Canonical items (`stop`, `descend`, `landed`) are handled as the canonical class handles them. A recovery item that is
     not yet due does not keep a flight going: a policy that stops before the place is reached has stopped."""
     def __init__(self,episode):
-        super().__init__(episode);self.forced=bool(self.queue) and all(item.get('when') in FORCED for item in self.queue);self.fired=[]
+        super().__init__(episode);self.forced=bool(self.queue) and all(item.get('when') in FORCED+FINAL for item in self.queue);self.fired=[]
 
     def pending(self):return self.left>0 if self.forced else super().pending()
 
@@ -177,6 +246,7 @@ class RecoveryPushes(Pushes):
         if when=='edge':return item['miss_m']+1.<distance<=item['from_m'] and above>=item['min_above_m']
         if when=='premature':return distance<=item['from_m'] and above>item['floor_m']+.25
         if when=='stall':return state=='descend' and 0.<above<=item['below_m']
+        if when in FINAL:return distance<=item['within_m'] and above>item.get('floor_m',.1)
         return super().due(item,state,view)
 
     def move(self,item,view,yaw_max):
@@ -193,6 +263,25 @@ class RecoveryPushes(Pushes):
         if when=='premature':
             return None if above<=item['floor_m'] else [item['forward_m'],min(item['down_m'],above-item['floor_m']+.05),0.]
         if when=='stall':return [item.get('forward_m',0.),-item['up_m'],0.]
+        if when=='low_hover':
+            # Down to the height, slowly enough for a vehicle that follows a command late, then nearly still.
+            off=above-item['hold_m']
+            if abs(off)<=item['band_m']:
+                item['held']=item.get('held',0)+1
+                return None if item['held']>item['hold_ticks'] else [0.,0.,0.]
+            return [0.,max(-item['down_m'],min(item['down_m'],item['gain']*off)),0.]
+        if when=='descent_decay':
+            if above<=item.get('floor_m',.1):return None
+            if above>item['from_m'] and 'decayed' not in item:return [0.,item['down_m'],0.]
+            item['decayed']=item.get('decayed',0)+1
+            return None if item['decayed']>item['decay_ticks'] else [0.,item['start_m']*item['ratio']**(item['decayed']-1),0.]
+        if when=='edge_drift':
+            if above>item['from_m'] and 'level' not in item:return [0.,item['down_m'],0.]
+            item['level']=True
+            if distance>=item['out_m'] and abs(bearing)>90.:return None
+            # Slower over the last metre and a half, so that the vehicle is not carried far past the place.
+            left=item['out_m']-distance if abs(bearing)>90. else item['out_m']+distance
+            return [item['forward_m']*max(.3,min(1.,left/1.5)),0.,0.]
         return None
 
     def step(self,state,view,yaw_max):
@@ -206,12 +295,13 @@ class RecoveryPushes(Pushes):
         self.left-=1;return action
 
 
-TEACHERS={'surface':SurfaceTeacher,'stop_safe':StopSafeTeacher,'recovery':RecoveryTeacher}
+TEACHERS={'surface':SurfaceTeacher,'stop_safe':StopSafeTeacher,'recovery':RecoveryTeacher,'final_descent':FinalDescentTeacher}
 
 
 def teacher_class(surface_of,kind='surface'):
     """A teacher class for the canonical episode loop, which builds its teacher itself: `surface_of()` gives the landing
-    surface of the episode being flown. `kind`: `surface` (stage 1), `stop_safe` (stage 1b) or `recovery` (stage 1c)."""
+    surface of the episode being flown. `kind`: `surface` (stage 1), `stop_safe` (stage 1b), `recovery` (stage 1c) or
+    `final_descent` (stage 1d)."""
     class Teacher(TEACHERS[kind]):
         def __init__(self,config,oft,strategy='right',ceiling_m=14.,landing=None):
             super().__init__(config,oft,strategy,ceiling_m,landing,surface_of())
@@ -237,7 +327,8 @@ def rollout(config,oft,map_config,layout,episode,surface,landing=None,kind='surf
         # the canonical pushes of an approach are left to the canonical dry run).
         forced=pushes.step(state,{'bearing_deg':view['bearing_deg'],'distance_m':view['distance_m'],'height_m':height,'surface_m':rest},limit) if pushes.forced else None
         if trace is not None:trace.append({'step':tick,'teacher_action':list(action),'teacher_state':state,'landed':landed,'distance_m':view['distance_m'],'height_m':height,
-                                           'perturbed':forced is not None,'seen':bool(view['visible'] or view['below'] or view['over']),'x':x,'y':y,'bearing_deg':view['bearing_deg']})
+                                           'perturbed':forced is not None,'seen':bool(view['visible'] or view['below'] or view['over']),'x':x,'y':y,'bearing_deg':view['bearing_deg'],
+                                           'over':bool(view.get('over'))})
         if forced is not None:action=forced;forced_ticks+=1
         if view['visible'] and acquired is None:acquired=tick
         states[state]=states.get(state,0)+1

@@ -1,0 +1,104 @@
+{
+ "rule": "A recorded label of stage 1c or stage 1b that the stage 1d teacher would not give in the same place is not replayed: the vehicle is over a small top, no higher than the canonical commit height over it, farther from the middle than the align radius and no farther than the hard recovery radius, and the recorded label is a climb (the stage 1c teacher gave up a descent beyond 2.675 m). The decision is taken out of every label window it is part of, as a forced move is; nothing else of the episode is touched and no label is rewritten. Counted and listed before training (scripts/generic_landing_1d.py left-out).",
+ "generic_landing_1b_added": {
+  "decisions": 0,
+  "episodes": 0,
+  "steps": {}
+ },
+ "generic_landing_1c_added": {
+  "decisions": 40,
+  "episodes": 25,
+  "steps": {
+   "g1c-60000-blue_cube-near_under_climb": [
+    37,
+    38
+   ],
+   "g1c-60001-red_cube-near_under_climb": [
+    54
+   ],
+   "g1c-60002-blue_cube-mid_under_climb": [
+    42
+   ],
+   "g1c-60003-red_cube-mid_under_climb": [
+    50
+   ],
+   "g1c-60006-blue_cube-near_under_climb": [
+    48
+   ],
+   "g1c-60009-red_cube-mid_under_climb": [
+    50
+   ],
+   "g1c-60010-blue_cube-far_under_climb": [
+    70
+   ],
+   "g1c-60012-blue_cube-near_under_climb": [
+    31,
+    32
+   ],
+   "g1c-60013-red_cube-near_under_climb": [
+    39,
+    40
+   ],
+   "g1c-60033-red_cube-mid_premature": [
+    43,
+    44,
+    45
+   ],
+   "g1c-60034-blue_cube-far_premature": [
+    74
+   ],
+   "g1c-60036-blue_cube-near_premature": [
+    28,
+    29
+   ],
+   "g1c-60037-red_cube-near_premature": [
+    58
+   ],
+   "g1c-60038-blue_cube-mid_premature": [
+    38,
+    39
+   ],
+   "g1c-60041-red_cube-far_premature": [
+    68
+   ],
+   "g1c-60043-red_cube-near_premature": [
+    36,
+    37
+   ],
+   "g1c-60044-blue_cube-mid_premature": [
+    64
+   ],
+   "g1c-60045-red_cube-mid_premature": [
+    42,
+    43
+   ],
+   "g1c-60046-blue_cube-far_premature": [
+    64,
+    65,
+    66
+   ],
+   "g1c-60047-red_cube-far_premature": [
+    55,
+    56
+   ],
+   "g1c-60064-blue_cylinder-near_under_climb": [
+    37
+   ],
+   "g1c-60065-green_cylinder-near_under_climb": [
+    46
+   ],
+   "g1c-60068-blue_cylinder-far_premature": [
+    56,
+    57
+   ],
+   "g1c-60069-green_cylinder-far_premature": [
+    79,
+    80
+   ],
+   "g1cval-62000-blue_cube-near_under_climb": [
+    32,
+    33
+   ]
+  }
+ }
+}

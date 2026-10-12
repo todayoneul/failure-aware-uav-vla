@@ -1,0 +1,16 @@
+{
+ "description": "The checkpoint stage 1d starts from: stage 1c's update 2000. Not generic_landing_v1.",
+ "path": "outputs/aerovla_oft/checkpoints/generic_landing_stage1c_run/update-2000",
+ "sha256": {
+  "head.pt": "43899514f23a90540a78e84dd4344e0abf11794cea5af7739a9c00535117fbbf",
+  "manifest.json": "499104da1e9ee4bd06dc354e87f4d0a57b2f7b3423a17bf5525c69f5e15c07b7",
+  "oft/adapter_model.safetensors": "7e81d15736f3d3630c0e881da3e576ae0feca5567334ffa910dfce067e706f49",
+  "oft/adapter_config.json": "72a23fded88a269aef2064789e8d9e7ab49556575853404df050c844b59d7c4a"
+ },
+ "matches_the_configuration": true,
+ "parts": {
+  "head.pt": "the action head and the FiLM module",
+  "oft/adapter_model.safetensors": "the LoRA adapter",
+  "manifest.json": "what it was trained with"
+ }
+}

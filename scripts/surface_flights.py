@@ -5,7 +5,7 @@
                                                                           the same starts flown by an AeroVLA-OFT checkpoint
   surface_flights.py --host H --plan FILE --set train --output DIR --policy teacher [--record ROOT] [--finalizer off]
                                                                           flown by the privileged teacher (src/landing/teacher.py;
-                                                                          --teacher stop_safe: stage 1b's, recovery: stage 1c's);
+                                                                          --teacher stop_safe: stage 1b's, recovery: stage 1c's, final_descent: stage 1d's);
                                                                           with --record, kept as training episodes
 
 A flight is the canonical evaluation's own: `SearchEnv.reset` and `run_episode` of scripts/visual_search.py, from the
@@ -81,6 +81,9 @@ def start_checks(episode,env,tolerance):
     return wanted,rows
 
 
+LET_GO_ABOVE_TOP_MIN_M=.15   # configs/generic_landing_stage1d.json, final_descent.let_go_above_top_min_m
+
+
 @contextlib.contextmanager
 def surface_teacher(canonical,env,kind='surface'):
     """For the length of one flight the teacher the canonical loop builds is the one that knows landing surfaces, and with
@@ -88,15 +91,21 @@ def surface_teacher(canonical,env,kind='surface'):
     from src.landing.teacher import teacher_class,RecoveryPushes
     original=canonical.SearchTeacher;pushes=canonical.Pushes
     canonical.SearchTeacher=teacher_class(lambda:env.surfaces[env.target],kind)
-    if kind=='recovery':canonical.Pushes=RecoveryPushes
+    if kind in ('recovery','final_descent'):canonical.Pushes=RecoveryPushes
     try:yield
     finally:canonical.SearchTeacher=original;canonical.Pushes=pushes
 
 
 def is_forced(episode):
-    """Does the episode carry forced moves of stage 1c?"""
-    from src.landing.teacher import FORCED
-    return any(item.get('when') in FORCED for item in episode.get('pushes',[]))
+    """Does the episode carry forced moves of stage 1c or stage 1d?"""
+    from src.landing.teacher import FORCED,FINAL
+    return any(item.get('when') in FORCED+FINAL for item in episode.get('pushes',[]))
+
+
+def is_final(episode):
+    """Does the episode carry a forced move of stage 1d (the last metres over a top)?"""
+    from src.landing.teacher import FINAL
+    return any(item.get('when') in FINAL for item in episode.get('pushes',[]))
 
 
 def forced_record(episode,steps,top_m):
@@ -108,9 +117,11 @@ def forced_record(episode,steps,top_m):
         elif inside:
             inside=False;runs[-1].update(let_go_step=index,distance_m=round(step['distance_m'],2),above_top_m=round(step['height_m']-top_m,2),
                                          front_seen=bool(step['front_seen']),down_seen=bool(step['down_seen']),over=bool(step.get('over')),
-                                         seen=bool(step['front_seen'] or step['down_seen'] or step.get('over')))
+                                         seen=bool(step['front_seen'] or step['down_seen'] or step.get('over')),in_air=not (step.get('landed') or step.get('on_surface')))
     return {'asked':len(episode.get('pushes',[])),'came_to_pass':len(runs),'let_go':runs,
-            'all_came_to_pass_and_seen':len(runs)==len(episode.get('pushes',[])) and all(run.get('seen') for run in runs)}
+            'all_came_to_pass_and_seen':len(runs)==len(episode.get('pushes',[])) and all(run.get('seen') for run in runs),
+            # Stage 1d: the state is one over the top, so the last push has to let go before the vehicle stands on it.
+            'last_let_go_in_the_air':bool(runs) and bool(runs[-1].get('in_air')) and runs[-1].get('above_top_m',0.)>=LET_GO_ABOVE_TOP_MIN_M}
 
 
 async def fly(args):
@@ -184,8 +195,8 @@ async def fly(args):
                     else:
                         aim,top=aim_point(episode['pilot'],env.surfaces);policy=ControlledPilot(env,oft,env.landing,aim,top,episode['pilot']['mode'])
                     if is_forced(episode):
-                        # The pushes of a forced episode are due at places, read with stage 1c's teacher beside the pilot.
-                        with surface_teacher(canonical,env,'recovery'):summary,steps=await canonical.run_episode(env,episode,policy,arguments,None)
+                        # The pushes of a forced episode are due at places, read with the stage's teacher beside the pilot.
+                        with surface_teacher(canonical,env,'final_descent' if is_final(episode) else 'recovery'):summary,steps=await canonical.run_episode(env,episode,policy,arguments,None)
                     else:summary,steps=await canonical.run_episode(env,episode,policy,arguments,None)
             except Exception:
                 error=traceback.format_exc();print(error,flush=True)
@@ -212,7 +223,7 @@ async def fly(args):
                 # A recorded episode is training data only if the teacher did what the sentence asked and stopped by itself.
                 good=bool(reading['success'] and summary['reason']=='teacher_stop' and (factor is None or factor>=getattr(args,'real_time_minimum',REAL_TIME_MINIMUM)) and record['passed'])
                 # A forced landing is data only if every push came to pass and a camera showed the object where it let go.
-                if 'forced' in record:good=good and record['forced']['all_came_to_pass_and_seen']
+                if 'forced' in record:good=good and record['forced']['all_came_to_pass_and_seen'] and (record['forced']['last_let_go_in_the_air'] or not is_final(episode))
                 folder=record_root/('episodes' if good else 'rejected');folder.mkdir(parents=True,exist_ok=True)
                 (folder/f'{episode["id"]}.json').write_text(json.dumps({'summary':{**summary,'surface_landing':reading,'real_time_factor':factor},'traj_rel_dir':rel,'steps':steps}))
                 if not good and (record_root/rel).exists():shutil.rmtree(record_root/rel)
@@ -240,7 +251,7 @@ if __name__=='__main__':
     parser.add_argument('--policy',choices=('controlled','oft','teacher'),default='controlled');parser.add_argument('--checkpoint');parser.add_argument('--model-name')
     parser.add_argument('--finalizer',choices=('on','off'),default='on',help='off: as the recorded episodes were flown, the teacher ends its own landing')
     parser.add_argument('--record',help='with --policy teacher: dataset folder the flights are recorded into')
-    parser.add_argument('--teacher',choices=('surface','stop_safe','recovery'),default='surface',help='with --policy teacher: the teacher of stage 1 (surface), of stage 1b (stop_safe) or of stage 1c (recovery)')
+    parser.add_argument('--teacher',choices=('surface','stop_safe','recovery','final_descent'),default='surface',help='with --policy teacher: the teacher of stage 1 (surface), of stage 1b (stop_safe), of stage 1c (recovery) or of stage 1d (final_descent)')
     parser.add_argument('--only',nargs='+',help='episode ids to fly');parser.add_argument('--skip',type=int,default=0);parser.add_argument('--limit',type=int,default=0)
     parser.add_argument('--real-time-minimum',type=float,default=REAL_TIME_MINIMUM,help='a recorded flight whose simulator ran slower than this share of real time is rejected')
     parser.add_argument('--again',action='store_true',help='fly everything again instead of keeping what results.json already holds')

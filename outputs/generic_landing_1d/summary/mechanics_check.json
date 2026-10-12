@@ -1,0 +1,366 @@
+{
+ "description": "Eight scratch teacher flights flown before the plans of stage 1d were drawn (in no set): how a forced move of the last metres goes with a vehicle that follows a command late. After them the edge_low state was moved outward (it coasts inward while it sinks).",
+ "landed": 8,
+ "flights": [
+  {
+   "id": "g1dx-89900-blue_cube-low_hover",
+   "kind": "cube",
+   "target": "blue_cube",
+   "task": "land",
+   "scene": "field",
+   "layout": "a",
+   "start_distance_m": 11.05,
+   "start_height_m": 10.23,
+   "initially_visible": true,
+   "state": "low_hover",
+   "other_object": null,
+   "success": true,
+   "reason": "landed",
+   "decisions": 60,
+   "policy_stopped_by_itself": true,
+   "landed_on": "blue_cube",
+   "touchdown_error_m": 1.19,
+   "inside_region": true,
+   "wrong_target": false,
+   "collision": null,
+   "final_distance_m": 1.2,
+   "final_height_above_top_m": 0.0,
+   "highest_m": 11.7,
+   "mean_decision_s": 0.501,
+   "forced": {
+    "asked": 2,
+    "came_to_pass": 2,
+    "last_let_go_in_the_air": true,
+    "let_go": [
+     {
+      "distance_m": 1.39,
+      "above_top_m": 3.68,
+      "seen": true,
+      "decisions": 21
+     },
+     {
+      "distance_m": 1.19,
+      "above_top_m": 1.68,
+      "seen": true,
+      "decisions": 13
+     }
+    ]
+   }
+  },
+  {
+   "id": "g1dx-89901-blue_cube-descent_decay",
+   "kind": "cube",
+   "target": "blue_cube",
+   "task": "land",
+   "scene": "lot",
+   "layout": "b",
+   "start_distance_m": 16.24,
+   "start_height_m": 6.85,
+   "initially_visible": true,
+   "state": "descent_decay",
+   "other_object": null,
+   "success": true,
+   "reason": "landed",
+   "decisions": 63,
+   "policy_stopped_by_itself": true,
+   "landed_on": "blue_cube",
+   "touchdown_error_m": 1.21,
+   "inside_region": true,
+   "wrong_target": false,
+   "collision": null,
+   "final_distance_m": 1.2,
+   "final_height_above_top_m": 0.0,
+   "highest_m": 11.8,
+   "mean_decision_s": 0.501,
+   "forced": {
+    "asked": 2,
+    "came_to_pass": 2,
+    "last_let_go_in_the_air": true,
+    "let_go": [
+     {
+      "distance_m": 1.51,
+      "above_top_m": 3.78,
+      "seen": true,
+      "decisions": 21
+     },
+     {
+      "distance_m": 1.21,
+      "above_top_m": 1.52,
+      "seen": true,
+      "decisions": 11
+     }
+    ]
+   }
+  },
+  {
+   "id": "g1dx-89902-blue_cube-edge_low",
+   "kind": "cube",
+   "target": "blue_cube",
+   "task": "land",
+   "scene": "field",
+   "layout": "a",
+   "start_distance_m": 22.67,
+   "start_height_m": 3.57,
+   "initially_visible": true,
+   "state": "edge_low",
+   "other_object": null,
+   "success": true,
+   "reason": "landed",
+   "decisions": 80,
+   "policy_stopped_by_itself": true,
+   "landed_on": "blue_cube",
+   "touchdown_error_m": 0.28,
+   "inside_region": true,
+   "wrong_target": false,
+   "collision": null,
+   "final_distance_m": 0.3,
+   "final_height_above_top_m": 0.0,
+   "highest_m": 11.9,
+   "mean_decision_s": 0.501,
+   "forced": {
+    "asked": 2,
+    "came_to_pass": 2,
+    "last_let_go_in_the_air": true,
+    "let_go": [
+     {
+      "distance_m": 4.04,
+      "above_top_m": 3.92,
+      "seen": true,
+      "decisions": 13
+     },
+     {
+      "distance_m": 3.59,
+      "above_top_m": 2.03,
+      "seen": true,
+      "decisions": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "g1dx-89903-blue_cube-edge_drift",
+   "kind": "cube",
+   "target": "blue_cube",
+   "task": "land",
+   "scene": "lot",
+   "layout": "b",
+   "start_distance_m": 22.22,
+   "start_height_m": 4.52,
+   "initially_visible": true,
+   "state": "edge_drift",
+   "other_object": null,
+   "success": true,
+   "reason": "landed",
+   "decisions": 111,
+   "policy_stopped_by_itself": true,
+   "landed_on": "blue_cube",
+   "touchdown_error_m": 0.43,
+   "inside_region": true,
+   "wrong_target": false,
+   "collision": null,
+   "final_distance_m": 0.4,
+   "final_height_above_top_m": 0.0,
+   "highest_m": 11.9,
+   "mean_decision_s": 0.501,
+   "forced": {
+    "asked": 2,
+    "came_to_pass": 2,
+    "last_let_go_in_the_air": true,
+    "let_go": [
+     {
+      "distance_m": 0.61,
+      "above_top_m": 3.93,
+      "seen": true,
+      "decisions": 22
+     },
+     {
+      "distance_m": 3.8,
+      "above_top_m": 1.03,
+      "seen": true,
+      "decisions": 24
+     }
+    ]
+   }
+  },
+  {
+   "id": "g1dx-89904-red_cube-low_hover",
+   "kind": "cube",
+   "target": "red_cube",
+   "task": "land",
+   "scene": "field",
+   "layout": "a",
+   "start_distance_m": 10.67,
+   "start_height_m": 9.2,
+   "initially_visible": true,
+   "state": "low_hover",
+   "other_object": null,
+   "success": true,
+   "reason": "landed",
+   "decisions": 57,
+   "policy_stopped_by_itself": true,
+   "landed_on": "red_cube",
+   "touchdown_error_m": 2.48,
+   "inside_region": true,
+   "wrong_target": false,
+   "collision": null,
+   "final_distance_m": 2.5,
+   "final_height_above_top_m": 0.0,
+   "highest_m": 11.9,
+   "mean_decision_s": 0.501,
+   "forced": {
+    "asked": 2,
+    "came_to_pass": 2,
+    "last_let_go_in_the_air": true,
+    "let_go": [
+     {
+      "distance_m": 2.78,
+      "above_top_m": 3.92,
+      "seen": true,
+      "decisions": 16
+     },
+     {
+      "distance_m": 2.48,
+      "above_top_m": 1.65,
+      "seen": true,
+      "decisions": 15
+     }
+    ]
+   }
+  },
+  {
+   "id": "g1dx-89905-red_cube-descent_decay",
+   "kind": "cube",
+   "target": "red_cube",
+   "task": "land",
+   "scene": "lot",
+   "layout": "b",
+   "start_distance_m": 10.89,
+   "start_height_m": 3.7,
+   "initially_visible": true,
+   "state": "descent_decay",
+   "other_object": null,
+   "success": true,
+   "reason": "landed",
+   "decisions": 69,
+   "policy_stopped_by_itself": true,
+   "landed_on": "red_cube",
+   "touchdown_error_m": 2.03,
+   "inside_region": true,
+   "wrong_target": false,
+   "collision": null,
+   "final_distance_m": 2.0,
+   "final_height_above_top_m": 0.0,
+   "highest_m": 11.9,
+   "mean_decision_s": 0.501,
+   "forced": {
+    "asked": 2,
+    "came_to_pass": 2,
+    "last_let_go_in_the_air": true,
+    "let_go": [
+     {
+      "distance_m": 2.27,
+      "above_top_m": 3.94,
+      "seen": true,
+      "decisions": 21
+     },
+     {
+      "distance_m": 2.03,
+      "above_top_m": 1.07,
+      "seen": true,
+      "decisions": 13
+     }
+    ]
+   }
+  },
+  {
+   "id": "g1dx-89906-red_cube-edge_low",
+   "kind": "cube",
+   "target": "red_cube",
+   "task": "land",
+   "scene": "field",
+   "layout": "a",
+   "start_distance_m": 22.45,
+   "start_height_m": 8.55,
+   "initially_visible": true,
+   "state": "edge_low",
+   "other_object": null,
+   "success": true,
+   "reason": "landed",
+   "decisions": 78,
+   "policy_stopped_by_itself": true,
+   "landed_on": "red_cube",
+   "touchdown_error_m": 0.47,
+   "inside_region": true,
+   "wrong_target": false,
+   "collision": null,
+   "final_distance_m": 0.5,
+   "final_height_above_top_m": 0.0,
+   "highest_m": 12.0,
+   "mean_decision_s": 0.501,
+   "forced": {
+    "asked": 2,
+    "came_to_pass": 2,
+    "last_let_go_in_the_air": true,
+    "let_go": [
+     {
+      "distance_m": 4.42,
+      "above_top_m": 3.95,
+      "seen": true,
+      "decisions": 9
+     },
+     {
+      "distance_m": 3.85,
+      "above_top_m": 1.57,
+      "seen": true,
+      "decisions": 13
+     }
+    ]
+   }
+  },
+  {
+   "id": "g1dx-89907-red_cube-edge_drift",
+   "kind": "cube",
+   "target": "red_cube",
+   "task": "land",
+   "scene": "lot",
+   "layout": "b",
+   "start_distance_m": 27.07,
+   "start_height_m": 7.25,
+   "initially_visible": true,
+   "state": "edge_drift",
+   "other_object": null,
+   "success": true,
+   "reason": "landed",
+   "decisions": 116,
+   "policy_stopped_by_itself": true,
+   "landed_on": "red_cube",
+   "touchdown_error_m": 0.18,
+   "inside_region": true,
+   "wrong_target": false,
+   "collision": null,
+   "final_distance_m": 0.2,
+   "final_height_above_top_m": 0.0,
+   "highest_m": 11.9,
+   "mean_decision_s": 0.501,
+   "forced": {
+    "asked": 2,
+    "came_to_pass": 2,
+    "last_let_go_in_the_air": true,
+    "let_go": [
+     {
+      "distance_m": 1.14,
+      "above_top_m": 3.93,
+      "seen": true,
+      "decisions": 19
+     },
+     {
+      "distance_m": 4.13,
+      "above_top_m": 1.03,
+      "seen": true,
+      "decisions": 25
+     }
+    ]
+   }
+  }
+ ]
+}

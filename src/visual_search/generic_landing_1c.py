@@ -71,8 +71,9 @@ def recorded(plan,keys=('ticks','clearance_m','climbed_m','acquired_tick','state
     return out
 
 
-def draw_recovery(config,oft,stage,scene,layout,target,category,band,visible,seed,split,name,excluded):
-    """A landing start whose teacher flight is pushed into `category` and recovers, or None."""
+def draw_recovery(config,oft,stage,scene,layout,target,category,band,visible,seed,split,name,excluded,make=None):
+    """A landing start whose teacher flight is pushed into `category` and recovers, or None. `make` draws the forced moves
+    of the episode (stage 1c's own by default; a later stage has its own states)."""
     surface=SurfaceSet(scene,layout)[target];landing=load_landing();mine=dict(stage)
     if category=='under_climb':
         # The push comes while the vehicle is still on its way up: the start has to be lower than the place it is due at.
@@ -81,7 +82,7 @@ def draw_recovery(config,oft,stage,scene,layout,target,category,band,visible,see
     if base is None:return None
     rng=random.Random(f'recovery|{base["id"]}|{category}')
     for attempt in range(6):
-        episode={key:value for key,value in base.items() if key!='plan'};episode['pushes']=pushes_of(stage,category,rng,surface,landing)
+        episode={key:value for key,value in base.items() if key!='plan'};episode['pushes']=(make or pushes_of)(stage,category,rng,surface,landing)
         trace=[];plan=rollout(config,oft,scene,layout,episode,surface,kind=stages.teacher_of(stage),trace=trace)
         if plan['reason']!='teacher_stop' or not plan['landed'] or plan['forced_left'] or not plan['forced_ticks']:continue
         # When a push lets go a camera has to show the object: what the teacher does next must be something the pictures can tell.

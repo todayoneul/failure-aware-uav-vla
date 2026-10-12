@@ -58,6 +58,10 @@
 /outputs/generic_landing_1c/*
 !/outputs/generic_landing_1c/summary/
 !/outputs/generic_landing_1c/examples/
+!/outputs/generic_landing_1d/
+/outputs/generic_landing_1d/*
+!/outputs/generic_landing_1d/summary/
+!/outputs/generic_landing_1d/examples/
 
 # Downloaded simulator, datasets and model weights.
 /assets/

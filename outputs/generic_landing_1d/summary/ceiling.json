@@ -1,0 +1,10 @@
+{
+ "description": "Flights above the ceiling of the start rule (14 m). The executor is not changed in stage 1d and no clamp is added.",
+ "teacher pilot": {
+  "limit_m": 14.0,
+  "flights": 20,
+  "over": 0,
+  "highest_m": 11.9,
+  "episodes": []
+ }
+}

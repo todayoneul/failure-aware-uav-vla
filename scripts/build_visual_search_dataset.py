@@ -28,8 +28,9 @@ def episode_samples(record,chunk_size):
     summary=record['summary'];samples=[]
     for index,step in enumerate(steps):
         window=steps[index:index+chunk_size]
-        # A forced turn is flown but is not the teacher's choice, so no label may contain one.
-        if any(item.get('perturbed') for item in window) or 'img_name' not in step:continue
+        # A forced turn is flown but is not the teacher's choice, so no label may contain one. Neither may it contain a decision
+        # a later stage leaves out of its replay (--leave-out).
+        if any(item.get('perturbed') or item.get('left_out') for item in window) or 'img_name' not in step:continue
         fwd,down,yaw=labels[index][0]
         samples.append({'traj_rel_dir':record['traj_rel_dir'],'img_name':step['img_name'],
                         'instruction':'<image>\n'+summary['instruction'],
@@ -161,6 +162,7 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('root');parser.add_argument('--oft-config')
     parser.add_argument('--validation-fraction',type=float,default=.2);parser.add_argument('--seed',type=int,default=0)
     parser.add_argument('--sources',nargs='+',help='recorded datasets to merge; they must sit next to ROOT')
+    parser.add_argument('--leave-out',help='with --sources: JSON {dataset name: {"steps": {episode id: [step numbers]}}}; those decisions are in no label window of the merge (the episodes stay)')
     args=parser.parse_args();root=Path(args.root)
     if args.sources:
         records=[]
@@ -169,8 +171,18 @@ if __name__=='__main__':
             records+=load_records(source,f'../{Path(source).name}/')
         clashes=collisions(records)
         if any(clashes.values()):raise SystemExit(f'The datasets overlap: {clashes}')
+        marked={}
+        if args.leave_out:
+            chosen={name:value['steps'] for name,value in json.loads(Path(args.leave_out).read_text(encoding='utf-8')).items() if isinstance(value,dict) and 'steps' in value}
+            for record in records:
+                numbers=set(chosen.get(record['source'],{}).get(record['summary']['id'],[]))
+                for step in record['steps']:
+                    if step['step'] in numbers:step['left_out']=True;marked[record['source']]=marked.get(record['source'],0)+1
+            asked={name:sum(len(steps) for steps in episodes.values()) for name,episodes in chosen.items()}
+            if any(marked.get(name,0)!=count for name,count in asked.items()):raise SystemExit(f'--leave-out names decisions that are not in the sources: asked {asked}, found {marked}')
         root.mkdir(parents=True,exist_ok=True)
         splits,summary=build_records(records,load_config(args.oft_config),args.validation_fraction,args.seed)
+        if args.leave_out:summary['decisions_left_out']=marked
     else:splits,summary=build(root,load_config(args.oft_config),args.validation_fraction,args.seed)
     if any(summary['leaks'].values()):raise SystemExit(f'Training and validation overlap: {summary["leaks"]}')
     for name,samples in splits.items():(root/f'{name}.json').write_text(json.dumps(samples))

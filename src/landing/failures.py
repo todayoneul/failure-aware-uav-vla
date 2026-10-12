@@ -142,6 +142,32 @@ def descent_profile(record,steps,landing,config,oft):
     return out
 
 
+def final_descent_profile(record,steps,landing,config,oft,band=(.2,2.),reach_m=None):
+    """Stage 1d: the last metres of a landing from the decisions the pilot made itself (forced moves left out). Beside the
+    descent profile: how near the middle the vehicle came, how long the descent took, what it commanded downward while it
+    was in `band` over the level of the top near the object, how often such a decision was smaller than the stop band or
+    a stop, and whether the flight ended there by its own stop."""
+    from .stop_safety import stop_ratio
+    own=[step for step in steps if not step.get('perturbed')];surface=record['surface_landing']['target_surface'];top=surface['top_m']
+    out=descent_profile(record,own,landing,config,oft);limit=oft['stop_threshold']*(oft['action_bounds']['down_m'][1]-oft['action_bounds']['down_m'][0])
+    pushed=[index for index,step in enumerate(steps) if step.get('perturbed')];after=steps[pushed[-1]+1:] if pushed else steps
+    air=[step for step in own if not (step.get('landed') or step.get('on_surface'))];near=[step for step in air if step['distance_m']<=config['arrive_distance_m']]
+    low=[step for step in near if band[0]<=step['height_m']-top<=band[1]];down=[step['action'][1] for step in low];ratios=[stop_ratio(step['action'],oft) for step in low]
+    middle=sorted(down)[len(down)//2] if down else None;end=end_of(record) if not record['surface_landing']['success'] else None;last=steps[-1]
+    out.update(pushes=len(record.get('forced',{}).get('let_go',[])) if 'forced' in record else None,
+               let_go=None if not pushed or not after else {'distance_m':round(after[0]['distance_m'],2),'above_top_m':round(after[0]['height_m']-top,2),'over':bool(after[0].get('over'))},
+               nearest_to_the_middle_m=round(min((step['distance_m'] for step in near),default=float('nan')),2) if near else None,
+               nearest_to_the_middle_after_the_push_m=round(min((step['distance_m'] for step in after),default=float('nan')),2) if pushed and after else None,
+               highest_after_the_push_above_top_m=round(max((step['height_m'] for step in after),default=top)-top,2) if pushed and after else None,
+               low_band={'decisions':len(low),'median_down_m':None if middle is None else round(middle,3),'down_below_the_stop_band':sum(abs(value)<=limit for value in down),
+                         'climbing':sum(value<-limit for value in down),'stop_decisions':sum(ratio<=1. for ratio in ratios),
+                         'median_stop_ratio':round(sorted(ratios)[len(ratios)//2],2) if ratios else None},
+               end=end,ended_by_its_own_stop_in_the_band=bool(end=='AIR_SELF_STOP' and band[0]<=last['height_m']-top<=band[1]+.5),
+               end_place=None if record['surface_landing']['success'] else {'distance_m':round(last['distance_m'],2),'above_top_m':round(last['height_m']-top,2),'over':bool(last.get('over'))})
+    if reach_m is not None:out['touched_outside_the_region']=out['inside_region'] is False
+    return out
+
+
 def plain(name):
     """An object's name as the catalogue and the simulator both spell it, reduced to letters: blue_cone, SceneBlueCone -> bluecone."""
     return ''.join(letter for letter in str(name).lower() if letter.isalnum()).replace('scene','')

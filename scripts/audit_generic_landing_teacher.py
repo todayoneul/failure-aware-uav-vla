@@ -37,6 +37,10 @@ def planned(config,oft,stage):
         # Stage 1c has more sets, and some of its episodes are pushed: the dry run flies the forced moves too.
         from src.visual_search import generic_landing_1c as later
         files=later.files_of(stage);names=('validation','same_color','same_color_twins','pilot','teacher_pilot')
+    if stage.get('stage')=='1d':
+        # Stage 1d: its own three check sets (the gates are stage 1c's files and are audited with stage 1c).
+        from src.visual_search import generic_landing_1d as later
+        files=later.files_of(stage);names=later.SETS
     for name in names:episodes+=json.loads(files[name].read_text(encoding='utf-8'))['episodes']
     for episode in episodes:
         scene=scenes.setdefault(episode['map'],load_map(episode['map']));trace=[]

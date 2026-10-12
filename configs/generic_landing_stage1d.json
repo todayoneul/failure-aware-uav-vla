@@ -1,0 +1,619 @@
+{
+ "description": "Phase B, stage 1d: final descent continuation (docs/generic_landing_stage1d_final_descent.md). One thing is corrected: what the policy does in the last two metres over a top. The later checkpoints of stage 1c chose the named object on every pilot start but stopped in the air 0.2-2.3 m over a cube. Stage 1d starts from stage 1c's update 2000, records landings pushed into four low states over a top, and replays stage 1c's and stage 1b's data. No new ability, no same-colour episode, no change of the model, the action space, the stop rule, the finalizer, the evaluator, the surfaces or the executor. Everything in this file was fixed before any episode of stage 1d was recorded.",
+ "stage": "1d",
+ "previous": "configs/generic_landing_stage1c.json",
+ "folder": "configs/generic_landing_stage1d",
+ "prefix": {
+  "train_final": "g1d",
+  "val_final": "g1dval",
+  "pilot": "g1dp",
+  "qualification": "g1dq",
+  "teacher_pilot": "g1dt"
+ },
+ "start_checkpoint": "outputs/aerovla_oft/checkpoints/generic_landing_stage1c_run/update-2000",
+ "start_checkpoint_note": "Stage 1c's update 2000. It was not the candidate stage 1c's fixed order picked, it did not pass stage 1c and it is not generic_landing_v1. Chosen as the start by the plan of stage 1d: no landing on a wrong object in stage 1c's pilot, cube 8/10, cylinder 4/4, pad 10/10, the lowest validation L1 of the four candidates.",
+ "start_checkpoint_sha256": {
+  "head.pt": "43899514f23a90540a78e84dd4344e0abf11794cea5af7739a9c00535117fbbf",
+  "manifest.json": "499104da1e9ee4bd06dc354e87f4d0a57b2f7b3423a17bf5525c69f5e15c07b7",
+  "oft/adapter_model.safetensors": "7e81d15736f3d3630c0e881da3e576ae0feca5567334ffa910dfce067e706f49",
+  "oft/adapter_config.json": "72a23fded88a269aef2064789e8d9e7ab49556575853404df050c844b59d7c4a"
+ },
+ "checkpoint": "outputs/aerovla_oft/checkpoints/generic_landing_v1",
+ "checkpoint_note": "Made only if the pilot, the qualification, both sealed gates with their second flights and the regression are all passed.",
+ "run": "outputs/aerovla_oft/checkpoints/generic_landing_stage1d_run",
+ "dataset": {
+  "added": "generic_landing_1d_added",
+  "merged": "generic_landing_1d",
+  "corrective": "generic_landing_1c_added",
+  "stop_safe": "generic_landing_1b_added",
+  "replay": [
+   "generalization_v1",
+   "generalization_v2_added",
+   "generalization_v3_added",
+   "generalization_v3b_added",
+   "generalization_v3c_added"
+  ],
+  "not_used": [
+   "generic_landing_added"
+  ],
+  "not_used_note": "Stage 1's 233 generic landing episodes carry the labels stage 1b took out. None of them is in the data of stage 1c. Stage 1b's 231 stop-safe episodes are.",
+  "left_out": {
+   "file": "outputs/generic_landing_1d/summary/left_out_labels.json",
+   "rule": "A recorded label of stage 1c or stage 1b that the stage 1d teacher would not give in the same place is not replayed: the vehicle is over a small top, no higher than the canonical commit height over it, farther from the middle than the align radius and no farther than the hard recovery radius, and the recorded label is a climb (the stage 1c teacher gave up a descent beyond 2.675 m). The decision is taken out of every label window it is part of, as a forced move is; nothing else of the episode is touched and no label is rewritten. Counted and listed before training (scripts/generic_landing_1d.py left-out).",
+   "why": "Stage 1c's students stopped in the air where these labels (up) meet the labels of a descent that goes on (down). Replaying them beside the new labels of the same place would give one picture two opposite labels."
+  }
+ },
+ "scenes": [
+  "field",
+  "lot"
+ ],
+ "layouts": {
+  "train": [
+   "a",
+   "b",
+   "c",
+   "d",
+   "k",
+   "l",
+   "m",
+   "n"
+  ],
+  "evaluation": [
+   "t",
+   "u",
+   "p",
+   "q",
+   "r",
+   "s"
+  ],
+  "note": "As before: episodes are recorded in the eight layouts of each scene that earlier episodes were recorded in, every check flies in the six that no episode was ever recorded in. All of it is the two training scenes."
+ },
+ "seeds": {
+  "train_final": [
+   80000,
+   80999
+  ],
+  "val_final": [
+   81000,
+   81099
+  ],
+  "teacher_pilot": [
+   81500,
+   81999
+  ],
+  "pilot": [
+   82000,
+   82999
+  ],
+  "qualification": [
+   83000,
+   83999
+  ],
+  "mechanics_check": [
+   89900,
+   89999
+  ]
+ },
+ "seeds_note": "Every plan, set and dataset of the repository was read for the seeds it uses (0-24999, 30000-31002, 40000-43999, 50000-53999, 60000-66999; the first, discarded draw of stage 1c's teacher pilot ran up to 70441). Stage 1d uses the 80000s. The mechanics check is eight scratch teacher flights flown before the plans were drawn, to see how far a vehicle that follows a command late sinks and coasts in a forced move; they are in no set.",
+ "separation_m": 6.0,
+ "checks": {
+  "may_be_near": [
+   "configs/generic_landing/pilot.json",
+   "configs/generic_landing/validation.json",
+   "configs/generic_landing/regression.json",
+   "configs/generic_landing/train_plan.json",
+   "configs/generic_landing_stage1b/pilot.json",
+   "configs/generic_landing_stage1b/validation.json",
+   "configs/generic_landing_stage1b/regression.json",
+   "configs/generic_landing_stage1c/teacher_pilot.json"
+  ],
+  "may_be_near_one_more": "The starts of stage 1c's teacher pilot: only the teacher flew those, no policy has flown them and none was recorded. With them kept away from, no new start was left that shows the blue cube first and hides the blue pad (or the other way round); found when the plans were first drawn, written here before any plan existed. A recorded start of stage 1d still keeps 6 m from them, as from every start flown for a check.",
+  "may_be_near_from": "As in stage 1c. The check starts of this stage (the pilot, the qualification, the teacher pilot) keep 6 m from every start a checkpoint of this chain was trained on, from each other, from stage 1c's sealed gates and regression set and from stage 1c's pilot. They need not keep 6 m from the check starts of stage 1 and stage 1b or from stage 1's recorded starts, which no checkpoint of this chain was trained on."
+ },
+ "targets": {
+  "pad": [
+   "blue_pad",
+   "red_pad"
+  ],
+  "cube": [
+   "blue_cube",
+   "red_cube"
+  ],
+  "cylinder": [
+   "blue_cylinder",
+   "green_cylinder"
+  ]
+ },
+ "bands_m": {
+  "near": [
+   10.0,
+   20.0
+  ],
+  "mid": [
+   20.0,
+   32.0
+  ],
+  "far": [
+   32.0,
+   44.0
+  ]
+ },
+ "height_m": [
+  3.0,
+  12.0
+ ],
+ "first_view": {
+  "visible_deg": [
+   0.0,
+   25.0
+  ],
+  "invisible_deg": [
+   60.0,
+   180.0
+  ]
+ },
+ "instructions": {
+  "land": "land",
+  "approach": "approach"
+ },
+ "max_ticks": 320,
+ "stop_safety": {
+  "description": "Stage 1b's rule, unchanged. The student's stop is src/aerovla_oft/spec.is_stop on the flown action (forward 0.08 m, down 0.08 m, yaw 0.0336 rad, all three), four decisions in a row. Every label of a landing before the touchdown is no stop and at least safe_ratio times the stop rule, and no four in a row are stops; the stop of a landing comes only once the vehicle stands on the surface. The new landing labels (the way out of a forced state, the search past an object of the named colour) are held to it like any other.",
+  "safe_ratio": 3.0,
+  "near_stop_ratio": 2.0,
+  "applies_to": "Every label of a landing before the touchdown. An approach's slowing down toward its stop is counted, not held to safe_ratio."
+ },
+ "teacher": {
+  "class": "final_descent",
+  "description": "src/landing/teacher.FinalDescentTeacher: the stage 1c teacher with two changes over a top smaller than a pad. (1) A vehicle that is low over the top goes on descending out to the hard recovery radius instead of stage 1c's abort radius. (2) Over the top itself a vehicle that has to climb moves in while it climbs; it climbs in place only beside the top and lower than the clearance over it. Everything else, every number of the descent included, is stage 1c's (and stage 1b's, and the canonical teacher's).",
+  "entry_forward_m": 0.35,
+  "ease_gain_per_m": 0.05,
+  "clear_above_top_m": 1.0,
+  "drift_margin_m": 0.3,
+  "thresholds": {
+   "A_descent_safe_m": 1.75,
+   "A_from": "the canonical align radius: inside it a descent starts, at any height, as on a pad and in every earlier stage",
+   "B_hard_recovery_m": {
+    "cube": 3.3,
+    "cylinder": 3.3,
+    "pad": 3.5
+   },
+   "B_from": "the end of the usable top (3.6 m from the middle of a cube or a cylinder) less drift_margin_m. The margin is the largest horizontal movement over the last 1.5 m of a descent in the 117 recorded cube and cylinder landings of stage 1b's teacher (0.28 m; median 0.18 m), rounded up. A vehicle that is low inside B touches down inside the usable region. A pad keeps the canonical 3.5 m.",
+   "between": "A < distance <= B. A vehicle that flies in (higher than the canonical commit height, 3 m over the top) does not descend there: it goes on to A. A vehicle that is low (3 m over the top or less) goes on descending there. Which of the two holds is a matter of where the vehicle is, never of what it did before: the student sees one pair of pictures.",
+   "beyond": "distance > B, or beside the top: no descent. Up and in (in place only beside the top and less than clear_above_top_m over it), to the height it flies in at, to A, down."
+  },
+  "descent_action": {
+   "above_2_5_m": [
+    0.0,
+    0.5,
+    0.0
+   ],
+   "last_2_5_m": [
+    0.0,
+    0.25,
+    0.0
+   ],
+   "stop_ratio_of_the_last_metres": 3.125,
+   "from": "Every descent label of every earlier teacher is one of these two actions: the canonical pad data (263 and 452 labels in 400 episodes read), stage 1b's recorded pad, cube and cylinder landings (361/524, 234/530, 246/558) and stage 1c's (429/525, 394/1082, 20/92). The final descent of a cube keeps them; no larger value is used."
+  },
+  "after_touchdown": "the zero action, as before. Before the touchdown of a landing no label is a stop and every label is at least safe_ratio times the stop rule."
+ },
+ "final_descent": {
+  "description": "Four low states over a top. Each recorded episode is a landing flown by the teacher that is pushed into one of them (flown, not a label) and then left to the teacher; the frames after the push carry the label. A push is an `edge` move of stage 1c, which sets how far from the middle the vehicle passes, and the move that makes the state. Both are due at places, so the same episode is flown by a tested policy with the same pushes.",
+  "states": {
+   "low_hover": "D1 CENTERED_LOW_HOVER: 0.3-2.0 m over the top, inside the part of it where a descent goes on (0.3-2.6 m beside the middle at the push, B = 3.3 m), held nearly still for 4-8 decisions. Label: down, to the touchdown.",
+   "descent_decay": "D2 CENTERED_DESCENT_DECAY: the same part of the top, coming down from 1.8-2.8 m over it with a descent that dies away (each decision 0.55-0.75 of the one before, 5-8 decisions). Label: down, at the same rate as ever, to the touchdown.",
+   "edge_low": "D3 EDGE_LOW: 0.5-2.0 m over the level of the top, passed 4.0-5.2 m beside the middle (the vehicle coasts about half a metre inward while it sinks): over the edge or a corner, or beside the top. Label: no descent; up, to the middle, down.",
+   "edge_drift": "D4 EDGE_AFTER_PARTIAL_DESCENT: down to 1.2-2.5 m over the top near the middle, then carried on level until it is 3.6-4.4 m out with the middle behind it. Label: no descent; up while it turns back, to the middle, down."
+  },
+  "let_go_above_top_min_m": 0.15,
+  "forced": {
+   "low_hover": {
+    "edge": {
+     "from_m": [
+      5.5,
+      7.5
+     ],
+     "min_above_m": 1.0,
+     "miss_m": [
+      0.3,
+      2.6
+     ],
+     "forward_m": 0.25,
+     "ticks": 60
+    },
+    "within_beyond_miss_m": 2.5,
+    "hold_m": [
+     0.3,
+     2.0
+    ],
+    "hold_ticks": [
+     4,
+     8
+    ],
+    "band_m": 0.15,
+    "gain": 0.2,
+    "down_m": 0.4,
+    "ticks": 60
+   },
+   "descent_decay": {
+    "edge": {
+     "from_m": [
+      5.5,
+      7.5
+     ],
+     "min_above_m": 1.0,
+     "miss_m": [
+      0.3,
+      2.6
+     ],
+     "forward_m": 0.25,
+     "ticks": 60
+    },
+    "within_beyond_miss_m": 2.5,
+    "from_m": [
+     1.8,
+     2.8
+    ],
+    "down_m": 0.3,
+    "start_m": [
+     0.15,
+     0.3
+    ],
+    "ratio": [
+     0.55,
+     0.75
+    ],
+    "decay_ticks": [
+     5,
+     8
+    ],
+    "ticks": 40
+   },
+   "edge_low": {
+    "edge": {
+     "from_m": [
+      6.5,
+      8.5
+     ],
+     "min_above_m": 1.0,
+     "miss_m": [
+      4.0,
+      5.2
+     ],
+     "forward_m": 0.3,
+     "ticks": 60
+    },
+    "within_beyond_miss_m": 2.5,
+    "hold_m": [
+     0.5,
+     2.0
+    ],
+    "hold_ticks": [
+     2,
+     4
+    ],
+    "band_m": 0.15,
+    "gain": 0.2,
+    "down_m": 0.4,
+    "ticks": 60
+   },
+   "edge_drift": {
+    "edge": {
+     "from_m": [
+      5.5,
+      7.5
+     ],
+     "min_above_m": 1.0,
+     "miss_m": [
+      0.3,
+      1.2
+     ],
+     "forward_m": 0.25,
+     "ticks": 60
+    },
+    "within_beyond_miss_m": 2.5,
+    "from_m": [
+     1.2,
+     2.5
+    ],
+    "down_m": 0.3,
+    "out_m": [
+     3.6,
+     4.4
+    ],
+    "forward_m": 0.3,
+    "ticks": 50
+   }
+  },
+  "forced_from": "The six flights of stage 1c's later checkpoints that stopped in the air (outputs/generic_landing_1d/summary/descent_failure_audit.json): 2.6-2.8 m beside the middle and 0.2-1.4 m over the top with the middle abeam, the descent command dying away over the last six to eight decisions (D1, D2); and 5.4 m out, beside the top, 1.9-2.3 m over its level (D3). D4 is the same place reached from a descent near the middle.",
+  "kept_if": "the teacher landed inside the usable region and stopped by itself, both pushes of the episode came to pass, a camera showed the object where each let go, the vehicle was still in the air where the second let go, and the simulator kept at least 0.8 of real time"
+ },
+ "same_color": {
+  "description": "No same-colour episode is recorded in stage 1d. The pilot and the qualification hold same-colour starts of stage 1c's kind (drawn by stage 1c's rule) to see that what stage 1c taught is still there; stage 1c's recorded same-colour episodes are replayed.",
+  "pair_within_m": 60.0,
+  "target_distance_m": [
+   14.0,
+   44.0
+  ],
+  "other_distance_m": [
+   14.0,
+   50.0
+  ],
+  "other_off_centre_deg": 15.0,
+  "accepted_if": "the other object is in the first front view with a free line to it; the named one is outside that view with a free line; the teacher lands on the named one in its dry run; and the teacher's track never comes within the arrival distance (12 m) of the other object while it is nearer to it than to the named one"
+ },
+ "training": {
+  "description": "80 recorded episodes and 8 for the validation loss, all forced landings: D1 24, D2 20, D3 20, D4 16. 68 on cubes (85 %), 6 on cylinders, 6 on pads.",
+  "final": {
+   "cube": {
+    "low_hover": 20,
+    "descent_decay": 16,
+    "edge_low": 18,
+    "edge_drift": 14
+   },
+   "cylinder": {
+    "low_hover": 2,
+    "descent_decay": 2,
+    "edge_low": 1,
+    "edge_drift": 1
+   },
+   "pad": {
+    "low_hover": 2,
+    "descent_decay": 2,
+    "edge_low": 1,
+    "edge_drift": 1
+   }
+  },
+  "val_final": {
+   "cube": {
+    "low_hover": 2,
+    "descent_decay": 2,
+    "edge_low": 2,
+    "edge_drift": 2
+   }
+  },
+  "recovery_bands": {
+   "pad": [
+    "mid",
+    "far"
+   ]
+  },
+  "recovery_bands_note": "The forced pad landings start 20-44 m from the pad: close to the pads the recording layouts have no room left for a new start that keeps 6 m from stage 1b's. Cubes and cylinders use all three bands.",
+  "keeps_away_from": "every start that is flown for a check, anywhere in the repository (each plan and set under configs/ but the plans of recorded episodes; stage 1c's sealed gates and regression set are among them), and this stage's own check starts and recorded starts. As in stage 1c it need not keep 6 m from an earlier recorded start."
+ },
+ "teacher_pilot": {
+  "description": "Before anything is recorded the teacher flies, with the finalizer, twenty forced cube landings: five for each state.",
+  "per_state": 5,
+  "pass": {
+   "success_min": 19,
+   "of": 20,
+   "collisions_max": 0,
+   "wrong_target_max": 0,
+   "stop_violations_max": 0,
+   "safe_ratio_violations_max": 0,
+   "forced_state_visibility_failures_max": 0
+  },
+  "recorded_for_each": [
+   "where the descent began (distance from the middle, height over the top)",
+   "touchdown error",
+   "changes of sign of the vertical label after the last push",
+   "separate climbs after the last push"
+  ]
+ },
+ "fine_tune": {
+  "description": "A narrower corrective fine-tune of stage 1c's update 2000 with stage 1c's way of training: the same trainable parts (LoRA, FiLM, action head), no new module, half of stage 1c's learning rate, 1,500 updates. Of the frames drawn 25 % are stage 1d's, 30 % stage 1c's corrective data (its recovery and same-colour episodes), 25 % stage 1b's stop-safe generic landing data and 20 % the older data. Not extended after a result.",
+  "updates": 1500,
+  "learning_rate": 1.25e-05,
+  "grounding_learning_rate": 1.25e-05,
+  "batch_size": 1,
+  "gradient_accumulation": 4,
+  "share": {
+   "generic_landing_1d_added": 0.25,
+   "generic_landing_1c_added": 0.3,
+   "generic_landing_1b_added": 0.25
+  },
+  "eval_every": 250,
+  "eval_samples": 600,
+  "balance": 3.0,
+  "boost": {
+   "small_visible": 2,
+   "selection": 3
+  },
+  "select_band": 0.02,
+  "val_file": "val_mix",
+  "candidates": [
+   500,
+   1000,
+   1500
+  ]
+ },
+ "pilot": {
+  "description": "Twenty-four new starts. Stage 1c's update 2000 flies them first, then each candidate once: twelve forced cube landings (three for each state; the pushes are flown by the tested policy as by the teacher), six same-colour landings (blue pad past the blue cube 2, blue pad past the blue cone 2, blue cube past the blue pad 1, red pad past the red cube 1), three pad and three cylinder landings. Stage 1b's checkpoint flies the twelve forced ones for the comparison of the descent; it judges nothing.",
+  "critical_per_state": 3,
+  "same_color": [
+   [
+    "blue_pad",
+    "blue_cube",
+    2,
+    0
+   ],
+   [
+    "blue_pad",
+    "blue_cone",
+    2,
+    0
+   ],
+   [
+    "blue_cube",
+    "blue_pad",
+    1,
+    0
+   ],
+   [
+    "red_pad",
+    "red_cube",
+    1,
+    0
+   ]
+  ],
+  "plain_rows": [
+   [
+    "near",
+    true
+   ],
+   [
+    "mid",
+    false
+   ],
+   [
+    "far",
+    true
+   ]
+  ],
+  "order": [
+   "collisions in the same-colour starts (fewer)",
+   "landings on a wrong object (fewer)",
+   "forced cube landings that end in a landing inside the region (more)",
+   "flights that stop by themselves in the air during a landing (fewer)",
+   "landings on cubes, all fourteen (more)",
+   "landings on cylinders (more)",
+   "landings on pads, all (more)",
+   "flights above the 14 m ceiling (fewer; recorded, the executor is not changed)",
+   "validation L1 at that update (lower)",
+   "the earlier update"
+  ],
+  "pass": {
+   "same_color_collisions_max": 0,
+   "wrong_target_landings_max": 0,
+   "critical_min": 10,
+   "critical_of": 12,
+   "critical_air_self_stops_max": 1,
+   "pad_landings_min": 3,
+   "pad_landings_of": 3,
+   "cylinder_landings_min": 2,
+   "cylinder_landings_of": 3,
+   "critical_not_below_stage_1c": true
+  },
+  "selection": "Each candidate is held against `pass` (the pad and cylinder lines count the three plain starts of each). The candidates that meet every line are ranked by `order` and the first goes on to the qualification. If no candidate meets every line the pilot is not passed: neither the qualification nor a gate is flown, and nothing more is trained.",
+  "selection_note": "Stage 1c ranked first and tested only the first; its plan and this one both say a candidate that does not meet the lines does not go on, and this plan says the gates stay shut \"if all fail\". So here a candidate is eligible only if it meets every line, and the order ranks the eligible ones."
+ },
+ "qualification": {
+  "description": "Twenty new starts the chosen candidate flies once before the sealed gates are opened: ten cube landings (one forced for each state and six plain: near, mid and far, each with the cube in the first view and not), four same-colour landings, three pad and three cylinder landings.",
+  "forced_per_state": 1,
+  "cube_rows": [
+   [
+    "near",
+    true
+   ],
+   [
+    "near",
+    false
+   ],
+   [
+    "mid",
+    true
+   ],
+   [
+    "mid",
+    false
+   ],
+   [
+    "far",
+    true
+   ],
+   [
+    "far",
+    false
+   ]
+  ],
+  "same_color": [
+   [
+    "blue_pad",
+    "blue_cube",
+    1,
+    0
+   ],
+   [
+    "blue_pad",
+    "blue_cone",
+    1,
+    0
+   ],
+   [
+    "blue_cube",
+    "blue_pad",
+    1,
+    0
+   ],
+   [
+    "red_pad",
+    "red_cube",
+    1,
+    0
+   ]
+  ],
+  "plain_rows": [
+   [
+    "near",
+    false
+   ],
+   [
+    "mid",
+    true
+   ],
+   [
+    "far",
+    false
+   ]
+  ],
+  "pass": {
+   "cube_landings_min": 8,
+   "cube_landings_of": 10,
+   "same_color_landings_min": 4,
+   "same_color_landings_of": 4,
+   "same_color_collisions_max": 0,
+   "pad_landings_min": 3,
+   "pad_landings_of": 3,
+   "cylinder_landings_min": 2,
+   "cylinder_landings_of": 3,
+   "air_self_stops_max": 1,
+   "wrong_target_max": 0,
+   "collisions_max": 0
+  },
+  "if_not_passed": "no gate is flown; stage 1d is not passed"
+ },
+ "gates": {
+  "config": "configs/generic_landing_stage1c.json",
+  "description": "The sealed sets of stage 1c, flown for the first time by a learned policy: gate A (configs/generic_landing_stage1c/validation.json, 36 starts) with the second flights of its twenty cube and cylinder landings, gate B (same_color.json, 24 starts) with the second flights of its fixed twelve, and the regression set (regression.json, 36 starts; the frozen baseline and stage 1b's checkpoint flew it in stage 1c). Every number is stage 1c's and is read from stage 1c's file by stage 1c's code (scripts/generic_landing_1c.py gate / repeat / regression).",
+  "open_if": "the pilot is passed and the qualification is passed",
+  "sha256": {
+   "configs/generic_landing_stage1c/validation.json": "5050c28348b9d65c4e48596331b9ec5f28e2e1005a4ce2040254124d79126607",
+   "configs/generic_landing_stage1c/same_color.json": "aefe35f6cdc56e1a463792be8ab22609db747622528e6878c076738389c2d61a",
+   "configs/generic_landing_stage1c/same_color_twins.json": "fcc04c07d4d6a53b9a835e0ec8094eaf6b51893154b1d358d97d2d848194a4e6",
+   "configs/generic_landing_stage1c/regression.json": "bececfee5cb817fb845765197fb42673995221981ad1e4705f5e787cca4789b3"
+  },
+  "never_used_for": [
+   "training",
+   "the pilot",
+   "the choice of the checkpoint",
+   "debugging"
+  ]
+ },
+ "regression": {
+  "description": "Stage 1c's criteria, read from its file, and one line more.",
+  "wrong_object_landings_max": 0,
+  "wrong_object_landings_from": "the plan of stage 1d: a regression flight that lands on another object than the named one (blue pad to blue cube) fails the regression, as a collision (blue pad to blue cone) already does under stage 1c's collisions_max 0"
+ },
+ "descent_reading": {
+  "description": "Reported for stage 1b, stage 1c and the chosen checkpoint on the twelve forced starts of the pilot, from the decisions each policy made itself.",
+  "band_over_top_m": [
+   0.2,
+   2.0
+  ],
+  "question": "In the band over the top (inside B) or beside it: how many decisions command a descent smaller than the stop band, and how many flights end there by the policy's own stop?"
+ },
+ "decision": "Stage 1d passes only if all of these hold: the recorded landing labels keep the stop rule; the data gives a student pictures and a sentence only; stage 1's generic landing episodes are not in the data and stage 1b's, stage 1c's same-colour and stage 1d's are; the pilot; the qualification; gate A and its second flights; gate B and its second flights; the regression. Only then is generic_landing_v1 made.",
+ "ceiling": "The executor is not changed in this stage and no clamp is added. Flights above the 14 m of the start rule are counted, with their highest point and their names, in every pilot, the qualification and every gate. If the stage passes while flights still go above it, the frozen checkpoint and a runtime envelope are reported as two separate things.",
+ "after_the_gates": "For the record, judging nothing, only if the gates were flown: the twins of gate B's starts by the chosen checkpoint."
+}
