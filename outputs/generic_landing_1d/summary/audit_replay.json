@@ -1,5 +1,5 @@
 {
- "what": "/mnt/c/Users/leegy/Desktop/drone/datasets/projectairsim_visual_search/generic_landing_1d",
+ "what": "datasets/projectairsim_visual_search/generic_landing_1d",
  "episodes": 1644,
  "samples": 86324,
  "by_source": {

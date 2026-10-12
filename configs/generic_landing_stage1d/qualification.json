@@ -1,5 +1,5 @@
 {
- "description": "Generic landing, stage 1d, qualification: twenty starts the chosen candidate flies once before the sealed gates of stage 1c are opened: ten cube landings (one forced for each state and six plain), four same-colour landings, three pad and three cylinder landings. Written before any episode of stage 1d was recorded (C:\\Users\\leegy\\Desktop\\drone\\configs\\generic_landing_stage1d.json). Flown in layouts of the two training scenes that no episode was recorded in; seeds and starts are disjoint from every earlier plan and set.",
+ "description": "Generic landing, stage 1d, qualification: twenty starts the chosen candidate flies once before the sealed gates of stage 1c are opened: ten cube landings (one forced for each state and six plain), four same-colour landings, three pad and three cylinder landings. Written before any episode of stage 1d was recorded (configs/generic_landing_stage1d.json). Flown in layouts of the two training scenes that no episode was recorded in; seeds and starts are disjoint from every earlier plan and set.",
  "seeds": [
   83000,
   83999

@@ -1,5 +1,5 @@
 {
- "description": "Generic landing, stage 1d, pilot: twenty-four starts flown once by stage 1c's checkpoint (update 2000) and by each candidate: twelve forced cube landings (three for each state), six same-colour landings, three pad and three cylinder landings; stage 1b's checkpoint flies the twelve forced ones, for the comparison of the descent. Written before any episode of stage 1d was recorded (C:\\Users\\leegy\\Desktop\\drone\\configs\\generic_landing_stage1d.json). Flown in layouts of the two training scenes that no episode was recorded in; seeds and starts are disjoint from every earlier plan and set.",
+ "description": "Generic landing, stage 1d, pilot: twenty-four starts flown once by stage 1c's checkpoint (update 2000) and by each candidate: twelve forced cube landings (three for each state), six same-colour landings, three pad and three cylinder landings; stage 1b's checkpoint flies the twelve forced ones, for the comparison of the descent. Written before any episode of stage 1d was recorded (configs/generic_landing_stage1d.json). Flown in layouts of the two training scenes that no episode was recorded in; seeds and starts are disjoint from every earlier plan and set.",
  "seeds": [
   82000,
   82999

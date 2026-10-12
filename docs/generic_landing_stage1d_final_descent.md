@@ -488,6 +488,6 @@ Executor는 바꾸지 않았고 clamp를 넣지 않았다.
 - 동결 fingerprint: `grounding_film` 30개 파일, `gen_v2` 120개 파일 모두 변동 없음 (작업 전과 후).
 - `outputs/aerovla_oft/checkpoints/generic_landing_v1`: 없음.
 - Stage 1c의 봉인한 파일 넷(gate A, gate B, twin, regression)의 hash는 config에 적은 것과 같다. `outputs/generic_landing_1d/`에 gate, qualification, regression 비행 folder는 없다.
-- 녹화 전 commit `76cb333` 뒤로 `configs/`, `scripts/`, `src/`, `tests/`의 파일은 바뀌지 않았다. Pilot은 그 commit의 code와 config로 판정했다.
+- Pilot은 녹화 전 commit `76cb333`의 code와 config로 판정했다. 판정 뒤에 한 가지를 고쳤다: 계획 파일 셋의 설명 문장과 두 감사 기록에 내 컴퓨터의 경로가 들어가 있어 저장소 경로로 바꿨다(`plans.load()`가 파일 이름을 적는 방식 포함). 시작, seed, 숫자는 한 글자도 바뀌지 않았고 `check`가 다시 통과한다.
 - 표: `outputs/generic_landing_1d/summary/`. 그림: `outputs/generic_landing_1d/examples/pilot_final_descent_side_view.png`.
 

@@ -39,7 +39,8 @@ NAMES={'low_hover':'D1 CENTERED_LOW_HOVER','descent_decay':'D2 CENTERED_DESCENT_
 
 
 def load(path=None):
-    stage=stages.load(path or CONFIG);stage.setdefault('file','configs/generic_landing_stage1d.json' if path is None else str(path));return stage
+    stage=stages.load(path or CONFIG);given=Path(path or CONFIG);given=given if given.is_absolute() else ROOT/given
+    stage.setdefault('file',given.resolve().relative_to(ROOT).as_posix() if ROOT in given.resolve().parents else given.name);return stage
 
 
 def files_of(stage):return {name:stages.folder_of(stage)/f'{name}.json' for name in SETS}
