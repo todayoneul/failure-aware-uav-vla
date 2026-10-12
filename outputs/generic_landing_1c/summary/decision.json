@@ -1,0 +1,70 @@
+{
+ "description": "Stage 1c passes only if every line holds. The candidate picked by the fixed order did not meet the lines of the pilot, so no gate was flown.",
+ "recorded_landing_labels_keep_the_stop_rule": true,
+ "the_data_gives_a_student_pictures_and_a_sentence": true,
+ "episodes_of_stage_1_in_the_data": 0,
+ "pilot": {
+  "order": [
+   "500",
+   "2000",
+   "1500",
+   "1000"
+  ],
+  "picked": "500",
+  "put_behind": {
+   "500": [],
+   "1000": [
+    "stops in the air above stage 1b"
+   ],
+   "1500": [
+    "stops in the air above stage 1b"
+   ],
+   "2000": [
+    "stops in the air above stage 1b"
+   ]
+  },
+  "checks": [
+   [
+    "collisions in the same-colour starts",
+    0,
+    "<= 0",
+    true
+   ],
+   [
+    "landings on a wrong object",
+    2,
+    "<= 1",
+    false
+   ],
+   [
+    "landings on cubes",
+    7,
+    ">= 6 of 10",
+    true
+   ],
+   [
+    "landings on pads",
+    10,
+    ">= 8 of 10",
+    true
+   ],
+   [
+    "landings on cylinders",
+    3,
+    ">= 3 of 4",
+    true
+   ]
+  ],
+  "passed": false
+ },
+ "gate_a": "not flown",
+ "gate_a_second_flights": "not flown",
+ "gate_b": "not flown",
+ "gate_b_second_flights": "not flown",
+ "regression": "not flown by a checkpoint of stage 1c",
+ "gate_folders_on_disk": [],
+ "stage_1c": "NOT PASSED",
+ "stopped_at": "the candidates' pilot",
+ "checkpoint": null,
+ "generic_landing_v1_made": false
+}

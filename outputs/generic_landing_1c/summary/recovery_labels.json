@@ -1,0 +1,32 @@
+{
+ "description": "Stage 1c: the labels of the recorded forced landings after their first push, by the teacher's state (climb: up; final and align: to the middle; descend: down), and the search labels of every recorded episode at decisions without the named object in view.",
+ "labels_after_the_first_push": {
+  "edge": {
+   "forced decisions (no label)": 277,
+   "align": 119,
+   "final": 204,
+   "descend": 315
+  },
+  "premature": {
+   "forced decisions (no label)": 110,
+   "climb": 97,
+   "final": 58,
+   "descend": 262
+  },
+  "stall": {
+   "forced decisions (no label)": 137,
+   "descend": 372
+  },
+  "under_climb": {
+   "forced decisions (no label)": 476,
+   "climb": 63,
+   "final": 48,
+   "descend": 254
+  }
+ },
+ "search_without_the_target_in_view": {
+  "decisions_without_the_target_in_view": 1342,
+  "labels_that_are_not_the_blind_search": 0,
+  "examples": []
+ }
+}

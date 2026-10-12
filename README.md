@@ -14,7 +14,7 @@
 | 문장만 주고 찾아가기 (방향 힌트 없음) | AeroVLA-OFT로 동작. 처음 보는 시작 32/32, 학습하지 않은 장면 18/20. 처음 보는 물체는 약함 | `.\scripts\run_visual_search_demo.ps1` |
 | 맵에서 물체를 골라 문장으로 보내기 (착륙 또는 접근) | 동작. 동결한 baseline을 직접 조작해 보는 시연 | `.\scripts\run_grounding_film_mission_demo.ps1` |
 | 시작 자세를 직접 정하기, pad가 아닌 평평한 윗면(cube, cylinder)에 착륙 임무 주기 | Simulator·화면·evaluator가 지원. **정책이 그렇게 착륙하도록 배운 것은 아님** | [문서](docs/arbitrary_start_generalized_landing.md) |
-| Cube·cylinder 윗면 착륙을 정책에 가르치기 (Generic Landing) | **Gate 미통과 (두 번).** Stage 1: pad 10/10, cylinder 8/10, cube 6/10(기준 8/10), 실패는 모두 공중 정지. Stage 1b(teacher label을 stop에서 떼어 놓음): 공중 정지는 거의 사라졌고 cylinder 10/10, cube 7/10, 그리고 44m 안 regression에서 충돌 2. 44m 밖 탐색 학습은 시작하지 않음 | [Stage 1](docs/generic_landing_active_search_v2.md), [Stage 1b](docs/generic_landing_stage1b_stop_safe_teacher.md) |
+| Cube·cylinder 윗면 착륙을 정책에 가르치기 (Generic Landing) | **Gate 미통과 (세 번).** Stage 1: pad 10/10, cylinder 8/10, cube 6/10(기준 8/10), 실패는 모두 공중 정지. Stage 1b(teacher label을 stop에서 떼어 놓음): 공중 정지는 거의 사라졌고 cylinder 10/10, cube 7/10, 그리고 44m 안 regression에서 충돌 2. Stage 1c(cube 하강 회복 + 같은 색 물체 구분): 후보 pilot에서 멈춤. 늦은 후보는 같은 색 물체를 맞게 골랐지만 공중 정지가 돌아왔고, 규칙이 고른 이른 후보는 다른 물체에 2번 착륙. Gate는 비행하지 않음. 44m 밖 탐색 학습은 시작하지 않음 | [Stage 1](docs/generic_landing_active_search_v2.md), [Stage 1b](docs/generic_landing_stage1b_stop_safe_teacher.md), [Stage 1c](docs/generic_landing_stage1c_recovery_grounding.md) |
 | Gaussian Blur가 baseline을 어디서 얼마나 무너뜨리는지 측정 (Clean / Low / Medium / High) | 완료. 48개 시작에서 성공 46 → 40 → 24 → 8. Blur에 강하지 않음 | [결과](docs/failure_gaussian_blur.md) |
 | 장애 자동 감지·복구 | 아직 없음 | - |
 
@@ -114,6 +114,10 @@ GIF: [탐색](outputs/examples/generalization/search_g1.gif) · [놓친 뒤 다�
 **Stage 1b: teacher의 label을 stop에서 떼어 놓음 (역시 통과하지 못함).** Stage 1의 실패는 모두 공중 정지였고, teacher가 작은 면 위에서 준 label(수평 전진 0.15m)이 비행 loop가 stop으로 읽는 크기의 1.9배밖에 되지 않았습니다. Stage 1b는 teacher의 label만 바꿨습니다: touchdown 전의 모든 착륙 label이 stop 규칙의 3배 이상(pad 착륙 teacher가 늘 지켜 온 여유)이 되게 하고, 나머지(시작 checkpoint, 구조, 일정, 기존 data, gate의 숫자)는 그대로 두었습니다. 결과는 반반입니다. 공중 정지는 cube·cylinder 40번의 비행 중 15번에서 1번으로 줄었고, cylinder는 두 번의 비행 모두 10/10, cube는 두 비행 합 11/20에서 16/20이 됐습니다. 그러나 cube의 첫 비행이 7/10으로 기준(8/10)에 하나 모자랐고, 44m 안의 예전 능력을 보는 regression에서 파란 pad 대신 파란 cone으로 가서 부딪힌 비행이 둘 나왔습니다(baseline은 충돌 0). 남은 실패는 "가다가 멈춤"이 아니라 cube에서 내려가는 자리와 마지막 하강입니다. 이 checkpoint도 baseline으로 올리지 않았고, 44m 밖 탐색 학습은 시작하지 않았습니다.
 
 [Stop 규칙 감사, 여유 기준, teacher 수정, label 비교, gate 결과, 실패 분석](docs/generic_landing_stage1b_stop_safe_teacher.md)
+
+**Stage 1c: cube 하강 회복과 같은 색 물체 구분 (통과하지 못함, 후보 pilot에서 멈춤).** Stage 1b에 남은 둘을 함께 고치려 했습니다. Cube 위에서 잘못된 상태(덜 오름, 가장자리로 들어감, 너무 일찍 내려감, 하강이 멈춤)로 밀어 넣은 뒤 teacher가 빠져나오는 착륙 86개와, 이름과 색만 같은 다른 물체가 먼저 보이는 착륙 80개를 녹화해 Stage 1b의 checkpoint에서 2,000 update를 더 학습했습니다. 새 시작 24개의 pilot에서 늦은 후보(update 1000 / 1500 / 2000)는 같은 색 착륙 8/8, 다른 물체 착륙 0, 충돌 0이었지만 Stage 1b가 없앤 공중 정지가 강제 cube 착륙 8개 중 2개에서 돌아왔습니다. 미리 정한 규칙은 그런 후보를 뒤로 보내므로 update 500이 골라졌고, 500은 파란 cube 대신 파란 pad에 두 번 착륙해 pilot의 기준(1번 이하)을 넘지 못했습니다. 그래서 gate는 비행하지 않았고, `generic_landing_v1`은 만들지 않았으며, 44m 밖 탐색 학습도 시작하지 않았습니다.
+
+[다시 읽은 실패, teacher 규칙, 강제 상태, 같은 색 data, pilot 결과, 공중 정지와 하강 분석](docs/generic_landing_stage1c_recovery_grounding.md)
 
 ### 3. 맵에서 목표를 골라 보내기 — Coordinate Goal Mode
 
@@ -225,7 +229,8 @@ configs/experiments/ 시작 계획 파일과 scripted 확인 비행의 계획
 configs/failures/    장애 실험의 고정 조건(Gaussian Blur 강도, 비행 순서, repeat subset)
 configs/generic_landing/  Generic Landing의 녹화 계획과 pilot·validation·regression 시작 (configs/generic_landing.json에 숫자)
 configs/generic_landing_stage1b/  Stage 1b의 같은 것 (configs/generic_landing_stage1b.json에 숫자와 stop-safety 규칙)
-tests/               simulator 없이 도는 테스트 (Python 410개 + PowerShell 4개)
+configs/generic_landing_stage1c/  Stage 1c의 녹화 계획과 pilot·gate A·gate B·regression 시작 (configs/generic_landing_stage1c.json에 숫자, 강제 상태, 선택 규칙)
+tests/               simulator 없이 도는 테스트 (Python 434개 + PowerShell 4개)
 docs/                아래 문서
 outputs/examples/    README에 쓰는 실제 화면과 GIF
 outputs/generalization/  동결한 결과 표와 실패 분류 (원자료는 로컬에만)
@@ -233,6 +238,7 @@ outputs/failures/        장애 실험의 표, 실행 기록, 예시 그림 (비
 outputs/arbitrary_start/ 시작·착륙면 확인의 표와 예시 화면 (비행 원자료는 로컬에만)
 outputs/generic_landing/ Generic Landing의 표와 그림 한 장 (비행, data, checkpoint는 로컬에만)
 outputs/generic_landing_1b/ Stage 1b의 감사 기록, 표, 그림 (비행, data, checkpoint는 로컬에만)
+outputs/generic_landing_1c/ Stage 1c의 감사 기록, pilot 표, 그림 (비행, data, checkpoint는 로컬에만)
 ```
 
 ## 문서
@@ -257,6 +263,7 @@ outputs/generic_landing_1b/ Stage 1b의 감사 기록, 표, 그림 (비행, data
 | [arbitrary_start_generalized_landing](docs/arbitrary_start_generalized_landing.md) | 임의의 시작 자세와 일반 착륙면: 시작 규칙, 지도·launcher 조작, 시작 planner, rectangle / circle / cap, finalizer와 evaluator의 역할, scripted 확인 비행, 정성 확인, 한계 |
 | [generic_landing_active_search_v2](docs/generic_landing_active_search_v2.md) | Cube·cylinder 착륙 학습(Stage 1): teacher, data, 후보 고르기, validation gate(미통과), 실패한 비행의 분석, stop 규칙과 label의 거리, 기록용 재비행과 regression. Active Search v2(Stage 2)는 시작하지 않음 |
 | [generic_landing_stage1b_stop_safe_teacher](docs/generic_landing_stage1b_stop_safe_teacher.md) | Stage 1b: student의 stop을 코드에서 읽은 것, stop ratio와 여유 기준(3.0), 고친 teacher, Stage 1과 Stage 1b의 label 비교, pilot, validation gate와 repeat gate(미통과), 실패의 이름, 정책이 비행한 행동의 stop 거리, regression(충돌 2), 다음 후보 |
+| [generic_landing_stage1c_recovery_grounding](docs/generic_landing_stage1c_recovery_grounding.md) | Stage 1c: Stage 1b의 cube 실패와 같은 색 실패를 다시 읽은 것, 하강 규칙, 강제로 만든 네 상태, same-colour data와 twin, 녹화 전 teacher pilot, 감사, 학습, 후보 pilot(미통과, gate는 비행하지 않음), 돌아온 공중 정지, 같은 시작에서의 하강·선택 비교 |
 | [failure_gaussian_blur](docs/failure_gaussian_blur.md) | Gaussian Blur 특성화: 고정한 조건과 순서, 주입 위치와 확인, 강도별·단계별 결과, 실패 분류, 착륙·탐색·목표 선택, paired 비교와 repeat, 선명도 통계, 지연, 다음 단계 |
 | [experiments](docs/experiments.md) | 날짜별 실험 요약 |
 | [failure_plan](docs/failure_plan.md) | 이후 넣을 장애 후보 |
@@ -283,7 +290,7 @@ outputs/generic_landing_1b/ Stage 1b의 감사 기록, 표, 그림 (비행, data
 - [x] Interactive Mission Control flown by the frozen AeroVLA-OFT baseline (qualitative demonstration)
 - [x] Gaussian Blur robustness characterization of the frozen baseline (Clean / Low / Medium / High, paired on the canonical starts)
 - [x] Arbitrary start poses and generalized landing surfaces in the simulator, the mission interface and the evaluator (infrastructure; no model change)
-- [ ] Landing on cubes and cylinders (generic landing): gate not passed twice. Stage 1: cube 6 of 10, every failure a stop in the air. Stage 1b (stop-safe teacher labels): stops in the air nearly gone, cylinder 10 of 10, cube 7 of 10 against 8, two collisions in the regression; what is left is where and how the vehicle comes down on a cube, and landing on another object of the named colour
+- [ ] Landing on cubes and cylinders (generic landing): gate not passed three times. Stage 1: cube 6 of 10, every failure a stop in the air. Stage 1b (stop-safe teacher labels): stops in the air nearly gone, cylinder 10 of 10, cube 7 of 10 against 8, two collisions in the regression; Stage 1c (cube descent recovery and same-colour landing data): stopped at the candidates' pilot, no gate flown; the later checkpoints chose the named object on every pilot start but stops in the air came back above the cube, and the earlier one the fixed order picked landed on another blue object twice
 - [ ] Active search beyond 44 m (not started; waits for the generic landing gate)
 - [ ] Front-only / Down-only blur ablation, then blur detection and recovery, evaluated on new starts
 - [ ] Unseen-object grounding, turn rate of the executor

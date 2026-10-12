@@ -1,0 +1,20 @@
+{
+ "what": "datasets\\projectairsim_visual_search\\generic_landing_1c_added",
+ "episodes": 166,
+ "sentences": 6,
+ "sentences_not_from_the_catalogue_or_with_a_number_or_an_id": [],
+ "proprio_enabled": false,
+ "twins": 16,
+ "twins_with_their_landing": 16,
+ "twins_that_do_not_fit": [],
+ "what_reaches_the_student": "the front and down pictures (one mosaic) and the sentence; the recorded steps also hold what the teacher and the evaluator were told (bearing_deg, distance_m, down_seen, front_seen, over, position), which the dataset builder keeps as analysis fields and the model never reads",
+ "examples": [
+  "Find the blue cube and land on it.",
+  "Find the blue cylinder and land on it.",
+  "Find the blue landing pad and land on it.",
+  "Find the green cylinder and land on it.",
+  "Find the red cube and land on it.",
+  "Find the red landing pad and land on it."
+ ],
+ "passed": true
+}

@@ -303,3 +303,24 @@ step마다 멈추는 대신 도착 2초 전에 다음 판단을 시작해 명령
 - **Regression (새 36개 시작):** success 33/36 (baseline 34), pad 착륙 24/27 (25), wrong target 1 (2), **충돌 2 (0)**. 파란 pad를 찾으라는 문장에 파란 cone으로 올라가 부딪힌 비행 둘, 파란 cube에 내린 비행 하나.
 - **Tests:** Python 410/410, PowerShell 4/4.
 - **다음:** 자동으로 시작하지 않는다. 후보는 cube 위의 하강 자리와 마지막 하강을 가르치는 회복 label, 같은 색 물체가 먼저 보이는 착륙 시작을 data에 넣는 것.
+
+## Generic Landing Stage 1c (cube descent recovery + same-colour grounding) — 2026-10-12
+
+브랜치 `exp/generic-landing-stage1c-recovery-grounding`. 상세: [Stage 1c — Cube Descent Recovery + Same-Color Landing Grounding](generic_landing_stage1c_recovery_grounding.md). 표: `outputs/generic_landing_1c/summary/`. **통과하지 못했다. 후보 pilot에서 멈췄고 Gate A, Gate B, regression은 비행하지 않았다. `generic_landing_v1`은 만들지 않았다. Stage 2는 시작하지 않았다.** Stage 1과 Stage 1b의 기록은 그대로다. Canonical 48 재평가와 Depot 비행은 없다.
+
+- **질문:** Stage 1b의 stop-safe 착륙을 유지하면서 cube 착륙의 마지막 하강과 같은 색 물체 사이의 선택을 함께 고칠 수 있는가.
+- **Stage 1b를 다시 읽음:** teacher는 가운데에서 1.44–1.75m, 윗면 위 3.3–4.0m에서 하강을 시작한다. Student는 0.83–6.16m에서 시작했고 5m 밖에서 시작한 하강은 모두 실패했다. 같은 색 실패에서 student는 pad를 한 번도 보지 않고 파란 cone / cube로 갔다.
+- **Teacher (녹화 전 commit `31934ca`):** 작은 면에서 하강을 포기하고 다시 가운데로 가는 반경을 2.675m로. 그 밖은 Stage 1b의 teacher.
+- **강제 상태 넷:** `under_climb`, `edge`, `premature`, `stall`. 위치에서 일어나는 강제 이동이고 label이 아니다. 정책 비행에도 같은 이동을 넣을 수 있다.
+- **Same colour:** 이름의 물체는 첫 시야에 없고 색만 같은 다른 물체가 있는 착륙. 다섯 쌍, 그중 16쌍은 같은 시작에 문장만 다른 twin.
+- **녹화 전 teacher pilot:** 강제 16/16 회복, same-colour 16/16, 충돌 0, stop 위반 0.
+- **Data:** 60000번대 seed. 168개 계획 중 166개 녹화(train 150, val 16). 착륙 label 10,492개 중 3.0 미만 0, 최소 3.125. 목표가 안 보이는 1,342 decision은 모두 canonical 탐색. Stage 1의 episode는 0개. 합쳐 1,557 episode.
+- **학습:** Stage 1b의 update 2000에서 2,000 update, learning rate 2.5e-5, 뽑는 frame의 35% 새 data / 35% Stage 1b / 30% 기존. Validation L1 0.0719 → 0.0599.
+- **후보 pilot (새 24개 시작, Stage 1b와 후보 넷):** 다른 물체 착륙 3 / 2 / 0 / 0 / 0, same-colour 착륙 6 / 7 / 8 / 8 / 8, cube 7 / 7 / 8 / 8 / 8, cylinder 3 / 3 / 3 / 4 / 4, pad 9 / 10 / 10 / 10 / 10, **공중 정지 0 / 0 / 2 / 2 / 2**.
+- **선택과 판정:** 공중 정지가 Stage 1b보다 2 많은 1000 / 1500 / 2000은 미리 정한 규칙으로 뒤로 갔고 update 500이 골라졌다. 500은 다른 물체 착륙 2건으로 pilot의 기준(1 이하)을 넘지 못했다. **Pilot NOT PASSED, gate는 비행하지 않음.** 그 규칙이 없었다면 2000이 골라졌고 다섯 기준을 모두 넘는다. 규칙은 바꾸지 않았다.
+- **돌아온 공중 정지:** 같은 두 시작에서 세 checkpoint 모두. 하나는 윗면 위 0.2–1.4m에서 하강 명령이 사라졌고, 하나는 모서리 쪽(가운데에서 5.4m) 윗면 위 2m에서 멈췄다(Stage 1b와 500은 같은 자리에서 모서리에 닿음).
+- **같은 10개 cube 시작의 하강:** 1000 이후는 더 높이 들어오고(윗면 위 2.7 → 3.8–3.9m) 가운데에 더 가까이서 내려오며(3.15 → 2.5–2.8m) 닿는 오차가 줄었다(2.37 → 1.5–1.6m). 부호 뒤집힘은 차이 없음.
+- **Regression 시작 (새 36개, 앞의 두 checkpoint만):** `grounding_film` 35/36, 충돌 0, wrong target 0. Stage 1b 33/36, 충돌 0, wrong target 2, 공중 정지 2. Stage 1b의 실패 셋은 모두 파란 pad 착륙.
+- **Ceiling (기록만):** pilot에서 14m를 넘은 비행 3 / 3 / 10 / 8 / 6.
+- **Tests:** Python 434/434, PowerShell 4/4.
+- **다음:** 자동으로 시작하지 않는다. 늦은 후보를 새 규칙으로 gate에 올릴지, 윗면 바로 위의 정지를 먼저 고칠지는 정해지지 않았다. Gate A와 gate B의 시작은 아직 아무도 비행하지 않았다.

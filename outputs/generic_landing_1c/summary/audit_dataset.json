@@ -1,0 +1,300 @@
+{
+ "rule": {
+  "safe_ratio": 3.0,
+  "near_stop_ratio": 2.0,
+  "stop_ticks": 4,
+  "stop_limits": {
+   "forward_m": 0.08,
+   "down_m": 0.08,
+   "yaw_rad": 0.0336
+  }
+ },
+ "total": {
+  "actions": 11156,
+  "terminal": 664,
+  "nonterminal": 10492,
+  "forced": 1000,
+  "nonterminal_stop": 0,
+  "below_safe": 0,
+  "stop_windows": 0,
+  "near_stop_windows": 0,
+  "terminal_not_a_stop": 0,
+  "episodes": 166
+ },
+ "by": {
+  "band": {
+   "LAND 10-20 m": {
+    "actions": 2438,
+    "terminal": 184,
+    "nonterminal": 2254,
+    "forced": 380,
+    "nonterminal_stop": 0,
+    "below_safe": 0,
+    "stop_windows": 0,
+    "near_stop_windows": 0,
+    "terminal_not_a_stop": 0,
+    "episodes": 46,
+    "stop_ratio": {
+     "n": 2254,
+     "min": 3.125,
+     "p5": 3.125,
+     "median": 6.25,
+     "p95": 12.418
+    }
+   },
+   "LAND 20-32 m": {
+    "actions": 4301,
+    "terminal": 256,
+    "nonterminal": 4045,
+    "forced": 342,
+    "nonterminal_stop": 0,
+    "below_safe": 0,
+    "stop_windows": 0,
+    "near_stop_windows": 0,
+    "terminal_not_a_stop": 0,
+    "episodes": 64,
+    "stop_ratio": {
+     "n": 4045,
+     "min": 3.125,
+     "p5": 3.125,
+     "median": 6.25,
+     "p95": 12.485
+    }
+   },
+   "LAND 32-44 m": {
+    "actions": 4160,
+    "terminal": 212,
+    "nonterminal": 3948,
+    "forced": 278,
+    "nonterminal_stop": 0,
+    "below_safe": 0,
+    "stop_windows": 0,
+    "near_stop_windows": 0,
+    "terminal_not_a_stop": 0,
+    "episodes": 53,
+    "stop_ratio": {
+     "n": 3948,
+     "min": 3.125,
+     "p5": 3.125,
+     "median": 6.556,
+     "p95": 12.496
+    }
+   },
+   "LAND other": {
+    "actions": 257,
+    "terminal": 12,
+    "nonterminal": 245,
+    "forced": 0,
+    "nonterminal_stop": 0,
+    "below_safe": 0,
+    "stop_windows": 0,
+    "near_stop_windows": 0,
+    "terminal_not_a_stop": 0,
+    "episodes": 3,
+    "stop_ratio": {
+     "n": 245,
+     "min": 3.125,
+     "p5": 3.125,
+     "median": 9.216,
+     "p95": 12.494
+    }
+   }
+  },
+  "kind": {
+   "cube LAND": {
+    "actions": 6777,
+    "terminal": 400,
+    "nonterminal": 6377,
+    "forced": 835,
+    "nonterminal_stop": 0,
+    "below_safe": 0,
+    "stop_windows": 0,
+    "near_stop_windows": 0,
+    "terminal_not_a_stop": 0,
+    "episodes": 100,
+    "stop_ratio": {
+     "n": 6377,
+     "min": 3.125,
+     "p5": 3.125,
+     "median": 6.25,
+     "p95": 12.488
+    }
+   },
+   "cylinder LAND": {
+    "actions": 480,
+    "terminal": 32,
+    "nonterminal": 448,
+    "forced": 102,
+    "nonterminal_stop": 0,
+    "below_safe": 0,
+    "stop_windows": 0,
+    "near_stop_windows": 0,
+    "terminal_not_a_stop": 0,
+    "episodes": 8,
+    "stop_ratio": {
+     "n": 448,
+     "min": 3.125,
+     "p5": 3.125,
+     "median": 6.25,
+     "p95": 12.476
+    }
+   },
+   "pad LAND": {
+    "actions": 3899,
+    "terminal": 232,
+    "nonterminal": 3667,
+    "forced": 63,
+    "nonterminal_stop": 0,
+    "below_safe": 0,
+    "stop_windows": 0,
+    "near_stop_windows": 0,
+    "terminal_not_a_stop": 0,
+    "episodes": 58,
+    "stop_ratio": {
+     "n": 3667,
+     "min": 3.125,
+     "p5": 3.125,
+     "median": 6.25,
+     "p95": 12.495
+    }
+   }
+  },
+  "state": {
+   "LAND ALIGN": {
+    "nonterminal": 238,
+    "below_safe": 0,
+    "near_stop": 0,
+    "nonterminal_stop": 0,
+    "stop_ratio": {
+     "n": 238,
+     "min": 6.25,
+     "p5": 6.25,
+     "median": 6.25,
+     "p95": 6.25
+    }
+   },
+   "LAND APPROACH": {
+    "nonterminal": 2854,
+    "below_safe": 0,
+    "near_stop": 0,
+    "nonterminal_stop": 0,
+    "stop_ratio": {
+     "n": 2854,
+     "min": 6.25,
+     "p5": 7.583,
+     "median": 12.346,
+     "p95": 12.497
+    }
+   },
+   "LAND CLIMB": {
+    "nonterminal": 1178,
+    "below_safe": 0,
+    "near_stop": 0,
+    "nonterminal_stop": 0,
+    "stop_ratio": {
+     "n": 1178,
+     "min": 4.375,
+     "p5": 6.25,
+     "median": 10.012,
+     "p95": 12.493
+    }
+   },
+   "LAND DESCENT": {
+    "nonterminal": 2542,
+    "below_safe": 0,
+    "near_stop": 0,
+    "nonterminal_stop": 0,
+    "stop_ratio": {
+     "n": 2542,
+     "min": 3.125,
+     "p5": 3.125,
+     "median": 3.125,
+     "p95": 6.25
+    }
+   },
+   "LAND SEARCH": {
+    "nonterminal": 1245,
+    "below_safe": 0,
+    "near_stop": 0,
+    "nonterminal_stop": 0,
+    "stop_ratio": {
+     "n": 1245,
+     "min": 6.25,
+     "p5": 6.25,
+     "median": 6.25,
+     "p95": 6.25
+    }
+   },
+   "LAND SURFACE_APPROACH": {
+    "nonterminal": 2435,
+    "below_safe": 0,
+    "near_stop": 0,
+    "nonterminal_stop": 0,
+    "stop_ratio": {
+     "n": 2435,
+     "min": 3.649,
+     "p5": 4.375,
+     "median": 4.915,
+     "p95": 12.481
+    }
+   }
+  },
+  "task": {
+   "LAND": {
+    "actions": 11156,
+    "terminal": 664,
+    "nonterminal": 10492,
+    "forced": 1000,
+    "nonterminal_stop": 0,
+    "below_safe": 0,
+    "stop_windows": 0,
+    "near_stop_windows": 0,
+    "terminal_not_a_stop": 0,
+    "episodes": 166,
+    "stop_ratio": {
+     "n": 10492,
+     "min": 3.125,
+     "p5": 3.125,
+     "median": 6.25,
+     "p95": 12.492
+    }
+   }
+  }
+ },
+ "checks": [
+  {
+   "what": "landing labels before the touchdown that are a stop",
+   "count": 0,
+   "allowed": 0,
+   "passed": true
+  },
+  {
+   "what": "landing labels before the touchdown below 3.0 x the stop rule",
+   "count": 0,
+   "allowed": 0,
+   "passed": true
+  },
+  {
+   "what": "runs of 4 stops before the touchdown of a landing",
+   "count": 0,
+   "allowed": 0,
+   "passed": true
+  },
+  {
+   "what": "approach labels that are a stop before the teacher's own stop",
+   "count": 0,
+   "allowed": 0,
+   "passed": true
+  },
+  {
+   "what": "runs of 4 stops before the stop of an approach",
+   "count": 0,
+   "allowed": 0,
+   "passed": true
+  }
+ ],
+ "passed": true,
+ "episodes_that_break_the_rule": 0,
+ "examples": [],
+ "what": "datasets/projectairsim_visual_search/generic_landing_1c_added"
+}

@@ -1,0 +1,74 @@
+{
+ "description": "Stage 1c: the recording of the planned episodes by the stage 1c teacher (finalizer off, three simulators side by side). An episode is kept only if the teacher did what the sentence asked by the surface evaluator, stopped by itself, the simulator kept at least 0.8 of real time and, for a forced landing, every push came to pass with the object in view where it let go.",
+ "flights": 168,
+ "kept": 166,
+ "by_kind": {
+  "edge": {
+   "flown": 24,
+   "kept": 23
+  },
+  "premature": {
+   "flown": 20,
+   "kept": 20
+  },
+  "same colour, twin": {
+   "flown": 16,
+   "kept": 16
+  },
+  "same colour: blue_cube past blue_pad": {
+   "flown": 7,
+   "kept": 7
+  },
+  "same colour: blue_pad past blue_cone": {
+   "flown": 14,
+   "kept": 14
+  },
+  "same colour: blue_pad past blue_cube": {
+   "flown": 22,
+   "kept": 22
+  },
+  "same colour: red_cube past red_pad": {
+   "flown": 7,
+   "kept": 7
+  },
+  "same colour: red_pad past red_cube": {
+   "flown": 14,
+   "kept": 14
+  },
+  "stall": {
+   "flown": 24,
+   "kept": 23
+  },
+  "under_climb": {
+   "flown": 20,
+   "kept": 20
+  }
+ },
+ "not_kept": [
+  {
+   "id": "g1c-60030-blue_cube-near_edge",
+   "kind": "edge",
+   "reason": "max_steps",
+   "teacher_did_it": false,
+   "real_time_factor": 0.9919272910327512,
+   "forced": 0,
+   "forced_seen": false,
+   "decisions": 320
+  },
+  {
+   "id": "g1c-60049-red_cube-near_stall",
+   "kind": "stall",
+   "reason": "max_steps",
+   "teacher_did_it": false,
+   "real_time_factor": 0.9990022193529767,
+   "forced": 0,
+   "forced_seen": false,
+   "decisions": 320
+  }
+ ],
+ "episodes_in_the_dataset": 166,
+ "real_time_factor": {
+  "minimum": 0.9015876100922241,
+  "median": 0.982403994053842
+ }
+}

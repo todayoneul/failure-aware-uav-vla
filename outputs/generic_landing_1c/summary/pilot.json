@@ -1,0 +1,369 @@
+{
+ "rows": [
+  {
+   "candidate": "stage1b",
+   "flights": 24,
+   "same_color_collisions": 1,
+   "wrong_target_landings": 3,
+   "recovered": 6,
+   "recovery_of": 8,
+   "recovered_by_state": {
+    "under_climb": 2,
+    "edge": 1,
+    "premature": 2,
+    "stall": 1
+   },
+   "pushed": 7,
+   "pushed_and_recovered": 6,
+   "cube_landings": 7,
+   "cube_of": 10,
+   "cylinder_landings": 3,
+   "cylinder_of": 4,
+   "pad_landings": 9,
+   "pad_of": 10,
+   "same_color_landings": 6,
+   "same_color_of": 8,
+   "air_self_stops": 0,
+   "collisions": 1,
+   "wrong_target": 3,
+   "success": 19,
+   "val_l1": null,
+   "failed": [
+    {
+     "id": "g1cp-63005-blue_cube-mid_edge",
+     "task": "land",
+     "reason": "landed",
+     "landed_on": "blue_pad",
+     "collision": null,
+     "wrong_target": true,
+     "final_distance_m": 44.4,
+     "steps": 129
+    },
+    {
+     "id": "g1cp-63009-blue_cube-near_stall",
+     "task": "land",
+     "reason": "landed",
+     "landed_on": "blue_cube",
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 5.2,
+     "steps": 84
+    },
+    {
+     "id": "g1cp-63014-blue_pad-past-blue_cone",
+     "task": "land",
+     "reason": "collision",
+     "landed_on": null,
+     "collision": "SceneBlueCone",
+     "wrong_target": false,
+     "final_distance_m": 41.6,
+     "steps": 63
+    },
+    {
+     "id": "g1cp-63020-blue_cube-past-blue_pad",
+     "task": "land",
+     "reason": "landed",
+     "landed_on": "blue_pad",
+     "collision": null,
+     "wrong_target": true,
+     "final_distance_m": 40.9,
+     "steps": 75
+    },
+    {
+     "id": "g1cp-63039-blue_cylinder-mid_visible",
+     "task": "land",
+     "reason": "landed",
+     "landed_on": "blue_cube",
+     "collision": null,
+     "wrong_target": true,
+     "final_distance_m": 80.1,
+     "steps": 214
+    }
+   ]
+  },
+  {
+   "candidate": "500",
+   "flights": 24,
+   "same_color_collisions": 0,
+   "wrong_target_landings": 2,
+   "recovered": 6,
+   "recovery_of": 8,
+   "recovered_by_state": {
+    "under_climb": 2,
+    "edge": 1,
+    "premature": 2,
+    "stall": 1
+   },
+   "pushed": 7,
+   "pushed_and_recovered": 6,
+   "cube_landings": 7,
+   "cube_of": 10,
+   "cylinder_landings": 3,
+   "cylinder_of": 4,
+   "pad_landings": 10,
+   "pad_of": 10,
+   "same_color_landings": 7,
+   "same_color_of": 8,
+   "air_self_stops": 0,
+   "collisions": 0,
+   "wrong_target": 2,
+   "success": 20,
+   "val_l1": 0.0717593014248026,
+   "failed": [
+    {
+     "id": "g1cp-63005-blue_cube-mid_edge",
+     "task": "land",
+     "reason": "landed",
+     "landed_on": "blue_pad",
+     "collision": null,
+     "wrong_target": true,
+     "final_distance_m": 43.9,
+     "steps": 126
+    },
+    {
+     "id": "g1cp-63009-blue_cube-near_stall",
+     "task": "land",
+     "reason": "landed",
+     "landed_on": "blue_cube",
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 5.1,
+     "steps": 75
+    },
+    {
+     "id": "g1cp-63020-blue_cube-past-blue_pad",
+     "task": "land",
+     "reason": "landed",
+     "landed_on": "blue_pad",
+     "collision": null,
+     "wrong_target": true,
+     "final_distance_m": 44.2,
+     "steps": 91
+    },
+    {
+     "id": "g1cp-63035-blue_cylinder-near_visible",
+     "task": "land",
+     "reason": "landed",
+     "landed_on": "blue_cylinder",
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 3.8,
+     "steps": 83
+    }
+   ],
+   "put_behind": []
+  },
+  {
+   "candidate": "1000",
+   "flights": 24,
+   "same_color_collisions": 0,
+   "wrong_target_landings": 0,
+   "recovered": 6,
+   "recovery_of": 8,
+   "recovered_by_state": {
+    "under_climb": 2,
+    "edge": 1,
+    "premature": 2,
+    "stall": 1
+   },
+   "pushed": 7,
+   "pushed_and_recovered": 6,
+   "cube_landings": 8,
+   "cube_of": 10,
+   "cylinder_landings": 3,
+   "cylinder_of": 4,
+   "pad_landings": 10,
+   "pad_of": 10,
+   "same_color_landings": 8,
+   "same_color_of": 8,
+   "air_self_stops": 2,
+   "collisions": 0,
+   "wrong_target": 0,
+   "success": 21,
+   "val_l1": 0.06584084276393697,
+   "failed": [
+    {
+     "id": "g1cp-63006-red_cube-mid_edge",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 2.8,
+     "steps": 108
+    },
+    {
+     "id": "g1cp-63009-blue_cube-near_stall",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 5.4,
+     "steps": 54
+    },
+    {
+     "id": "g1cp-63039-blue_cylinder-mid_visible",
+     "task": "land",
+     "reason": "landed",
+     "landed_on": "blue_cylinder",
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 3.9,
+     "steps": 96
+    }
+   ],
+   "put_behind": [
+    "stops in the air above stage 1b"
+   ]
+  },
+  {
+   "candidate": "1500",
+   "flights": 24,
+   "same_color_collisions": 0,
+   "wrong_target_landings": 0,
+   "recovered": 6,
+   "recovery_of": 8,
+   "recovered_by_state": {
+    "under_climb": 2,
+    "edge": 1,
+    "premature": 2,
+    "stall": 1
+   },
+   "pushed": 7,
+   "pushed_and_recovered": 6,
+   "cube_landings": 8,
+   "cube_of": 10,
+   "cylinder_landings": 4,
+   "cylinder_of": 4,
+   "pad_landings": 10,
+   "pad_of": 10,
+   "same_color_landings": 8,
+   "same_color_of": 8,
+   "air_self_stops": 2,
+   "collisions": 0,
+   "wrong_target": 0,
+   "success": 22,
+   "val_l1": 0.06119936968107747,
+   "failed": [
+    {
+     "id": "g1cp-63006-red_cube-mid_edge",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 2.6,
+     "steps": 106
+    },
+    {
+     "id": "g1cp-63009-blue_cube-near_stall",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 5.5,
+     "steps": 60
+    }
+   ],
+   "put_behind": [
+    "stops in the air above stage 1b"
+   ]
+  },
+  {
+   "candidate": "2000",
+   "flights": 24,
+   "same_color_collisions": 0,
+   "wrong_target_landings": 0,
+   "recovered": 6,
+   "recovery_of": 8,
+   "recovered_by_state": {
+    "under_climb": 2,
+    "edge": 1,
+    "premature": 2,
+    "stall": 1
+   },
+   "pushed": 7,
+   "pushed_and_recovered": 6,
+   "cube_landings": 8,
+   "cube_of": 10,
+   "cylinder_landings": 4,
+   "cylinder_of": 4,
+   "pad_landings": 10,
+   "pad_of": 10,
+   "same_color_landings": 8,
+   "same_color_of": 8,
+   "air_self_stops": 2,
+   "collisions": 0,
+   "wrong_target": 0,
+   "success": 22,
+   "val_l1": 0.05986208053958156,
+   "failed": [
+    {
+     "id": "g1cp-63006-red_cube-mid_edge",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 2.8,
+     "steps": 102
+    },
+    {
+     "id": "g1cp-63009-blue_cube-near_stall",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 5.4,
+     "steps": 53
+    }
+   ],
+   "put_behind": [
+    "stops in the air above stage 1b"
+   ]
+  }
+ ],
+ "order": [
+  "500",
+  "2000",
+  "1500",
+  "1000"
+ ],
+ "chosen": "500",
+ "checks": [
+  [
+   "collisions in the same-colour starts",
+   0,
+   "<= 0",
+   true
+  ],
+  [
+   "landings on a wrong object",
+   2,
+   "<= 1",
+   false
+  ],
+  [
+   "landings on cubes",
+   7,
+   ">= 6 of 10",
+   true
+  ],
+  [
+   "landings on pads",
+   10,
+   ">= 8 of 10",
+   true
+  ],
+  [
+   "landings on cylinders",
+   3,
+   ">= 3 of 4",
+   true
+  ]
+ ],
+ "passed": false
+}
