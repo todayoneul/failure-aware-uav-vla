@@ -1,0 +1,26 @@
+{
+ "description": "Stage 1d: the labels of the recorded landings after their last push, by the teacher's state (descend: down; climb: up; final and align: to the middle).",
+ "labels_after_the_last_push": {
+  "descent_decay": {
+   "forced decisions (no label)": 681,
+   "descend": 142
+  },
+  "edge_drift": {
+   "forced decisions (no label)": 733,
+   "climb": 82,
+   "align": 112,
+   "final": 224,
+   "descend": 223
+  },
+  "edge_low": {
+   "forced decisions (no label)": 536,
+   "climb": 110,
+   "final": 225,
+   "descend": 285
+  },
+  "low_hover": {
+   "forced decisions (no label)": 893,
+   "descend": 175
+  }
+ }
+}

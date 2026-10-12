@@ -1,0 +1,1482 @@
+{
+ "description": "Every failed landing of the pilot named (src/landing/failures.py).",
+ "stage 1b (update 2000)": {
+  "failed_landings": 4,
+  "by_end": {
+   "AIR_SELF_STOP": 0,
+   "COLLISION": 0,
+   "TIMEOUT": 0,
+   "TARGET_SELECTION": 0,
+   "TOUCHDOWN": 4,
+   "STABILITY": 0,
+   "OTHER": 0
+  },
+  "air_self_stops_by_phase": {
+   "SEARCH": 0,
+   "SURFACE_APPROACH": 0,
+   "CLIMB": 0,
+   "ALIGNMENT": 0,
+   "DESCENT": 0
+  },
+  "by_kind": {
+   "pad": {
+    "failed": 0,
+    "air_self_stop": 0
+   },
+   "cube": {
+    "failed": 4,
+    "air_self_stop": 0
+   },
+   "cylinder": {
+    "failed": 0,
+    "air_self_stop": 0
+   }
+  },
+  "flights": [
+   {
+    "id": "g1dp-82010-blue_cube-near_edge_low",
+    "kind": "cube",
+    "task": "land",
+    "end": "TOUCHDOWN",
+    "phase": "ALIGNMENT",
+    "reason": "landed",
+    "decisions": 93
+   },
+   {
+    "id": "g1dp-82012-red_cube-near_edge_low",
+    "kind": "cube",
+    "task": "land",
+    "end": "TOUCHDOWN",
+    "phase": "ALIGNMENT",
+    "reason": "landed",
+    "decisions": 60
+   },
+   {
+    "id": "g1dp-82013-blue_cube-mid_edge_low",
+    "kind": "cube",
+    "task": "land",
+    "end": "TOUCHDOWN",
+    "phase": "CLIMB",
+    "reason": "landed",
+    "decisions": 92
+   },
+   {
+    "id": "g1dp-82015-blue_cube-far_edge_drift",
+    "kind": "cube",
+    "task": "land",
+    "end": "TOUCHDOWN",
+    "phase": "CLIMB",
+    "reason": "landed",
+    "decisions": 148
+   }
+  ]
+ },
+ "stage 1c (update 2000)": {
+  "failed_landings": 7,
+  "by_end": {
+   "AIR_SELF_STOP": 3,
+   "COLLISION": 0,
+   "TIMEOUT": 0,
+   "TARGET_SELECTION": 3,
+   "TOUCHDOWN": 1,
+   "STABILITY": 0,
+   "OTHER": 0
+  },
+  "air_self_stops_by_phase": {
+   "SEARCH": 0,
+   "SURFACE_APPROACH": 0,
+   "CLIMB": 1,
+   "ALIGNMENT": 2,
+   "DESCENT": 0
+  },
+  "by_kind": {
+   "pad": {
+    "failed": 1,
+    "air_self_stop": 0
+   },
+   "cube": {
+    "failed": 5,
+    "air_self_stop": 3
+   },
+   "cylinder": {
+    "failed": 1,
+    "air_self_stop": 0
+   }
+  },
+  "flights": [
+   {
+    "id": "g1dp-82010-blue_cube-near_edge_low",
+    "kind": "cube",
+    "task": "land",
+    "end": "TOUCHDOWN",
+    "phase": "ALIGNMENT",
+    "reason": "landed",
+    "decisions": 99
+   },
+   {
+    "id": "g1dp-82012-red_cube-near_edge_low",
+    "kind": "cube",
+    "task": "land",
+    "end": "AIR_SELF_STOP",
+    "phase": "ALIGNMENT",
+    "reason": "model_stop",
+    "decisions": 66,
+    "self_stop": {
+     "height_m": 8.19,
+     "height_above_top_m": 0.19,
+     "target_distance_m": 4.36,
+     "offset_from_centre_m": [
+      -3.69,
+      2.32
+     ],
+     "over_the_object": true,
+     "front_sees_target": true,
+     "down_sees_target": true,
+     "last_actions": [
+      [
+       0.0059,
+       0.0193,
+       0.0001
+      ],
+      [
+       0.002,
+       0.0016,
+       -0.0008
+      ],
+      [
+       0.0039,
+       0.0015,
+       -0.0046
+      ],
+      [
+       0.0039,
+       0.0007,
+       0.0008
+      ]
+     ],
+     "last_stop_ratios": [
+      0.241,
+      0.024,
+      0.137,
+      0.049
+     ],
+     "start_distance_m": 12.42,
+     "start_height_m": 6.24,
+     "finalizer_state": "LANDING_DESCENT",
+     "phases_of_the_last_decisions": [
+      "ALIGNMENT",
+      "ALIGNMENT",
+      "ALIGNMENT",
+      "ALIGNMENT"
+     ]
+    }
+   },
+   {
+    "id": "g1dp-82015-blue_cube-far_edge_drift",
+    "kind": "cube",
+    "task": "land",
+    "end": "AIR_SELF_STOP",
+    "phase": "ALIGNMENT",
+    "reason": "model_stop",
+    "decisions": 214,
+    "self_stop": {
+     "height_m": 10.09,
+     "height_above_top_m": 2.09,
+     "target_distance_m": 4.29,
+     "offset_from_centre_m": [
+      -1.77,
+      3.91
+     ],
+     "over_the_object": true,
+     "front_sees_target": false,
+     "down_sees_target": true,
+     "last_actions": [
+      [
+       0.002,
+       0.0635,
+       0.0001
+      ],
+      [
+       0.0,
+       0.0508,
+       -0.0007
+      ],
+      [
+       0.0,
+       0.0544,
+       -0.001
+      ],
+      [
+       0.0,
+       0.0654,
+       0.0002
+      ]
+     ],
+     "last_stop_ratios": [
+      0.793,
+      0.635,
+      0.681,
+      0.818
+     ],
+     "start_distance_m": 42.89,
+     "start_height_m": 7.25,
+     "finalizer_state": "LANDING_DESCENT",
+     "phases_of_the_last_decisions": [
+      "ALIGNMENT",
+      "ALIGNMENT",
+      "ALIGNMENT",
+      "ALIGNMENT"
+     ]
+    }
+   },
+   {
+    "id": "g1dp-82016-red_cube-far_edge_drift",
+    "kind": "cube",
+    "task": "land",
+    "end": "AIR_SELF_STOP",
+    "phase": "CLIMB",
+    "reason": "model_stop",
+    "decisions": 232,
+    "self_stop": {
+     "height_m": 10.88,
+     "height_above_top_m": 2.88,
+     "target_distance_m": 4.66,
+     "offset_from_centre_m": [
+      0.66,
+      4.62
+     ],
+     "over_the_object": false,
+     "front_sees_target": false,
+     "down_sees_target": true,
+     "last_actions": [
+      [
+       0.0,
+       0.0009,
+       -0.0011
+      ],
+      [
+       0.0,
+       -0.0031,
+       -0.0012
+      ],
+      [
+       0.0,
+       -0.0012,
+       -0.002
+      ],
+      [
+       0.0,
+       0.0007,
+       -0.0025
+      ]
+     ],
+     "last_stop_ratios": [
+      0.034,
+      0.038,
+      0.06,
+      0.075
+     ],
+     "start_distance_m": 35.51,
+     "start_height_m": 7.48,
+     "finalizer_state": "FLYING",
+     "phases_of_the_last_decisions": [
+      "CLIMB",
+      "CLIMB",
+      "CLIMB",
+      "CLIMB"
+     ]
+    }
+   },
+   {
+    "id": "g1dp-82155-blue_cube-past-blue_pad",
+    "kind": "cube",
+    "task": "land",
+    "end": "TARGET_SELECTION",
+    "phase": "SEARCH",
+    "reason": "landed",
+    "decisions": 75
+   },
+   {
+    "id": "g1dp-82157-red_pad-past-red_cube",
+    "kind": "pad",
+    "task": "land",
+    "end": "TARGET_SELECTION",
+    "phase": "SEARCH",
+    "reason": "model_stop",
+    "decisions": 191
+   },
+   {
+    "id": "g1dp-82169-blue_cylinder-far_visible",
+    "kind": "cylinder",
+    "task": "land",
+    "end": "TARGET_SELECTION",
+    "phase": "SEARCH",
+    "reason": "model_stop",
+    "decisions": 79
+   }
+  ]
+ },
+ "stage 1d update 500": {
+  "failed_landings": 8,
+  "by_end": {
+   "AIR_SELF_STOP": 5,
+   "COLLISION": 1,
+   "TIMEOUT": 0,
+   "TARGET_SELECTION": 2,
+   "TOUCHDOWN": 0,
+   "STABILITY": 0,
+   "OTHER": 0
+  },
+  "air_self_stops_by_phase": {
+   "SEARCH": 0,
+   "SURFACE_APPROACH": 0,
+   "CLIMB": 2,
+   "ALIGNMENT": 3,
+   "DESCENT": 0
+  },
+  "by_kind": {
+   "pad": {
+    "failed": 1,
+    "air_self_stop": 0
+   },
+   "cube": {
+    "failed": 6,
+    "air_self_stop": 5
+   },
+   "cylinder": {
+    "failed": 1,
+    "air_self_stop": 0
+   }
+  },
+  "flights": [
+   {
+    "id": "g1dp-82010-blue_cube-near_edge_low",
+    "kind": "cube",
+    "task": "land",
+    "end": "AIR_SELF_STOP",
+    "phase": "CLIMB",
+    "reason": "model_stop",
+    "decisions": 78,
+    "self_stop": {
+     "height_m": 9.0,
+     "height_above_top_m": 1.0,
+     "target_distance_m": 4.64,
+     "offset_from_centre_m": [
+      4.18,
+      -2.02
+     ],
+     "over_the_object": false,
+     "front_sees_target": false,
+     "down_sees_target": true,
+     "last_actions": [
+      [
+       0.0,
+       -0.0654,
+       -0.0028
+      ],
+      [
+       0.0,
+       -0.0405,
+       -0.0037
+      ],
+      [
+       0.0,
+       -0.0352,
+       -0.0033
+      ],
+      [
+       0.0,
+       0.0261,
+       -0.004
+      ]
+     ],
+     "last_stop_ratios": [
+      0.818,
+      0.507,
+      0.439,
+      0.327
+     ],
+     "start_distance_m": 13.65,
+     "start_height_m": 3.95,
+     "finalizer_state": "LANDING_DESCENT",
+     "phases_of_the_last_decisions": [
+      "CLIMB",
+      "CLIMB",
+      "CLIMB",
+      "CLIMB"
+     ]
+    }
+   },
+   {
+    "id": "g1dp-82012-red_cube-near_edge_low",
+    "kind": "cube",
+    "task": "land",
+    "end": "AIR_SELF_STOP",
+    "phase": "ALIGNMENT",
+    "reason": "model_stop",
+    "decisions": 59,
+    "self_stop": {
+     "height_m": 8.17,
+     "height_above_top_m": 0.17,
+     "target_distance_m": 4.27,
+     "offset_from_centre_m": [
+      -3.64,
+      2.22
+     ],
+     "over_the_object": true,
+     "front_sees_target": true,
+     "down_sees_target": true,
+     "last_actions": [
+      [
+       0.0039,
+       0.0293,
+       -0.0007
+      ],
+      [
+       0.002,
+       -0.0005,
+       0.0006
+      ],
+      [
+       0.0039,
+       0.0009,
+       0.0005
+      ],
+      [
+       0.0039,
+       0.0004,
+       0.0005
+      ]
+     ],
+     "last_stop_ratios": [
+      0.366,
+      0.024,
+      0.049,
+      0.049
+     ],
+     "start_distance_m": 12.42,
+     "start_height_m": 6.24,
+     "finalizer_state": "LANDING_DESCENT",
+     "phases_of_the_last_decisions": [
+      "ALIGNMENT",
+      "ALIGNMENT",
+      "ALIGNMENT",
+      "ALIGNMENT"
+     ]
+    }
+   },
+   {
+    "id": "g1dp-82014-red_cube-mid_edge_drift",
+    "kind": "cube",
+    "task": "land",
+    "end": "AIR_SELF_STOP",
+    "phase": "ALIGNMENT",
+    "reason": "model_stop",
+    "decisions": 86,
+    "self_stop": {
+     "height_m": 8.39,
+     "height_above_top_m": 0.39,
+     "target_distance_m": 4.4,
+     "offset_from_centre_m": [
+      3.54,
+      -2.61
+     ],
+     "over_the_object": true,
+     "front_sees_target": false,
+     "down_sees_target": true,
+     "last_actions": [
+      [
+       0.0039,
+       -0.0021,
+       0.0008
+      ],
+      [
+       0.002,
+       0.0549,
+       -0.0007
+      ],
+      [
+       0.0059,
+       -0.0034,
+       0.0004
+      ],
+      [
+       0.002,
+       -0.0044,
+       -0.0009
+      ]
+     ],
+     "last_stop_ratios": [
+      0.049,
+      0.687,
+      0.073,
+      0.055
+     ],
+     "start_distance_m": 20.51,
+     "start_height_m": 3.02,
+     "finalizer_state": "FLYING",
+     "phases_of_the_last_decisions": [
+      "ALIGNMENT",
+      "ALIGNMENT",
+      "ALIGNMENT",
+      "ALIGNMENT"
+     ]
+    }
+   },
+   {
+    "id": "g1dp-82015-blue_cube-far_edge_drift",
+    "kind": "cube",
+    "task": "land",
+    "end": "AIR_SELF_STOP",
+    "phase": "CLIMB",
+    "reason": "model_stop",
+    "decisions": 150,
+    "self_stop": {
+     "height_m": 8.29,
+     "height_above_top_m": 0.29,
+     "target_distance_m": 4.74,
+     "offset_from_centre_m": [
+      -2.33,
+      4.13
+     ],
+     "over_the_object": false,
+     "front_sees_target": false,
+     "down_sees_target": true,
+     "last_actions": [
+      [
+       0.0,
+       0.0371,
+       0.0003
+      ],
+      [
+       0.0,
+       0.0471,
+       -0.0001
+      ],
+      [
+       0.0,
+       0.0469,
+       0.0
+      ],
+      [
+       0.0,
+       -0.0703,
+       0.0003
+      ]
+     ],
+     "last_stop_ratios": [
+      0.464,
+      0.589,
+      0.586,
+      0.879
+     ],
+     "start_distance_m": 42.89,
+     "start_height_m": 7.25,
+     "finalizer_state": "LANDING_DESCENT",
+     "phases_of_the_last_decisions": [
+      "CLIMB",
+      "CLIMB",
+      "CLIMB",
+      "CLIMB"
+     ]
+    }
+   },
+   {
+    "id": "g1dp-82016-red_cube-far_edge_drift",
+    "kind": "cube",
+    "task": "land",
+    "end": "AIR_SELF_STOP",
+    "phase": "ALIGNMENT",
+    "reason": "model_stop",
+    "decisions": 122,
+    "self_stop": {
+     "height_m": 8.91,
+     "height_above_top_m": 0.91,
+     "target_distance_m": 4.49,
+     "offset_from_centre_m": [
+      2.55,
+      3.69
+     ],
+     "over_the_object": true,
+     "front_sees_target": false,
+     "down_sees_target": true,
+     "last_actions": [
+      [
+       0.0059,
+       -0.0004,
+       -0.0008
+      ],
+      [
+       0.0039,
+       -0.0016,
+       -0.0003
+      ],
+      [
+       0.0039,
+       -0.0239,
+       0.0001
+      ],
+      [
+       0.0039,
+       0.0005,
+       -0.0004
+      ]
+     ],
+     "last_stop_ratios": [
+      0.073,
+      0.049,
+      0.299,
+      0.049
+     ],
+     "start_distance_m": 35.51,
+     "start_height_m": 7.48,
+     "finalizer_state": "FLYING",
+     "phases_of_the_last_decisions": [
+      "ALIGNMENT",
+      "ALIGNMENT",
+      "ALIGNMENT",
+      "ALIGNMENT"
+     ]
+    }
+   },
+   {
+    "id": "g1dp-82155-blue_cube-past-blue_pad",
+    "kind": "cube",
+    "task": "land",
+    "end": "COLLISION",
+    "phase": "SEARCH",
+    "reason": "collision",
+    "decisions": 111
+   },
+   {
+    "id": "g1dp-82157-red_pad-past-red_cube",
+    "kind": "pad",
+    "task": "land",
+    "end": "TARGET_SELECTION",
+    "phase": "SEARCH",
+    "reason": "model_stop",
+    "decisions": 119
+   },
+   {
+    "id": "g1dp-82169-blue_cylinder-far_visible",
+    "kind": "cylinder",
+    "task": "land",
+    "end": "TARGET_SELECTION",
+    "phase": "SEARCH",
+    "reason": "model_stop",
+    "decisions": 87
+   }
+  ]
+ },
+ "stage 1d update 1000": {
+  "failed_landings": 8,
+  "by_end": {
+   "AIR_SELF_STOP": 5,
+   "COLLISION": 0,
+   "TIMEOUT": 0,
+   "TARGET_SELECTION": 2,
+   "TOUCHDOWN": 1,
+   "STABILITY": 0,
+   "OTHER": 0
+  },
+  "air_self_stops_by_phase": {
+   "SEARCH": 1,
+   "SURFACE_APPROACH": 0,
+   "CLIMB": 2,
+   "ALIGNMENT": 2,
+   "DESCENT": 0
+  },
+  "by_kind": {
+   "pad": {
+    "failed": 1,
+    "air_self_stop": 0
+   },
+   "cube": {
+    "failed": 6,
+    "air_self_stop": 5
+   },
+   "cylinder": {
+    "failed": 1,
+    "air_self_stop": 0
+   }
+  },
+  "flights": [
+   {
+    "id": "g1dp-82010-blue_cube-near_edge_low",
+    "kind": "cube",
+    "task": "land",
+    "end": "AIR_SELF_STOP",
+    "phase": "CLIMB",
+    "reason": "model_stop",
+    "decisions": 151,
+    "self_stop": {
+     "height_m": 9.13,
+     "height_above_top_m": 1.13,
+     "target_distance_m": 4.65,
+     "offset_from_centre_m": [
+      4.35,
+      -1.65
+     ],
+     "over_the_object": false,
+     "front_sees_target": false,
+     "down_sees_target": true,
+     "last_actions": [
+      [
+       0.0,
+       0.0173,
+       -0.0028
+      ],
+      [
+       0.0039,
+       -0.017,
+       -0.0028
+      ],
+      [
+       0.0,
+       0.0674,
+       -0.0022
+      ],
+      [
+       0.0,
+       0.0347,
+       -0.0035
+      ]
+     ],
+     "last_stop_ratios": [
+      0.217,
+      0.212,
+      0.842,
+      0.433
+     ],
+     "start_distance_m": 13.65,
+     "start_height_m": 3.95,
+     "finalizer_state": "FLYING",
+     "phases_of_the_last_decisions": [
+      "CLIMB",
+      "CLIMB",
+      "CLIMB",
+      "CLIMB"
+     ]
+    }
+   },
+   {
+    "id": "g1dp-82012-red_cube-near_edge_low",
+    "kind": "cube",
+    "task": "land",
+    "end": "TOUCHDOWN",
+    "phase": "ALIGNMENT",
+    "reason": "landed",
+    "decisions": 67
+   },
+   {
+    "id": "g1dp-82014-red_cube-mid_edge_drift",
+    "kind": "cube",
+    "task": "land",
+    "end": "AIR_SELF_STOP",
+    "phase": "ALIGNMENT",
+    "reason": "model_stop",
+    "decisions": 86,
+    "self_stop": {
+     "height_m": 9.33,
+     "height_above_top_m": 1.33,
+     "target_distance_m": 4.39,
+     "offset_from_centre_m": [
+      3.53,
+      -2.62
+     ],
+     "over_the_object": true,
+     "front_sees_target": false,
+     "down_sees_target": true,
+     "last_actions": [
+      [
+       0.002,
+       -0.0742,
+       -0.0007
+      ],
+      [
+       0.0039,
+       -0.0134,
+       -0.0041
+      ],
+      [
+       0.002,
+       -0.0155,
+       -0.0076
+      ],
+      [
+       0.0,
+       -0.0723,
+       -0.003
+      ]
+     ],
+     "last_stop_ratios": [
+      0.928,
+      0.168,
+      0.227,
+      0.903
+     ],
+     "start_distance_m": 20.51,
+     "start_height_m": 3.02,
+     "finalizer_state": "FLYING",
+     "phases_of_the_last_decisions": [
+      "ALIGNMENT",
+      "ALIGNMENT",
+      "ALIGNMENT",
+      "ALIGNMENT"
+     ]
+    }
+   },
+   {
+    "id": "g1dp-82015-blue_cube-far_edge_drift",
+    "kind": "cube",
+    "task": "land",
+    "end": "AIR_SELF_STOP",
+    "phase": "CLIMB",
+    "reason": "model_stop",
+    "decisions": 150,
+    "self_stop": {
+     "height_m": 8.88,
+     "height_above_top_m": 0.88,
+     "target_distance_m": 4.83,
+     "offset_from_centre_m": [
+      -2.3,
+      4.24
+     ],
+     "over_the_object": false,
+     "front_sees_target": false,
+     "down_sees_target": true,
+     "last_actions": [
+      [
+       0.0,
+       -0.0664,
+       0.0008
+      ],
+      [
+       0.0,
+       -0.0143,
+       0.0007
+      ],
+      [
+       0.002,
+       -0.0613,
+       -0.0003
+      ],
+      [
+       0.0,
+       -0.0038,
+       -0.0002
+      ]
+     ],
+     "last_stop_ratios": [
+      0.83,
+      0.179,
+      0.766,
+      0.047
+     ],
+     "start_distance_m": 42.89,
+     "start_height_m": 7.25,
+     "finalizer_state": "FLYING",
+     "phases_of_the_last_decisions": [
+      "CLIMB",
+      "CLIMB",
+      "CLIMB",
+      "CLIMB"
+     ]
+    }
+   },
+   {
+    "id": "g1dp-82016-red_cube-far_edge_drift",
+    "kind": "cube",
+    "task": "land",
+    "end": "AIR_SELF_STOP",
+    "phase": "ALIGNMENT",
+    "reason": "model_stop",
+    "decisions": 130,
+    "self_stop": {
+     "height_m": 9.12,
+     "height_above_top_m": 1.12,
+     "target_distance_m": 4.46,
+     "offset_from_centre_m": [
+      2.85,
+      3.43
+     ],
+     "over_the_object": true,
+     "front_sees_target": false,
+     "down_sees_target": true,
+     "last_actions": [
+      [
+       0.0195,
+       -0.0208,
+       0.0006
+      ],
+      [
+       0.0371,
+       -0.0117,
+       0.0005
+      ],
+      [
+       0.0645,
+       -0.05,
+       0.0022
+      ],
+      [
+       0.0078,
+       -0.0028,
+       0.0031
+      ]
+     ],
+     "last_stop_ratios": [
+      0.259,
+      0.464,
+      0.806,
+      0.098
+     ],
+     "start_distance_m": 35.51,
+     "start_height_m": 7.48,
+     "finalizer_state": "FLYING",
+     "phases_of_the_last_decisions": [
+      "ALIGNMENT",
+      "ALIGNMENT",
+      "ALIGNMENT",
+      "ALIGNMENT"
+     ]
+    }
+   },
+   {
+    "id": "g1dp-82155-blue_cube-past-blue_pad",
+    "kind": "cube",
+    "task": "land",
+    "end": "AIR_SELF_STOP",
+    "phase": "SEARCH",
+    "reason": "model_stop",
+    "decisions": 139,
+    "self_stop": {
+     "height_m": 16.23,
+     "height_above_top_m": 8.23,
+     "target_distance_m": 48.18,
+     "offset_from_centre_m": [
+      -19.02,
+      44.27
+     ],
+     "over_the_object": false,
+     "front_sees_target": false,
+     "down_sees_target": false,
+     "last_actions": [
+      [
+       0.0,
+       0.0004,
+       -0.0003
+      ],
+      [
+       0.0,
+       -0.0005,
+       -0.0007
+      ],
+      [
+       0.0,
+       0.0,
+       0.0001
+      ],
+      [
+       0.0,
+       0.0002,
+       0.0001
+      ]
+     ],
+     "last_stop_ratios": [
+      0.009,
+      0.021,
+      0.004,
+      0.003
+     ],
+     "start_distance_m": 41.27,
+     "start_height_m": 7.55,
+     "finalizer_state": "FLYING",
+     "phases_of_the_last_decisions": [
+      "SEARCH",
+      "SEARCH",
+      "SEARCH",
+      "SEARCH"
+     ]
+    }
+   },
+   {
+    "id": "g1dp-82157-red_pad-past-red_cube",
+    "kind": "pad",
+    "task": "land",
+    "end": "TARGET_SELECTION",
+    "phase": "SEARCH",
+    "reason": "model_stop",
+    "decisions": 235
+   },
+   {
+    "id": "g1dp-82169-blue_cylinder-far_visible",
+    "kind": "cylinder",
+    "task": "land",
+    "end": "TARGET_SELECTION",
+    "phase": "SEARCH",
+    "reason": "model_stop",
+    "decisions": 93
+   }
+  ]
+ },
+ "stage 1d update 1500": {
+  "failed_landings": 9,
+  "by_end": {
+   "AIR_SELF_STOP": 7,
+   "COLLISION": 0,
+   "TIMEOUT": 0,
+   "TARGET_SELECTION": 2,
+   "TOUCHDOWN": 0,
+   "STABILITY": 0,
+   "OTHER": 0
+  },
+  "air_self_stops_by_phase": {
+   "SEARCH": 1,
+   "SURFACE_APPROACH": 0,
+   "CLIMB": 3,
+   "ALIGNMENT": 3,
+   "DESCENT": 0
+  },
+  "by_kind": {
+   "pad": {
+    "failed": 1,
+    "air_self_stop": 0
+   },
+   "cube": {
+    "failed": 7,
+    "air_self_stop": 7
+   },
+   "cylinder": {
+    "failed": 1,
+    "air_self_stop": 0
+   }
+  },
+  "flights": [
+   {
+    "id": "g1dp-82010-blue_cube-near_edge_low",
+    "kind": "cube",
+    "task": "land",
+    "end": "AIR_SELF_STOP",
+    "phase": "CLIMB",
+    "reason": "model_stop",
+    "decisions": 86,
+    "self_stop": {
+     "height_m": 9.23,
+     "height_above_top_m": 1.23,
+     "target_distance_m": 4.61,
+     "offset_from_centre_m": [
+      4.17,
+      -1.98
+     ],
+     "over_the_object": false,
+     "front_sees_target": false,
+     "down_sees_target": true,
+     "last_actions": [
+      [
+       0.0,
+       -0.0043,
+       0.0115
+      ],
+      [
+       0.0039,
+       0.053,
+       -0.0018
+      ],
+      [
+       0.0,
+       -0.0122,
+       0.0021
+      ],
+      [
+       0.0,
+       0.0261,
+       -0.0025
+      ]
+     ],
+     "last_stop_ratios": [
+      0.343,
+      0.662,
+      0.153,
+      0.327
+     ],
+     "start_distance_m": 13.65,
+     "start_height_m": 3.95,
+     "finalizer_state": "LANDING_DESCENT",
+     "phases_of_the_last_decisions": [
+      "CLIMB",
+      "CLIMB",
+      "CLIMB",
+      "CLIMB"
+     ]
+    }
+   },
+   {
+    "id": "g1dp-82012-red_cube-near_edge_low",
+    "kind": "cube",
+    "task": "land",
+    "end": "AIR_SELF_STOP",
+    "phase": "ALIGNMENT",
+    "reason": "model_stop",
+    "decisions": 65,
+    "self_stop": {
+     "height_m": 8.09,
+     "height_above_top_m": 0.09,
+     "target_distance_m": 4.35,
+     "offset_from_centre_m": [
+      -3.64,
+      2.39
+     ],
+     "over_the_object": true,
+     "front_sees_target": true,
+     "down_sees_target": true,
+     "last_actions": [
+      [
+       0.002,
+       -0.0007,
+       -0.0005
+      ],
+      [
+       0.002,
+       0.0009,
+       -0.0043
+      ],
+      [
+       0.0,
+       -0.0002,
+       -0.0001
+      ],
+      [
+       0.0,
+       0.0,
+       -0.0004
+      ]
+     ],
+     "last_stop_ratios": [
+      0.024,
+      0.127,
+      0.003,
+      0.01
+     ],
+     "start_distance_m": 12.42,
+     "start_height_m": 6.24,
+     "finalizer_state": "LANDING_DESCENT",
+     "phases_of_the_last_decisions": [
+      "ALIGNMENT",
+      "ALIGNMENT",
+      "ALIGNMENT",
+      "ALIGNMENT"
+     ]
+    }
+   },
+   {
+    "id": "g1dp-82013-blue_cube-mid_edge_low",
+    "kind": "cube",
+    "task": "land",
+    "end": "AIR_SELF_STOP",
+    "phase": "ALIGNMENT",
+    "reason": "model_stop",
+    "decisions": 76,
+    "self_stop": {
+     "height_m": 9.97,
+     "height_above_top_m": 1.97,
+     "target_distance_m": 3.9,
+     "offset_from_centre_m": [
+      3.27,
+      2.13
+     ],
+     "over_the_object": true,
+     "front_sees_target": false,
+     "down_sees_target": true,
+     "last_actions": [
+      [
+       0.0742,
+       -0.0007,
+       -0.0017
+      ],
+      [
+       0.0332,
+       -0.0016,
+       -0.0023
+      ],
+      [
+       0.0254,
+       -0.0004,
+       -0.0016
+      ],
+      [
+       0.0039,
+       -0.0008,
+       -0.0014
+      ]
+     ],
+     "last_stop_ratios": [
+      0.928,
+      0.415,
+      0.317,
+      0.049
+     ],
+     "start_distance_m": 24.02,
+     "start_height_m": 6.72,
+     "finalizer_state": "FLYING",
+     "phases_of_the_last_decisions": [
+      "ALIGNMENT",
+      "ALIGNMENT",
+      "ALIGNMENT",
+      "ALIGNMENT"
+     ]
+    }
+   },
+   {
+    "id": "g1dp-82014-red_cube-mid_edge_drift",
+    "kind": "cube",
+    "task": "land",
+    "end": "AIR_SELF_STOP",
+    "phase": "ALIGNMENT",
+    "reason": "model_stop",
+    "decisions": 140,
+    "self_stop": {
+     "height_m": 8.49,
+     "height_above_top_m": 0.49,
+     "target_distance_m": 4.38,
+     "offset_from_centre_m": [
+      3.55,
+      -2.57
+     ],
+     "over_the_object": true,
+     "front_sees_target": false,
+     "down_sees_target": true,
+     "last_actions": [
+      [
+       0.0,
+       -0.0012,
+       0.0147
+      ],
+      [
+       0.002,
+       -0.0001,
+       -0.0181
+      ],
+      [
+       0.0,
+       -0.0026,
+       0.017
+      ],
+      [
+       0.0,
+       -0.0061,
+       0.0255
+      ]
+     ],
+     "last_stop_ratios": [
+      0.436,
+      0.54,
+      0.507,
+      0.76
+     ],
+     "start_distance_m": 20.51,
+     "start_height_m": 3.02,
+     "finalizer_state": "FLYING",
+     "phases_of_the_last_decisions": [
+      "ALIGNMENT",
+      "ALIGNMENT",
+      "ALIGNMENT",
+      "ALIGNMENT"
+     ]
+    }
+   },
+   {
+    "id": "g1dp-82015-blue_cube-far_edge_drift",
+    "kind": "cube",
+    "task": "land",
+    "end": "AIR_SELF_STOP",
+    "phase": "CLIMB",
+    "reason": "model_stop",
+    "decisions": 176,
+    "self_stop": {
+     "height_m": 9.41,
+     "height_above_top_m": 1.41,
+     "target_distance_m": 4.75,
+     "offset_from_centre_m": [
+      -2.25,
+      4.19
+     ],
+     "over_the_object": false,
+     "front_sees_target": false,
+     "down_sees_target": true,
+     "last_actions": [
+      [
+       0.0,
+       0.0564,
+       -0.0006
+      ],
+      [
+       0.0,
+       -0.0055,
+       -0.0003
+      ],
+      [
+       0.0,
+       -0.0693,
+       -0.0002
+      ],
+      [
+       0.0,
+       -0.0625,
+       -0.0002
+      ]
+     ],
+     "last_stop_ratios": [
+      0.705,
+      0.069,
+      0.867,
+      0.781
+     ],
+     "start_distance_m": 42.89,
+     "start_height_m": 7.25,
+     "finalizer_state": "LANDING_DESCENT",
+     "phases_of_the_last_decisions": [
+      "CLIMB",
+      "CLIMB",
+      "CLIMB",
+      "CLIMB"
+     ]
+    }
+   },
+   {
+    "id": "g1dp-82016-red_cube-far_edge_drift",
+    "kind": "cube",
+    "task": "land",
+    "end": "AIR_SELF_STOP",
+    "phase": "CLIMB",
+    "reason": "model_stop",
+    "decisions": 131,
+    "self_stop": {
+     "height_m": 9.82,
+     "height_above_top_m": 1.82,
+     "target_distance_m": 4.67,
+     "offset_from_centre_m": [
+      2.18,
+      4.13
+     ],
+     "over_the_object": false,
+     "front_sees_target": false,
+     "down_sees_target": true,
+     "last_actions": [
+      [
+       0.0,
+       -0.0038,
+       -0.0006
+      ],
+      [
+       0.002,
+       -0.0039,
+       0.0009
+      ],
+      [
+       0.0,
+       -0.0042,
+       -0.0017
+      ],
+      [
+       0.0059,
+       -0.0011,
+       0.0005
+      ]
+     ],
+     "last_stop_ratios": [
+      0.047,
+      0.049,
+      0.052,
+      0.073
+     ],
+     "start_distance_m": 35.51,
+     "start_height_m": 7.48,
+     "finalizer_state": "FLYING",
+     "phases_of_the_last_decisions": [
+      "CLIMB",
+      "CLIMB",
+      "CLIMB",
+      "CLIMB"
+     ]
+    }
+   },
+   {
+    "id": "g1dp-82155-blue_cube-past-blue_pad",
+    "kind": "cube",
+    "task": "land",
+    "end": "AIR_SELF_STOP",
+    "phase": "SEARCH",
+    "reason": "model_stop",
+    "decisions": 77,
+    "self_stop": {
+     "height_m": 17.29,
+     "height_above_top_m": 9.29,
+     "target_distance_m": 48.2,
+     "offset_from_centre_m": [
+      -16.42,
+      45.32
+     ],
+     "over_the_object": false,
+     "front_sees_target": false,
+     "down_sees_target": false,
+     "last_actions": [
+      [
+       0.0,
+       0.0238,
+       -0.0023
+      ],
+      [
+       0.0,
+       -0.0045,
+       -0.0029
+      ],
+      [
+       0.0391,
+       -0.0093,
+       -0.0013
+      ],
+      [
+       0.0117,
+       0.0364,
+       -0.0004
+      ]
+     ],
+     "last_stop_ratios": [
+      0.298,
+      0.088,
+      0.488,
+      0.455
+     ],
+     "start_distance_m": 41.27,
+     "start_height_m": 7.55,
+     "finalizer_state": "LANDING_DESCENT",
+     "phases_of_the_last_decisions": [
+      "SEARCH",
+      "SEARCH",
+      "SEARCH",
+      "SEARCH"
+     ]
+    }
+   },
+   {
+    "id": "g1dp-82157-red_pad-past-red_cube",
+    "kind": "pad",
+    "task": "land",
+    "end": "TARGET_SELECTION",
+    "phase": "SEARCH",
+    "reason": "model_stop",
+    "decisions": 186
+   },
+   {
+    "id": "g1dp-82169-blue_cylinder-far_visible",
+    "kind": "cylinder",
+    "task": "land",
+    "end": "TARGET_SELECTION",
+    "phase": "SEARCH",
+    "reason": "model_stop",
+    "decisions": 88
+   }
+  ]
+ }
+}

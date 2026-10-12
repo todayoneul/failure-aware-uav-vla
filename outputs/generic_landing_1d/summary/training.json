@@ -1,0 +1,177 @@
+{
+ "description": "Stage 1d: the data and the corrective fine-tune of stage 1c's update 2000 (configs/generic_landing_stage1d.json, fine_tune).",
+ "recorded": {
+  "episodes": 87,
+  "train_episodes": 79,
+  "val_episodes": 8,
+  "dropped_episodes": {},
+  "samples": 4761,
+  "train_samples": 4333,
+  "val_samples": 428,
+  "tasks": {
+   "land": 87
+  },
+  "by_target_episodes": {
+   "blue_cube": 38,
+   "blue_cylinder": 3,
+   "blue_pad": 3,
+   "green_cylinder": 3,
+   "red_cube": 38,
+   "red_pad": 2
+  },
+  "by_teacher_state": {
+   "align": 130,
+   "approach": 1166,
+   "climb": 875,
+   "descend": 825,
+   "final": 953,
+   "landed": 348,
+   "search": 464
+  },
+  "labels_outside_action_bounds": 0
+ },
+ "merged": {
+  "episodes": 1644,
+  "train_episodes": 1477,
+  "val_episodes": 167,
+  "samples": 86324,
+  "train_samples": 77854,
+  "val_samples": 8470,
+  "sources": {
+   "generalization_v1": 292,
+   "generalization_v2_added": 153,
+   "generalization_v3_added": 414,
+   "generalization_v3b_added": 193,
+   "generalization_v3c_added": 108,
+   "generic_landing_1b_added": 231,
+   "generic_landing_1c_added": 166,
+   "generic_landing_1d_added": 87
+  },
+  "decisions_left_out": {
+   "generic_landing_1c_added": 40
+  }
+ },
+ "run": {
+  "init": "outputs/aerovla_oft/checkpoints/generic_landing_stage1c_run/update-2000",
+  "planned_updates": 1500,
+  "batch_size": 1,
+  "gradient_accumulation": 4,
+  "learning_rate": 1.25e-05,
+  "grounding_learning_rate": 1.25e-05,
+  "share_of_draws": {
+   "generic_landing_1d_added": 0.25,
+   "generic_landing_1c_added": 0.3,
+   "generic_landing_1b_added": 0.25
+  },
+  "frames_by_source": {
+   "generic_landing_1d_added": 4333,
+   "generic_landing_1c_added": 9725,
+   "generic_landing_1b_added": 12156,
+   "None": 51640
+  },
+  "boost": {
+   "small_visible": 2.0,
+   "selection": 3.0
+  },
+  "balance": 3.0,
+  "parameters": {
+   "lora": 39976960,
+   "head": 14716931,
+   "grounding": 4338432
+  },
+  "peak_allocated_GiB": 9.896618843078613,
+  "train_seconds": 3402.916910171509,
+  "gpu": "NVIDIA GeForce RTX 5070"
+ },
+ "start_checkpoint_on_validation_mix": {
+  "l1": 0.07724888252252977,
+  "behaviour": {
+   "grounding_accuracy": 0.8853333333333333,
+   "terminal_accuracy": 0.9411764705882353,
+   "all": 0.8814691151919867,
+   "terminal_accuracy_land": 0.9338842975206612,
+   "terminal_accuracy_approach": 1.0,
+   "score": 0.9132549019607843
+  }
+ },
+ "validation_curve": [
+  {
+   "update": 250,
+   "val_l1": 0.08077145084492005,
+   "behaviour": {
+    "grounding_accuracy": 0.88,
+    "terminal_accuracy": 0.9338235294117647,
+    "all": 0.8764607679465777,
+    "terminal_accuracy_land": 0.9256198347107438,
+    "terminal_accuracy_approach": 1.0,
+    "score": 0.9069117647058824
+   },
+   "saved_candidate": null
+  },
+  {
+   "update": 500,
+   "val_l1": 0.07532639954185587,
+   "behaviour": {
+    "grounding_accuracy": 0.8853333333333333,
+    "terminal_accuracy": 0.9485294117647058,
+    "all": 0.8831385642737897,
+    "terminal_accuracy_land": 0.9421487603305785,
+    "terminal_accuracy_approach": 1.0,
+    "score": 0.9169313725490196
+   },
+   "saved_candidate": 500
+  },
+  {
+   "update": 750,
+   "val_l1": 0.07477735702040915,
+   "behaviour": {
+    "grounding_accuracy": 0.8773333333333333,
+    "terminal_accuracy": 0.9558823529411765,
+    "all": 0.8797996661101837,
+    "terminal_accuracy_land": 0.9504132231404959,
+    "terminal_accuracy_approach": 1.0,
+    "score": 0.9166078431372549
+   },
+   "saved_candidate": null
+  },
+  {
+   "update": 1000,
+   "val_l1": 0.0731347993883819,
+   "behaviour": {
+    "grounding_accuracy": 0.8933333333333333,
+    "terminal_accuracy": 0.9485294117647058,
+    "all": 0.8881469115191987,
+    "terminal_accuracy_land": 0.9421487603305785,
+    "terminal_accuracy_approach": 1.0,
+    "score": 0.9209313725490196
+   },
+   "saved_candidate": 1000
+  },
+  {
+   "update": 1250,
+   "val_l1": 0.07178004827618678,
+   "behaviour": {
+    "grounding_accuracy": 0.8906666666666667,
+    "terminal_accuracy": 0.9485294117647058,
+    "all": 0.8864774624373957,
+    "terminal_accuracy_land": 0.9421487603305785,
+    "terminal_accuracy_approach": 1.0,
+    "score": 0.9195980392156863
+   },
+   "saved_candidate": null
+  },
+  {
+   "update": 1499,
+   "val_l1": 0.07110839550866979,
+   "behaviour": {
+    "grounding_accuracy": 0.888,
+    "terminal_accuracy": 0.9485294117647058,
+    "all": 0.8848080133555927,
+    "terminal_accuracy_land": 0.9421487603305785,
+    "terminal_accuracy_approach": 1.0,
+    "score": 0.918264705882353
+   },
+   "saved_candidate": 1500
+  }
+ ]
+}

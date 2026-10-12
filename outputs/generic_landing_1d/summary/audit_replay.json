@@ -1,0 +1,24 @@
+{
+ "what": "/mnt/c/Users/leegy/Desktop/drone/datasets/projectairsim_visual_search/generic_landing_1d",
+ "episodes": 1644,
+ "samples": 86324,
+ "by_source": {
+  "generalization_v1": 292,
+  "generalization_v2_added": 153,
+  "generalization_v3_added": 414,
+  "generalization_v3b_added": 193,
+  "generalization_v3c_added": 108,
+  "generic_landing_1b_added": 231,
+  "generic_landing_1c_added": 166,
+  "generic_landing_1d_added": 87
+ },
+ "stage_1_generic_landing_episodes": 0,
+ "stage_1b_episodes": 231,
+ "stage_1c_episodes": 166,
+ "stage_1c_same_colour_episodes_recorded": 80,
+ "stage_1c_twins_recorded": 16,
+ "stage_1d_episodes": 87,
+ "older_episodes": 1160,
+ "all_of_stage_1c_is_in": true,
+ "passed": true
+}

@@ -1,0 +1,611 @@
+{
+ "rows": [
+  {
+   "candidate": "stage1c",
+   "flights": 24,
+   "same_color_collisions": 0,
+   "wrong_target_landings": 1,
+   "critical": 8,
+   "critical_of": 12,
+   "critical_by_state": {
+    "low_hover": 3,
+    "descent_decay": 3,
+    "edge_low": 1,
+    "edge_drift": 1
+   },
+   "critical_pushed": 12,
+   "critical_pushed_and_landed": 8,
+   "critical_air_self_stops": 3,
+   "air_self_stops": 5,
+   "cube_landings": 8,
+   "cube_of": 13,
+   "cylinder_landings": 2,
+   "cylinder_of": 3,
+   "pad_landings": 3,
+   "pad_of": 3,
+   "pad_landings_all": 7,
+   "pad_of_all": 8,
+   "same_color_landings": 4,
+   "same_color_of": 6,
+   "collisions": 0,
+   "wrong_target": 3,
+   "success": 17,
+   "ceiling_overruns": 9,
+   "highest_m": 25.5,
+   "val_l1": null,
+   "failed": [
+    {
+     "id": "g1dp-82010-blue_cube-near_edge_low",
+     "task": "land",
+     "reason": "landed",
+     "landed_on": "blue_cube",
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 4.6,
+     "steps": 99
+    },
+    {
+     "id": "g1dp-82012-red_cube-near_edge_low",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 4.4,
+     "steps": 66
+    },
+    {
+     "id": "g1dp-82015-blue_cube-far_edge_drift",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 4.3,
+     "steps": 214
+    },
+    {
+     "id": "g1dp-82016-red_cube-far_edge_drift",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 4.7,
+     "steps": 232
+    },
+    {
+     "id": "g1dp-82155-blue_cube-past-blue_pad",
+     "task": "land",
+     "reason": "landed",
+     "landed_on": "blue_pad",
+     "collision": null,
+     "wrong_target": true,
+     "final_distance_m": 43.5,
+     "steps": 75
+    },
+    {
+     "id": "g1dp-82157-red_pad-past-red_cube",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": true,
+     "final_distance_m": 54.6,
+     "steps": 191
+    },
+    {
+     "id": "g1dp-82169-blue_cylinder-far_visible",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": true,
+     "final_distance_m": 62.4,
+     "steps": 79
+    }
+   ]
+  },
+  {
+   "candidate": "500",
+   "flights": 24,
+   "same_color_collisions": 1,
+   "wrong_target_landings": 0,
+   "critical": 7,
+   "critical_of": 12,
+   "critical_by_state": {
+    "low_hover": 3,
+    "descent_decay": 3,
+    "edge_low": 1,
+    "edge_drift": 0
+   },
+   "critical_pushed": 12,
+   "critical_pushed_and_landed": 7,
+   "critical_air_self_stops": 5,
+   "air_self_stops": 7,
+   "cube_landings": 7,
+   "cube_of": 13,
+   "cylinder_landings": 2,
+   "cylinder_of": 3,
+   "pad_landings": 3,
+   "pad_of": 3,
+   "pad_landings_all": 7,
+   "pad_of_all": 8,
+   "same_color_landings": 4,
+   "same_color_of": 6,
+   "collisions": 1,
+   "wrong_target": 2,
+   "success": 16,
+   "ceiling_overruns": 9,
+   "highest_m": 24.0,
+   "val_l1": 0.07532639954185587,
+   "failed": [
+    {
+     "id": "g1dp-82010-blue_cube-near_edge_low",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 4.6,
+     "steps": 78
+    },
+    {
+     "id": "g1dp-82012-red_cube-near_edge_low",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 4.3,
+     "steps": 59
+    },
+    {
+     "id": "g1dp-82014-red_cube-mid_edge_drift",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 4.4,
+     "steps": 86
+    },
+    {
+     "id": "g1dp-82015-blue_cube-far_edge_drift",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 4.7,
+     "steps": 150
+    },
+    {
+     "id": "g1dp-82016-red_cube-far_edge_drift",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 4.5,
+     "steps": 122
+    },
+    {
+     "id": "g1dp-82155-blue_cube-past-blue_pad",
+     "task": "land",
+     "reason": "collision",
+     "landed_on": null,
+     "collision": "FieldSilo",
+     "wrong_target": false,
+     "final_distance_m": 49.9,
+     "steps": 111
+    },
+    {
+     "id": "g1dp-82157-red_pad-past-red_cube",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": true,
+     "final_distance_m": 55.4,
+     "steps": 119
+    },
+    {
+     "id": "g1dp-82169-blue_cylinder-far_visible",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": true,
+     "final_distance_m": 62.9,
+     "steps": 87
+    }
+   ],
+   "checks": [
+    [
+     "collisions in the same-colour starts",
+     1,
+     "<= 0",
+     false
+    ],
+    [
+     "landings on a wrong object",
+     0,
+     "<= 0",
+     true
+    ],
+    [
+     "forced cube landings that landed",
+     7,
+     ">= 10 of 12",
+     false
+    ],
+    [
+     "stops in the air among the forced cube landings",
+     5,
+     "<= 1",
+     false
+    ],
+    [
+     "pad landings",
+     3,
+     ">= 3 of 3",
+     true
+    ],
+    [
+     "cylinder landings",
+     2,
+     ">= 2 of 3",
+     true
+    ],
+    [
+     "forced cube landings against stage 1c's checkpoint on the same starts",
+     7,
+     ">= 8",
+     false
+    ]
+   ],
+   "eligible": false
+  },
+  {
+   "candidate": "1000",
+   "flights": 24,
+   "same_color_collisions": 0,
+   "wrong_target_landings": 0,
+   "critical": 7,
+   "critical_of": 12,
+   "critical_by_state": {
+    "low_hover": 3,
+    "descent_decay": 3,
+    "edge_low": 1,
+    "edge_drift": 0
+   },
+   "critical_pushed": 12,
+   "critical_pushed_and_landed": 7,
+   "critical_air_self_stops": 4,
+   "air_self_stops": 7,
+   "cube_landings": 7,
+   "cube_of": 13,
+   "cylinder_landings": 2,
+   "cylinder_of": 3,
+   "pad_landings": 3,
+   "pad_of": 3,
+   "pad_landings_all": 7,
+   "pad_of_all": 8,
+   "same_color_landings": 4,
+   "same_color_of": 6,
+   "collisions": 0,
+   "wrong_target": 2,
+   "success": 16,
+   "ceiling_overruns": 11,
+   "highest_m": 28.4,
+   "val_l1": 0.0731347993883819,
+   "failed": [
+    {
+     "id": "g1dp-82010-blue_cube-near_edge_low",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 4.7,
+     "steps": 151
+    },
+    {
+     "id": "g1dp-82012-red_cube-near_edge_low",
+     "task": "land",
+     "reason": "landed",
+     "landed_on": "red_cube",
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 4.5,
+     "steps": 67
+    },
+    {
+     "id": "g1dp-82014-red_cube-mid_edge_drift",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 4.4,
+     "steps": 86
+    },
+    {
+     "id": "g1dp-82015-blue_cube-far_edge_drift",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 4.8,
+     "steps": 150
+    },
+    {
+     "id": "g1dp-82016-red_cube-far_edge_drift",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 4.5,
+     "steps": 130
+    },
+    {
+     "id": "g1dp-82155-blue_cube-past-blue_pad",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 48.2,
+     "steps": 139
+    },
+    {
+     "id": "g1dp-82157-red_pad-past-red_cube",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": true,
+     "final_distance_m": 55.2,
+     "steps": 235
+    },
+    {
+     "id": "g1dp-82169-blue_cylinder-far_visible",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": true,
+     "final_distance_m": 61.7,
+     "steps": 93
+    }
+   ],
+   "checks": [
+    [
+     "collisions in the same-colour starts",
+     0,
+     "<= 0",
+     true
+    ],
+    [
+     "landings on a wrong object",
+     0,
+     "<= 0",
+     true
+    ],
+    [
+     "forced cube landings that landed",
+     7,
+     ">= 10 of 12",
+     false
+    ],
+    [
+     "stops in the air among the forced cube landings",
+     4,
+     "<= 1",
+     false
+    ],
+    [
+     "pad landings",
+     3,
+     ">= 3 of 3",
+     true
+    ],
+    [
+     "cylinder landings",
+     2,
+     ">= 2 of 3",
+     true
+    ],
+    [
+     "forced cube landings against stage 1c's checkpoint on the same starts",
+     7,
+     ">= 8",
+     false
+    ]
+   ],
+   "eligible": false
+  },
+  {
+   "candidate": "1500",
+   "flights": 24,
+   "same_color_collisions": 0,
+   "wrong_target_landings": 0,
+   "critical": 6,
+   "critical_of": 12,
+   "critical_by_state": {
+    "low_hover": 3,
+    "descent_decay": 3,
+    "edge_low": 0,
+    "edge_drift": 0
+   },
+   "critical_pushed": 12,
+   "critical_pushed_and_landed": 6,
+   "critical_air_self_stops": 6,
+   "air_self_stops": 9,
+   "cube_landings": 6,
+   "cube_of": 13,
+   "cylinder_landings": 2,
+   "cylinder_of": 3,
+   "pad_landings": 3,
+   "pad_of": 3,
+   "pad_landings_all": 7,
+   "pad_of_all": 8,
+   "same_color_landings": 4,
+   "same_color_of": 6,
+   "collisions": 0,
+   "wrong_target": 2,
+   "success": 15,
+   "ceiling_overruns": 11,
+   "highest_m": 27.3,
+   "val_l1": 0.07110839550866979,
+   "failed": [
+    {
+     "id": "g1dp-82010-blue_cube-near_edge_low",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 4.6,
+     "steps": 86
+    },
+    {
+     "id": "g1dp-82012-red_cube-near_edge_low",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 4.4,
+     "steps": 65
+    },
+    {
+     "id": "g1dp-82013-blue_cube-mid_edge_low",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 3.9,
+     "steps": 76
+    },
+    {
+     "id": "g1dp-82014-red_cube-mid_edge_drift",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 4.4,
+     "steps": 140
+    },
+    {
+     "id": "g1dp-82015-blue_cube-far_edge_drift",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 4.8,
+     "steps": 176
+    },
+    {
+     "id": "g1dp-82016-red_cube-far_edge_drift",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 4.7,
+     "steps": 131
+    },
+    {
+     "id": "g1dp-82155-blue_cube-past-blue_pad",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": false,
+     "final_distance_m": 48.2,
+     "steps": 77
+    },
+    {
+     "id": "g1dp-82157-red_pad-past-red_cube",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": true,
+     "final_distance_m": 54.5,
+     "steps": 186
+    },
+    {
+     "id": "g1dp-82169-blue_cylinder-far_visible",
+     "task": "land",
+     "reason": "model_stop",
+     "landed_on": null,
+     "collision": null,
+     "wrong_target": true,
+     "final_distance_m": 63.0,
+     "steps": 88
+    }
+   ],
+   "checks": [
+    [
+     "collisions in the same-colour starts",
+     0,
+     "<= 0",
+     true
+    ],
+    [
+     "landings on a wrong object",
+     0,
+     "<= 0",
+     true
+    ],
+    [
+     "forced cube landings that landed",
+     6,
+     ">= 10 of 12",
+     false
+    ],
+    [
+     "stops in the air among the forced cube landings",
+     6,
+     "<= 1",
+     false
+    ],
+    [
+     "pad landings",
+     3,
+     ">= 3 of 3",
+     true
+    ],
+    [
+     "cylinder landings",
+     2,
+     ">= 2 of 3",
+     true
+    ],
+    [
+     "forced cube landings against stage 1c's checkpoint on the same starts",
+     6,
+     ">= 8",
+     false
+    ]
+   ],
+   "eligible": false
+  }
+ ],
+ "order_of_all": [
+  "1000",
+  "1500",
+  "500"
+ ],
+ "eligible": [],
+ "chosen": null,
+ "passed": false
+}

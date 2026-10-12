@@ -324,3 +324,23 @@ step마다 멈추는 대신 도착 2초 전에 다음 판단을 시작해 명령
 - **Ceiling (기록만):** pilot에서 14m를 넘은 비행 3 / 3 / 10 / 8 / 6.
 - **Tests:** Python 434/434, PowerShell 4/4.
 - **다음:** 자동으로 시작하지 않는다. 늦은 후보를 새 규칙으로 gate에 올릴지, 윗면 바로 위의 정지를 먼저 고칠지는 정해지지 않았다. Gate A와 gate B의 시작은 아직 아무도 비행하지 않았다.
+
+## Generic Landing Stage 1d (final descent continuation) — 2026-10-13
+
+브랜치 `exp/generic-landing-stage1d-final-descent`. 상세: [Stage 1d — Final Descent Continuation Correction](generic_landing_stage1d_final_descent.md). 표: `outputs/generic_landing_1d/summary/`. **통과하지 못했다. 후보 pilot에서 멈췄고 qualification, Stage 1c의 봉인한 Gate A·Gate B, regression은 비행하지 않았다. `generic_landing_v1`은 만들지 않았다. Stage 2는 시작하지 않았다.** Stage 1 / 1b / 1c의 기록은 그대로다. Canonical 48 재평가와 Depot 비행은 없다.
+
+- **질문:** Stage 1c의 같은 색 구분과 generic landing을 유지하면서 윗면 위 마지막 하강을 끝까지 이어가게 할 수 있는가. 고치는 것은 그것 하나.
+- **실패 감사:** Stage 1c 늦은 후보의 공중 정지 여섯 비행은 모두 전진·회전 없이 곧게 내려오다 하강 명령만 0으로 줄었다. 멈춘 자리(가운데에서 2.6–2.8m, 윗면 위 0.2–1.4m)는 Stage 1c teacher의 label이 하강에서 상승으로 바뀌는 경계(2.675m)이고, 그 상태(낮음 + 가운데가 옆·뒤)의 녹화 label은 0개였다.
+- **Teacher (녹화 전 commit `76cb333`):** A = 1.75m(하강 시작), B = 3.3m(낮은 기체가 하강을 이어가는 끝; usable top 3.6m − drift 0.3m). 자리로 정하는 규칙이고 기억이 아니다. 윗면 위에서는 제자리 상승 없음. 하강 크기는 기존 teacher의 두 값(0.5 / 0.25m) 그대로.
+- **강제 상태:** D1 `low_hover`, D2 `descent_decay`(B 안), D3 `edge_low`, D4 `edge_drift`(B 밖). 위치에서 일어나는 강제 이동이고 label이 아니다.
+- **Teacher pilot:** 20/20, 충돌 0, stop 위반 0. D1·D2는 놓인 자리에서 하강(부호 바뀜 0), D3·D4는 상승 한 번 뒤 가운데로(오차 0.13–0.52m).
+- **Data:** 80000번대 seed. 88개 계획 중 87개 녹화(D1 26, D2 22, D3 22, D4 17; cube 76). 착륙 label 4,761개 중 3.0 미만 0, 최소 3.125. Same-colour episode는 새로 녹화하지 않음.
+- **Replay:** 25% Stage 1d / 30% Stage 1c / 25% Stage 1b / 20% 그 이전. Stage 1의 episode 0개. Stage 1c의 label 40개(25 episode, B 안에서 낮은데 상승)는 replay에서 뺌. 합쳐 1,644 episode.
+- **학습:** Stage 1c의 update 2000에서 1,500 update, learning rate 1.25e-5. Validation L1 0.0772 → 0.0711.
+- **후보 pilot (새 24개 시작; Stage 1c의 update 2000, 후보 500 / 1000 / 1500):** 강제 cube 착륙 8 / 7 / 7 / 6 (기준 10/12), 그 12개의 공중 정지 3 / 5 / 4 / 6 (기준 1 이하), same-colour 4 / 4 / 4 / 4 (6개), 다른 물체 착륙 1 / 0 / 0 / 0, 충돌 0 / 1 / 0 / 0, pad 3/3, cylinder 2/3. **기준을 넘은 후보 없음. Pilot NOT PASSED.**
+- **어디서 실패했는가:** D1·D2는 Stage 1b를 포함해 모두 6/6. 실패는 모두 D3·D4다. Stage 1b는 가장자리에서 그냥 닿았고(영역 밖 4, 정지 0), Stage 1d의 후보는 내려가지도 올라가지도 않고 멈췄다(1500은 여섯 모두). 낮은 띠의 stop decision 1(1b) → 9(1c) → 32 / 49 / 46.
+- **Same-colour:** 시작 checkpoint가 새 6개 시작에서 4/6이고 blue cube 대신 blue pad에 한 번 착륙했다(Stage 1c pilot에서는 8/8, 0). 후보도 4/6.
+- **Ceiling (기록만):** 14m를 넘은 비행 9 / 9 / 11 / 11 (24개 중), 최고 28.4m.
+- **한계:** D1·D2 상태가 0.6–2.4m에 놓여, rule을 바꾼 띠(2.675–3.3m)에 놓인 cube·cylinder episode가 녹화에 없고 pilot에도 없다. B를 옮긴 효과는 이 pilot으로 알 수 없다.
+- **Tests:** Python 460/460, PowerShell 4/4.
+- **다음:** 자동으로 시작하지 않는다. Gate A(36), gate B(24)와 twin, regression은 여전히 봉인돼 있다.

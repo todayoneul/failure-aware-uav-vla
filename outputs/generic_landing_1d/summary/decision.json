@@ -1,0 +1,12 @@
+{
+ "description": "Stage 1d passes only if every part holds. The sealed gates of stage 1c were not opened.",
+ "pilot": false,
+ "chosen": null,
+ "qualification": "not flown",
+ "gate_a": "not flown",
+ "gate_b": "not flown",
+ "regression": "not flown",
+ "stage_1d": "NOT PASSED",
+ "gate_folders_on_disk": [],
+ "generic_landing_v1_made": false
+}

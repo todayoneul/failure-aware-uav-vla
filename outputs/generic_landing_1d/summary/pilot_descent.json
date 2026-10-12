@@ -1,0 +1,2649 @@
+{
+ "description": "The last metres of the twelve forced cube landings of the pilot, the same starts for every checkpoint, read from the decisions each policy made itself (src/landing/failures.final_descent_profile). The band is 0.2-2.0 m over the level of the top, near the object.",
+ "in_short": {
+  "stage 1b (update 2000)": {
+   "landings": 12,
+   "landed": 8,
+   "by_state": {
+    "low_hover": {
+     "flown": 3,
+     "landed": 3,
+     "stopped_in_the_air": 0
+    },
+    "descent_decay": {
+     "flown": 3,
+     "landed": 3,
+     "stopped_in_the_air": 0
+    },
+    "edge_low": {
+     "flown": 3,
+     "landed": 0,
+     "stopped_in_the_air": 0
+    },
+    "edge_drift": {
+     "flown": 3,
+     "landed": 2,
+     "stopped_in_the_air": 0
+    }
+   },
+   "descent_start_distance_m": {
+    "n": 12,
+    "min": 0.6,
+    "median": 1.6,
+    "max": 5.01
+   },
+   "descent_start_height_above_top_m": {
+    "n": 12,
+    "min": 0.64,
+    "median": 2.95,
+    "max": 5.82
+   },
+   "nearest_to_the_middle_m": {
+    "n": 12,
+    "min": 0.6,
+    "median": 1.38,
+    "max": 4.62
+   },
+   "touchdown_error_m": {
+    "n": 8,
+    "min": 0.7,
+    "median": 1.38,
+    "max": 4.29
+   },
+   "descent_decisions": {
+    "n": 12,
+    "min": 5,
+    "median": 8.5,
+    "max": 11
+   },
+   "flights_with_a_sign_flip": 0,
+   "sign_flips_in_all": 0,
+   "low_band": {
+    "decisions": 108,
+    "down_below_the_stop_band": 29,
+    "stop_decisions": 1,
+    "climbing": 10,
+    "share_below_the_stop_band": 0.269,
+    "median_down_m": {
+     "n": 12,
+     "min": -0.005,
+     "median": 0.25,
+     "max": 0.318
+    }
+   },
+   "air_self_stops": 0,
+   "air_self_stops_in_the_band": 0,
+   "touched_outside_the_region": 4,
+   "timeouts": 0,
+   "landed_on_another_object_or_hit": 0
+  },
+  "stage 1c (update 2000)": {
+   "landings": 12,
+   "landed": 8,
+   "by_state": {
+    "low_hover": {
+     "flown": 3,
+     "landed": 3,
+     "stopped_in_the_air": 0
+    },
+    "descent_decay": {
+     "flown": 3,
+     "landed": 3,
+     "stopped_in_the_air": 0
+    },
+    "edge_low": {
+     "flown": 3,
+     "landed": 1,
+     "stopped_in_the_air": 1
+    },
+    "edge_drift": {
+     "flown": 3,
+     "landed": 1,
+     "stopped_in_the_air": 2
+    }
+   },
+   "descent_start_distance_m": {
+    "n": 12,
+    "min": 0.64,
+    "median": 1.62,
+    "max": 4.97
+   },
+   "descent_start_height_above_top_m": {
+    "n": 12,
+    "min": 1.17,
+    "median": 4.91,
+    "max": 13.19
+   },
+   "nearest_to_the_middle_m": {
+    "n": 12,
+    "min": 0.58,
+    "median": 1.07,
+    "max": 4.58
+   },
+   "touchdown_error_m": {
+    "n": 8,
+    "min": 0.82,
+    "median": 1.36,
+    "max": 4.29
+   },
+   "descent_decisions": {
+    "n": 12,
+    "min": 7,
+    "median": 9.5,
+    "max": 141
+   },
+   "flights_with_a_sign_flip": 1,
+   "sign_flips_in_all": 15,
+   "low_band": {
+    "decisions": 146,
+    "down_below_the_stop_band": 34,
+    "stop_decisions": 9,
+    "climbing": 28,
+    "share_below_the_stop_band": 0.233,
+    "median_down_m": {
+     "n": 12,
+     "min": -0.205,
+     "median": 0.19,
+     "max": 0.262
+    }
+   },
+   "air_self_stops": 3,
+   "air_self_stops_in_the_band": 1,
+   "touched_outside_the_region": 1,
+   "timeouts": 0,
+   "landed_on_another_object_or_hit": 0
+  },
+  "stage 1d update 500": {
+   "landings": 12,
+   "landed": 7,
+   "by_state": {
+    "low_hover": {
+     "flown": 3,
+     "landed": 3,
+     "stopped_in_the_air": 0
+    },
+    "descent_decay": {
+     "flown": 3,
+     "landed": 3,
+     "stopped_in_the_air": 0
+    },
+    "edge_low": {
+     "flown": 3,
+     "landed": 1,
+     "stopped_in_the_air": 2
+    },
+    "edge_drift": {
+     "flown": 3,
+     "landed": 0,
+     "stopped_in_the_air": 3
+    }
+   },
+   "descent_start_distance_m": {
+    "n": 12,
+    "min": 0.62,
+    "median": 1.33,
+    "max": 4.64
+   },
+   "descent_start_height_above_top_m": {
+    "n": 12,
+    "min": 1.2,
+    "median": 4.62,
+    "max": 10.98
+   },
+   "nearest_to_the_middle_m": {
+    "n": 12,
+    "min": 0.62,
+    "median": 1.11,
+    "max": 4.64
+   },
+   "touchdown_error_m": {
+    "n": 7,
+    "min": 0.89,
+    "median": 1.19,
+    "max": 2.88
+   },
+   "descent_decisions": {
+    "n": 12,
+    "min": 6,
+    "median": 10.0,
+    "max": 30
+   },
+   "flights_with_a_sign_flip": 2,
+   "sign_flips_in_all": 4,
+   "low_band": {
+    "decisions": 150,
+    "down_below_the_stop_band": 67,
+    "stop_decisions": 32,
+    "climbing": 16,
+    "share_below_the_stop_band": 0.447,
+    "median_down_m": {
+     "n": 12,
+     "min": -0.002,
+     "median": 0.17,
+     "max": 0.248
+    }
+   },
+   "air_self_stops": 5,
+   "air_self_stops_in_the_band": 4,
+   "touched_outside_the_region": 0,
+   "timeouts": 0,
+   "landed_on_another_object_or_hit": 0
+  },
+  "stage 1d update 1000": {
+   "landings": 12,
+   "landed": 7,
+   "by_state": {
+    "low_hover": {
+     "flown": 3,
+     "landed": 3,
+     "stopped_in_the_air": 0
+    },
+    "descent_decay": {
+     "flown": 3,
+     "landed": 3,
+     "stopped_in_the_air": 0
+    },
+    "edge_low": {
+     "flown": 3,
+     "landed": 1,
+     "stopped_in_the_air": 1
+    },
+    "edge_drift": {
+     "flown": 3,
+     "landed": 0,
+     "stopped_in_the_air": 3
+    }
+   },
+   "descent_start_distance_m": {
+    "n": 12,
+    "min": 0.61,
+    "median": 1.1,
+    "max": 4.65
+   },
+   "descent_start_height_above_top_m": {
+    "n": 12,
+    "min": 1.16,
+    "median": 3.58,
+    "max": 7.06
+   },
+   "nearest_to_the_middle_m": {
+    "n": 12,
+    "min": 0.61,
+    "median": 1.1,
+    "max": 4.65
+   },
+   "touchdown_error_m": {
+    "n": 7,
+    "min": 0.79,
+    "median": 1.26,
+    "max": 4.25
+   },
+   "descent_decisions": {
+    "n": 12,
+    "min": 6,
+    "median": 10.5,
+    "max": 74
+   },
+   "flights_with_a_sign_flip": 4,
+   "sign_flips_in_all": 18,
+   "low_band": {
+    "decisions": 213,
+    "down_below_the_stop_band": 80,
+    "stop_decisions": 49,
+    "climbing": 43,
+    "share_below_the_stop_band": 0.376,
+    "median_down_m": {
+     "n": 12,
+     "min": -0.072,
+     "median": 0.2,
+     "max": 0.256
+    }
+   },
+   "air_self_stops": 4,
+   "air_self_stops_in_the_band": 4,
+   "touched_outside_the_region": 1,
+   "timeouts": 0,
+   "landed_on_another_object_or_hit": 0
+  },
+  "stage 1d update 1500": {
+   "landings": 12,
+   "landed": 6,
+   "by_state": {
+    "low_hover": {
+     "flown": 3,
+     "landed": 3,
+     "stopped_in_the_air": 0
+    },
+    "descent_decay": {
+     "flown": 3,
+     "landed": 3,
+     "stopped_in_the_air": 0
+    },
+    "edge_low": {
+     "flown": 3,
+     "landed": 0,
+     "stopped_in_the_air": 3
+    },
+    "edge_drift": {
+     "flown": 3,
+     "landed": 0,
+     "stopped_in_the_air": 3
+    }
+   },
+   "descent_start_distance_m": {
+    "n": 11,
+    "min": 0.53,
+    "median": 1.07,
+    "max": 4.61
+   },
+   "descent_start_height_above_top_m": {
+    "n": 11,
+    "min": 0.78,
+    "median": 3.07,
+    "max": 6.4
+   },
+   "nearest_to_the_middle_m": {
+    "n": 12,
+    "min": 0.53,
+    "median": 1.14,
+    "max": 4.61
+   },
+   "touchdown_error_m": {
+    "n": 6,
+    "min": 0.8,
+    "median": 1.13,
+    "max": 1.95
+   },
+   "descent_decisions": {
+    "n": 12,
+    "min": 0,
+    "median": 9.0,
+    "max": 69
+   },
+   "flights_with_a_sign_flip": 3,
+   "sign_flips_in_all": 11,
+   "low_band": {
+    "decisions": 190,
+    "down_below_the_stop_band": 85,
+    "stop_decisions": 46,
+    "climbing": 37,
+    "share_below_the_stop_band": 0.447,
+    "median_down_m": {
+     "n": 12,
+     "min": -0.017,
+     "median": 0.17,
+     "max": 0.252
+    }
+   },
+   "air_self_stops": 6,
+   "air_self_stops_in_the_band": 5,
+   "touched_outside_the_region": 0,
+   "timeouts": 0,
+   "landed_on_another_object_or_hit": 0
+  }
+ },
+ "flights": {
+  "stage 1b (update 2000)": [
+   {
+    "id": "g1dp-82001-blue_cube-near_low_hover",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 43,
+    "highest_above_top_m": 2.95,
+    "touchdown_error_m": 0.7,
+    "inside_region": true,
+    "entry_height_above_top_m": 2.95,
+    "descent_start_distance_m": 0.76,
+    "descent_start_height_above_top_m": 2.95,
+    "sign_flips": 0,
+    "descent_decisions": 11,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 0.7,
+     "above_top_m": 1.99,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.7,
+    "nearest_to_the_middle_after_the_push_m": 0.7,
+    "highest_after_the_push_above_top_m": 1.99,
+    "low_band": {
+     "decisions": 9,
+     "median_down_m": 0.268,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.34
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82003-red_cube-near_low_hover",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 65,
+    "highest_above_top_m": 3.1,
+    "touchdown_error_m": 1.42,
+    "inside_region": true,
+    "entry_height_above_top_m": 3.1,
+    "descent_start_distance_m": 1.54,
+    "descent_start_height_above_top_m": 3.1,
+    "sign_flips": 0,
+    "descent_decisions": 7,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 1.42,
+     "above_top_m": 0.95,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 1.42,
+    "nearest_to_the_middle_after_the_push_m": 1.42,
+    "highest_after_the_push_above_top_m": 0.95,
+    "low_band": {
+     "decisions": 5,
+     "median_down_m": 0.243,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.04
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82005-blue_cube-mid_low_hover",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 48,
+    "highest_above_top_m": 4.32,
+    "touchdown_error_m": 1.33,
+    "inside_region": true,
+    "entry_height_above_top_m": 4.31,
+    "descent_start_distance_m": 1.66,
+    "descent_start_height_above_top_m": 4.31,
+    "sign_flips": 0,
+    "descent_decisions": 10,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 1.33,
+     "above_top_m": 1.57,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 1.33,
+    "nearest_to_the_middle_after_the_push_m": 1.33,
+    "highest_after_the_push_above_top_m": 1.57,
+    "low_band": {
+     "decisions": 7,
+     "median_down_m": 0.258,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.22
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82006-red_cube-mid_descent_decay",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 92,
+    "highest_above_top_m": 1.35,
+    "touchdown_error_m": 0.91,
+    "inside_region": true,
+    "entry_height_above_top_m": 1.35,
+    "descent_start_distance_m": 1.09,
+    "descent_start_height_above_top_m": 1.35,
+    "sign_flips": 0,
+    "descent_decisions": 5,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 0.9,
+     "above_top_m": 0.6,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.9,
+    "nearest_to_the_middle_after_the_push_m": 0.9,
+    "highest_after_the_push_above_top_m": 0.6,
+    "low_band": {
+     "decisions": 16,
+     "median_down_m": -0.005,
+     "down_below_the_stop_band": 9,
+     "climbing": 3,
+     "stop_decisions": 0,
+     "median_stop_ratio": 4.55
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82007-blue_cube-far_descent_decay",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 99,
+    "highest_above_top_m": 5.82,
+    "touchdown_error_m": 1.82,
+    "inside_region": true,
+    "entry_height_above_top_m": 5.82,
+    "descent_start_distance_m": 1.89,
+    "descent_start_height_above_top_m": 5.82,
+    "sign_flips": 0,
+    "descent_decisions": 9,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 1.82,
+     "above_top_m": 1.34,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 1.82,
+    "nearest_to_the_middle_after_the_push_m": 1.82,
+    "highest_after_the_push_above_top_m": 1.34,
+    "low_band": {
+     "decisions": 7,
+     "median_down_m": 0.206,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 2.58
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82008-red_cube-far_descent_decay",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 78,
+    "highest_above_top_m": 2.95,
+    "touchdown_error_m": 0.81,
+    "inside_region": true,
+    "entry_height_above_top_m": 2.94,
+    "descent_start_distance_m": 0.88,
+    "descent_start_height_above_top_m": 2.94,
+    "sign_flips": 0,
+    "descent_decisions": 6,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 0.81,
+     "above_top_m": 0.78,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.81,
+    "nearest_to_the_middle_after_the_push_m": 0.81,
+    "highest_after_the_push_above_top_m": 0.78,
+    "low_band": {
+     "decisions": 4,
+     "median_down_m": 0.25,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.12
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82010-blue_cube-near_edge_low",
+    "kind": "cube",
+    "success": false,
+    "reason": "landed",
+    "decisions": 66,
+    "highest_above_top_m": 4.62,
+    "touchdown_error_m": 4.62,
+    "inside_region": false,
+    "entry_height_above_top_m": 4.62,
+    "descent_start_distance_m": 5.01,
+    "descent_start_height_above_top_m": 4.62,
+    "sign_flips": 0,
+    "descent_decisions": 9,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 4.62,
+     "above_top_m": 1.48,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 4.62,
+    "nearest_to_the_middle_after_the_push_m": 4.62,
+    "highest_after_the_push_above_top_m": 1.48,
+    "low_band": {
+     "decisions": 7,
+     "median_down_m": 0.316,
+     "down_below_the_stop_band": 2,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 4.64
+    },
+    "end": "TOUCHDOWN",
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": {
+     "distance_m": 4.62,
+     "above_top_m": 0.0,
+     "over": true
+    }
+   },
+   {
+    "id": "g1dp-82012-red_cube-near_edge_low",
+    "kind": "cube",
+    "success": false,
+    "reason": "landed",
+    "decisions": 39,
+    "highest_above_top_m": 3.79,
+    "touchdown_error_m": 4.27,
+    "inside_region": false,
+    "entry_height_above_top_m": 1.2,
+    "descent_start_distance_m": 4.27,
+    "descent_start_height_above_top_m": 1.2,
+    "sign_flips": 0,
+    "descent_decisions": 7,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 4.27,
+     "above_top_m": 1.2,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 4.27,
+    "nearest_to_the_middle_after_the_push_m": 4.27,
+    "highest_after_the_push_above_top_m": 1.2,
+    "low_band": {
+     "decisions": 6,
+     "median_down_m": 0.27,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.37
+    },
+    "end": "TOUCHDOWN",
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": {
+     "distance_m": 4.27,
+     "above_top_m": 0.0,
+     "over": true
+    }
+   },
+   {
+    "id": "g1dp-82013-blue_cube-mid_edge_low",
+    "kind": "cube",
+    "success": false,
+    "reason": "landed",
+    "decisions": 76,
+    "highest_above_top_m": 2.43,
+    "touchdown_error_m": 4.16,
+    "inside_region": false,
+    "entry_height_above_top_m": null,
+    "descent_start_distance_m": 4.51,
+    "descent_start_height_above_top_m": 2.43,
+    "sign_flips": 0,
+    "descent_decisions": 10,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 4.17,
+     "above_top_m": 2.03,
+     "over": false
+    },
+    "nearest_to_the_middle_m": 4.16,
+    "nearest_to_the_middle_after_the_push_m": 4.16,
+    "highest_after_the_push_above_top_m": 2.03,
+    "low_band": {
+     "decisions": 9,
+     "median_down_m": 0.318,
+     "down_below_the_stop_band": 1,
+     "climbing": 2,
+     "stop_decisions": 0,
+     "median_stop_ratio": 4.74
+    },
+    "end": "TOUCHDOWN",
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": {
+     "distance_m": 4.16,
+     "above_top_m": 0.0,
+     "over": false
+    }
+   },
+   {
+    "id": "g1dp-82014-red_cube-mid_edge_drift",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 71,
+    "highest_above_top_m": 2.51,
+    "touchdown_error_m": 4.29,
+    "inside_region": true,
+    "entry_height_above_top_m": 2.51,
+    "descent_start_distance_m": 0.93,
+    "descent_start_height_above_top_m": 2.51,
+    "sign_flips": 0,
+    "descent_decisions": 8,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 3.69,
+     "above_top_m": 0.73,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.93,
+    "nearest_to_the_middle_after_the_push_m": 3.69,
+    "highest_after_the_push_above_top_m": 0.73,
+    "low_band": {
+     "decisions": 9,
+     "median_down_m": 0.119,
+     "down_below_the_stop_band": 0,
+     "climbing": 4,
+     "stop_decisions": 0,
+     "median_stop_ratio": 2.81
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82015-blue_cube-far_edge_drift",
+    "kind": "cube",
+    "success": false,
+    "reason": "landed",
+    "decisions": 100,
+    "highest_above_top_m": 3.6,
+    "touchdown_error_m": 4.82,
+    "inside_region": false,
+    "entry_height_above_top_m": 3.6,
+    "descent_start_distance_m": 0.6,
+    "descent_start_height_above_top_m": 3.6,
+    "sign_flips": 0,
+    "descent_decisions": 10,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 4.13,
+     "above_top_m": 1.35,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.6,
+    "nearest_to_the_middle_after_the_push_m": 4.13,
+    "highest_after_the_push_above_top_m": 1.35,
+    "low_band": {
+     "decisions": 8,
+     "median_down_m": 0.227,
+     "down_below_the_stop_band": 1,
+     "climbing": 0,
+     "stop_decisions": 1,
+     "median_stop_ratio": 2.83
+    },
+    "end": "TOUCHDOWN",
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": {
+     "distance_m": 4.82,
+     "above_top_m": 0.0,
+     "over": false
+    }
+   },
+   {
+    "id": "g1dp-82016-red_cube-far_edge_drift",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 55,
+    "highest_above_top_m": 0.64,
+    "touchdown_error_m": 2.74,
+    "inside_region": true,
+    "entry_height_above_top_m": 0.64,
+    "descent_start_distance_m": 4.0,
+    "descent_start_height_above_top_m": 0.64,
+    "sign_flips": 0,
+    "descent_decisions": 5,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 0,
+    "let_go": null,
+    "nearest_to_the_middle_m": 2.79,
+    "nearest_to_the_middle_after_the_push_m": null,
+    "highest_after_the_push_above_top_m": null,
+    "low_band": {
+     "decisions": 21,
+     "median_down_m": -0.002,
+     "down_below_the_stop_band": 16,
+     "climbing": 1,
+     "stop_decisions": 0,
+     "median_stop_ratio": 4.88
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   }
+  ],
+  "stage 1c (update 2000)": [
+   {
+    "id": "g1dp-82001-blue_cube-near_low_hover",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 43,
+    "highest_above_top_m": 4.36,
+    "touchdown_error_m": 0.93,
+    "inside_region": true,
+    "entry_height_above_top_m": 4.36,
+    "descent_start_distance_m": 0.64,
+    "descent_start_height_above_top_m": 4.36,
+    "sign_flips": 0,
+    "descent_decisions": 12,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 0.93,
+     "above_top_m": 1.96,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.64,
+    "nearest_to_the_middle_after_the_push_m": 0.93,
+    "highest_after_the_push_above_top_m": 1.96,
+    "low_band": {
+     "decisions": 14,
+     "median_down_m": 0.205,
+     "down_below_the_stop_band": 0,
+     "climbing": 4,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.15
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82003-red_cube-near_low_hover",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 67,
+    "highest_above_top_m": 5.36,
+    "touchdown_error_m": 1.53,
+    "inside_region": true,
+    "entry_height_above_top_m": 5.36,
+    "descent_start_distance_m": 1.6,
+    "descent_start_height_above_top_m": 5.36,
+    "sign_flips": 0,
+    "descent_decisions": 7,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 1.53,
+     "above_top_m": 0.96,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 1.53,
+    "nearest_to_the_middle_after_the_push_m": 1.53,
+    "highest_after_the_push_above_top_m": 0.96,
+    "low_band": {
+     "decisions": 5,
+     "median_down_m": 0.25,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.12
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82005-blue_cube-mid_low_hover",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 49,
+    "highest_above_top_m": 7.98,
+    "touchdown_error_m": 1.2,
+    "inside_region": true,
+    "entry_height_above_top_m": 7.97,
+    "descent_start_distance_m": 1.65,
+    "descent_start_height_above_top_m": 7.97,
+    "sign_flips": 0,
+    "descent_decisions": 10,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 1.2,
+     "above_top_m": 1.55,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 1.2,
+    "nearest_to_the_middle_after_the_push_m": 1.2,
+    "highest_after_the_push_above_top_m": 1.55,
+    "low_band": {
+     "decisions": 8,
+     "median_down_m": 0.244,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.05
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82006-red_cube-mid_descent_decay",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 88,
+    "highest_above_top_m": 4.46,
+    "touchdown_error_m": 0.82,
+    "inside_region": true,
+    "entry_height_above_top_m": 4.45,
+    "descent_start_distance_m": 1.04,
+    "descent_start_height_above_top_m": 4.45,
+    "sign_flips": 0,
+    "descent_decisions": 9,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 0.82,
+     "above_top_m": 1.68,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.82,
+    "nearest_to_the_middle_after_the_push_m": 0.82,
+    "highest_after_the_push_above_top_m": 1.68,
+    "low_band": {
+     "decisions": 7,
+     "median_down_m": 0.258,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.22
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82007-blue_cube-far_descent_decay",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 102,
+    "highest_above_top_m": 13.19,
+    "touchdown_error_m": 2.11,
+    "inside_region": true,
+    "entry_height_above_top_m": 13.19,
+    "descent_start_distance_m": 1.94,
+    "descent_start_height_above_top_m": 13.19,
+    "sign_flips": 0,
+    "descent_decisions": 9,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 2.11,
+     "above_top_m": 1.64,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 1.94,
+    "nearest_to_the_middle_after_the_push_m": 2.11,
+    "highest_after_the_push_above_top_m": 1.64,
+    "low_band": {
+     "decisions": 6,
+     "median_down_m": 0.262,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.27
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82008-red_cube-far_descent_decay",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 79,
+    "highest_above_top_m": 6.77,
+    "touchdown_error_m": 1.06,
+    "inside_region": true,
+    "entry_height_above_top_m": 6.77,
+    "descent_start_distance_m": 0.88,
+    "descent_start_height_above_top_m": 6.77,
+    "sign_flips": 0,
+    "descent_decisions": 7,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 1.06,
+     "above_top_m": 0.86,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.88,
+    "nearest_to_the_middle_after_the_push_m": 1.06,
+    "highest_after_the_push_above_top_m": 0.86,
+    "low_band": {
+     "decisions": 5,
+     "median_down_m": 0.25,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.12
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82010-blue_cube-near_edge_low",
+    "kind": "cube",
+    "success": false,
+    "reason": "landed",
+    "decisions": 68,
+    "highest_above_top_m": 6.07,
+    "touchdown_error_m": 4.58,
+    "inside_region": false,
+    "entry_height_above_top_m": 6.07,
+    "descent_start_distance_m": 4.58,
+    "descent_start_height_above_top_m": 1.5,
+    "sign_flips": 0,
+    "descent_decisions": 11,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 4.58,
+     "above_top_m": 1.5,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 4.58,
+    "nearest_to_the_middle_after_the_push_m": 4.58,
+    "highest_after_the_push_above_top_m": 1.5,
+    "low_band": {
+     "decisions": 9,
+     "median_down_m": 0.161,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.04
+    },
+    "end": "TOUCHDOWN",
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": {
+     "distance_m": 4.58,
+     "above_top_m": 0.0,
+     "over": true
+    }
+   },
+   {
+    "id": "g1dp-82012-red_cube-near_edge_low",
+    "kind": "cube",
+    "success": false,
+    "reason": "model_stop",
+    "decisions": 36,
+    "highest_above_top_m": 6.02,
+    "touchdown_error_m": null,
+    "inside_region": null,
+    "entry_height_above_top_m": 1.17,
+    "descent_start_distance_m": 4.36,
+    "descent_start_height_above_top_m": 1.17,
+    "sign_flips": 0,
+    "descent_decisions": 9,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 4.36,
+     "above_top_m": 1.17,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 4.36,
+    "nearest_to_the_middle_after_the_push_m": 4.36,
+    "highest_after_the_push_above_top_m": 1.17,
+    "low_band": {
+     "decisions": 8,
+     "median_down_m": 0.161,
+     "down_below_the_stop_band": 3,
+     "climbing": 0,
+     "stop_decisions": 3,
+     "median_stop_ratio": 2.01
+    },
+    "end": "AIR_SELF_STOP",
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": {
+     "distance_m": 4.36,
+     "above_top_m": 0.19,
+     "over": true
+    }
+   },
+   {
+    "id": "g1dp-82013-blue_cube-mid_edge_low",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 79,
+    "highest_above_top_m": 5.39,
+    "touchdown_error_m": 4.01,
+    "inside_region": true,
+    "entry_height_above_top_m": 5.39,
+    "descent_start_distance_m": 4.01,
+    "descent_start_height_above_top_m": 1.98,
+    "sign_flips": 0,
+    "descent_decisions": 13,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 4.01,
+     "above_top_m": 2.0,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 4.01,
+    "nearest_to_the_middle_after_the_push_m": 4.01,
+    "highest_after_the_push_above_top_m": 2.0,
+    "low_band": {
+     "decisions": 13,
+     "median_down_m": 0.166,
+     "down_below_the_stop_band": 1,
+     "climbing": 0,
+     "stop_decisions": 1,
+     "median_stop_ratio": 2.08
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82014-red_cube-mid_edge_drift",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 48,
+    "highest_above_top_m": 3.16,
+    "touchdown_error_m": 4.29,
+    "inside_region": true,
+    "entry_height_above_top_m": 3.16,
+    "descent_start_distance_m": 0.91,
+    "descent_start_height_above_top_m": 3.16,
+    "sign_flips": 0,
+    "descent_decisions": 7,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 3.7,
+     "above_top_m": 0.56,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.91,
+    "nearest_to_the_middle_after_the_push_m": 3.7,
+    "highest_after_the_push_above_top_m": 0.56,
+    "low_band": {
+     "decisions": 9,
+     "median_down_m": 0.077,
+     "down_below_the_stop_band": 1,
+     "climbing": 4,
+     "stop_decisions": 1,
+     "median_stop_ratio": 2.6
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82015-blue_cube-far_edge_drift",
+    "kind": "cube",
+    "success": false,
+    "reason": "model_stop",
+    "decisions": 167,
+    "highest_above_top_m": 6.93,
+    "touchdown_error_m": null,
+    "inside_region": null,
+    "entry_height_above_top_m": 6.15,
+    "descent_start_distance_m": 4.97,
+    "descent_start_height_above_top_m": 6.93,
+    "sign_flips": 0,
+    "descent_decisions": 18,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 4.08,
+     "above_top_m": 1.37,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.58,
+    "nearest_to_the_middle_after_the_push_m": 4.08,
+    "highest_after_the_push_above_top_m": 6.93,
+    "low_band": {
+     "decisions": 5,
+     "median_down_m": -0.205,
+     "down_below_the_stop_band": 0,
+     "climbing": 5,
+     "stop_decisions": 0,
+     "median_stop_ratio": 10.69
+    },
+    "end": "AIR_SELF_STOP",
+    "ended_by_its_own_stop_in_the_band": true,
+    "end_place": {
+     "distance_m": 4.29,
+     "above_top_m": 2.09,
+     "over": true
+    }
+   },
+   {
+    "id": "g1dp-82016-red_cube-far_edge_drift",
+    "kind": "cube",
+    "success": false,
+    "reason": "model_stop",
+    "decisions": 178,
+    "highest_above_top_m": 5.91,
+    "touchdown_error_m": null,
+    "inside_region": null,
+    "entry_height_above_top_m": 5.9,
+    "descent_start_distance_m": 0.95,
+    "descent_start_height_above_top_m": 5.9,
+    "sign_flips": 15,
+    "descent_decisions": 141,
+    "climbs_after_the_descent_began": 39,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 3.9,
+     "above_top_m": 0.62,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.95,
+    "nearest_to_the_middle_after_the_push_m": 3.9,
+    "highest_after_the_push_above_top_m": 2.88,
+    "low_band": {
+     "decisions": 57,
+     "median_down_m": 0.001,
+     "down_below_the_stop_band": 29,
+     "climbing": 15,
+     "stop_decisions": 4,
+     "median_stop_ratio": 3.2
+    },
+    "end": "AIR_SELF_STOP",
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": {
+     "distance_m": 4.66,
+     "above_top_m": 2.88,
+     "over": false
+    }
+   }
+  ],
+  "stage 1d update 500": [
+   {
+    "id": "g1dp-82001-blue_cube-near_low_hover",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 42,
+    "highest_above_top_m": 3.7,
+    "touchdown_error_m": 0.89,
+    "inside_region": true,
+    "entry_height_above_top_m": 3.7,
+    "descent_start_distance_m": 0.65,
+    "descent_start_height_above_top_m": 3.7,
+    "sign_flips": 0,
+    "descent_decisions": 13,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 0.89,
+     "above_top_m": 2.0,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.65,
+    "nearest_to_the_middle_after_the_push_m": 0.89,
+    "highest_after_the_push_above_top_m": 2.0,
+    "low_band": {
+     "decisions": 15,
+     "median_down_m": 0.158,
+     "down_below_the_stop_band": 0,
+     "climbing": 4,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.04
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82003-red_cube-near_low_hover",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 62,
+    "highest_above_top_m": 4.41,
+    "touchdown_error_m": 1.34,
+    "inside_region": true,
+    "entry_height_above_top_m": 4.41,
+    "descent_start_distance_m": 1.6,
+    "descent_start_height_above_top_m": 4.41,
+    "sign_flips": 0,
+    "descent_decisions": 7,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 1.34,
+     "above_top_m": 0.96,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 1.34,
+    "nearest_to_the_middle_after_the_push_m": 1.34,
+    "highest_after_the_push_above_top_m": 0.96,
+    "low_band": {
+     "decisions": 5,
+     "median_down_m": 0.248,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.1
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82005-blue_cube-mid_low_hover",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 49,
+    "highest_above_top_m": 8.4,
+    "touchdown_error_m": 1.19,
+    "inside_region": true,
+    "entry_height_above_top_m": 8.39,
+    "descent_start_distance_m": 1.64,
+    "descent_start_height_above_top_m": 8.39,
+    "sign_flips": 0,
+    "descent_decisions": 10,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 1.19,
+     "above_top_m": 1.56,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 1.19,
+    "nearest_to_the_middle_after_the_push_m": 1.19,
+    "highest_after_the_push_above_top_m": 1.56,
+    "low_band": {
+     "decisions": 8,
+     "median_down_m": 0.239,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 2.99
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82006-red_cube-mid_descent_decay",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 88,
+    "highest_above_top_m": 4.83,
+    "touchdown_error_m": 1.04,
+    "inside_region": true,
+    "entry_height_above_top_m": 4.82,
+    "descent_start_distance_m": 1.06,
+    "descent_start_height_above_top_m": 4.82,
+    "sign_flips": 0,
+    "descent_decisions": 10,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 1.04,
+     "above_top_m": 1.81,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 1.04,
+    "nearest_to_the_middle_after_the_push_m": 1.04,
+    "highest_after_the_push_above_top_m": 1.81,
+    "low_band": {
+     "decisions": 8,
+     "median_down_m": 0.246,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.08
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82007-blue_cube-far_descent_decay",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 100,
+    "highest_above_top_m": 10.98,
+    "touchdown_error_m": 1.98,
+    "inside_region": true,
+    "entry_height_above_top_m": 10.98,
+    "descent_start_distance_m": 1.94,
+    "descent_start_height_above_top_m": 10.98,
+    "sign_flips": 0,
+    "descent_decisions": 8,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 1.98,
+     "above_top_m": 1.16,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 1.94,
+    "nearest_to_the_middle_after_the_push_m": 1.98,
+    "highest_after_the_push_above_top_m": 1.16,
+    "low_band": {
+     "decisions": 6,
+     "median_down_m": 0.245,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.06
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82008-red_cube-far_descent_decay",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 80,
+    "highest_above_top_m": 7.01,
+    "touchdown_error_m": 0.97,
+    "inside_region": true,
+    "entry_height_above_top_m": 7.01,
+    "descent_start_distance_m": 0.96,
+    "descent_start_height_above_top_m": 7.01,
+    "sign_flips": 0,
+    "descent_decisions": 6,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 0.97,
+     "above_top_m": 0.62,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.96,
+    "nearest_to_the_middle_after_the_push_m": 0.97,
+    "highest_after_the_push_above_top_m": 0.62,
+    "low_band": {
+     "decisions": 4,
+     "median_down_m": 0.241,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.02
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82010-blue_cube-near_edge_low",
+    "kind": "cube",
+    "success": false,
+    "reason": "model_stop",
+    "decisions": 47,
+    "highest_above_top_m": 5.72,
+    "touchdown_error_m": null,
+    "inside_region": null,
+    "entry_height_above_top_m": 5.72,
+    "descent_start_distance_m": 4.64,
+    "descent_start_height_above_top_m": 1.49,
+    "sign_flips": 0,
+    "descent_decisions": 10,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 4.64,
+     "above_top_m": 1.5,
+     "over": false
+    },
+    "nearest_to_the_middle_m": 4.64,
+    "nearest_to_the_middle_after_the_push_m": 4.64,
+    "highest_after_the_push_above_top_m": 1.5,
+    "low_band": {
+     "decisions": 13,
+     "median_down_m": 0.022,
+     "down_below_the_stop_band": 10,
+     "climbing": 0,
+     "stop_decisions": 7,
+     "median_stop_ratio": 0.84
+    },
+    "end": "AIR_SELF_STOP",
+    "ended_by_its_own_stop_in_the_band": true,
+    "end_place": {
+     "distance_m": 4.64,
+     "above_top_m": 1.0,
+     "over": false
+    }
+   },
+   {
+    "id": "g1dp-82012-red_cube-near_edge_low",
+    "kind": "cube",
+    "success": false,
+    "reason": "model_stop",
+    "decisions": 33,
+    "highest_above_top_m": 5.49,
+    "touchdown_error_m": null,
+    "inside_region": null,
+    "entry_height_above_top_m": 1.2,
+    "descent_start_distance_m": 4.27,
+    "descent_start_height_above_top_m": 1.2,
+    "sign_flips": 0,
+    "descent_decisions": 9,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 4.27,
+     "above_top_m": 1.2,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 4.27,
+    "nearest_to_the_middle_after_the_push_m": 4.27,
+    "highest_after_the_push_above_top_m": 1.2,
+    "low_band": {
+     "decisions": 11,
+     "median_down_m": 0.029,
+     "down_below_the_stop_band": 3,
+     "climbing": 3,
+     "stop_decisions": 3,
+     "median_stop_ratio": 2.82
+    },
+    "end": "AIR_SELF_STOP",
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": {
+     "distance_m": 4.27,
+     "above_top_m": 0.17,
+     "over": true
+    }
+   },
+   {
+    "id": "g1dp-82013-blue_cube-mid_edge_low",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 83,
+    "highest_above_top_m": 5.61,
+    "touchdown_error_m": 2.88,
+    "inside_region": true,
+    "entry_height_above_top_m": 5.61,
+    "descent_start_distance_m": 3.3,
+    "descent_start_height_above_top_m": 1.96,
+    "sign_flips": 0,
+    "descent_decisions": 10,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 3.85,
+     "above_top_m": 1.98,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 2.88,
+    "nearest_to_the_middle_after_the_push_m": 2.88,
+    "highest_after_the_push_above_top_m": 1.98,
+    "low_band": {
+     "decisions": 16,
+     "median_down_m": 0.184,
+     "down_below_the_stop_band": 7,
+     "climbing": 0,
+     "stop_decisions": 1,
+     "median_stop_ratio": 3.09
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82014-red_cube-mid_edge_drift",
+    "kind": "cube",
+    "success": false,
+    "reason": "model_stop",
+    "decisions": 45,
+    "highest_above_top_m": 2.64,
+    "touchdown_error_m": null,
+    "inside_region": null,
+    "entry_height_above_top_m": 2.64,
+    "descent_start_distance_m": 0.98,
+    "descent_start_height_above_top_m": 2.64,
+    "sign_flips": 0,
+    "descent_decisions": 16,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 3.67,
+     "above_top_m": 0.6,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.98,
+    "nearest_to_the_middle_after_the_push_m": 3.67,
+    "highest_after_the_push_above_top_m": 0.6,
+    "low_band": {
+     "decisions": 20,
+     "median_down_m": -0.002,
+     "down_below_the_stop_band": 14,
+     "climbing": 5,
+     "stop_decisions": 8,
+     "median_stop_ratio": 1.77
+    },
+    "end": "AIR_SELF_STOP",
+    "ended_by_its_own_stop_in_the_band": true,
+    "end_place": {
+     "distance_m": 4.4,
+     "above_top_m": 0.39,
+     "over": true
+    }
+   },
+   {
+    "id": "g1dp-82015-blue_cube-far_edge_drift",
+    "kind": "cube",
+    "success": false,
+    "reason": "model_stop",
+    "decisions": 92,
+    "highest_above_top_m": 7.18,
+    "touchdown_error_m": null,
+    "inside_region": null,
+    "entry_height_above_top_m": 7.18,
+    "descent_start_distance_m": 0.62,
+    "descent_start_height_above_top_m": 7.18,
+    "sign_flips": 3,
+    "descent_decisions": 17,
+    "climbs_after_the_descent_began": 3,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 4.0,
+     "above_top_m": 1.28,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.62,
+    "nearest_to_the_middle_after_the_push_m": 4.0,
+    "highest_after_the_push_above_top_m": 1.28,
+    "low_band": {
+     "decisions": 15,
+     "median_down_m": 0.047,
+     "down_below_the_stop_band": 6,
+     "climbing": 2,
+     "stop_decisions": 6,
+     "median_stop_ratio": 1.9
+    },
+    "end": "AIR_SELF_STOP",
+    "ended_by_its_own_stop_in_the_band": true,
+    "end_place": {
+     "distance_m": 4.74,
+     "above_top_m": 0.29,
+     "over": false
+    }
+   },
+   {
+    "id": "g1dp-82016-red_cube-far_edge_drift",
+    "kind": "cube",
+    "success": false,
+    "reason": "model_stop",
+    "decisions": 67,
+    "highest_above_top_m": 6.2,
+    "touchdown_error_m": null,
+    "inside_region": null,
+    "entry_height_above_top_m": 6.2,
+    "descent_start_distance_m": 0.94,
+    "descent_start_height_above_top_m": 6.2,
+    "sign_flips": 1,
+    "descent_decisions": 30,
+    "climbs_after_the_descent_began": 2,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 3.82,
+     "above_top_m": 0.64,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.94,
+    "nearest_to_the_middle_after_the_push_m": 3.82,
+    "highest_after_the_push_above_top_m": 0.91,
+    "low_band": {
+     "decisions": 29,
+     "median_down_m": -0.002,
+     "down_below_the_stop_band": 27,
+     "climbing": 2,
+     "stop_decisions": 7,
+     "median_stop_ratio": 4.57
+    },
+    "end": "AIR_SELF_STOP",
+    "ended_by_its_own_stop_in_the_band": true,
+    "end_place": {
+     "distance_m": 4.49,
+     "above_top_m": 0.91,
+     "over": true
+    }
+   }
+  ],
+  "stage 1d update 1000": [
+   {
+    "id": "g1dp-82001-blue_cube-near_low_hover",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 42,
+    "highest_above_top_m": 4.27,
+    "touchdown_error_m": 0.8,
+    "inside_region": true,
+    "entry_height_above_top_m": 4.27,
+    "descent_start_distance_m": 0.77,
+    "descent_start_height_above_top_m": 4.27,
+    "sign_flips": 0,
+    "descent_decisions": 12,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 0.8,
+     "above_top_m": 1.98,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.77,
+    "nearest_to_the_middle_after_the_push_m": 0.8,
+    "highest_after_the_push_above_top_m": 1.98,
+    "low_band": {
+     "decisions": 14,
+     "median_down_m": 0.245,
+     "down_below_the_stop_band": 0,
+     "climbing": 4,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.17
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82003-red_cube-near_low_hover",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 67,
+    "highest_above_top_m": 6.35,
+    "touchdown_error_m": 1.47,
+    "inside_region": true,
+    "entry_height_above_top_m": 6.35,
+    "descent_start_distance_m": 1.53,
+    "descent_start_height_above_top_m": 6.35,
+    "sign_flips": 0,
+    "descent_decisions": 7,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 1.47,
+     "above_top_m": 0.94,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 1.47,
+    "nearest_to_the_middle_after_the_push_m": 1.47,
+    "highest_after_the_push_above_top_m": 0.94,
+    "low_band": {
+     "decisions": 5,
+     "median_down_m": 0.249,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.11
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82005-blue_cube-mid_low_hover",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 50,
+    "highest_above_top_m": 7.2,
+    "touchdown_error_m": 1.26,
+    "inside_region": true,
+    "entry_height_above_top_m": 7.19,
+    "descent_start_distance_m": 1.26,
+    "descent_start_height_above_top_m": 1.54,
+    "sign_flips": 0,
+    "descent_decisions": 9,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 1.26,
+     "above_top_m": 1.54,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 1.26,
+    "nearest_to_the_middle_after_the_push_m": 1.26,
+    "highest_after_the_push_above_top_m": 1.54,
+    "low_band": {
+     "decisions": 8,
+     "median_down_m": 0.248,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.1
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82006-red_cube-mid_descent_decay",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 89,
+    "highest_above_top_m": 4.86,
+    "touchdown_error_m": 0.79,
+    "inside_region": true,
+    "entry_height_above_top_m": 4.86,
+    "descent_start_distance_m": 0.79,
+    "descent_start_height_above_top_m": 1.63,
+    "sign_flips": 0,
+    "descent_decisions": 8,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 0.79,
+     "above_top_m": 1.63,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.79,
+    "nearest_to_the_middle_after_the_push_m": 0.79,
+    "highest_after_the_push_above_top_m": 1.63,
+    "low_band": {
+     "decisions": 7,
+     "median_down_m": 0.247,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.09
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82007-blue_cube-far_descent_decay",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 113,
+    "highest_above_top_m": 7.06,
+    "touchdown_error_m": 1.7,
+    "inside_region": true,
+    "entry_height_above_top_m": 7.06,
+    "descent_start_distance_m": 1.9,
+    "descent_start_height_above_top_m": 7.06,
+    "sign_flips": 0,
+    "descent_decisions": 7,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 1.7,
+     "above_top_m": 1.13,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 1.7,
+    "nearest_to_the_middle_after_the_push_m": 1.7,
+    "highest_after_the_push_above_top_m": 1.13,
+    "low_band": {
+     "decisions": 5,
+     "median_down_m": 0.25,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.12
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82008-red_cube-far_descent_decay",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 78,
+    "highest_above_top_m": 4.77,
+    "touchdown_error_m": 0.94,
+    "inside_region": true,
+    "entry_height_above_top_m": 4.75,
+    "descent_start_distance_m": 0.84,
+    "descent_start_height_above_top_m": 4.75,
+    "sign_flips": 0,
+    "descent_decisions": 6,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 0.94,
+     "above_top_m": 0.79,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.84,
+    "nearest_to_the_middle_after_the_push_m": 0.94,
+    "highest_after_the_push_above_top_m": 0.79,
+    "low_band": {
+     "decisions": 4,
+     "median_down_m": 0.256,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.2
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82010-blue_cube-near_edge_low",
+    "kind": "cube",
+    "success": false,
+    "reason": "model_stop",
+    "decisions": 113,
+    "highest_above_top_m": 7.34,
+    "touchdown_error_m": null,
+    "inside_region": null,
+    "entry_height_above_top_m": 7.34,
+    "descent_start_distance_m": 4.65,
+    "descent_start_height_above_top_m": 1.5,
+    "sign_flips": 13,
+    "descent_decisions": 74,
+    "climbs_after_the_descent_began": 23,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 4.65,
+     "above_top_m": 1.5,
+     "over": false
+    },
+    "nearest_to_the_middle_m": 4.65,
+    "nearest_to_the_middle_after_the_push_m": 4.65,
+    "highest_after_the_push_above_top_m": 1.5,
+    "low_band": {
+     "decisions": 74,
+     "median_down_m": 0.035,
+     "down_below_the_stop_band": 23,
+     "climbing": 23,
+     "stop_decisions": 19,
+     "median_stop_ratio": 1.72
+    },
+    "end": "AIR_SELF_STOP",
+    "ended_by_its_own_stop_in_the_band": true,
+    "end_place": {
+     "distance_m": 4.65,
+     "above_top_m": 1.13,
+     "over": false
+    }
+   },
+   {
+    "id": "g1dp-82012-red_cube-near_edge_low",
+    "kind": "cube",
+    "success": false,
+    "reason": "landed",
+    "decisions": 37,
+    "highest_above_top_m": 5.62,
+    "touchdown_error_m": 4.47,
+    "inside_region": false,
+    "entry_height_above_top_m": 1.16,
+    "descent_start_distance_m": 4.47,
+    "descent_start_height_above_top_m": 1.16,
+    "sign_flips": 0,
+    "descent_decisions": 9,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 4.47,
+     "above_top_m": 1.16,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 4.47,
+    "nearest_to_the_middle_after_the_push_m": 4.47,
+    "highest_after_the_push_above_top_m": 1.16,
+    "low_band": {
+     "decisions": 11,
+     "median_down_m": 0.162,
+     "down_below_the_stop_band": 1,
+     "climbing": 4,
+     "stop_decisions": 1,
+     "median_stop_ratio": 2.88
+    },
+    "end": "TOUCHDOWN",
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": {
+     "distance_m": 4.47,
+     "above_top_m": 0.0,
+     "over": true
+    }
+   },
+   {
+    "id": "g1dp-82013-blue_cube-mid_edge_low",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 78,
+    "highest_above_top_m": 6.0,
+    "touchdown_error_m": 4.25,
+    "inside_region": true,
+    "entry_height_above_top_m": 6.0,
+    "descent_start_distance_m": 4.25,
+    "descent_start_height_above_top_m": 1.98,
+    "sign_flips": 0,
+    "descent_decisions": 17,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 4.25,
+     "above_top_m": 1.98,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 4.25,
+    "nearest_to_the_middle_after_the_push_m": 4.25,
+    "highest_after_the_push_above_top_m": 1.98,
+    "low_band": {
+     "decisions": 15,
+     "median_down_m": 0.137,
+     "down_below_the_stop_band": 5,
+     "climbing": 0,
+     "stop_decisions": 5,
+     "median_stop_ratio": 1.71
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82014-red_cube-mid_edge_drift",
+    "kind": "cube",
+    "success": false,
+    "reason": "model_stop",
+    "decisions": 45,
+    "highest_above_top_m": 2.9,
+    "touchdown_error_m": null,
+    "inside_region": null,
+    "entry_height_above_top_m": 2.9,
+    "descent_start_distance_m": 0.95,
+    "descent_start_height_above_top_m": 2.9,
+    "sign_flips": 1,
+    "descent_decisions": 14,
+    "climbs_after_the_descent_began": 3,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 3.7,
+     "above_top_m": 0.8,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.95,
+    "nearest_to_the_middle_after_the_push_m": 3.7,
+    "highest_after_the_push_above_top_m": 1.33,
+    "low_band": {
+     "decisions": 17,
+     "median_down_m": -0.072,
+     "down_below_the_stop_band": 10,
+     "climbing": 7,
+     "stop_decisions": 5,
+     "median_stop_ratio": 2.72
+    },
+    "end": "AIR_SELF_STOP",
+    "ended_by_its_own_stop_in_the_band": true,
+    "end_place": {
+     "distance_m": 4.39,
+     "above_top_m": 1.33,
+     "over": true
+    }
+   },
+   {
+    "id": "g1dp-82015-blue_cube-far_edge_drift",
+    "kind": "cube",
+    "success": false,
+    "reason": "model_stop",
+    "decisions": 94,
+    "highest_above_top_m": 6.61,
+    "touchdown_error_m": null,
+    "inside_region": null,
+    "entry_height_above_top_m": 6.6,
+    "descent_start_distance_m": 0.61,
+    "descent_start_height_above_top_m": 6.6,
+    "sign_flips": 3,
+    "descent_decisions": 18,
+    "climbs_after_the_descent_began": 4,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 4.12,
+     "above_top_m": 1.31,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.61,
+    "nearest_to_the_middle_after_the_push_m": 4.12,
+    "highest_after_the_push_above_top_m": 1.31,
+    "low_band": {
+     "decisions": 17,
+     "median_down_m": -0.013,
+     "down_below_the_stop_band": 7,
+     "climbing": 4,
+     "stop_decisions": 7,
+     "median_stop_ratio": 1.15
+    },
+    "end": "AIR_SELF_STOP",
+    "ended_by_its_own_stop_in_the_band": true,
+    "end_place": {
+     "distance_m": 4.83,
+     "above_top_m": 0.88,
+     "over": false
+    }
+   },
+   {
+    "id": "g1dp-82016-red_cube-far_edge_drift",
+    "kind": "cube",
+    "success": false,
+    "reason": "model_stop",
+    "decisions": 75,
+    "highest_above_top_m": 6.27,
+    "touchdown_error_m": null,
+    "inside_region": null,
+    "entry_height_above_top_m": 6.27,
+    "descent_start_distance_m": 0.95,
+    "descent_start_height_above_top_m": 6.27,
+    "sign_flips": 1,
+    "descent_decisions": 37,
+    "climbs_after_the_descent_began": 1,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 3.89,
+     "above_top_m": 0.82,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.95,
+    "nearest_to_the_middle_after_the_push_m": 3.89,
+    "highest_after_the_push_above_top_m": 1.12,
+    "low_band": {
+     "decisions": 36,
+     "median_down_m": -0.002,
+     "down_below_the_stop_band": 34,
+     "climbing": 1,
+     "stop_decisions": 12,
+     "median_stop_ratio": 3.15
+    },
+    "end": "AIR_SELF_STOP",
+    "ended_by_its_own_stop_in_the_band": true,
+    "end_place": {
+     "distance_m": 4.46,
+     "above_top_m": 1.12,
+     "over": true
+    }
+   }
+  ],
+  "stage 1d update 1500": [
+   {
+    "id": "g1dp-82001-blue_cube-near_low_hover",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 41,
+    "highest_above_top_m": 4.34,
+    "touchdown_error_m": 0.8,
+    "inside_region": true,
+    "entry_height_above_top_m": 4.34,
+    "descent_start_distance_m": 0.76,
+    "descent_start_height_above_top_m": 4.34,
+    "sign_flips": 0,
+    "descent_decisions": 12,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 0.8,
+     "above_top_m": 1.97,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.76,
+    "nearest_to_the_middle_after_the_push_m": 0.8,
+    "highest_after_the_push_above_top_m": 1.97,
+    "low_band": {
+     "decisions": 14,
+     "median_down_m": 0.247,
+     "down_below_the_stop_band": 0,
+     "climbing": 4,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.22
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82003-red_cube-near_low_hover",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 64,
+    "highest_above_top_m": 6.4,
+    "touchdown_error_m": 1.54,
+    "inside_region": true,
+    "entry_height_above_top_m": 6.4,
+    "descent_start_distance_m": 1.56,
+    "descent_start_height_above_top_m": 6.4,
+    "sign_flips": 0,
+    "descent_decisions": 7,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 1.54,
+     "above_top_m": 0.96,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 1.54,
+    "nearest_to_the_middle_after_the_push_m": 1.54,
+    "highest_after_the_push_above_top_m": 0.96,
+    "low_band": {
+     "decisions": 5,
+     "median_down_m": 0.246,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.08
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82005-blue_cube-mid_low_hover",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 50,
+    "highest_above_top_m": 7.99,
+    "touchdown_error_m": 1.25,
+    "inside_region": true,
+    "entry_height_above_top_m": 7.99,
+    "descent_start_distance_m": 1.25,
+    "descent_start_height_above_top_m": 1.55,
+    "sign_flips": 0,
+    "descent_decisions": 9,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 1.25,
+     "above_top_m": 1.55,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 1.25,
+    "nearest_to_the_middle_after_the_push_m": 1.25,
+    "highest_after_the_push_above_top_m": 1.55,
+    "low_band": {
+     "decisions": 8,
+     "median_down_m": 0.247,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.09
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82006-red_cube-mid_descent_decay",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 88,
+    "highest_above_top_m": 4.91,
+    "touchdown_error_m": 0.8,
+    "inside_region": true,
+    "entry_height_above_top_m": 4.91,
+    "descent_start_distance_m": 1.07,
+    "descent_start_height_above_top_m": 4.91,
+    "sign_flips": 0,
+    "descent_decisions": 9,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 0.8,
+     "above_top_m": 1.65,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.8,
+    "nearest_to_the_middle_after_the_push_m": 0.8,
+    "highest_after_the_push_above_top_m": 1.65,
+    "low_band": {
+     "decisions": 7,
+     "median_down_m": 0.252,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.15
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82007-blue_cube-far_descent_decay",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 102,
+    "highest_above_top_m": 11.2,
+    "touchdown_error_m": 1.95,
+    "inside_region": true,
+    "entry_height_above_top_m": 11.2,
+    "descent_start_distance_m": 1.95,
+    "descent_start_height_above_top_m": 1.23,
+    "sign_flips": 0,
+    "descent_decisions": 7,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 1.95,
+     "above_top_m": 1.23,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 1.91,
+    "nearest_to_the_middle_after_the_push_m": 1.95,
+    "highest_after_the_push_above_top_m": 1.23,
+    "low_band": {
+     "decisions": 6,
+     "median_down_m": 0.232,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 2.91
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82008-red_cube-far_descent_decay",
+    "kind": "cube",
+    "success": true,
+    "reason": "landed",
+    "decisions": 80,
+    "highest_above_top_m": 6.73,
+    "touchdown_error_m": 1.01,
+    "inside_region": true,
+    "entry_height_above_top_m": 6.73,
+    "descent_start_distance_m": 1.01,
+    "descent_start_height_above_top_m": 0.78,
+    "sign_flips": 0,
+    "descent_decisions": 5,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 1.01,
+     "above_top_m": 0.78,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.88,
+    "nearest_to_the_middle_after_the_push_m": 1.01,
+    "highest_after_the_push_above_top_m": 0.78,
+    "low_band": {
+     "decisions": 4,
+     "median_down_m": 0.248,
+     "down_below_the_stop_band": 0,
+     "climbing": 0,
+     "stop_decisions": 0,
+     "median_stop_ratio": 3.1
+    },
+    "end": null,
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": null
+   },
+   {
+    "id": "g1dp-82010-blue_cube-near_edge_low",
+    "kind": "cube",
+    "success": false,
+    "reason": "model_stop",
+    "decisions": 49,
+    "highest_above_top_m": 7.21,
+    "touchdown_error_m": null,
+    "inside_region": null,
+    "entry_height_above_top_m": 7.21,
+    "descent_start_distance_m": 4.61,
+    "descent_start_height_above_top_m": 1.48,
+    "sign_flips": 0,
+    "descent_decisions": 7,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 4.61,
+     "above_top_m": 1.49,
+     "over": false
+    },
+    "nearest_to_the_middle_m": 4.61,
+    "nearest_to_the_middle_after_the_push_m": 4.61,
+    "highest_after_the_push_above_top_m": 1.49,
+    "low_band": {
+     "decisions": 10,
+     "median_down_m": 0.026,
+     "down_below_the_stop_band": 9,
+     "climbing": 0,
+     "stop_decisions": 5,
+     "median_stop_ratio": 1.17
+    },
+    "end": "AIR_SELF_STOP",
+    "ended_by_its_own_stop_in_the_band": true,
+    "end_place": {
+     "distance_m": 4.61,
+     "above_top_m": 1.23,
+     "over": false
+    }
+   },
+   {
+    "id": "g1dp-82012-red_cube-near_edge_low",
+    "kind": "cube",
+    "success": false,
+    "reason": "model_stop",
+    "decisions": 37,
+    "highest_above_top_m": 5.83,
+    "touchdown_error_m": null,
+    "inside_region": null,
+    "entry_height_above_top_m": 1.18,
+    "descent_start_distance_m": 4.35,
+    "descent_start_height_above_top_m": 1.18,
+    "sign_flips": 0,
+    "descent_decisions": 12,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 4.35,
+     "above_top_m": 1.18,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 4.35,
+    "nearest_to_the_middle_after_the_push_m": 4.35,
+    "highest_after_the_push_above_top_m": 1.18,
+    "low_band": {
+     "decisions": 14,
+     "median_down_m": 0.106,
+     "down_below_the_stop_band": 3,
+     "climbing": 4,
+     "stop_decisions": 3,
+     "median_stop_ratio": 2.04
+    },
+    "end": "AIR_SELF_STOP",
+    "ended_by_its_own_stop_in_the_band": false,
+    "end_place": {
+     "distance_m": 4.35,
+     "above_top_m": 0.09,
+     "over": true
+    }
+   },
+   {
+    "id": "g1dp-82013-blue_cube-mid_edge_low",
+    "kind": "cube",
+    "success": false,
+    "reason": "model_stop",
+    "decisions": 50,
+    "highest_above_top_m": 6.08,
+    "touchdown_error_m": null,
+    "inside_region": null,
+    "entry_height_above_top_m": 6.08,
+    "descent_start_distance_m": null,
+    "descent_start_height_above_top_m": null,
+    "sign_flips": 0,
+    "descent_decisions": 0,
+    "climbs_after_the_descent_began": 0,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 3.91,
+     "above_top_m": 1.99,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 3.9,
+    "nearest_to_the_middle_after_the_push_m": 3.9,
+    "highest_after_the_push_above_top_m": 1.99,
+    "low_band": {
+     "decisions": 4,
+     "median_down_m": -0.001,
+     "down_below_the_stop_band": 4,
+     "climbing": 0,
+     "stop_decisions": 4,
+     "median_stop_ratio": 0.42
+    },
+    "end": "AIR_SELF_STOP",
+    "ended_by_its_own_stop_in_the_band": true,
+    "end_place": {
+     "distance_m": 3.9,
+     "above_top_m": 1.97,
+     "over": true
+    }
+   },
+   {
+    "id": "g1dp-82014-red_cube-mid_edge_drift",
+    "kind": "cube",
+    "success": false,
+    "reason": "model_stop",
+    "decisions": 100,
+    "highest_above_top_m": 3.07,
+    "touchdown_error_m": null,
+    "inside_region": null,
+    "entry_height_above_top_m": 3.07,
+    "descent_start_distance_m": 1.02,
+    "descent_start_height_above_top_m": 3.07,
+    "sign_flips": 2,
+    "descent_decisions": 69,
+    "climbs_after_the_descent_began": 7,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 3.68,
+     "above_top_m": 0.8,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 1.02,
+    "nearest_to_the_middle_after_the_push_m": 3.68,
+    "highest_after_the_push_above_top_m": 2.37,
+    "low_band": {
+     "decisions": 33,
+     "median_down_m": -0.003,
+     "down_below_the_stop_band": 18,
+     "climbing": 11,
+     "stop_decisions": 7,
+     "median_stop_ratio": 2.06
+    },
+    "end": "AIR_SELF_STOP",
+    "ended_by_its_own_stop_in_the_band": true,
+    "end_place": {
+     "distance_m": 4.38,
+     "above_top_m": 0.49,
+     "over": true
+    }
+   },
+   {
+    "id": "g1dp-82015-blue_cube-far_edge_drift",
+    "kind": "cube",
+    "success": false,
+    "reason": "model_stop",
+    "decisions": 121,
+    "highest_above_top_m": 6.33,
+    "touchdown_error_m": null,
+    "inside_region": null,
+    "entry_height_above_top_m": 6.33,
+    "descent_start_distance_m": 0.53,
+    "descent_start_height_above_top_m": 6.33,
+    "sign_flips": 8,
+    "descent_decisions": 47,
+    "climbs_after_the_descent_began": 14,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 4.0,
+     "above_top_m": 1.33,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.53,
+    "nearest_to_the_middle_after_the_push_m": 4.0,
+    "highest_after_the_push_above_top_m": 1.71,
+    "low_band": {
+     "decisions": 46,
+     "median_down_m": -0.017,
+     "down_below_the_stop_band": 16,
+     "climbing": 14,
+     "stop_decisions": 16,
+     "median_stop_ratio": 1.26
+    },
+    "end": "AIR_SELF_STOP",
+    "ended_by_its_own_stop_in_the_band": true,
+    "end_place": {
+     "distance_m": 4.75,
+     "above_top_m": 1.41,
+     "over": false
+    }
+   },
+   {
+    "id": "g1dp-82016-red_cube-far_edge_drift",
+    "kind": "cube",
+    "success": false,
+    "reason": "model_stop",
+    "decisions": 77,
+    "highest_above_top_m": 5.68,
+    "touchdown_error_m": null,
+    "inside_region": null,
+    "entry_height_above_top_m": 5.67,
+    "descent_start_distance_m": 0.93,
+    "descent_start_height_above_top_m": 5.67,
+    "sign_flips": 1,
+    "descent_decisions": 40,
+    "climbs_after_the_descent_began": 4,
+    "pushes": 2,
+    "let_go": {
+     "distance_m": 3.9,
+     "above_top_m": 0.8,
+     "over": true
+    },
+    "nearest_to_the_middle_m": 0.93,
+    "nearest_to_the_middle_after_the_push_m": 3.9,
+    "highest_after_the_push_above_top_m": 1.82,
+    "low_band": {
+     "decisions": 39,
+     "median_down_m": -0.002,
+     "down_below_the_stop_band": 35,
+     "climbing": 4,
+     "stop_decisions": 11,
+     "median_stop_ratio": 3.27
+    },
+    "end": "AIR_SELF_STOP",
+    "ended_by_its_own_stop_in_the_band": true,
+    "end_place": {
+     "distance_m": 4.67,
+     "above_top_m": 1.82,
+     "over": false
+    }
+   }
+  ]
+ }
+}

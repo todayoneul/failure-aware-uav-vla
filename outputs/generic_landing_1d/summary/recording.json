@@ -1,0 +1,108 @@
+{
+ "description": "Stage 1d: the recording of the planned episodes by the stage 1d teacher (finalizer off, three simulators side by side). An episode is kept only if the teacher landed inside the usable region and stopped by itself, the simulator kept at least 0.8 of real time, both pushes came to pass with the object in view where each let go, and the vehicle was in the air where the second let go.",
+ "flights": 88,
+ "kept": 87,
+ "by_state": {
+  "descent_decay": {
+   "flown": 22,
+   "kept": 22
+  },
+  "edge_drift": {
+   "flown": 18,
+   "kept": 17
+  },
+  "edge_low": {
+   "flown": 22,
+   "kept": 22
+  },
+  "low_hover": {
+   "flown": 26,
+   "kept": 26
+  }
+ },
+ "by_surface": {
+  "cube": 76,
+  "cylinder": 6,
+  "pad": 5
+ },
+ "where_the_state_was_left": {
+  "descent_decay": {
+   "distance_from_the_middle_m": {
+    "n": 22,
+    "min": 0.6,
+    "median": 0.97,
+    "max": 2.35
+   },
+   "above_top_m": {
+    "n": 22,
+    "min": 0.68,
+    "median": 1.29,
+    "max": 1.88
+   },
+   "over_the_footprint": 22
+  },
+  "edge_drift": {
+   "distance_from_the_middle_m": {
+    "n": 17,
+    "min": 3.65,
+    "median": 3.87,
+    "max": 4.37
+   },
+   "above_top_m": {
+    "n": 17,
+    "min": 0.89,
+    "median": 1.65,
+    "max": 2.14
+   },
+   "over_the_footprint": 14
+  },
+  "edge_low": {
+   "distance_from_the_middle_m": {
+    "n": 22,
+    "min": 3.18,
+    "median": 4.04,
+    "max": 4.79
+   },
+   "above_top_m": {
+    "n": 22,
+    "min": 0.66,
+    "median": 1.44,
+    "max": 2.04
+   },
+   "over_the_footprint": 17
+  },
+  "low_hover": {
+   "distance_from_the_middle_m": {
+    "n": 26,
+    "min": 0.58,
+    "median": 1.31,
+    "max": 2.39
+   },
+   "above_top_m": {
+    "n": 26,
+    "min": 0.38,
+    "median": 1.25,
+    "max": 2.09
+   },
+   "over_the_footprint": 26
+  }
+ },
+ "not_kept": [
+  {
+   "id": "g1d-80079-red_pad-mid_edge_drift",
+   "state": "edge_drift",
+   "reason": "landed_no_stop",
+   "teacher_did_it": false,
+   "real_time_factor": 0.9987491189722336,
+   "forced": 2,
+   "forced_seen": true,
+   "in_the_air": true,
+   "decisions": 123
+  }
+ ],
+ "episodes_in_the_dataset": 87,
+ "real_time_factor": {
+  "minimum": 0.9077798404830308,
+  "median": 0.9814464127852359
+ }
+}

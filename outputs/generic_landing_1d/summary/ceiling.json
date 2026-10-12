@@ -6,5 +6,244 @@
   "over": 0,
   "highest_m": 11.9,
   "episodes": []
+ },
+ "pilot, stage 1b (update 2000)": {
+  "limit_m": 14.0,
+  "flights": 12,
+  "over": 0,
+  "highest_m": 13.8,
+  "episodes": []
+ },
+ "pilot, stage 1c (update 2000)": {
+  "limit_m": 14.0,
+  "flights": 24,
+  "over": 9,
+  "highest_m": 25.5,
+  "episodes": [
+   {
+    "id": "g1dp-82005-blue_cube-mid_low_hover",
+    "highest_m": 16.0,
+    "success": true
+   },
+   {
+    "id": "g1dp-82007-blue_cube-far_descent_decay",
+    "highest_m": 21.2,
+    "success": true
+   },
+   {
+    "id": "g1dp-82008-red_cube-far_descent_decay",
+    "highest_m": 14.8,
+    "success": true
+   },
+   {
+    "id": "g1dp-82010-blue_cube-near_edge_low",
+    "highest_m": 14.1,
+    "success": false
+   },
+   {
+    "id": "g1dp-82012-red_cube-near_edge_low",
+    "highest_m": 14.0,
+    "success": false
+   },
+   {
+    "id": "g1dp-82015-blue_cube-far_edge_drift",
+    "highest_m": 14.9,
+    "success": false
+   },
+   {
+    "id": "g1dp-82157-red_pad-past-red_cube",
+    "highest_m": 25.5,
+    "success": false
+   },
+   {
+    "id": "g1dp-82168-green_cylinder-mid_search",
+    "highest_m": 14.6,
+    "success": true
+   },
+   {
+    "id": "g1dp-82169-blue_cylinder-far_visible",
+    "highest_m": 21.2,
+    "success": false
+   }
+  ]
+ },
+ "pilot, stage 1d update 500": {
+  "limit_m": 14.0,
+  "flights": 24,
+  "over": 9,
+  "highest_m": 24.0,
+  "episodes": [
+   {
+    "id": "g1dp-82005-blue_cube-mid_low_hover",
+    "highest_m": 16.4,
+    "success": true
+   },
+   {
+    "id": "g1dp-82007-blue_cube-far_descent_decay",
+    "highest_m": 19.0,
+    "success": true
+   },
+   {
+    "id": "g1dp-82008-red_cube-far_descent_decay",
+    "highest_m": 15.0,
+    "success": true
+   },
+   {
+    "id": "g1dp-82015-blue_cube-far_edge_drift",
+    "highest_m": 15.2,
+    "success": false
+   },
+   {
+    "id": "g1dp-82016-red_cube-far_edge_drift",
+    "highest_m": 14.2,
+    "success": false
+   },
+   {
+    "id": "g1dp-82155-blue_cube-past-blue_pad",
+    "highest_m": 19.9,
+    "success": false
+   },
+   {
+    "id": "g1dp-82157-red_pad-past-red_cube",
+    "highest_m": 21.4,
+    "success": false
+   },
+   {
+    "id": "g1dp-82168-green_cylinder-mid_search",
+    "highest_m": 14.3,
+    "success": true
+   },
+   {
+    "id": "g1dp-82169-blue_cylinder-far_visible",
+    "highest_m": 24.0,
+    "success": false
+   }
+  ]
+ },
+ "pilot, stage 1d update 1000": {
+  "limit_m": 14.0,
+  "flights": 24,
+  "over": 11,
+  "highest_m": 28.4,
+  "episodes": [
+   {
+    "id": "g1dp-82003-red_cube-near_low_hover",
+    "highest_m": 14.4,
+    "success": true
+   },
+   {
+    "id": "g1dp-82005-blue_cube-mid_low_hover",
+    "highest_m": 15.2,
+    "success": true
+   },
+   {
+    "id": "g1dp-82007-blue_cube-far_descent_decay",
+    "highest_m": 15.1,
+    "success": true
+   },
+   {
+    "id": "g1dp-82010-blue_cube-near_edge_low",
+    "highest_m": 15.3,
+    "success": false
+   },
+   {
+    "id": "g1dp-82013-blue_cube-mid_edge_low",
+    "highest_m": 14.0,
+    "success": true
+   },
+   {
+    "id": "g1dp-82015-blue_cube-far_edge_drift",
+    "highest_m": 14.6,
+    "success": false
+   },
+   {
+    "id": "g1dp-82016-red_cube-far_edge_drift",
+    "highest_m": 14.3,
+    "success": false
+   },
+   {
+    "id": "g1dp-82155-blue_cube-past-blue_pad",
+    "highest_m": 18.2,
+    "success": false
+   },
+   {
+    "id": "g1dp-82157-red_pad-past-red_cube",
+    "highest_m": 28.4,
+    "success": false
+   },
+   {
+    "id": "g1dp-82168-green_cylinder-mid_search",
+    "highest_m": 14.2,
+    "success": true
+   },
+   {
+    "id": "g1dp-82169-blue_cylinder-far_visible",
+    "highest_m": 24.4,
+    "success": false
+   }
+  ]
+ },
+ "pilot, stage 1d update 1500": {
+  "limit_m": 14.0,
+  "flights": 24,
+  "over": 11,
+  "highest_m": 27.3,
+  "episodes": [
+   {
+    "id": "g1dp-82003-red_cube-near_low_hover",
+    "highest_m": 14.4,
+    "success": true
+   },
+   {
+    "id": "g1dp-82005-blue_cube-mid_low_hover",
+    "highest_m": 16.0,
+    "success": true
+   },
+   {
+    "id": "g1dp-82007-blue_cube-far_descent_decay",
+    "highest_m": 19.2,
+    "success": true
+   },
+   {
+    "id": "g1dp-82008-red_cube-far_descent_decay",
+    "highest_m": 14.7,
+    "success": true
+   },
+   {
+    "id": "g1dp-82010-blue_cube-near_edge_low",
+    "highest_m": 15.2,
+    "success": false
+   },
+   {
+    "id": "g1dp-82013-blue_cube-mid_edge_low",
+    "highest_m": 14.1,
+    "success": false
+   },
+   {
+    "id": "g1dp-82015-blue_cube-far_edge_drift",
+    "highest_m": 14.3,
+    "success": false
+   },
+   {
+    "id": "g1dp-82155-blue_cube-past-blue_pad",
+    "highest_m": 18.4,
+    "success": false
+   },
+   {
+    "id": "g1dp-82157-red_pad-past-red_cube",
+    "highest_m": 27.3,
+    "success": false
+   },
+   {
+    "id": "g1dp-82168-green_cylinder-mid_search",
+    "highest_m": 14.3,
+    "success": true
+   },
+   {
+    "id": "g1dp-82169-blue_cylinder-far_visible",
+    "highest_m": 22.9,
+    "success": false
+   }
+  ]
  }
 }
