@@ -1,10 +1,11 @@
-param([string]$Plan='configs/experiments/controlled_landings.json',[string]$Output='outputs/arbitrary_start/controlled',[ValidateSet('controlled','oft','teacher')][string]$Policy='controlled',[string]$Checkpoint='outputs/aerovla_oft/checkpoints/grounding_film',[string]$ModelName='',[string]$Set='',[string]$Record='',[ValidateSet('on','off')][string]$Finalizer='on',[string[]]$Only=@(),[int]$Skip=0,[int]$Limit=0,[switch]$Again,[ValidateRange(1,10)][int]$Attempts=3,[string]$Distro='Ubuntu',[switch]$HideSimulator,[int]$TopicsPort=8989,[int]$ServicesPort=8990,[ValidateSet('surface','stop_safe')][string]$Teacher='surface')
+param([string]$Plan='configs/experiments/controlled_landings.json',[string]$Output='outputs/arbitrary_start/controlled',[ValidateSet('controlled','oft','teacher')][string]$Policy='controlled',[string]$Checkpoint='outputs/aerovla_oft/checkpoints/grounding_film',[string]$ModelName='',[string]$Set='',[string]$Record='',[ValidateSet('on','off')][string]$Finalizer='on',[string[]]$Only=@(),[int]$Skip=0,[int]$Limit=0,[switch]$Again,[ValidateRange(1,10)][int]$Attempts=3,[string]$Distro='Ubuntu',[switch]$HideSimulator,[int]$TopicsPort=8989,[int]$ServicesPort=8990,[ValidateSet('surface','stop_safe','recovery')][string]$Teacher='surface')
 # Flies a plan of starts with landing surfaces read as surfaces (docs/arbitrary_start_generalized_landing.md). The worker is
 # scripts/surface_flights.py: the canonical episode loop from each episode's own start, flown by the episode's scripted pilot
 # (-Policy controlled: flights whose outcome is known beforehand, for checking the evaluator), by a checkpoint (-Policy oft)
 # or by the privileged teacher (-Policy teacher; with -Record the flights are kept as training episodes, flown with
 # -Finalizer off as the earlier data was). -TopicsPort / -ServicesPort let several simulators record side by side.
-# -Teacher names the teacher of a teacher flight: surface (stage 1, src/landing/teacher.SurfaceTeacher) or stop_safe (stage 1b).
+# -Teacher names the teacher of a teacher flight: surface (stage 1, src/landing/teacher.SurfaceTeacher), stop_safe (stage 1b) or
+# recovery (stage 1c). An episode that carries forced moves of stage 1c is pushed whoever flies it.
 # The simulator is started as scripts/run_blur_characterization.ps1 starts it, with its window shown. The frozen baselines'
 # fingerprints are verified before the simulator starts and after the worker ends: nothing here trains or changes a model.
 $ErrorActionPreference='Stop'

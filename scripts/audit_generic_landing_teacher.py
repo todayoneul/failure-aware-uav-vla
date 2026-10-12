@@ -32,8 +32,12 @@ def planned(config,oft,stage):
     from src.landing.surface import SurfaceSet
     from src.landing.teacher import rollout
     from src.visual_search.maps import load_map
-    plan=json.loads(stages.train_plan_of(stage).read_text(encoding='utf-8'));episodes=plan['train']+plan['val'];scenes={};out=[]
-    for name in ('pilot','validation'):episodes+=json.loads(stages.files_of(stage)[name].read_text(encoding='utf-8'))['episodes']
+    plan=json.loads(stages.train_plan_of(stage).read_text(encoding='utf-8'));episodes=plan['train']+plan['val'];scenes={};out=[];files=stages.files_of(stage);names=('pilot','validation')
+    if stage.get('stage')=='1c':
+        # Stage 1c has more sets, and some of its episodes are pushed: the dry run flies the forced moves too.
+        from src.visual_search import generic_landing_1c as later
+        files=later.files_of(stage);names=('validation','same_color','same_color_twins','pilot','teacher_pilot')
+    for name in names:episodes+=json.loads(files[name].read_text(encoding='utf-8'))['episodes']
     for episode in episodes:
         scene=scenes.setdefault(episode['map'],load_map(episode['map']));trace=[]
         result=rollout(config,oft,scene,episode['layout'],episode,SurfaceSet(scene,episode['layout'])[episode['target']],kind=stages.teacher_of(stage),trace=trace)

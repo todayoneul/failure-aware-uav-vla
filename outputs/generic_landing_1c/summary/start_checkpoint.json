@@ -1,0 +1,32 @@
+{
+ "description": "The checkpoint stage 1c is fine-tuned from: stage 1b's chosen candidate (update 2000). It did not pass stage 1b's gates and is not generic_landing_v1.",
+ "path": "outputs/aerovla_oft/checkpoints/generic_landing_stage1b_run/update-2000",
+ "sha256": {
+  "head.pt": "7fb40d043e269fd215648ff3b7858bd0c3a4636213465b1f6d1c7a883f334cba",
+  "manifest.json": "6cf001dfaa0c05876ad71edd5c8ff53c179dba3fcdc42634e213f99f7fe4f26e",
+  "oft/adapter_model.safetensors": "856c521ec655edca9832af8375257fd5f1e6c9e48ca426e4140d0daa32f53efc",
+  "oft/adapter_config.json": "ed43d0c72fc889e02ba998799addc165f44c3f1e6bea3217e5f5e0672aa288dd"
+ },
+ "matches_the_configuration": true,
+ "candidate": {
+  "update": 2000,
+  "val_l1": 0.06587881650203296,
+  "val_first_action_l1": 0.06589035473637826,
+  "train_l1_ema": 0.04997904896288195,
+  "score": 0.918592230280542,
+  "behaviour": {
+   "grounding_accuracy": 0.9115646258503401,
+   "terminal_accuracy": 0.9256198347107438,
+   "all": 0.9,
+   "terminal_accuracy_land": 0.9270833333333334,
+   "terminal_accuracy_approach": 0.92,
+   "score": 0.918592230280542
+  }
+ },
+ "trained_from": "outputs/aerovla_oft/checkpoints/grounding_film",
+ "parameters": {
+  "lora": 39976960,
+  "head": 14716931,
+  "grounding": 4338432
+ }
+}

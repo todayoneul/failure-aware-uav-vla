@@ -120,3 +120,61 @@ def ceiling(records,limit_m):
     over=[{'id':record['id'],'highest_m':round(record['summary']['height_range_m'][1],1),'success':bool(record['surface_landing']['success'])}
           for record in records if record['summary']['height_range_m'][1]>limit_m]
     return {'limit_m':limit_m,'flights':len(records),'over':len(over),'highest_m':round(max((record['summary']['height_range_m'][1] for record in records),default=0.),1),'episodes':over}
+
+
+def descent_profile(record,steps,landing,config,oft):
+    """The last part of a landing, read from where the vehicle was and what it flew: how high it came in over the object,
+    where and how high it began to come down, how often its vertical command changed sign, and how the flight ended."""
+    surface=record['surface_landing']['target_surface'];top=surface['top_m'];limit=oft['stop_threshold']*(oft['action_bounds']['down_m'][1]-oft['action_bounds']['down_m'][0])
+    flown_steps=[step for step in steps if not (step.get('landed') or step.get('on_surface'))];reading=record['surface_landing']
+    out={'id':record['id'],'kind':record['episode'].get('surface_kind'),'success':bool(reading['success']),'reason':record['summary']['reason'],'decisions':len(steps),
+         'highest_above_top_m':round(max((step['height_m'] for step in steps),default=top)-top,2),
+         'touchdown_error_m':None if reading.get('horizontal_error_m') is None else round(reading['horizontal_error_m'],2),'inside_region':bool(reading.get('inside_region')) if reading.get('landed_on') else None}
+    near=[step for step in flown_steps if step['distance_m']<=config['arrive_distance_m']]
+    over=next((step for step in near if step.get('over')),None)
+    out['entry_height_above_top_m']=None if over is None else round(over['height_m']-top,2)
+    # The descent starts at the first decision near the object whose flown vertical command is downward and larger than the stop band.
+    start=next((index for index,step in enumerate(near) if step['action'][1]>limit),None)
+    if start is None:out.update(descent_start_distance_m=None,descent_start_height_above_top_m=None,sign_flips=0,descent_decisions=0,climbs_after_the_descent_began=0);return out
+    after=near[start:];signs=[1 if step['action'][1]>limit else -1 for step in after if abs(step['action'][1])>limit]
+    out.update(descent_start_distance_m=round(after[0]['distance_m'],2),descent_start_height_above_top_m=round(after[0]['height_m']-top,2),
+               sign_flips=sum(a!=b for a,b in zip(signs,signs[1:])),descent_decisions=len(after),climbs_after_the_descent_began=sum(sign<0 for sign in signs))
+    return out
+
+
+def plain(name):
+    """An object's name as the catalogue and the simulator both spell it, reduced to letters: blue_cone, SceneBlueCone -> bluecone."""
+    return ''.join(letter for letter in str(name).lower() if letter.isalnum()).replace('scene','')
+
+
+def cube_counts(profiles,rule,usable_reach_m):
+    """Stage 1c: how the cube landings of a run went wrong, counted from their descent profiles (reported, not a gate)."""
+    failed=[row for row in profiles if not row['success']]
+    return {'landings':len(profiles),'landed':sum(row['success'] for row in profiles),
+            'insufficient_climb':sum(row['entry_height_above_top_m'] is not None and row['entry_height_above_top_m']<rule['clear_above_top_m'] for row in profiles),
+            'premature_descent':sum(row['descent_start_distance_m'] is not None and row['descent_start_distance_m']>usable_reach_m for row in profiles),
+            'edge_touchdown':sum(row['inside_region'] is False for row in profiles),
+            'descent_oscillation':sum(row['sign_flips']>=2 for row in profiles),
+            'air_self_stop':sum(row['reason']=='model_stop' and row['touchdown_error_m'] is None for row in failed),
+            'timeout':sum(row['reason']=='max_steps' for row in failed)}
+
+
+def same_color_reading(record,steps,other_centre,arrive_m):
+    """A landing whose first view held another object of the named colour, read against that object: did the flight go to
+    it, did it end at it? From the vehicle's positions and the evaluator's reading, not from anything the policy put out."""
+    episode=record['episode'];summary=record['summary'];reading=record['surface_landing'];other=episode['distractor'];target=episode['target']
+    away=[math.hypot(other_centre[0]-step['position'][0],other_centre[1]-step['position'][1]) for step in steps]
+    near=[index for index,(distance,step) in enumerate(zip(away,steps)) if distance<=arrive_m and distance<step['distance_m']]
+    acquired=next((index for index,step in enumerate(steps) if step['front_seen'] or step['down_seen']),None)
+    hit=reading.get('collision') or summary.get('hit');last=steps[-1]
+    hit_other=bool(hit) and plain(hit).startswith(plain(other));hit_wrong=bool(hit) and not plain(hit).startswith(plain(target))
+    wrong_landing=bool(reading.get('landed_on')) and reading['landed_on']!=target
+    stopped_at_other=bool(summary.get('stopped') and not reading.get('contact_from_above') and not hit and away[-1]<=arrive_m and away[-1]<last['distance_m'])
+    wrong_terminal=bool(wrong_landing or hit_wrong or stopped_at_other)
+    return {'id':record['id'],'target':target,'other':other,'success':bool(reading['success']),'reason':summary['reason'],'landed_on':reading.get('landed_on'),
+            'collision':hit,'collision_with_the_other':hit_other,'wrong_target_landing':wrong_landing,'stopped_at_the_other':stopped_at_other,'wrong_terminal':wrong_terminal,
+            'approached_the_other':bool(near),'rejected_the_other':not near and not wrong_terminal,
+            'nearest_to_the_other_m':round(min(away),1),'start_distance_to_the_other_m':round(away[0],1),'target_acquired_at_decision':acquired,
+            'nearest_to_the_other_before_the_target_was_seen_m':round(min(away[:acquired+1] if acquired is not None else away),1),
+            'first_approach_of_the_other_at_decision':near[0] if near else None,'decisions':len(steps),'final_distance_to_target_m':round(last['distance_m'],1),
+            'final_distance_to_the_other_m':round(away[-1],1)}

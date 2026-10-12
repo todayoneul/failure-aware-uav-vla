@@ -32,6 +32,21 @@ nothing else:
 
 Every label of a landing before the touchdown then keeps the margin from the stop rule that the stage's configuration
 fixes (src/landing/stop_safety.py measures it with the student's own `is_stop`).
+
+`RecoveryTeacher` (stage 1c) is the stage 1b teacher with one more rule, and `RecoveryPushes` puts a landing into the
+states that rule is for. The stage 1b student no longer stops in the air; what is left of its failures on a cube is how
+it comes down: it flies in too low and touches the edge, it starts to descend before it is over the middle, or it hangs a
+metre or two over the top and commands up and down in turn. The teacher never flies into such a state by itself, so the
+data never held the way out of one.
+
+    descent    over a small top the canonical rule 'low over the top and within 3.5 m of the middle: keep descending' is a
+               pad's (a cube's usable top ends 3.6 m from its middle). The descent still starts within the canonical
+               align radius; once the vehicle is low it goes on within the abort radius, half-way between the align
+               radius and the end of the usable top, and beyond that the vehicle climbs back and comes in again.
+    forced     a landing is pushed (flown, never a label, as the canonical pushes are) into one of four states: in over
+               the object without the height (`under_climb`), over its edge beside the middle (`edge`), coming down
+               before the middle (`premature`), or lifted again during the last metres (`stall`). The frames after the
+               push carry the teacher's way out: up, to the middle, down, and down without a pause.
 """
 import json
 import math
@@ -122,12 +137,81 @@ class StopSafeTeacher(SearchTeacher):
         return [forward,action[1],yaw],('approach' if distance>self.config['arrive_distance_m'] else 'final') if forward>.05 else 'align'
 
 
-TEACHERS={'surface':SurfaceTeacher,'stop_safe':StopSafeTeacher}
+def abort_radius(rule,surface):
+    """How far from the middle of a small top a descent that has begun goes on: half-way between the canonical align
+    radius, inside which a descent starts, and the end of the usable top."""
+    return (rule['align_radius_m']+surface.usable_reach_m)/2
+
+
+class RecoveryTeacher(StopSafeTeacher):
+    """Stage 1c: the stage 1b teacher, with the radius of a descent that goes on fitted to a small top."""
+    def __init__(self,config,oft,strategy='right',ceiling_m=14.,landing=None,surface=None,rule=None):
+        super().__init__(config,oft,strategy,ceiling_m,landing,surface,rule)
+        if self.small:self.landing=dict(self.landing,commit_radius_m=abort_radius(self.landing,surface))
+
+
+FORCED=('under_climb','edge','premature','stall')
+
+
+class RecoveryPushes(Pushes):
+    """Forced moves of a landing episode of stage 1c, flown by the teacher and by a tested policy alike and never a label.
+    Each item of `episode['pushes']` names a state (`when`) and is due at a place, not at something a policy puts out:
+
+        under_climb  within `within_m` of the object and between `rise_m` and `rise_m` + `band_m` over its top, on its way
+                     up: straight in, without climbing on, to `until_m`
+        edge         within `from_m` and at least `min_above_m` over the top: past the middle at `miss_m` on `side`
+                     (-1 left, 1 right), until the middle is abeam
+        premature    within `from_m`: down (and slowly on) to `floor_m` over the top
+        stall        coming down, `below_m` over the top or lower: up again by `up_m` a decision for `ticks` decisions
+
+    Canonical items (`stop`, `descend`, `landed`) are handled as the canonical class handles them. A recovery item that is
+    not yet due does not keep a flight going: a policy that stops before the place is reached has stopped."""
+    def __init__(self,episode):
+        super().__init__(episode);self.forced=bool(self.queue) and all(item.get('when') in FORCED for item in self.queue);self.fired=[]
+
+    def pending(self):return self.left>0 if self.forced else super().pending()
+
+    def due(self,item,state,view):
+        when=item.get('when','stop');above=view['height_m']-view['surface_m'];distance=view['distance_m']
+        if when=='under_climb':return item['until_m']<distance<=item['within_m'] and item['rise_m']<=above<=item['rise_m']+item['band_m']
+        if when=='edge':return item['miss_m']+1.<distance<=item['from_m'] and above>=item['min_above_m']
+        if when=='premature':return distance<=item['from_m'] and above>item['floor_m']+.25
+        if when=='stall':return state=='descend' and 0.<above<=item['below_m']
+        return super().due(item,state,view)
+
+    def move(self,item,view,yaw_max):
+        """The forced action of this decision, or None when the state is reached."""
+        when=item['when'];above=view['height_m']-view['surface_m'];distance=view['distance_m'];bearing=view['bearing_deg']
+        turn=lambda degrees:max(-yaw_max,min(yaw_max,math.radians(degrees)))
+        if when=='under_climb':
+            return None if distance<=item['until_m'] else [item['forward_m']*max(0.,1-abs(bearing)/45.),0.,turn(bearing)]
+        if when=='edge':
+            # The middle is kept at the angle that makes the track pass it at `miss_m`; abeam of it the push is over.
+            wanted=item['side']*math.degrees(math.asin(min(1.,item['miss_m']/max(distance,1e-6))));off=bearing-wanted
+            if abs(bearing)>=75. or distance<=item['miss_m']+.3:return None
+            return [item['forward_m']*max(.2,1-abs(off)/30.),0.,turn(off)]
+        if when=='premature':
+            return None if above<=item['floor_m'] else [item['forward_m'],min(item['down_m'],above-item['floor_m']+.05),0.]
+        if when=='stall':return [item.get('forward_m',0.),-item['up_m'],0.]
+        return None
+
+    def step(self,state,view,yaw_max):
+        if not self.forced:return super().step(state,view,yaw_max)
+        if self.left<=0:
+            if not self.queue or not self.due(self.queue[0],state,view):return None
+            self.current=self.queue.pop(0);self.left=self.current['ticks'];self.done+=1
+            self.fired.append({'when':self.current['when'],'distance_m':view['distance_m'],'above_top_m':view['height_m']-view['surface_m']})
+        action=self.move(self.current,view,yaw_max)
+        if action is None:self.left=0;return None
+        self.left-=1;return action
+
+
+TEACHERS={'surface':SurfaceTeacher,'stop_safe':StopSafeTeacher,'recovery':RecoveryTeacher}
 
 
 def teacher_class(surface_of,kind='surface'):
     """A teacher class for the canonical episode loop, which builds its teacher itself: `surface_of()` gives the landing
-    surface of the episode being flown. `kind`: `surface` (stage 1) or `stop_safe` (stage 1b)."""
+    surface of the episode being flown. `kind`: `surface` (stage 1), `stop_safe` (stage 1b) or `recovery` (stage 1c)."""
     class Teacher(TEACHERS[kind]):
         def __init__(self,config,oft,strategy='right',ceiling_m=14.,landing=None):
             super().__init__(config,oft,strategy,ceiling_m,landing,surface_of())
@@ -137,18 +221,24 @@ def teacher_class(surface_of,kind='surface'):
 def rollout(config,oft,map_config,layout,episode,surface,landing=None,kind='surface',trace=None):
     """Fly the teacher through an episode on the map's boxes: kinematics only (no lag, no simulator), as the canonical dry
     run does. Says whether the teacher finishes, how near it comes to an obstacle and how much it climbs. `trace`: a list
-    that receives every decision (label, state, distance, whether the vehicle stands on the surface)."""
+    that receives every decision (label, state, distance, whether the vehicle stands on the surface, whether the decision
+    was a forced move and whether a camera shows the object). The forced moves of a stage 1c episode are flown."""
     settings=config['generalization'];landing=landing or load_landing();geometry=MapGeometry(map_config,layout)
     teacher=TEACHERS[kind](config,oft,episode.get('strategy','right'),map_config['altitude']['ceiling_m'],landing,surface)
     x,y=episode['start_xy'];yaw=math.radians(episode['start_yaw_deg']);height=episode['start_height_m'];target=episode['target']
     task=episode.get('task','approach');stops=0;clearance=float('inf');states={};acquired=None;top=height;reason='max_steps';landed=False;tick=0
-    rest=surface.top_m if surface is not None and surface.landable else 0.;pushes=Pushes(episode)
+    rest=surface.top_m if surface is not None and surface.landable else 0.;pushes=RecoveryPushes(episode);limit=oft['action_bounds']['yaw_rad'][1];forced_ticks=0
     for tick in range(episode.get('max_ticks',settings['max_ticks'])):
         view=geometric_view(config,geometry,target,x,y,height,yaw)
         over=bool(rest) and surface.on_top(surface.offset_of(x,y));landed=task=='land' and over and height<=rest+1e-6
         view.update(task=task,landed=landed,surface_m=rest)
         action,state=teacher.act(view)
-        if trace is not None:trace.append({'step':tick,'teacher_action':list(action),'teacher_state':state,'landed':landed,'distance_m':view['distance_m'],'height_m':height})
+        # A forced move of the episode is flown instead of the teacher's action and is no label (only the recovery items:
+        # the canonical pushes of an approach are left to the canonical dry run).
+        forced=pushes.step(state,{'bearing_deg':view['bearing_deg'],'distance_m':view['distance_m'],'height_m':height,'surface_m':rest},limit) if pushes.forced else None
+        if trace is not None:trace.append({'step':tick,'teacher_action':list(action),'teacher_state':state,'landed':landed,'distance_m':view['distance_m'],'height_m':height,
+                                           'perturbed':forced is not None,'seen':bool(view['visible'] or view['below'] or view['over']),'x':x,'y':y,'bearing_deg':view['bearing_deg']})
+        if forced is not None:action=forced;forced_ticks+=1
         if view['visible'] and acquired is None:acquired=tick
         states[state]=states.get(state,0)+1
         stops=stops+1 if state in STOP_STATES else 0
@@ -165,4 +255,4 @@ def rollout(config,oft,map_config,layout,episode,surface,landing=None,kind='surf
             if geometry.over(x,y,target) and height<item['size_m'][2]:reason='hit_target';break
     final=math.hypot(geometry.objects[target]['centre'][0]-x,geometry.objects[target]['centre'][1]-y)
     return {'reason':reason,'ticks':tick+1,'clearance_m':clearance,'climbed_m':top-episode['start_height_m'],'states':states,
-            'acquired_tick':acquired,'final_distance_m':final,'landed':landed}
+            'acquired_tick':acquired,'final_distance_m':final,'landed':landed,'forced_ticks':forced_ticks,'forced':list(pushes.fired),'forced_left':len(pushes.queue)}

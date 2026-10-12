@@ -1,0 +1,134 @@
+{
+ "numbers": {
+  "flights": 32,
+  "success": 32,
+  "wrong_target": 0,
+  "collisions": 0
+ },
+ "recovery": {
+  "under_climb": {
+   "flown": 4,
+   "pushed_and_seen": 4,
+   "recovered": 4
+  },
+  "edge": {
+   "flown": 4,
+   "pushed_and_seen": 4,
+   "recovered": 4
+  },
+  "premature": {
+   "flown": 4,
+   "pushed_and_seen": 4,
+   "recovered": 4
+  },
+  "stall": {
+   "flown": 4,
+   "pushed_and_seen": 4,
+   "recovered": 4
+  }
+ },
+ "same_colour": {
+  "flown": 16,
+  "landed_on_the_named_object": 16,
+  "twins": 4
+ },
+ "labels": {
+  "checks": [
+   {
+    "what": "landing labels before the touchdown that are a stop",
+    "count": 0,
+    "allowed": 0,
+    "passed": true
+   },
+   {
+    "what": "landing labels before the touchdown below 3.0 x the stop rule",
+    "count": 0,
+    "allowed": 0,
+    "passed": true
+   },
+   {
+    "what": "runs of 4 stops before the touchdown of a landing",
+    "count": 0,
+    "allowed": 0,
+    "passed": true
+   },
+   {
+    "what": "approach labels that are a stop before the teacher's own stop",
+    "count": 0,
+    "allowed": 0,
+    "passed": true
+   },
+   {
+    "what": "runs of 4 stops before the stop of an approach",
+    "count": 0,
+    "allowed": 0,
+    "passed": true
+   }
+  ],
+  "by_task": {
+   "LAND": {
+    "actions": 2243,
+    "terminal": 128,
+    "nonterminal": 2115,
+    "forced": 182,
+    "nonterminal_stop": 0,
+    "below_safe": 0,
+    "stop_windows": 0,
+    "near_stop_windows": 0,
+    "terminal_not_a_stop": 0,
+    "episodes": 32,
+    "stop_ratio": {
+     "n": 2115,
+     "min": 3.125,
+     "p5": 3.125,
+     "median": 6.25,
+     "p95": 12.494
+    }
+   }
+  }
+ },
+ "search": {
+  "decisions_without_the_target_in_view": 270,
+  "labels_that_are_not_the_blind_search": 0,
+  "examples": []
+ },
+ "checks": [
+  [
+   "forced landings recovered (the push came to pass, the object was in view where it let go, the teacher landed)",
+   16,
+   ">= 15 of 16",
+   true
+  ],
+  [
+   "same-colour starts landed on the named object",
+   16,
+   ">= 16 of 16",
+   true
+  ],
+  [
+   "collisions",
+   0,
+   "<= 0",
+   true
+  ],
+  [
+   "flights at a wrong object",
+   0,
+   "<= 0",
+   true
+  ],
+  [
+   "labels that break the stop rule",
+   0,
+   "<= 0",
+   true
+  ],
+  [
+   "labels of the search that are not the blind search",
+   0,
+   "<= 0",
+   true
+  ]
+ ],
+ "passed": true
+}

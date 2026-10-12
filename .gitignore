@@ -53,6 +53,11 @@
 /outputs/generic_landing_1b/*
 !/outputs/generic_landing_1b/summary/
 !/outputs/generic_landing_1b/examples/
+# Generic landing, stage 1c: the audits, tables and small pictures (flights, datasets and checkpoints stay local).
+!/outputs/generic_landing_1c/
+/outputs/generic_landing_1c/*
+!/outputs/generic_landing_1c/summary/
+!/outputs/generic_landing_1c/examples/
 
 # Downloaded simulator, datasets and model weights.
 /assets/
