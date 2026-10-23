@@ -20,6 +20,11 @@ label is marked, and the dataset builder leaves the decision out of every label 
 The stop at the end of a flight (after the pilot says it is done, or after a touchdown) is the policy's stop and is not
 marked.
 
+In takeover mode a model flies until the human takes over. Two more marks say who flew a decision (`pilot_mark`):
+
+    model       the model flew the whole tick: its own action, not a human's label
+    handover    the human took over during the tick: part model, part human, neither's label
+
 Speeds: a key held flies at the chosen tier. Tiers 1-3 lie inside the policy's bounds and are at least `safe_ratio` times
 the stop band on each axis, so a held key there records a label far from a stop; tier 4 (boost) is faster than a policy
 can fly and is never a label. A stick past its dead zone is scaled from that floor to the tier's rate.
@@ -145,6 +150,18 @@ def mark(action,oft,terminal=False,reason=None):
     if ratio<=1.:return 'pause'
     if ratio<SAFE_RATIO:return 'below_safe'
     return None
+
+
+def active(inputs):
+    """Is the pilot asking for any motion: a flight key held, or a stick past its dead zone?"""
+    return bool(inputs.forward or inputs.backward or inputs.up or inputs.down or inputs.left or inputs.right
+                or max(abs(inputs.stick_forward),abs(inputs.stick_turn),abs(inputs.stick_vertical))>DEAD_ZONE)
+
+
+def pilot_mark(pilots):
+    """The mark of a decision by who flew its tick ({'human'}, {'model'} or both); None when the human flew all of it."""
+    if 'model' not in pilots:return None
+    return 'handover' if 'human' in pilots else 'model'
 
 
 def beyond(rates,oft):

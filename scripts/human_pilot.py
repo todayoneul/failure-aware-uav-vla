@@ -14,6 +14,11 @@ heading to turn to) and the same limits; only the commands come twenty times a s
 decision. Every 0.5 s the pictures are taken as the canonical loop takes them (scripts/visual_search.SearchEnv.observe)
 and the commands of the following 0.5 s become that decision's label.
 
+Takeover mode (`--takeover READY_FILE`, src/human_pilot/remote.py serving the checkpoint in WSL): the model flies each
+flight first, as the canonical loop flies it, and the pilot takes over when it goes wrong (Space, or any flight key) and
+gives it back (Space). Only the pilot's decisions are labels; the model's are recorded and marked `model`, the decision of
+a takeover `handover`. The flights go to their own dataset folder.
+
 --script FILE flies a fixed list of inputs instead of a person: a check of the whole loop with the simulator.
 """
 import argparse
@@ -21,6 +26,7 @@ import asyncio
 import copy
 import json
 import math
+import statistics
 import sys
 import threading
 import time
@@ -33,7 +39,7 @@ from src.human_pilot import controls,session
 from src.human_pilot.controls import Axes,Inputs,Smoother,TickLabel
 
 WINDOW='HUMAN PILOT | front + down cameras only'
-STATES={'human':'FLYING','stop':'DONE - holding','landed':'TOUCHDOWN - holding'}
+STATES={'human':'FLYING','model':'MODEL FLYING','taken':'YOU ARE FLYING','stop':'DONE - holding','landed':'TOUCHDOWN - holding'}
 UNREAL='Blocks Environment'     # the simulator's own window
 VIEWS={'front':'FrontView','down':'DownView'}
 
@@ -166,6 +172,8 @@ def render(front,down,lines,rates=None,limits=None,size=560,footer=''):
 
 
 KEYS_FLYING='W/S forward/back | A D turn | Up/Down climb/descend | 1-4 speed | Enter done | Backspace discard | Esc quit'
+KEYS_MODEL='Space or any flight key: take over | 1-4 your speed | Enter: end (after the model stops) | Backspace discard | Esc quit'
+KEYS_TAKEN='W/S | A D | Up/Down | 1-4 speed | Space: give back to the model | Enter done | Backspace discard | Esc quit'
 KEYS_MENU='N/P object | T land/approach | L layout | M scene | Enter fly | Esc quit'
 
 
@@ -174,12 +182,13 @@ def show(canvas):
 
 
 def make_step(env,observation,index,instruction,mode,recorder,oft):
-    """One decision as the canonical loop writes it (scripts/visual_search.run_episode), with the pictures saved."""
+    """One decision as the canonical loop writes it (scripts/visual_search.run_episode), with the pictures saved. Returns the
+    step and what a policy is given at it (the canonical loop's own `policy_inputs`)."""
     from src.aerovla_oft.spec import proprio_vector
     from src.visual_search.episodes import policy_inputs
     private=observation['privileged'];state=observation['state']
     proprio=proprio_vector(state,env.ground_z,oft,observation['yaw_rate'])
-    inputs=policy_inputs(observation['frames']['front'],observation['frames']['down'],instruction,None)
+    inputs=policy_inputs(observation['frames']['front'],observation['frames']['down'],instruction,proprio if oft['proprio']['enabled'] else None)
     step={'step':index,'epoch':time.time(),'position':state['position'],'yaw_rad':observation['yaw'],'height_m':private['height_m'],'bearing_deg':private['bearing_deg'],
           'distance_m':private['distance_m'],'front_seen':private['front']['seen'],'front_in_fov':private['front']['in_fov'],'down_seen':private['down']['seen'],
           'front_pixel':private['front']['pixel'],'down_pixel':private['down']['pixel'],'ahead_m':private['ahead_m'],'over':private['over'],
@@ -187,19 +196,39 @@ def make_step(env,observation,index,instruction,mode,recorder,oft):
           'input_sha256':{name:session.digest(inputs[name]) for name in ('front','down')},'proprio':proprio,'teacher_state':mode,'perturbed':False,
           'sim_stamp':observation['stamp']}
     if recorder:step['img_name']=recorder.frames(index,inputs['front'],inputs['down'])
-    return step
+    return step,inputs
 
 
-async def fly(env,episode,devices,settings,oft,config,recorder,size,tier_index=2,snapshot=None):
-    """One flight. Returns (reason, stopped, steps, touchdown, hit) or None when the pilot discarded it or quit (then the
-    second value says which)."""
+async def fly(env,episode,devices,settings,oft,config,recorder,size,tier_index=2,snapshot=None,policy=None):
+    """One flight. Returns (reason, stopped, steps, touchdown, hit, switches) or None when the pilot discarded it or quit
+    (then the second value says which).
+
+    With `policy` (src/human_pilot/remote.RemotePolicy) the model flies first, as the canonical loop flies it: at each
+    decision the pictures, the model's answer, and the canonical executor's command (SearchEnv.tick). The pilot takes over
+    at any moment (Space, or any flight key) and gives control back with Space at the next decision. After the model's own
+    stop (four in a row) the vehicle holds and waits: the pilot takes over, or ends the flight there (Enter)."""
+    from src.aerovla_oft.spec import is_stop
     boost=settings['boost'];tiers=controls.tiers_of(oft,Axes(boost['forward_mps'],boost['vertical_mps'],math.radians(boost['turn_degps'])))
     tick=oft['tick_s'];dt=1./settings['control_hz'];limits=tiers[-1]
     acceleration=settings['acceleration'];smoother=Smoother(Axes(acceleration['forward_mps2'],acceleration['down_mps2'],acceleration['turn_radps2']))
     labeler=TickLabel(oft);steps=[];index=0;terminal=None;terminal_left=settings['terminal_ticks'];reason='max_steps';stopped=False
-    soft=env.landing['touchdown']['max_vertical_speed_mps']
-    opened=time.monotonic();observation=env.observe();heading=observation['yaw'];z_set=env.setpoint_z
-    pending=make_step(env,observation,index,episode['instruction'],'human',recorder,oft);rates=Axes();saved=False
+    soft=env.landing['touchdown']['max_vertical_speed_mps'];low=env.ground_z-env.limits['maximum_clearance_m'];high=env.ground_z-env.limits['minimum_clearance_m']
+    # Who flies now; who flew during the open decision; the model's decision under way and whether its action is flown;
+    # its stops in a row; whether it stopped and the vehicle waits; whether the pilot asked to give control back.
+    pilot='model' if policy else 'human';flown={pilot};thinking=None;applied=True;stop_count=0;held=False;giving_back=False
+    switches=[];model_rates=Axes()
+
+    def open_decision():
+        nonlocal opened,observation,pending,thinking,applied
+        opened=time.monotonic();observation=env.observe()
+        pending,given=make_step(env,observation,index,episode['instruction'],terminal or pilot,recorder,oft)
+        if pilot=='model' and terminal is None:thinking=asyncio.ensure_future(asyncio.to_thread(policy.infer,given));applied=False
+
+    def switch(to):
+        nonlocal pilot,flown
+        pilot=to;flown.add(to);switches.append({'decision':index,'to':to,'epoch':time.time()})
+
+    opened=observation=pending=None;open_decision();heading=observation['yaw'];rates=Axes();saved=False
     if hasattr(devices,'flying'):devices.flying()
     last=time.monotonic();touchdown=hit=None
     while True:
@@ -213,42 +242,82 @@ async def fly(env,episode,devices,settings,oft,config,recorder,size,tier_index=2
         if 'pad_rb' in pressed:tier_index=min(len(tiers)-1,tier_index+1)
         touchdown,hit=env.contacts()
         if hit:reason='collision';break
-        if terminal is None and episode['task']=='land' and touchdown:terminal='landed';smoother.stop()
+        if terminal is None and episode['task']=='land' and touchdown:
+            terminal='landed';smoother.stop()
+            if held:held=False;labeler.close();open_decision()
+        if policy and terminal is None:
+            asked=bool({'space','pad_y'}&pressed)
+            if pilot=='model' and (asked or controls.active(inputs)):
+                # The pilot's commands start from what the model was commanding (its decision's rates and heading).
+                switch('human');smoother.now=model_rates
+                if held:held=False;flown={'human'};labeler.close();open_decision()
+            elif pilot=='human' and asked:giving_back=not giving_back
         if terminal is None and ('enter' in pressed or 'pad_a' in pressed):
-            if episode['task']=='approach':terminal='stop';smoother.stop()
+            if pilot=='model':
+                if held:reason='model_stop';stopped=True;break
+            elif episode['task']=='approach':terminal='stop';smoother.stop()
             else:reason='gave_up';break
-        target=Axes() if terminal else controls.wanted(inputs,tiers[tier_index],oft)
-        rates=smoother.step(target,elapsed) if not terminal else smoother.stop()
-        before=z_set;heading+=rates.turn*elapsed
-        z_set=max(env.ground_z-env.limits['maximum_clearance_m'],min(env.ground_z-env.limits['minimum_clearance_m'],z_set+rates.down*elapsed))
-        labeler.add(Axes(rates.forward,(z_set-before)/elapsed,rates.turn),elapsed)
-        await env.drone.move_by_velocity_z_async(rates.forward*math.cos(heading),rates.forward*math.sin(heading),z_set,duration=settings['command_duration_s'],
-                                                 yaw_is_rate=False,yaw=heading)
-        if time.monotonic()-opened>=tick:
-            label=labeler.close();pending.update(teacher_action=label,action=label,executed=label)
-            mark=controls.mark(label,oft,terminal=pending['teacher_state']!='human',reason=labeler.reason)
+        if pilot=='human' or terminal or held:
+            target=Axes() if terminal or held else controls.wanted(inputs,tiers[tier_index],oft)
+            rates=smoother.stop() if terminal or held else smoother.step(target,elapsed)
+            before=env.setpoint_z;heading+=rates.turn*elapsed;env.setpoint_z=max(low,min(high,env.setpoint_z+rates.down*elapsed))
+            labeler.add(Axes(rates.forward,(env.setpoint_z-before)/elapsed,rates.turn),elapsed)
+            await env.drone.move_by_velocity_z_async(rates.forward*math.cos(heading),rates.forward*math.sin(heading),env.setpoint_z,duration=settings['command_duration_s'],
+                                                     yaw_is_rate=False,yaw=heading)
+        elif not applied and thinking.done():
+            # The model's decision, flown as the canonical loop flies it (no finalizer: the canonical evaluation's setting).
+            answer=thinking.result();action=answer['chunk'][0]
+            stop_count=stop_count+1 if is_stop(action,oft) else 0
+            pending.update(chunk=answer['chunk'],normalised=answer['normalised_chunk'][0],prompt=answer['prompt'],inference_ms=answer['inference_ms'],
+                           action=list(action),executed=list(action),teacher_action=list(action))
+            await env.tick(action,observation['yaw']);heading=observation['yaw']+action[2];applied=True
+            model_rates=rates=Axes(action[0]/tick,action[1]/tick,action[2]/tick)
+        if pending is not None and time.monotonic()-opened>=tick and (pilot=='human' or terminal or applied):
+            label=labeler.close();mark=controls.pilot_mark(flown)
+            if 'action' not in pending:pending.update(teacher_action=label,action=label,executed=label)
+            if 'human' in flown:pending['human_action']=label
+            pending['pilot']=mark or 'human'
+            if mark is None:
+                pending.update(teacher_action=label,action=label,executed=label)
+                mark=controls.mark(label,oft,terminal=pending['teacher_state'] in ('stop','landed'),reason=labeler.reason)
             if mark:pending['excluded']=mark
             steps.append(pending)
-            if pending['teacher_state']!='human':
+            if pending['teacher_state'] in ('stop','landed'):
                 terminal_left-=1
-                if terminal_left<=0:reason='human_stop';stopped=True;break
+                if terminal_left<=0:reason='human_stop' if pilot=='human' else 'model_stop';stopped=True;break
             index+=1
             if index>=episode.get('max_ticks',settings['max_ticks']):reason='max_steps';break
-            opened=time.monotonic();observation=env.observe()
-            pending=make_step(env,observation,index,episode['instruction'],terminal or 'human',recorder,oft)
-        state=STATES[terminal or 'human'];tier=controls.TIER_NAMES[tier_index]
+            if pilot=='model' and terminal is None and stop_count>=config['stop_ticks']:
+                # The model's own stop: the canonical loop would end the flight here. The vehicle holds; the pilot decides.
+                held=True;pending=None
+            else:
+                if giving_back and terminal is None:giving_back=False;switch('model');stop_count=0
+                flown={pilot};open_decision()
+        if held:state='MODEL STOPPED'
+        elif terminal:state=STATES[terminal]
+        else:state=(STATES['model'] if pilot=='model' else STATES['taken']) if policy else STATES['human']
+        tier=controls.TIER_NAMES[tier_index]
         # Backward, or faster than a policy can fly: flown, recorded, never a label; the pilot is told so.
-        note=' | BEYOND THE MODEL: not used for training' if controls.beyond(rates,oft) else ''
-        lines=[(episode['instruction'],(20,20,20),True),(f'{state} | speed {tier_index+1} {tier} | {"REC" if recorder else "not recorded"}{note}',(0,0,170) if recorder and not note else (0,90,200) if note else (90,90,90),False)]
+        note=' | BEYOND THE MODEL: not used for training' if pilot=='human' and controls.beyond(rates,oft) else ''
+        colour=(150,40,150) if pilot=='model' and not terminal else (0,90,200) if note else (0,0,170) if recorder else (90,90,90)
+        lines=[(episode['instruction'],(20,20,20),True),(f'{state} | speed {tier_index+1} {tier} | {"REC" if recorder else "not recorded"}{note}',colour,False)]
+        if held:lines.append(('THE MODEL STOPPED IN THE AIR: take over (Space or a flight key) or end the flight here (Enter)',(0,0,200),False))
+        elif giving_back:lines.append(('Control goes back to the model at the next decision (Space: cancel)',(150,40,150),False))
         # A landing counts only when the touchdown is soft; speed 3 descends faster than that.
-        if episode['task']=='land' and not terminal and rates.down>soft:lines.append((f'DESCENDING TOO FAST TO TOUCH DOWN: a landing needs {soft:.2f} m/s or less (speed 1 or 2)',(0,0,200),False))
+        elif pilot=='human' and episode['task']=='land' and not terminal and rates.down>soft:
+            lines.append((f'DESCENDING TOO FAST TO TOUCH DOWN: a landing needs {soft:.2f} m/s or less (speed 1 or 2)',(0,0,200),False))
+        footer=KEYS_FLYING if not policy else KEYS_MODEL if pilot=='model' else KEYS_TAKEN
         # The stream when it runs; else the pictures of the last decision (the stream is for the display only).
         front=env.stream.latest('front');down=env.stream.latest('down')
-        canvas=render(front if front is not None else observation['frames']['front'],down if down is not None else observation['frames']['down'],lines,rates,limits,size,KEYS_FLYING)
+        canvas=render(front if front is not None else observation['frames']['front'],down if down is not None else observation['frames']['down'],lines,rates,limits,size,footer)
         show(canvas)
         if snapshot and not saved and index>=12:cv2.imwrite(str(snapshot),canvas);saved=True
         await asyncio.sleep(max(0.,dt-(time.monotonic()-begun)))
-    return (reason,stopped,steps,touchdown,hit),None
+    if thinking is not None and not thinking.done():
+        # The model's answer to a decision the pilot took over is not flown; the connection is free again once it comes.
+        try:await thinking
+        except Exception:pass
+    return (reason,stopped,steps,touchdown,hit,switches),None
 
 
 async def pumping(period=.1):
@@ -267,7 +336,12 @@ async def main(args):
     settings=session.load(args.config);config=load_config();oft=load_oft();size=settings['display_px_unreal' if args.unreal_view else 'display_px']
     scenes=settings['scenes'];scene=args.scene or scenes[0];layout=args.layout or settings['layouts'][0]
     if scene not in scenes or layout not in settings['layouts']:raise SystemExit(f'scene and layout must be recording ones: {scenes}, {settings["layouts"]}')
-    record_root=None if args.no_record else Path(args.record or ROOT/settings['dataset'])
+    record_root=None if args.no_record else Path(args.record or ROOT/(settings['takeover']['dataset'] if args.takeover else settings['dataset']))
+    policy=None;model=None
+    if args.takeover:
+        from src.human_pilot.remote import RemotePolicy
+        policy=RemotePolicy(args.takeover);check=Path(args.takeover).parent/'checkpoint-check.json'
+        model=json.loads(check.read_text(encoding='utf-8')) if check.exists() else {}
     output=Path(args.output);output.mkdir(parents=True,exist_ok=True)
     from src.human_pilot.devices import Devices
     devices=Script(args.script) if args.script else Devices(WINDOW,also=(UNREAL,) if args.unreal_view else ())
@@ -283,9 +357,14 @@ async def main(args):
         while True:
             item=objects[chosen]
             if task=='land' and not item['landable']:task='approach'
-            lines=[('HUMAN PILOT - choose what to fly',(20,20,20),True),
+            lines=[('TAKEOVER - the model flies, you take over' if policy else 'HUMAN PILOT - choose what to fly',(20,20,20),True),
                    (f'scene {scene} | layout {layout} | {item["noun"]} | {task.upper()} | start: a random place {settings["distance_m"][0]:.0f}-{settings["distance_m"][1]:.0f} m away',(20,20,20),False),
                    (message,(0,110,0) if message.startswith('KEPT') else (0,0,170),False)]
+            status=policy.status() if policy else 'ready'
+            if policy:
+                name=f'{Path(model.get("checkpoint","")).name} ({model.get("name")}, frozen baseline {(model.get("frozen") or {}).get("state")})'
+                lines.append((f'MODEL {name}: ready' if status=='ready' else f'MODEL {name}: loading in WSL (about a minute) ...' if status=='loading'
+                              else 'MODEL FAILED TO LOAD: see outputs/human_pilot/takeover/policy-server-errors.log',(150,40,150) if status in ('ready','loading') else (0,0,200),False))
             show(render(None,None,lines,size=size,footer=KEYS_MENU))
             inputs,pressed,_=devices.read()
             if 'escape' in pressed:break
@@ -299,7 +378,10 @@ async def main(args):
             if not ({'enter','pad_start'}&pressed):
                 await asyncio.sleep(.05);continue
             if args.episodes and flown>=args.episodes:break
+            if status!='ready':
+                await asyncio.sleep(.05);continue
             episode=session.draw(settings,config,maps[scene],layout,item['name'],task,seed,avoid[scene]);seed+=1
+            if policy:episode.update(id='tk'+episode['id'][2:],kind='takeover',pilot='takeover')
             show(render(None,None,[(episode['instruction'],(20,20,20),True),('PREPARING: loading the scene and flying to the start ...',(0,0,170),False)],size=size))
             recorder=session.Recorder(record_root,episode) if record_root else None
             # The window is kept answering while the scene loads (Windows marks it "not responding" otherwise).
@@ -308,7 +390,7 @@ async def main(args):
             finally:pump.cancel()
             clock=time.time();stamp=env.drone.get_ground_truth_kinematics()['time_stamp']
             if args.unreal_view:place_simulator()
-            try:result,why=await fly(env,episode,devices,settings,oft,config,recorder,size,tier_index=settings['default_tier']-1,snapshot=args.snapshot)
+            try:result,why=await fly(env,episode,devices,settings,oft,config,recorder,size,tier_index=settings['default_tier']-1,snapshot=args.snapshot,policy=policy)
             except Exception:
                 traceback.print_exc();result,why=None,'error'
             if hasattr(devices,'menu'):devices.menu()
@@ -317,7 +399,7 @@ async def main(args):
                 await env.close();message=f'{episode["id"]}: {why}, nothing kept'
                 if why=='quit':break
                 continue
-            reason,stopped,steps,touchdown,hit=result;flown+=1
+            reason,stopped,steps,touchdown,hit,switches=result;flown+=1
             if not steps:
                 await env.close();message=f'{episode["id"]}: {reason} before the first decision, nothing kept'
                 if recorder:recorder.discard()
@@ -327,21 +409,29 @@ async def main(args):
             reading=evaluator.read(summary,env.surfaces,env.landing,steps)
             wall=steps[-1]['epoch']-clock;factor=((steps[-1]['sim_stamp']-stamp)/1e9/wall) if wall>0 else None
             good=session.kept(reading,summary,factor,settings);rows=session.label_rows(steps)
+            # A takeover flight is data only for what the pilot flew: with no decision of the pilot's a label, there is none.
+            if policy:good=good and rows['labels']>0
+            extra={'takeover':{'checkpoint':model.get('checkpoint'),'model':model.get('name'),'frozen':(model.get('frozen') or {}).get('state'),
+                               'loaded':policy.info.get('loaded'),'switches':switches,'takeovers':sum(item['to']=='human' for item in switches)}} if policy else {}
             if recorder:
-                recorder.finish({**summary,'surface_landing':reading,'real_time_factor':factor,'pilot':'human','controls':'script' if args.script else 'keyboard/pad','labels':rows,
-                                 'view':'unreal' if args.unreal_view else 'cameras','view_px':args.view_px or settings['view_px']},
+                recorder.finish({**summary,'surface_landing':reading,'real_time_factor':factor,'pilot':'takeover' if policy else 'human','controls':'script' if args.script else 'keyboard/pad','labels':rows,
+                                 'view':'unreal' if args.unreal_view else 'cameras','view_px':args.view_px or settings['view_px'],**extra},
                                 steps,good,settings['keep_rejected_frames'])
             await env.close()
             line={'id':episode['id'],'scene':scene,'layout':layout,'target':item['name'],'task':task,'reason':reason,'success':bool(reading.get('success')),
                   'landed_on':reading.get('landed_on'),'collision':reading.get('collision'),'decisions':len(steps),'labels':rows,'real_time_factor':factor,'kept':good and bool(recorder),
-                  'decision_period_s':round((steps[-1]['epoch']-steps[0]['epoch'])/max(1,len(steps)-1),3),'stream_frames':dict(env.stream.counts),
-                  'view':'unreal' if args.unreal_view else 'cameras'}
+                  # The median: in takeover mode the vehicle may wait between two decisions after the model's stop.
+                  'decision_period_s':round(statistics.median([b['epoch']-a['epoch'] for a,b in zip(steps,steps[1:])] or [0.]),3),'stream_frames':dict(env.stream.counts),
+                  'view':'unreal' if args.unreal_view else 'cameras','mode':'takeover' if policy else 'human'}
+            if policy:line.update(model=model.get('name'),takeovers=extra['takeover']['takeovers'],switches=[[item['decision'],item['to']] for item in switches])
             with (output/'flights.jsonl').open('a',encoding='utf-8') as file:file.write(json.dumps(line)+'\n')
             print('FLIGHT',json.dumps(line),flush=True)
             message=(f'KEPT {episode["id"]}' if good and recorder else f'NOT KEPT {episode["id"]}')+f': {reason}, success={bool(reading.get("success"))}, {rows["labels"]} labels, {rows["decisions"]-rows["labels"]-rows["terminal"]} left out'
+            if policy:message+=f', taken over {extra["takeover"]["takeovers"]} times'
             if args.episodes and flown>=args.episodes:break
     finally:
         cv2.destroyAllWindows()
+        if policy:policy.close()
         try:client.disconnect()
         except Exception:pass
 
@@ -358,4 +448,5 @@ if __name__=='__main__':
     parser.add_argument('--snapshot',help='save the window once, at the twelfth decision of a flight (to show what the pilot sees)')
     parser.add_argument('--view-px',type=int,help='resolution of the display cameras (default: the configuration\'s)')
     parser.add_argument('--unreal-view',action='store_true',help='the simulator\'s own window is shown; keys work in it too; the flights are recorded with view: unreal')
+    parser.add_argument('--takeover',metavar='READY_FILE',help='takeover mode: the model served by src/human_pilot/remote.py (which writes READY_FILE once loaded) flies first')
     asyncio.run(main(parser.parse_args()))

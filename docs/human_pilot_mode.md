@@ -5,6 +5,7 @@
 ```powershell
 .\scripts\run_human_pilot.ps1                # 조종 창만 (simulator 창은 숨김)
 .\scripts\run_human_pilot.ps1 -UnrealView    # simulator(Unreal) 창도 띄우고, 그 창을 보며 조종
+.\scripts\run_human_pilot.ps1 -Takeover      # 개입 모드: 모델이 먼저 날고, 막히면 사람이 넘겨받음
 ```
 
 ## 화면에 보이는 것
@@ -96,6 +97,42 @@ outputs/human_pilot/flights.jsonl            비행마다 한 줄: 결과, label
 
 각 decision에는 simulator가 아는 값(거리, 방향, 카메라에 보였는지)도 분석용으로 함께 저장됩니다. Builder는 이를 `meta`에만 두고, 모델은 읽지 않습니다. Teacher 녹화와 같습니다. 비행 요약에는 `view`(`cameras` / `unreal`)와 표시 해상도(`view_px`)도 남습니다.
 
+## 개입 모드 — 모델이 날다가 막히면 사람이 넘겨받기
+
+```powershell
+.\scripts\run_human_pilot.ps1 -Takeover
+.\scripts\run_human_pilot.ps1 -Takeover -UnrealView
+.\scripts\run_human_pilot.ps1 -Takeover -Checkpoint outputs/aerovla_oft/checkpoints/generic_landing_stage1c_run/update-2000
+```
+
+모델이 먼저 날고, 사람은 보고 있다가 모델이 잘못 갈 때 넘겨받아 고칩니다. 이렇게 모이는 data는 **모델이 실제로 간 상태에서 사람이 고친 조작**입니다. 사람이 처음부터 날린 비행과 달리, 모델이 막히는 장면(가려진 목표 앞에서 제자리 회전, 윗면 위 공중 정지)에서의 정답이 모입니다.
+
+| 키보드 | Pad | 동작 |
+|---|---|---|
+| Space 또는 아무 비행 키 (W S A D ↑ ↓ …) | Y 또는 stick | 넘겨받기 (바로) |
+| Space | Y | 모델에게 돌려주기 (다음 decision부터, 다시 누르면 취소) |
+| Enter | A | 모델이 멈춰 기다릴 때: 그 자리에서 비행 끝내기. 사람이 날 때: 사람 조종과 같음 |
+
+- **모델의 비행은 canonical 평가와 같습니다.** 0.5초마다 같은 함수로 사진을 받아 모델에 주고, 모델의 첫 action을 canonical executor(`SearchEnv.tick`)로 날립니다. Landing finalizer는 canonical 평가처럼 꺼져 있습니다.
+- **모델은 WSL의 GPU에서 돕니다**(`src/human_pilot/remote.py`). 추론은 한 decision에 약 0.35초(첫 decision만 약 1.2초)이고, decision 간격은 0.53–0.56초입니다. `-UnrealView`를 함께 쓰면 Unreal 창과 모델이 GPU를 나눠 써서 약 0.62초로 늘어납니다. 실행하면 checkpoint를 먼저 확인하고(동결 baseline이면 fingerprint까지), WSL에서 불러오는 동안(약 1분) 메뉴에 `loading`이 뜹니다.
+- **모델이 받는 것은 사진 두 장과 문장뿐입니다.** 답에는 모델이 받은 사진의 sha256이 붙어 오고, 저장한 사진과 다르면 비행을 멈춥니다.
+- **넘겨받는 순간 사람의 조작은 모델이 내던 속도와 방향에서 시작합니다.** 덜컥이지 않습니다.
+- **모델이 멈추면 기다립니다.** 모델이 stop을 4번 연속 내면 canonical 평가에서는 비행이 끝납니다. 개입 모드에서는 기체가 그 자리에 머물고 `MODEL STOPPED`가 뜹니다. 넘겨받아 고치거나(공중에서 멈췄으면 내려가서 착륙), Enter로 그대로 끝냅니다.
+- **화면:** 상태 줄이 `MODEL FLYING`(보라) / `YOU ARE FLYING` / `MODEL STOPPED`로 바뀝니다. 모델이 날 때 막대는 모델의 명령을 보여 줍니다.
+- **시작:** 사람 조종과 같은 규칙입니다(녹화 layout의 무작위 자리, check 시작에서 6m 이상, `-Seed`로 반복).
+
+**무엇이 label인가.**
+
+| 표시 | 뜻 |
+|---|---|
+| `model` | 모델이 날린 decision. 사진과 모델의 답(chunk, 추론 시간)까지 기록하지만 label이 아님 |
+| `handover` | 넘겨받은 순간의 decision(앞은 모델, 뒤는 사람). label이 아님 |
+| 표시 없음 | 사람이 날린 decision. 사람 조종의 규칙(`pause`, `below_safe`, `backward`, `over_bound`)을 그대로 적용 |
+
+**어떤 비행이 data가 되는가.** 사람 조종과 같은 조건(문장대로 함, 부딪치지 않음, 실시간 0.8배 이상)에 하나가 더 붙습니다: 사람의 label이 하나 이상 있어야 합니다. 모델이 혼자 끝까지 한 비행에는 배울 것이 없기 때문입니다. 모델의 stop을 Enter로 받아들여 끝낸 비행(`model_stop`)도 성공이면 들어갑니다. 저장 위치는 `datasets/projectairsim_visual_search/takeover/`이고 id는 `tk-`로 시작합니다. 사람 혼자 날린 비행과 따로 둡니다. 비행 요약에는 checkpoint, 동결 baseline 확인 결과, 넘겨받고 돌려준 decision 번호가 남습니다.
+
+**Checkpoint.** 기본은 Interactive Mission Control의 기본값인 동결 baseline `grounding_film`입니다. `-Checkpoint`로 다른 것을 날릴 수 있고, 그때는 확인되지 않은 checkpoint라는 경고가 나옵니다.
+
 ## 어디서 날 수 있는가
 
 - 장면: `field`, `lot`. Layout: `a b c d k l m n` (모든 generic landing 단계가 녹화한 layout).
@@ -107,6 +144,7 @@ outputs/human_pilot/flights.jsonl            비행마다 한 줄: 결과, label
 .\scripts\run_human_pilot.ps1 -Scene lot -Layout k -Target green_cylinder -Task land
 ```
 
+- `-Takeover`: 개입 모드(위). `-Checkpoint DIR`로 다른 checkpoint를, `-Distro`로 다른 WSL 배포판을 씁니다.
 - `-UnrealView`: simulator 창을 1280×720으로 띄우고 그 창을 보며 조종합니다(`view: unreal`로 기록).
 - `-ViewPx 1024`: 표시용 카메라 해상도(기본 768). 기록되는 사진에는 영향이 없습니다.
 - `-Seed 24`: 같은 시작에서 다시 날립니다. 시작은 seed로 정해지므로, 같은 seed는 같은 자리·방향입니다(비행마다 1씩 늘어남).
@@ -136,11 +174,31 @@ outputs/human_pilot/flights.jsonl            비행마다 한 줄: 결과, label
 - 전진+상승 구간의 label은 `[1.0, -0.5, 0]`(전진 1m, 상승 0.5m per 0.5초)로, 두 축이 한 label에 함께 들어갔습니다.
 - 후진 2.5초는 6개 decision(5개 + 바뀌는 순간 1개)이 `backward`로, 부스트 1.5초는 3개 + 부스트에서 감속하던 1개가 `over_bound`로 표시됐습니다.
 - `-UnrealView`: simulator 창 안쪽이 1280×720, 화면 (8, 31)에 놓였고(제목 표시줄이 화면 안), 조종 창은 그 오른쪽 (1300, 0)에 붙었습니다. Unreal 창을 띄운 접근 비행 일곱 번의 실시간 비율은 0.90–1.00이었습니다.
+- 회귀 확인: 비행 loop를 개입 모드에 맞게 바꾼 뒤 위의 2단계 pad 착륙(기록됨, label 34)과 후진·부스트 비행(`backward` 6, `over_bound` 4)을 다시 날려 같은 결과를 얻었습니다.
 - 첫 버전 비행에서 decision 간격이 0.5초보다 길었던 것(0.6–0.78초)은 0.5초를 사진을 요청하는 순간부터 세도록 고쳐 0.52초가 됐습니다. Canonical loop은 0.51초입니다.
+
+### 개입 모드 확인 비행
+
+동결 baseline `grounding_film`(fingerprint 확인됨)으로, 사람 대신 정해진 입력으로 날렸습니다. 모두 field / layout a / seed 7 시작이고, 확인용 폴더에만 기록했습니다.
+
+| 비행 | 무슨 일이 있었나 | 결과 | Decision | model / handover / 사람 label / 그 외 사람 decision |
+|---|---|---|---:|---|
+| blue cube 접근 | 모델 13 decision → 넘겨받아 전진·회전 → 돌려줌 → 모델이 7.2m에서 stop 4번 → 기다림 → Enter | 성공, 기록됨 (`model_stop`) | 28 | 17 / 1 / 9 / pause 1 |
+| blue cube 접근 | 모델이 10.5m에서 stop 4번 → 18초 기다림 → 넘겨받아 전진 → Enter | 성공, 기록됨 (`human_stop`) | 35 | 22 / 0 / 4 / pause 4, below_safe 1, 끝의 stop 4 |
+| blue cube 착륙, 개입 없음 | 모델이 혼자 cube 윗면 가장자리(가운데에서 4.9m, 영역 밖)에 닿음 | 실패, 기록 안 됨 | 72 | 72 / 0 / 0 / – |
+| blue cube 착륙, 개입 | 같은 시작. 모델이 cube 12m 앞에 왔을 때 넘겨받아 조금 올라가 다가간 뒤 2단계로 하강 | 윗면 영역 안(가운데에서 2.45m), 0.57 m/s, 성공, 기록됨 | 88 | 57 / 1 / 20 / pause 6, 끝의 stop 4 |
+| blue cube 접근, `-UnrealView` | 넘겨받기 2번, 돌려주기 1번 | 성공 (기록하지 않음) | 54 | 32 / 2 / 10 / pause 6, 끝의 stop 4 |
+
+- 모델의 추론은 decision마다 약 0.35초였고(첫 decision 1.2초), 모델이 받은 사진의 sha256은 매번 저장한 사진과 같았습니다(다르면 비행이 멈춤).
+- 넘겨받은 순간 사람의 조작은 모델이 내던 1.94 m/s에서 시작해 그 decision의 사람 몫이 2 m/s로 이어졌습니다.
+- Dataset builder의 규칙으로 첫 비행을 읽으면 label window는 사람이 날린 decision 14–19에서만 시작합니다. 넘겨받은 decision(13)이나 손을 뗀 decision(23)이 든 window는 빠집니다.
+- 매 비행 뒤 WSL의 policy server는 pilot이 연결을 닫자 스스로 끝났습니다.
+- 개입 없는 착륙과 개입한 착륙은 같은 시작에서 날렸습니다. 모델이 혼자 가면 가장자리에 닿고(Stage 1d의 가장자리 문제와 같은 모습), 사람이 넘겨받아 고치면 영역 안에 내립니다. 개입 모드가 모으려는 data가 바로 이 차이입니다.
 
 ## 한계
 
 - 사람은 기억을 쓰지만(아까 왼쪽에 보였다) 모델은 지금 사진 한 쌍만 봅니다. 기억에 기댄 조작은 모델이 따라 하기 어렵습니다. Unreal 창을 보며 날린 비행은 더 그렇습니다(밖에서 본 시점).
 - 같은 장면에서 사람과 scripted teacher가 다르게 행동하면, 둘을 섞어 학습할 때 다시 평균되어 멈출 수 있습니다. 사람 data는 teacher가 못 하는 상황(가려진 목표 찾기, 가장자리 회복)에 쓰는 편이 낫습니다.
 - 부스트와 후진은 빠르게 자리를 옮기는 데는 편하지만, 그 구간은 학습에 쓰이지 않습니다. 학습할 비행은 1–3단계로 날리는 편이 data가 많이 남습니다.
+- 개입 모드에서 모델이 표면에 닿으면 비행은 4 decision 뒤 끝나고, 그 뒤에는 넘겨받을 수 없습니다. 판정이 첫 접지로 정해지기 때문입니다. 가장자리로 가는 것이 보이면 닿기 전에 넘겨받아야 합니다.
 - 아직 이 data로 학습하지 않았습니다. 학습에 넣는 비율과 기준은 다음 단계에서 정합니다.

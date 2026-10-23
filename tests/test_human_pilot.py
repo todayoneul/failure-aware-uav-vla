@@ -1,6 +1,9 @@
-"""Human pilot mode: what keys and sticks become, what is recorded of them, where a flight may start, and that the
-recording reads like the teacher's. No simulator, no window."""
+"""Human pilot mode: what keys and sticks become, what is recorded of them, where a flight may start, that the
+recording reads like the teacher's, and how takeover mode asks the model for a decision. No simulator, no window, no model."""
+import hashlib
 import json
+import os
+import threading
 import math
 import tempfile
 import unittest
@@ -91,6 +94,15 @@ class ControlTests(unittest.TestCase):
         for action in ([.3,0.,0.],[0.,.1,.02],[.05,.05,.1]):self.assertAlmostEqual(self.c.stop_ratio(action,self.oft),stop_ratio(action,self.oft))
 
 
+    def test_any_flight_input_takes_over_and_a_decision_is_marked_by_who_flew_it(self):
+        Inputs=self.c.Inputs
+        self.assertFalse(self.c.active(Inputs()));self.assertFalse(self.c.active(Inputs(stick_turn=.15)))
+        for keys in ({'forward':True},{'backward':True},{'up':True},{'down':True},{'left':True},{'right':True},{'stick_forward':-.5},{'stick_vertical':.3}):
+            self.assertTrue(self.c.active(Inputs(**keys)),keys)
+        self.assertIsNone(self.c.pilot_mark({'human'}));self.assertEqual(self.c.pilot_mark({'model'}),'model')
+        self.assertEqual(self.c.pilot_mark({'model','human'}),'handover')
+
+
 class SessionTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -137,7 +149,7 @@ class SessionTests(unittest.TestCase):
             summary={**episode,'reason':'human_stop','success':True}
             path=recorder.finish(summary,steps,kept=True)
             self.assertEqual(path.parent.name,'episodes');self.assertTrue((Path(root)/'field/hp-test-blue_cube-land/frontcamera/000011.png').exists())
-            self.assertEqual(self.s.label_rows(steps),{'decisions':12,'labels':6,'pause':1,'below_safe':1,'backward':0,'over_bound':0,'terminal':4})
+            self.assertEqual(self.s.label_rows(steps),{'decisions':12,'labels':6,'pause':1,'below_safe':1,'backward':0,'over_bound':0,'model':0,'handover':0,'terminal':4})
             records=load_records(root);self.assertEqual(len(records),1);samples=episode_samples(records[0],4)
             used={sample['meta']['step'] for sample in samples}
             # A window holding decision 2 or 3 is left out (decisions 0-3); the stops after the touchdown are labels.
@@ -157,6 +169,70 @@ class SessionTests(unittest.TestCase):
         land={**summary,'task':'land'}
         self.assertFalse(self.s.kept({'success':True,'stable_physical_landing':False},land,.95,settings))
         self.assertTrue(self.s.kept({'success':False,'stable_physical_landing':True},land,.95,settings))
+        # Takeover mode: the pilot may accept the model's own stop at the end.
+        self.assertTrue(self.s.kept(good,{**summary,'reason':'model_stop'},.95,settings))
+
+    def test_a_takeover_flights_model_and_handover_decisions_are_in_no_label(self):
+        import numpy as np
+        from scripts.build_visual_search_dataset import load_records,episode_samples
+        episode={'id':'tk-test-blue_cube-land','map':'field','task':'land','target':'blue_cube','instruction':'Find the blue cube and land on it.','case':'human','split':'train'}
+        with tempfile.TemporaryDirectory() as root:
+            recorder=self.s.Recorder(root,episode);steps=[]
+            pilots=['model']*5+['handover']+['human']*6+['human']*4
+            for index,pilot in enumerate(pilots):
+                frame=np.full((256,256,3),index,np.uint8);state='landed' if index>=12 else 'model' if pilot=='model' else 'human'
+                step={'step':index,'teacher_state':state,'teacher_action':[.3,.25,0.],'action':[.3,.25,0.],'proprio':[0.]*4,'front_seen':True,'pilot':pilot,
+                      'front_in_fov':True,'down_seen':False,'bearing_deg':5.,'distance_m':20.-index,'height_m':9.,'perturbed':False,'img_name':recorder.frames(index,frame,frame)}
+                if pilot!='human':step['excluded']=pilot
+                steps.append(step)
+            recorder.finish({**episode,'reason':'human_stop','success':True},steps,kept=True)
+            self.assertEqual(self.s.label_rows(steps),{'decisions':16,'labels':6,'pause':0,'below_safe':0,'backward':0,'over_bound':0,'model':5,'handover':1,'terminal':4})
+            # Only windows of the pilot's own decisions (6 onward) are labels.
+            samples=episode_samples(load_records(root)[0],4);self.assertEqual({sample['meta']['step'] for sample in samples},set(range(6,16)))
+
+
+class RemoteTests(unittest.TestCase):
+    """The pilot's side and the server's side of takeover mode, over a real local connection, with a stand-in for the model."""
+    class Model:
+        def __init__(self):self.calls=[]
+        def infer(self,front,down,instruction,proprio=None):
+            self.calls.append((front.copy(),down.copy(),instruction,proprio))
+            return {'chunk':[[float(front[0,0,0])/100,0.,0.]]*4,'normalised_chunk':[[0.,0.,0.]]*4,'prompt':'p','inference_ms':1.,'stop':False,'proprio':proprio}
+
+    def test_a_decision_goes_to_the_server_and_back_with_proof_of_its_pictures(self):
+        import numpy as np
+        from multiprocessing.connection import Listener
+        from src.human_pilot import remote
+        model=self.Model();key=os.urandom(16);listener=Listener(('127.0.0.1',0),authkey=key)
+        server=threading.Thread(target=remote.serve,args=(model,listener,lambda text:None),daemon=True);server.start()
+        with tempfile.TemporaryDirectory() as folder:
+            ready=Path(folder)/'policy-ready.json';policy=remote.RemotePolicy(ready)
+            self.assertEqual(policy.status(),'loading')
+            ready.write_text(json.dumps({'port':listener.address[1],'key':key.hex(),'loaded':{'name':'stand-in'}}),encoding='utf-8')
+            self.assertEqual(policy.status(),'ready')
+            front=np.full((256,256,3),42,np.uint8);down=np.zeros((256,256,3),np.uint8);down[5,6]=[1,2,3]
+            answer=policy.infer({'front':front,'down':down,'instruction':'Find the blue cube and land on it.','proprio':None})
+            self.assertEqual(answer['chunk'][0],[.42,0.,0.])
+            # The model was given these pictures and this sentence, nothing else; the answer says which pictures it was given.
+            given=model.calls[0];self.assertTrue((given[0]==front).all() and (given[1]==down).all())
+            self.assertEqual(given[2:],('Find the blue cube and land on it.',None))
+            self.assertEqual(answer['input_sha256'],{'front':hashlib.sha256(front.tobytes()).hexdigest(),'down':hashlib.sha256(down.tobytes()).hexdigest()})
+            policy.close()
+        server.join(5);self.assertFalse(server.is_alive());listener.close()
+
+    def test_other_pictures_or_a_failed_server_stop_the_flight(self):
+        import numpy as np
+        from src.human_pilot import remote
+        class Connection:
+            def __init__(self,answer):self.answer=answer
+            def send_bytes(self,data):pass
+            def recv_bytes(self):return json.dumps(self.answer).encode()
+        frame=np.zeros((256,256,3),np.uint8)
+        with self.assertRaisesRegex(RuntimeError,'other pictures'):remote.ask(Connection({'chunk':[],'input_sha256':{'front':'x','down':'y'}}),frame,frame,'s')
+        with self.assertRaisesRegex(RuntimeError,'failed'):remote.ask(Connection({'error':'Traceback ...'}),frame,frame,'s')
+        with tempfile.TemporaryDirectory() as folder:
+            ready=Path(folder)/'policy-ready.json';ready.write_text(json.dumps({'error':'CUDA is required'}),encoding='utf-8')
+            self.assertEqual(remote.RemotePolicy(ready).status(),'CUDA is required')
 
 
 class WindowTests(unittest.TestCase):

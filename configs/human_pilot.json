@@ -46,6 +46,12 @@
   "turn_degps": 60.0
  },
  "boost_from": "tier 4, for getting somewhere: faster than a policy can fly (2 m/s, 1 m/s, 24 deg/s). Every decision flown faster than a policy can, or backward, is recorded and marked; none is a label.",
+ "takeover": {
+  "dataset": "datasets/projectairsim_visual_search/takeover",
+  "policy_port": 8995,
+  "checkpoint": "the interactive map's default (configs/mission/grounding_film_demo.json: the frozen grounding_film), unless the launcher is given -Checkpoint; checked by scripts/mission_checkpoint.py before anything starts",
+  "from": "takeover mode (-Takeover): the model flies first and the pilot takes over when it goes wrong; the pilot's decisions at the states the model reached are the data. Kept apart from the pilot's own flights."
+ },
  "view_px": 768,
  "view_from": "two display cameras with the pose and the field of view (90 deg) of the policy's front and down cameras, at 768 x 768 instead of 256 x 256; the recorded pictures are the policy's 256 x 256",
  "display_px": 560,

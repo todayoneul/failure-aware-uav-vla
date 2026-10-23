@@ -66,7 +66,7 @@ def draw(settings,config,map_config,layout,target,task,seed,avoid=None,stamp=Non
 
 def label_rows(steps):
     """How many decisions of a flight are labels, and why the others are not."""
-    out={'decisions':len(steps),'labels':0,'pause':0,'below_safe':0,'backward':0,'over_bound':0,'terminal':0}
+    out={'decisions':len(steps),'labels':0,'pause':0,'below_safe':0,'backward':0,'over_bound':0,'model':0,'handover':0,'terminal':0}
     for step in steps:
         if step.get('excluded'):out[step['excluded']]+=1
         elif step.get('teacher_state') in ('stop','landed'):out['terminal']+=1
@@ -103,12 +103,12 @@ class Recorder:
 
 def kept(reading,summary,factor,settings):
     """A human flight is data only if it did what the sentence asked by the surface evaluator's reading, the pilot said it
-    was done (or landed), nothing was hit, and the simulator kept up with real time. A landing is read by the surface
+    was done (or landed; in takeover mode, accepted the model's own stop), nothing was hit, and the simulator kept up with real time. A landing is read by the surface
     evaluator's own touchdown (the named surface, inside its region, soft, then standing still), not by the canonical rule:
     that one reads the touchdown from the simulator's reported vertical speed, which can settle only after a hard contact
     (a hard landing counted) or not within the four decisions after a soft one (a soft landing missed)."""
     done=reading.get('stable_physical_landing') if summary.get('task')=='land' else reading.get('success')
-    return bool(done and summary['reason']=='human_stop' and not summary.get('hit') and (factor is None or factor>=settings['real_time_minimum']))
+    return bool(done and summary['reason'] in ('human_stop','model_stop') and not summary.get('hit') and (factor is None or factor>=settings['real_time_minimum']))
 
 
 def digest(frame):return hashlib.sha256(frame.tobytes()).hexdigest()

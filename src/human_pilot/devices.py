@@ -11,8 +11,10 @@ Keys:
     1 2 3 4         speed tier (4: faster than a policy can fly; not used for training)
     Enter           done (approach: here; land: give up)
     Backspace       discard this flight  Esc                quit
+    Space           takeover mode: take over from the model, or give it back (any flight key also takes over)
 Before a flight: N / P next or previous object, T land or approach, L next layout, M next scene, Enter fly.
-Pad: left stick forward and back, and turn; right stick up and down; A done, B discard, Start fly, LB / RB tier.
+Pad: left stick forward and back, and turn; right stick up and down; A done, B discard, Start fly, LB / RB tier, Y take
+over or give back.
 """
 import ctypes
 import sys
@@ -20,7 +22,7 @@ from .controls import Inputs
 
 KEYS={'w':0x57,'s':0x53,'a':0x41,'d':0x44,'r':0x52,'f':0x46,'n':0x4E,'p':0x50,'t':0x54,'l':0x4C,'m':0x4D,'1':0x31,'2':0x32,'3':0x33,'4':0x34,
       'up':0x26,'down':0x28,'left':0x25,'right':0x27,'pageup':0x21,'pagedown':0x22,'enter':0x0D,'space':0x20,'backspace':0x08,'escape':0x1B}
-PAD_BUTTONS={'a':0x1000,'b':0x2000,'start':0x0010,'lb':0x0100,'rb':0x0200}
+PAD_BUTTONS={'a':0x1000,'b':0x2000,'y':0x8000,'start':0x0010,'lb':0x0100,'rb':0x0200}
 
 
 class _Gamepad(ctypes.Structure):
