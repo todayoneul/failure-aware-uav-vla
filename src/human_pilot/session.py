@@ -66,7 +66,7 @@ def draw(settings,config,map_config,layout,target,task,seed,avoid=None,stamp=Non
 
 def label_rows(steps):
     """How many decisions of a flight are labels, and why the others are not."""
-    out={'decisions':len(steps),'labels':0,'pause':0,'below_safe':0,'terminal':0}
+    out={'decisions':len(steps),'labels':0,'pause':0,'below_safe':0,'backward':0,'over_bound':0,'terminal':0}
     for step in steps:
         if step.get('excluded'):out[step['excluded']]+=1
         elif step.get('teacher_state') in ('stop','landed'):out['terminal']+=1

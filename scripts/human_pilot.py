@@ -2,10 +2,12 @@
 
   human_pilot.py --host 127.0.0.1 [--scene field] [--layout a] [--target blue_cube] [--task land] [--no-record]
 
-The window shows the two pictures a policy is given (256 x 256 each, enlarged), the sentence, and the pilot's own
-commands. It shows no map, no position, no height and nothing of where the object is; the simulator's own window is
-hidden by the launcher (scripts/run_human_pilot.ps1). Keys and pad: src/human_pilot/devices.py. What is recorded and
-what is left out of the labels: src/human_pilot/controls.py and src/human_pilot/session.py; docs/human_pilot_mode.md.
+The window shows the front and down views, the sentence, and the pilot's own commands; no map, no position, no height
+and nothing of where the object is. The views come from two display cameras with the pose and the field of view of the
+policy's cameras at a higher resolution (`--view-px`); what is recorded is the policy's own 256 x 256 pictures. With
+`--unreal-view` the simulator's own window (the vehicle seen from outside) is shown beside it and the flight is recorded
+with `view: unreal`. Keys and pad: src/human_pilot/devices.py. What is recorded and what is left out of the labels:
+src/human_pilot/controls.py and src/human_pilot/session.py; docs/human_pilot_mode.md.
 
 The vehicle is flown as a policy's flights are, with the same call (a velocity along the heading, a height to hold, a
 heading to turn to) and the same limits; only the commands come twenty times a second, eased in, instead of once per
@@ -16,6 +18,7 @@ and the commands of the following 0.5 s become that decision's label.
 """
 import argparse
 import asyncio
+import copy
 import json
 import math
 import sys
@@ -31,6 +34,8 @@ from src.human_pilot.controls import Axes,Inputs,Smoother,TickLabel
 
 WINDOW='HUMAN PILOT | front + down cameras only'
 STATES={'human':'FLYING','stop':'DONE - holding','landed':'TOUCHDOWN - holding'}
+UNREAL='Blocks Environment'     # the simulator's own window
+VIEWS={'front':'FrontView','down':'DownView'}
 
 
 class Stream:
@@ -44,7 +49,7 @@ class Stream:
             try:client.unsubscribe(self.topics)
             except Exception:pass
         self.topics=[];self.counts={'front':0,'down':0}
-        for sensor,name in (('FrontCamera','front'),('DownCamera','down')):
+        for name,sensor in VIEWS.items():
             topic=drone.sensors[sensor]['scene_camera'];self.topics.append(topic)
             def keep(_,message,name=name):
                 try:image=unpack_image(message)
@@ -58,27 +63,49 @@ class Stream:
         return None
 
 
-def streaming(prepare):
-    """The canonical scene configuration with the two RGB cameras also published as a stream (for the display; the
-    recorded pictures are still requested as the canonical loop requests them)."""
+def display_cameras(prepare,size,chase=None):
+    """The canonical scene configuration with two more cameras for the display: each a copy of the policy's camera (the
+    same place on the vehicle, the same direction and field of view), at `size` x `size` and published as a stream. The
+    policy's own cameras are left as they are; the recorded pictures are still requested from them as the canonical loop
+    requests them."""
     def prepared(root,output):
         directory=prepare(root,output);path=directory/'robot_quadrotor_fastphysics.jsonc';robot=json.loads(path.read_text())
-        for sensor in robot.get('sensors',[]):
-            if sensor.get('id') in ('FrontCamera','DownCamera'):
-                for setting in sensor.get('capture-settings',[]):
-                    if setting.get('image-type')==0:setting['streaming-enabled']=True
+        sensors={sensor['id']:sensor for sensor in robot['sensors']}
+        for source,name in (('FrontCamera',VIEWS['front']),('DownCamera',VIEWS['down'])):
+            view=copy.deepcopy(sensors[source]);rgb=next(setting for setting in view['capture-settings'] if setting['image-type']==0)
+            view.update({'id':name,'capture-settings':[dict(rgb,width=size,height=size,**{'streaming-enabled':True})]})
+            view.pop('noise-settings',None);robot['sensors'].append(view)
+        # With the simulator's window shown, its view (the camera behind the vehicle) at `chase` (width, height).
+        if chase and 'Chase' in sensors:sensors['Chase']['capture-settings'][0].update(width=chase[0],height=chase[1])
         path.write_text(json.dumps(robot,indent=2));return directory
     return prepared
 
 
-def environment(canonical):
+def place_simulator(width=1280,height=720):
+    """Puts the simulator's own window at the top left with a `width` x `height` inside. Windows only; a no-op elsewhere."""
+    if sys.platform!='win32':return False
+    import ctypes
+    from ctypes import wintypes
+    user32=ctypes.windll.user32;found=[]
+    def visit(handle,_):
+        buffer=ctypes.create_unicode_buffer(256);user32.GetWindowTextW(handle,buffer,256)
+        if buffer.value.strip()==UNREAL and user32.IsWindowVisible(handle):found.append(handle)
+        return True
+    user32.EnumWindows(ctypes.WINFUNCTYPE(wintypes.BOOL,wintypes.HWND,wintypes.LPARAM)(visit),0)
+    if not found:return False
+    outer=wintypes.RECT();inner=wintypes.RECT();user32.GetWindowRect(found[0],ctypes.byref(outer));user32.GetClientRect(found[0],ctypes.byref(inner))
+    extra_w=(outer.right-outer.left)-(inner.right-inner.left);extra_h=(outer.bottom-outer.top)-(inner.bottom-inner.top)
+    return bool(user32.MoveWindow(found[0],0,0,width+extra_w,height+extra_h,True))
+
+
+def environment(canonical,view_px,chase=None):
     from src.landing.env import SurfaceContacts
 
     class PilotEnv(SurfaceContacts,canonical.SearchEnv):
         stream=None
 
         async def reset(self,episode):
-            original=canonical.prepare_mission_config;canonical.prepare_mission_config=streaming(original)
+            original=canonical.prepare_mission_config;canonical.prepare_mission_config=display_cameras(original,view_px,chase)
             try:await super().reset(episode)
             finally:canonical.prepare_mission_config=original
             named=self.surfaces[self.target];self.surface=named.top_m if named.landable else 0.
@@ -115,26 +142,28 @@ def bar(canvas,x,y,width,value,top,label):
     cv2.rectangle(canvas,(min(middle,end),y+2),(max(middle,end),y+12),(60,120,200),-1)
 
 
-def render(front,down,lines,rates=None,limits=None,scale=2,footer=''):
-    """The pilot's window: the sentence and state on top, the two pictures, the pilot's own commands. Nothing else."""
-    size=256*scale;width=2*size+60;height=size+190;canvas=np.full((height,width,3),245,np.uint8)
+def render(front,down,lines,rates=None,limits=None,size=560,footer=''):
+    """The pilot's window: the sentence and state on top, the two views (`size` pixels square), the pilot's own commands.
+    Nothing else."""
+    width=max(2*size+60,780);height=size+190;canvas=np.full((height,width,3),245,np.uint8)
     for row,(text,colour,big) in enumerate(lines):
         cv2.putText(canvas,text,(20,32+row*28),cv2.FONT_HERSHEY_SIMPLEX,.8 if big else .55,colour,2 if big else 1,cv2.LINE_AA)
     for column,(name,frame) in enumerate((('FRONT',front),('DOWN',down))):
         x=20+column*(size+20);y=100
         if frame is None:cv2.rectangle(canvas,(x,y),(x+size,y+size),(30,30,30),-1)
-        else:canvas[y:y+size,x:x+size]=cv2.resize(frame,(size,size),interpolation=cv2.INTER_NEAREST)
+        else:canvas[y:y+size,x:x+size]=cv2.resize(frame,(size,size),interpolation=cv2.INTER_AREA if frame.shape[0]>size else cv2.INTER_LINEAR)
         cv2.putText(canvas,name,(x+8,y+24),cv2.FONT_HERSHEY_SIMPLEX,.6,(255,255,255),2,cv2.LINE_AA)
     if rates is not None and limits is not None:
         y=size+125
-        bar(canvas,20,y,220,rates.forward,limits.forward,f'forward {rates.forward:+.2f} m/s')
-        bar(canvas,270,y,220,-rates.down,limits.down,f'up {-rates.down:+.2f} m/s')
-        bar(canvas,520,y,220,rates.turn,limits.turn,f'turn {math.degrees(rates.turn):+.1f} deg/s')
+        width_bar=max(160,(width-80)//3)
+        bar(canvas,20,y,width_bar,rates.forward,limits.forward,f'forward {rates.forward:+.2f} m/s')
+        bar(canvas,40+width_bar,y,width_bar,-rates.down,limits.down,f'up {0.-rates.down:+.2f} m/s')
+        bar(canvas,60+2*width_bar,y,width_bar,rates.turn,limits.turn,f'turn {math.degrees(rates.turn):+.1f} deg/s')
     if footer:cv2.putText(canvas,footer,(20,height-14),cv2.FONT_HERSHEY_SIMPLEX,.45,(90,90,90),1,cv2.LINE_AA)
     return canvas
 
 
-KEYS_FLYING='W/Up forward | A D turn | R/PgUp up | F/PgDn down | 1 2 3 speed | Enter done | Backspace discard | Esc quit'
+KEYS_FLYING='W/S forward/back | A D turn | Up/Down climb/descend | 1-4 speed | Enter done | Backspace discard | Esc quit'
 KEYS_MENU='N/P object | T land/approach | L layout | M scene | Enter fly | Esc quit'
 
 
@@ -159,10 +188,11 @@ def make_step(env,observation,index,instruction,mode,recorder,oft):
     return step
 
 
-async def fly(env,episode,devices,settings,oft,config,recorder,scale,tier_index=1,snapshot=None):
+async def fly(env,episode,devices,settings,oft,config,recorder,size,tier_index=2,snapshot=None):
     """One flight. Returns (reason, stopped, steps, touchdown, hit) or None when the pilot discarded it or quit (then the
     second value says which)."""
-    tick=oft['tick_s'];dt=1./settings['control_hz'];tiers=controls.tiers_of(oft);limits=controls.limits_of(oft)
+    boost=settings['boost'];tiers=controls.tiers_of(oft,Axes(boost['forward_mps'],boost['vertical_mps'],math.radians(boost['turn_degps'])))
+    tick=oft['tick_s'];dt=1./settings['control_hz'];limits=tiers[-1]
     acceleration=settings['acceleration'];smoother=Smoother(Axes(acceleration['forward_mps2'],acceleration['down_mps2'],acceleration['turn_radps2']))
     labeler=TickLabel(oft);steps=[];index=0;terminal=None;terminal_left=settings['terminal_ticks'];reason='max_steps';stopped=False
     opened=time.monotonic();observation=env.observe();heading=observation['yaw'];z_set=env.setpoint_z
@@ -174,10 +204,10 @@ async def fly(env,episode,devices,settings,oft,config,recorder,scale,tier_index=
         inputs,pressed,_=devices.read()
         if 'escape' in pressed:return None,'quit'
         if 'backspace' in pressed or 'pad_b' in pressed:return None,'discard'
-        for key,number in (('1',0),('2',1),('3',2)):
+        for key,number in (('1',0),('2',1),('3',2),('4',3)):
             if key in pressed:tier_index=number
         if 'pad_lb' in pressed:tier_index=max(0,tier_index-1)
-        if 'pad_rb' in pressed:tier_index=min(2,tier_index+1)
+        if 'pad_rb' in pressed:tier_index=min(len(tiers)-1,tier_index+1)
         touchdown,hit=env.contacts()
         if hit:reason='collision';break
         if terminal is None and episode['task']=='land' and touchdown:terminal='landed';smoother.stop()
@@ -193,7 +223,7 @@ async def fly(env,episode,devices,settings,oft,config,recorder,scale,tier_index=
                                                  yaw_is_rate=False,yaw=heading)
         if time.monotonic()-opened>=tick:
             label=labeler.close();pending.update(teacher_action=label,action=label,executed=label)
-            mark=controls.mark(label,oft,terminal=pending['teacher_state']!='human')
+            mark=controls.mark(label,oft,terminal=pending['teacher_state']!='human',reason=labeler.reason)
             if mark:pending['excluded']=mark
             steps.append(pending)
             if pending['teacher_state']!='human':
@@ -203,15 +233,22 @@ async def fly(env,episode,devices,settings,oft,config,recorder,scale,tier_index=
             if index>=episode.get('max_ticks',settings['max_ticks']):reason='max_steps';break
             opened=time.monotonic();observation=env.observe()
             pending=make_step(env,observation,index,episode['instruction'],terminal or 'human',recorder,oft)
-        state=STATES[terminal or 'human'];tier=['slow','normal','fast'][tier_index]
-        lines=[(episode['instruction'],(20,20,20),True),(f'{state} | decision {index} | speed {tier} | {"REC" if recorder else "not recorded"}',(0,0,170) if recorder else (90,90,90),False)]
+        state=STATES[terminal or 'human'];tier=controls.TIER_NAMES[tier_index]
+        # Backward, or faster than a policy can fly: flown, recorded, never a label; the pilot is told so.
+        note=' | BEYOND THE MODEL: not used for training' if controls.beyond(rates,oft) else ''
+        lines=[(episode['instruction'],(20,20,20),True),(f'{state} | speed {tier_index+1} {tier} | {"REC" if recorder else "not recorded"}{note}',(0,0,170) if recorder and not note else (0,90,200) if note else (90,90,90),False)]
         # The stream when it runs; else the pictures of the last decision (the stream is for the display only).
         front=env.stream.latest('front');down=env.stream.latest('down')
-        canvas=render(front if front is not None else observation['frames']['front'],down if down is not None else observation['frames']['down'],lines,rates,limits,scale,KEYS_FLYING)
+        canvas=render(front if front is not None else observation['frames']['front'],down if down is not None else observation['frames']['down'],lines,rates,limits,size,KEYS_FLYING)
         show(canvas)
         if snapshot and not saved and index>=12:cv2.imwrite(str(snapshot),canvas);saved=True
         await asyncio.sleep(max(0.,dt-(time.monotonic()-begun)))
     return (reason,stopped,steps,touchdown,hit),None
+
+
+async def pumping(period=.1):
+    while True:
+        cv2.waitKey(1);await asyncio.sleep(period)
 
 
 async def main(args):
@@ -222,19 +259,21 @@ async def main(args):
     from src.visual_search.episodes import load_config
     from src.visual_search.finalizer import LandingFinalizer
     from src.visual_search.maps import load_map
-    settings=session.load(args.config);config=load_config();oft=load_oft();scale=settings['display_scale']
+    settings=session.load(args.config);config=load_config();oft=load_oft();size=settings['display_px_unreal' if args.unreal_view else 'display_px']
     scenes=settings['scenes'];scene=args.scene or scenes[0];layout=args.layout or settings['layouts'][0]
     if scene not in scenes or layout not in settings['layouts']:raise SystemExit(f'scene and layout must be recording ones: {scenes}, {settings["layouts"]}')
     record_root=None if args.no_record else Path(args.record or ROOT/settings['dataset'])
     output=Path(args.output);output.mkdir(parents=True,exist_ok=True)
     from src.human_pilot.devices import Devices
-    devices=Script(args.script) if args.script else Devices(WINDOW)
+    devices=Script(args.script) if args.script else Devices(WINDOW,also=(UNREAL,) if args.unreal_view else ())
     maps={name:load_map(name) for name in scenes};avoid={name:session.check_starts(name) for name in scenes}
     objects=session.targets_of(maps[scene],layout);chosen=next((index for index,item in enumerate(objects) if item['name']==args.target),0)
     task=args.task or ('land' if objects[chosen]['landable'] else 'approach');seed=args.seed if args.seed is not None else int(time.time())%100000
     client=ProjectAirSimClient(address=args.host,port_topics=args.ports[0],port_services=args.ports[1]);client.connect();client.socket_services.recv_timeout=60000
-    env=environment(canonical)(client,config,oft,output);env.stream=Stream();flown=0;message=''
+    env=environment(canonical,args.view_px or settings['view_px'],(1280,720) if args.unreal_view else None)(client,config,oft,output);env.stream=Stream();flown=0;message=''
     cv2.namedWindow(WINDOW,cv2.WINDOW_AUTOSIZE)
+    # Beside the simulator's window (1280 x 720 at the top left) when it is shown.
+    if args.unreal_view:cv2.moveWindow(WINDOW,1300,0)
     try:
         while True:
             item=objects[chosen]
@@ -242,7 +281,7 @@ async def main(args):
             lines=[('HUMAN PILOT - choose what to fly',(20,20,20),True),
                    (f'scene {scene} | layout {layout} | {item["noun"]} | {task.upper()} | start: a random place {settings["distance_m"][0]:.0f}-{settings["distance_m"][1]:.0f} m away',(20,20,20),False),
                    (message,(0,110,0) if message.startswith('KEPT') else (0,0,170),False)]
-            show(render(None,None,lines,scale=scale,footer=KEYS_MENU))
+            show(render(None,None,lines,size=size,footer=KEYS_MENU))
             inputs,pressed,_=devices.read()
             if 'escape' in pressed:break
             if 'n' in pressed:chosen=(chosen+1)%len(objects)
@@ -256,10 +295,15 @@ async def main(args):
                 await asyncio.sleep(.05);continue
             if args.episodes and flown>=args.episodes:break
             episode=session.draw(settings,config,maps[scene],layout,item['name'],task,seed,avoid[scene]);seed+=1
-            show(render(None,None,[(episode['instruction'],(20,20,20),True),('PREPARING: loading the scene and flying to the start ...',(0,0,170),False)],scale=scale))
+            show(render(None,None,[(episode['instruction'],(20,20,20),True),('PREPARING: loading the scene and flying to the start ...',(0,0,170),False)],size=size))
             recorder=session.Recorder(record_root,episode) if record_root else None
-            await env.reset(episode);clock=time.time();stamp=env.drone.get_ground_truth_kinematics()['time_stamp']
-            try:result,why=await fly(env,episode,devices,settings,oft,config,recorder,scale,snapshot=args.snapshot)
+            # The window is kept answering while the scene loads (Windows marks it "not responding" otherwise).
+            pump=asyncio.ensure_future(pumping())
+            try:await env.reset(episode)
+            finally:pump.cancel()
+            clock=time.time();stamp=env.drone.get_ground_truth_kinematics()['time_stamp']
+            if args.unreal_view:place_simulator()
+            try:result,why=await fly(env,episode,devices,settings,oft,config,recorder,size,tier_index=settings['default_tier']-1,snapshot=args.snapshot)
             except Exception:
                 traceback.print_exc();result,why=None,'error'
             if result is None:
@@ -278,15 +322,17 @@ async def main(args):
             wall=steps[-1]['epoch']-clock;factor=((steps[-1]['sim_stamp']-stamp)/1e9/wall) if wall>0 else None
             good=session.kept(reading,summary,factor,settings);rows=session.label_rows(steps)
             if recorder:
-                recorder.finish({**summary,'surface_landing':reading,'real_time_factor':factor,'pilot':'human','controls':'script' if args.script else 'keyboard/pad','labels':rows},
+                recorder.finish({**summary,'surface_landing':reading,'real_time_factor':factor,'pilot':'human','controls':'script' if args.script else 'keyboard/pad','labels':rows,
+                                 'view':'unreal' if args.unreal_view else 'cameras','view_px':args.view_px or settings['view_px']},
                                 steps,good,settings['keep_rejected_frames'])
             await env.close()
             line={'id':episode['id'],'scene':scene,'layout':layout,'target':item['name'],'task':task,'reason':reason,'success':bool(reading.get('success')),
                   'landed_on':reading.get('landed_on'),'collision':reading.get('collision'),'decisions':len(steps),'labels':rows,'real_time_factor':factor,'kept':good and bool(recorder),
-                  'decision_period_s':round((steps[-1]['epoch']-steps[0]['epoch'])/max(1,len(steps)-1),3),'stream_frames':dict(env.stream.counts)}
+                  'decision_period_s':round((steps[-1]['epoch']-steps[0]['epoch'])/max(1,len(steps)-1),3),'stream_frames':dict(env.stream.counts),
+                  'view':'unreal' if args.unreal_view else 'cameras'}
             with (output/'flights.jsonl').open('a',encoding='utf-8') as file:file.write(json.dumps(line)+'\n')
             print('FLIGHT',json.dumps(line),flush=True)
-            message=(f'KEPT {episode["id"]}' if good and recorder else f'NOT KEPT {episode["id"]}')+f': {reason}, success={bool(reading.get("success"))}, {rows["labels"]} labels, {rows["pause"]+rows["below_safe"]} left out'
+            message=(f'KEPT {episode["id"]}' if good and recorder else f'NOT KEPT {episode["id"]}')+f': {reason}, success={bool(reading.get("success"))}, {rows["labels"]} labels, {rows["decisions"]-rows["labels"]-rows["terminal"]} left out'
             if args.episodes and flown>=args.episodes:break
     finally:
         cv2.destroyAllWindows()
@@ -304,4 +350,6 @@ if __name__=='__main__':
     parser.add_argument('--script',help='fly a fixed list of inputs instead of a person (a check of the loop)')
     parser.add_argument('--episodes',type=int,default=0,help='stop after this many flights (0: until Esc)')
     parser.add_argument('--snapshot',help='save the window once, at the twelfth decision of a flight (to show what the pilot sees)')
+    parser.add_argument('--view-px',type=int,help='resolution of the display cameras (default: the configuration\'s)')
+    parser.add_argument('--unreal-view',action='store_true',help='the simulator\'s own window is shown; keys work in it too; the flights are recorded with view: unreal')
     asyncio.run(main(parser.parse_args()))
