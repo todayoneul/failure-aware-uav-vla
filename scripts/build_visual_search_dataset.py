@@ -29,8 +29,8 @@ def episode_samples(record,chunk_size):
     for index,step in enumerate(steps):
         window=steps[index:index+chunk_size]
         # A forced turn is flown but is not the teacher's choice, so no label may contain one. Neither may it contain a decision
-        # a later stage leaves out of its replay (--leave-out).
-        if any(item.get('perturbed') or item.get('left_out') for item in window) or 'img_name' not in step:continue
+        # a later stage leaves out of its replay (--leave-out), nor one a recording marked (a human pilot's pause: `excluded`).
+        if any(item.get('perturbed') or item.get('left_out') or item.get('excluded') for item in window) or 'img_name' not in step:continue
         fwd,down,yaw=labels[index][0]
         samples.append({'traj_rel_dir':record['traj_rel_dir'],'img_name':step['img_name'],
                         'instruction':'<image>\n'+summary['instruction'],

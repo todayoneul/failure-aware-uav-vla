@@ -28,6 +28,7 @@
 !/outputs/examples/gen_v3c/
 !/outputs/examples/grounding_architecture/
 !/outputs/examples/grounding_film_mission/
+!/outputs/examples/human_pilot/
 # Frozen result tables of the generalisation runs (small files; the raw run folders stay local).
 !/outputs/generalization/
 # Gaussian blur characterization: tables, the run's own records and small pictures (the flights and their frames stay local).

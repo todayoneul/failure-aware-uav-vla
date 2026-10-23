@@ -1,0 +1,21 @@
+{
+ "description": "Human pilot mode (docs/human_pilot_mode.md): a person flies the vehicle from the two pictures a policy is given (front and down, 256 x 256) and the sentence, with the policy's three axes, and the flight is recorded in the format of the teacher's recordings. Nothing here changes a model, a gate or an earlier result.",
+ "scenes": ["field", "lot"],
+ "layouts": ["a", "b", "c", "d", "k", "l", "m", "n"],
+ "layouts_from": "the recording layouts of every generic landing stage (configs/generic_landing_stage1d.json, layouts.train). The layouts checks are flown in (t, u, p, q, r, s) and the canonical ones (e, g, h, i, j) are refused.",
+ "distance_m": [12.0, 44.0],
+ "distance_from": "the validated range of the canonical evaluation (44 m); 12 m keeps the object out of reach of the first decision",
+ "separation_from_check_starts_m": 6.0,
+ "max_ticks": 400,
+ "instructions": {"land": "land", "approach": "approach"},
+ "dataset": "datasets/projectairsim_visual_search/human_pilot",
+ "control_hz": 20,
+ "command_duration_s": 0.3,
+ "acceleration": {"forward_mps2": 1.5, "down_mps2": 1.5, "turn_radps2": 1.5},
+ "acceleration_from": "eases a key press in: 0 to the fastest forward speed (2 m/s) in 1.3 s, a full turn rate (24 deg/s) in 0.3 s. The vehicle's own response (about 2.4 s to follow a change of velocity) is the simulator's and is not changed: the recorded flights must move as a policy's flights move.",
+ "terminal_ticks": 4,
+ "terminal_from": "configs/visual_search.json stop_ticks: a policy ends a flight by giving the stop four decisions in a row; the teacher's recordings end the same way",
+ "real_time_minimum": 0.8,
+ "display_scale": 2,
+ "keep_rejected_frames": true
+}

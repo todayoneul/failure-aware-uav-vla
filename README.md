@@ -13,6 +13,7 @@
 | 맵에서 목표를 골라 보내기 (방향 힌트 사용) | 동작. 20m 안 정지는 조건에 따라 0–60% | `.\scripts\run_mission_demo.ps1` |
 | 문장만 주고 찾아가기 (방향 힌트 없음) | AeroVLA-OFT로 동작. 처음 보는 시작 32/32, 학습하지 않은 장면 18/20. 처음 보는 물체는 약함 | `.\scripts\run_visual_search_demo.ps1` |
 | 맵에서 물체를 골라 문장으로 보내기 (착륙 또는 접근) | 동작. 동결한 baseline을 직접 조작해 보는 시연 | `.\scripts\run_grounding_film_mission_demo.ps1` |
+| 사람이 앞·아래 카메라만 보고 조종하고, 그 비행을 학습 data로 기록하기 | 동작 (키보드·Xbox pad, 1초 20번 연속 조작). 아직 이 data로 학습하지 않음 | `.\scripts\run_human_pilot.ps1` |
 | 시작 자세를 직접 정하기, pad가 아닌 평평한 윗면(cube, cylinder)에 착륙 임무 주기 | Simulator·화면·evaluator가 지원. **정책이 그렇게 착륙하도록 배운 것은 아님** | [문서](docs/arbitrary_start_generalized_landing.md) |
 | Cube·cylinder 윗면 착륙을 정책에 가르치기 (Generic Landing) | **Gate 미통과 (네 번).** Stage 1: pad 10/10, cylinder 8/10, cube 6/10(기준 8/10), 실패는 모두 공중 정지. Stage 1b(teacher label을 stop에서 떼어 놓음): 공중 정지는 거의 사라졌고 cylinder 10/10, cube 7/10, 그리고 44m 안 regression에서 충돌 2. Stage 1c(cube 하강 회복 + 같은 색 물체 구분): 후보 pilot에서 멈춤. 늦은 후보는 같은 색 물체를 맞게 골랐지만 공중 정지가 돌아왔고, 규칙이 고른 이른 후보는 다른 물체에 2번 착륙. Gate는 비행하지 않음. Stage 1d(윗면 위 마지막 하강): 후보 pilot에서 멈춤. 가운데 쪽의 낮은 상태는 이미 착륙했고, 가장자리 상태에서는 공중 정지가 3 → 4–6으로 늘어남. 봉인한 gate는 열지 않음. 44m 밖 탐색 학습은 시작하지 않음 | [Stage 1](docs/generic_landing_active_search_v2.md), [Stage 1b](docs/generic_landing_stage1b_stop_safe_teacher.md), [Stage 1c](docs/generic_landing_stage1c_recovery_grounding.md), [Stage 1d](docs/generic_landing_stage1d_final_descent.md) |
 | Gaussian Blur가 baseline을 어디서 얼마나 무너뜨리는지 측정 (Clean / Low / Medium / High) | 완료. 48개 시작에서 성공 46 → 40 → 24 → 8. Blur에 강하지 않음 | [결과](docs/failure_gaussian_blur.md) |
@@ -123,7 +124,24 @@ GIF: [탐색](outputs/examples/generalization/search_g1.gif) · [놓친 뒤 다�
 
 [실패 감사, 하강 규칙과 두 반경, 강제 상태 넷, replay와 뺀 label, pilot 결과, 가장자리에서 일어난 일, 한계](docs/generic_landing_stage1d_final_descent.md)
 
-### 3. 맵에서 목표를 골라 보내기 — Coordinate Goal Mode
+### 3. 사람이 카메라만 보고 조종하기 — Human Pilot Mode
+
+![사람 조종 화면: 모델이 받는 Front/Down 사진 두 장과 문장, 조종하는 사람의 명령만 보인다](outputs/examples/human_pilot/window.png)
+
+```powershell
+.\scripts\run_human_pilot.ps1
+```
+
+사람이 **모델과 같은 정보**(Front·Down 카메라 256×256, 문장 하나)만 보고 조종합니다. 지도, 위치, 높이, simulator 창은 보이지 않습니다. 비행 전에 물체 이름과 LAND / APPROACH만 고르고, 시작은 12–44m 떨어진 무작위 자리입니다.
+
+- 조작은 모델과 같은 세 축(전진, 상하, 회전)뿐이지만, 명령이 1초에 20번 갱신되고 가속이 부드럽게 제한되어 끊기지 않습니다. 키보드: W 전진, A D 회전, R F 상하, 1 2 3 속도, Enter 끝. Xbox식 pad도 됩니다.
+- 비행은 0.5초마다 모델의 decision과 같은 형식(사진 두 장 + 그 0.5초의 조작을 모델 action으로 바꾼 label)으로 기록됩니다. 손을 뗀 순간처럼 stop에 가까운 label은 학습에서 빠지게 표시됩니다.
+- 판정이 성공인 비행만 `datasets/projectairsim_visual_search/human_pilot/episodes/`에 들어갑니다.
+- 확인: 사람 대신 정해진 입력으로 세 번 날려 봤습니다(접근 2, pad 착륙 1). 셋 다 끝까지 기록됐고, decision 간격은 0.52초, 화면은 초당 약 29장이었습니다. 이 data로 아직 학습하지 않았습니다.
+
+[화면, 조작, label 계산, 학습에서 빼는 decision, 기록 형식, 한계](docs/human_pilot_mode.md)
+
+### 4. 맵에서 목표를 골라 보내기 — Coordinate Goal Mode
 
 ![Blue cone 미션의 실제 화면: 102m 비행 뒤 모델이 LAND를 내고 목표 3.6m에 착륙](outputs/examples/mission_landmark.png)
 
@@ -146,7 +164,7 @@ GIF: [탐색](outputs/examples/generalization/search_g1.gif) · [놓친 뒤 다�
 
 [조작과 화면 설명](docs/mission_demo.md)
 
-### 4. 장애 주입 — Gaussian Blur
+### 5. 장애 주입 — Gaussian Blur
 
 > 동결한 baseline에 대한 정량 측정은 [Gaussian Blur Robustness Characterization](docs/failure_gaussian_blur.md)에 있습니다. Interactive Mission Control(`run_grounding_film_mission_demo.ps1`)에서도 **B**, **1/2/3**으로 같은 blur를 켜 볼 수 있습니다. 아래는 기존 AeroVLA closed loop의 blur 데모입니다.
 
@@ -158,7 +176,7 @@ GIF: [탐색](outputs/examples/generalization/search_g1.gif) · [놓친 뒤 다�
 
 왼쪽은 원본, 오른쪽은 실제 모델 입력입니다. 관찰 창에서 **B**로 켜고 끄고 **1/2/3**으로 강도를 바꿉니다. [관찰 창](outputs/examples/gaussian_blur_observer.png)에는 prompt, 모델 출력, 실행 명령이 함께 나옵니다. 자동 감지와 복구는 아직 없습니다. [안내](docs/gaussian_blur_demo.md)
 
-### 4. 드론과 모델 입력
+### 6. 드론과 모델 입력
 
 | | |
 |---|---|
@@ -235,7 +253,7 @@ configs/generic_landing/  Generic Landing의 녹화 계획과 pilot·validation�
 configs/generic_landing_stage1b/  Stage 1b의 같은 것 (configs/generic_landing_stage1b.json에 숫자와 stop-safety 규칙)
 configs/generic_landing_stage1c/  Stage 1c의 녹화 계획과 pilot·gate A·gate B·regression 시작 (configs/generic_landing_stage1c.json에 숫자, 강제 상태, 선택 규칙)
 configs/generic_landing_stage1d/  Stage 1d의 녹화 계획과 pilot·qualification 시작 (configs/generic_landing_stage1d.json에 숫자, 두 반경, 강제 상태 넷; gate는 Stage 1c의 파일)
-tests/               simulator 없이 도는 테스트 (Python 460개 + PowerShell 4개)
+tests/               simulator 없이 도는 테스트 (Python 473개 + PowerShell 4개)
 docs/                아래 문서
 outputs/examples/    README에 쓰는 실제 화면과 GIF
 outputs/generalization/  동결한 결과 표와 실패 분류 (원자료는 로컬에만)
@@ -256,6 +274,7 @@ outputs/generic_landing_1d/ Stage 1d의 실패 감사, teacher pilot, pilot 표,
 | [gaussian_blur_demo](docs/gaussian_blur_demo.md) | Blur 주입 데모 |
 | [mission_demo](docs/mission_demo.md) · [full_map_grounding](docs/full_map_grounding.md) | 미션 데모 조작, 지도와 Inspector |
 | [grounding_film_interactive_demo](docs/grounding_film_interactive_demo.md) | 동결한 baseline으로 나는 Interactive Mission Control: 구조, 모델에 들어가는 것과 아닌 것, 장면과 launch 자세, 조작, 수동 확인 기록, 한계 |
+| [human_pilot_mode](docs/human_pilot_mode.md) | 사람이 Front/Down 카메라만 보고 조종하는 모드: 보이는 것과 안 보이는 것, 조작, 속도 단계, 조작을 모델 action으로 바꾸는 법, 학습에서 빼는 decision, 기록 형식, 확인 비행 |
 | [model_evaluation](docs/model_evaluation.md) | 하네스 수정, 69회 평가, 연속 비행, 디코더, 블록 위 목표, 지시문 |
 | [aerovla_oft](docs/aerovla_oft.md) | Visual Search Mode와 AeroVLA-OFT pilot |
 | [aerovla_oft_generalization](docs/aerovla_oft_generalization.md) | 맵 정의, held-out 시작 상태, teacher, Gen-v1의 G0–G4 결과와 대조 시험 |
