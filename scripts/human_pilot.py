@@ -116,7 +116,7 @@ def environment(canonical,view_px,chase=None):
 
 class Script:
     """Inputs read from a file instead of a person: [[seconds, {"forward": true, ...}], ...]. A segment may press a key once
-    when it begins (`"press": "enter"`). In the menu, before the flight, it presses Enter; after the script, nothing."""
+    when it begins (`"press": "enter"`). In the menu, before each flight, it presses Enter; after the script, nothing."""
     def __init__(self,path):
         self.segments=json.loads(Path(path).read_text(encoding='utf-8'));self.started=None;self.done=set()
 
@@ -132,6 +132,8 @@ class Script:
         return Inputs(),set(),False
 
     def flying(self):self.started=time.monotonic()
+
+    def menu(self):self.started=None;self.done=set()
 
 
 def bar(canvas,x,y,width,value,top,label):
@@ -195,6 +197,7 @@ async def fly(env,episode,devices,settings,oft,config,recorder,size,tier_index=2
     tick=oft['tick_s'];dt=1./settings['control_hz'];limits=tiers[-1]
     acceleration=settings['acceleration'];smoother=Smoother(Axes(acceleration['forward_mps2'],acceleration['down_mps2'],acceleration['turn_radps2']))
     labeler=TickLabel(oft);steps=[];index=0;terminal=None;terminal_left=settings['terminal_ticks'];reason='max_steps';stopped=False
+    soft=env.landing['touchdown']['max_vertical_speed_mps']
     opened=time.monotonic();observation=env.observe();heading=observation['yaw'];z_set=env.setpoint_z
     pending=make_step(env,observation,index,episode['instruction'],'human',recorder,oft);rates=Axes();saved=False
     if hasattr(devices,'flying'):devices.flying()
@@ -237,6 +240,8 @@ async def fly(env,episode,devices,settings,oft,config,recorder,size,tier_index=2
         # Backward, or faster than a policy can fly: flown, recorded, never a label; the pilot is told so.
         note=' | BEYOND THE MODEL: not used for training' if controls.beyond(rates,oft) else ''
         lines=[(episode['instruction'],(20,20,20),True),(f'{state} | speed {tier_index+1} {tier} | {"REC" if recorder else "not recorded"}{note}',(0,0,170) if recorder and not note else (0,90,200) if note else (90,90,90),False)]
+        # A landing counts only when the touchdown is soft; speed 3 descends faster than that.
+        if episode['task']=='land' and not terminal and rates.down>soft:lines.append((f'DESCENDING TOO FAST TO TOUCH DOWN: a landing needs {soft:.2f} m/s or less (speed 1 or 2)',(0,0,200),False))
         # The stream when it runs; else the pictures of the last decision (the stream is for the display only).
         front=env.stream.latest('front');down=env.stream.latest('down')
         canvas=render(front if front is not None else observation['frames']['front'],down if down is not None else observation['frames']['down'],lines,rates,limits,size,KEYS_FLYING)
@@ -306,6 +311,7 @@ async def main(args):
             try:result,why=await fly(env,episode,devices,settings,oft,config,recorder,size,tier_index=settings['default_tier']-1,snapshot=args.snapshot)
             except Exception:
                 traceback.print_exc();result,why=None,'error'
+            if hasattr(devices,'menu'):devices.menu()
             if result is None:
                 if recorder:recorder.discard()
                 await env.close();message=f'{episode["id"]}: {why}, nothing kept'

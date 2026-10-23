@@ -153,6 +153,10 @@ class SessionTests(unittest.TestCase):
         self.assertTrue(self.s.kept(good,summary,.95,settings));self.assertTrue(self.s.kept(good,summary,None,settings))
         self.assertFalse(self.s.kept({'success':False},summary,.95,settings));self.assertFalse(self.s.kept(good,{**summary,'reason':'gave_up'},.95,settings))
         self.assertFalse(self.s.kept(good,{**summary,'hit':'Wall'},.95,settings));self.assertFalse(self.s.kept(good,summary,.7,settings))
+        # A landing: the surface evaluator's own soft touchdown that stood, whatever the canonical rule read.
+        land={**summary,'task':'land'}
+        self.assertFalse(self.s.kept({'success':True,'stable_physical_landing':False},land,.95,settings))
+        self.assertTrue(self.s.kept({'success':False,'stable_physical_landing':True},land,.95,settings))
 
 
 class WindowTests(unittest.TestCase):

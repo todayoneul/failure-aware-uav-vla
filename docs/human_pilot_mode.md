@@ -55,6 +55,8 @@
 | 3 빠름 (모델의 최고 속도) | 2.0 m/s | 1.0 m/s | 24°/s | 씀 |
 | 4 부스트 | 5.0 m/s | 2.5 m/s | 60°/s | **안 씀** |
 
+**착륙할 때는 마지막 하강을 1 또는 2단계로 하세요.** 착륙으로 인정되는 접지 속도는 0.75 m/s 이하인데, 3단계의 하강 속도는 1.0 m/s입니다. LAND 비행에서 이보다 빠르게 내려가면 화면에 `DESCENDING TOO FAST TO TOUCH DOWN`이 뜹니다. 기체가 2.4초 늦게 따라오므로 표면에 닿기 몇 초 전에 바꿔야 합니다.
+
 1–3은 정책의 stop 기준의 3배 이상이고 action 한도 이하입니다. 4는 멀리 이동할 때 쓰는 단계로, 모델이 낼 수 없는 속도입니다. 부스트(또는 후진) 중에는 화면 상태 줄에 `BEYOND THE MODEL: not used for training`이 뜹니다. Stick은 dead zone(20%)을 넘으면 그 하한부터 고른 단계의 속도까지 비례합니다.
 
 ## 무엇이 기록되는가
@@ -77,7 +79,12 @@
 
 Dataset builder는 이 표시가 붙은 decision이 든 label window를 뺍니다(`excluded`). 비행 끝의 stop(APPROACH에서 Enter 뒤 4번, LAND에서 touchdown 뒤 4번)은 정책의 정상적인 끝이므로 label입니다.
 
-**어떤 비행이 data가 되는가.** Surface evaluator가 문장대로 했다고 읽고(이름의 물체에 착륙 / 그 가까이에서 멈춤), 사람이 끝냈거나 착륙했고, 아무것도 부딪치지 않았고, simulator가 실시간의 0.8배 이상을 유지한 비행만 `episodes/`에 들어갑니다. 나머지는 `rejected/`에 사진과 함께 남아 볼 수 있지만, builder는 읽지 않습니다.
+**어떤 비행이 data가 되는가.** 문장대로 했고, 사람이 끝냈거나 착륙했고, 아무것도 부딪치지 않았고, simulator가 실시간의 0.8배 이상을 유지한 비행만 `episodes/`에 들어갑니다. 문장대로 했는지는 이렇게 읽습니다.
+
+- LAND: surface evaluator의 접지 기준. 이름의 물체 윗면, 착륙 영역 안, 접지 속도 0.75 m/s 이하, 그 뒤 멈춰 서 있음(`stable_physical_landing`).
+- APPROACH: canonical 판정(그 물체 가까이에서 멈춤).
+
+LAND에 canonical 판정을 쓰지 않는 이유가 있습니다. Canonical 판정은 simulator가 보고하는 수직 속도가 가라앉은 순간을 접지로 봅니다. 사람 비행의 마지막 4번(2초) 동안에는 이 값이 늦게 가라앉거나 아예 가라앉지 않을 수 있습니다. 실제로 첫 사람 비행 여섯 번 중에 두 번이 틀리게 분류됐습니다. 2.25 m/s의 세게 닿은 착륙은 들어갔고, 0.41 m/s로 가운데에 닿은 착륙은 수직 속도 보고가 0.06에 머물러 빠졌습니다. 기준을 고친 뒤 이 두 비행의 파일을 옮겼습니다. 나머지는 `rejected/`에 사진과 함께 남아 볼 수 있지만, builder는 읽지 않습니다.
 
 ```
 datasets/projectairsim_visual_search/human_pilot/
@@ -102,10 +109,16 @@ outputs/human_pilot/flights.jsonl            비행마다 한 줄: 결과, label
 
 - `-UnrealView`: simulator 창을 1280×720으로 띄우고 그 창을 보며 조종합니다(`view: unreal`로 기록).
 - `-ViewPx 1024`: 표시용 카메라 해상도(기본 768). 기록되는 사진에는 영향이 없습니다.
+- `-Seed 24`: 같은 시작에서 다시 날립니다. 시작은 seed로 정해지므로, 같은 seed는 같은 자리·방향입니다(비행마다 1씩 늘어남).
 - `-NoRecord`: 기록하지 않고 연습합니다.
 - `-Record DIR`: 다른 dataset 폴더에 기록합니다.
 - `-TopicsPort 9089 -ServicesPort 9090`: 다른 simulator가 떠 있을 때 다른 port로 띄웁니다.
 - `-Script FILE`: 사람 대신 정해진 입력으로 날립니다(전체 loop 점검용).
+
+## 자주 보는 메시지
+
+- `Timed out while trying to unsubscribe from all topics.` Simulator client가 카메라 영상 구독을 끊으려 했는데, simulator가 1초 안에 요청을 받지 않았다는 경고입니다. 새 비행의 장면을 불러올 때와 종료할 때 구독을 끊습니다. Simulator가 먼저 닫혔거나 장면을 불러오느라 바쁘면 나옵니다. 구독은 장면·연결과 함께 사라지고, 비행 기록은 그 전에 이미 저장되므로 무시해도 됩니다.
+- 종료할 때 `pynng ... Object closed`가 붙은 traceback: 같은 client library가 종료 순서에 따라 가끔 내는 메시지입니다. 이전 데모들에서도 나왔고 결과에 영향이 없습니다.
 
 ## 확인 비행
 
@@ -116,6 +129,8 @@ outputs/human_pilot/flights.jsonl            비행마다 한 줄: 결과, label
 | blue cube 접근 (첫 버전) | 256 확대 | 성공 | 36 | 28 / 3 / 1 / – / – / 4 | 0.52초 | 초당 약 28 |
 | blue pad 착륙 (첫 버전) | 256 확대 | pad 위에 착륙, 영역 안, soft, 성공 | 50 | 34 / 10 / 2 / – / – / 4 (닿은 뒤) | 0.52초 | 초당 약 28 |
 | 전진 → 전진+상승 → 후진 → 부스트 → 멈춤 | 768 | 끝까지 기록 | 32 | 9 / 9 / 0 / 6 / 4 / 4 | 0.52초 | 초당 약 28 |
+| blue pad 착륙, 3단계로 하강 | 768 | pad 위, 영역 안, 0.96 m/s로 접지 → 기록 안 됨(rejected) | 46 | 31 / 10 / 1 / 0 / 0 / 4 | 0.51초 | 초당 약 28 |
+| blue pad 착륙, 2단계로 하강 (같은 시작) | 768 | pad 위, 영역 안, soft → 기록됨(episodes) | 50 | 33 / 11 / 2 / 0 / 0 / 4 | 0.51초 | 초당 약 28 |
 | 짧은 접근, `-UnrealView` | Unreal + 300 | 끝까지 기록, 실시간 0.999배 | 15 | 6 / 5 / 0 / 0 / 0 / 4 | 0.51초 | 초당 약 28 |
 
 - 전진+상승 구간의 label은 `[1.0, -0.5, 0]`(전진 1m, 상승 0.5m per 0.5초)로, 두 축이 한 label에 함께 들어갔습니다.

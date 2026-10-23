@@ -138,7 +138,7 @@ GIF: [탐색](outputs/examples/generalization/search_g1.gif) · [놓친 뒤 다�
 - 키보드: **W/S 전진·후진, A/D 회전, ↑/↓ 상승·하강, 1–4 속도, Enter 끝.** 세 축을 동시에 조작할 수 있습니다(앞으로 가며 올라가기). Xbox식 pad도 됩니다. 명령은 1초에 20번 갱신됩니다.
 - 속도 1–3은 모델이 낼 수 있는 범위(최고 2 m/s), 4는 부스트(5 m/s)입니다. 부스트와 후진 구간은 기록되지만 학습에서 빠지게 표시되고, 화면에 `BEYOND THE MODEL`이 뜹니다.
 - `-UnrealView`: simulator 창을 1280×720으로 띄우고 그 창을 보며 조종합니다. 모델이 받지 않는 시점이라 이 비행은 `view: unreal`로 따로 표시됩니다.
-- 비행은 0.5초마다 모델의 decision과 같은 형식(사진 두 장 + 그 0.5초의 조작을 모델 action으로 바꾼 label)으로 기록됩니다. 손을 뗀 순간처럼 stop에 가까운 label도 학습에서 빠지게 표시됩니다. 판정이 성공인 비행만 `datasets/projectairsim_visual_search/human_pilot/episodes/`에 들어갑니다.
+- 비행은 0.5초마다 모델의 decision과 같은 형식(사진 두 장 + 그 0.5초의 조작을 모델 action으로 바꾼 label)으로 기록됩니다. 손을 뗀 순간처럼 stop에 가까운 label도 학습에서 빠지게 표시됩니다. 판정이 성공인 비행만 `datasets/projectairsim_visual_search/human_pilot/episodes/`에 들어갑니다. 착륙은 이름의 물체 착륙 영역 안에 0.75 m/s 이하로 닿고 멈춰야 하므로, 마지막 하강은 1·2단계로 합니다(3단계는 1.0 m/s, 화면에 경고가 뜸).
 - 확인: 사람 대신 정해진 입력으로 날려 봤습니다(접근, pad 착륙, 후진·부스트·전진+상승, Unreal 창). 모두 끝까지 기록됐고 decision 간격은 0.51–0.52초였습니다. 이 data로 아직 학습하지 않았습니다.
 
 [화면, Unreal 창 모드, 조작, 속도 단계, label 계산, 학습에서 빼는 decision, 기록 형식, 한계](docs/human_pilot_mode.md)
