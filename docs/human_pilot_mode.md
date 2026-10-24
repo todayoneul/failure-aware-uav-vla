@@ -19,7 +19,7 @@
 
 - **고화질 화면.** 화면의 두 사진은 모델 카메라와 같은 위치·같은 화각(90°)에 붙인 표시용 카메라 두 대가 768×768로 찍어 보내는 영상입니다(초당 약 28장). 모델 카메라(256×256)를 확대한 것이 아니어서 선명합니다. **기록되는 사진은 여전히 모델이 받는 256×256 그대로**이고, 표시용 카메라는 기록에 쓰지 않습니다. 해상도는 `-ViewPx`로 바꿀 수 있습니다.
 - **Decision 수는 화면에 없습니다.** Decision은 기록 단위일 뿐입니다: 모델은 0.5초마다 한 번 판단하므로, 사람의 연속 조작을 0.5초씩 묶어 모델 action 하나로 바꿔 저장합니다(아래 "무엇이 기록되는가"). 조종하는 사람은 신경 쓸 필요가 없습니다.
-- 비행을 고를 때도 물체 **이름**만 고르고, 시작 위치는 고르지 않습니다. 시작은 목표에서 12–44m 떨어진 무작위 자리, 무작위 방향입니다. 사람도 모델처럼 목표가 어디 있는지 모른 채 출발합니다.
+- 비행을 고를 때도 물체 **이름**과 **거리 단계**만 고르고, 시작 위치는 고르지 않습니다. 시작은 그 단계 안의 무작위 자리, 무작위 방향입니다. 사람도 모델처럼 목표가 어디 있는지 모른 채 출발합니다(아래 "시작 거리").
 - 비행이 끝난 뒤에는 결과(착륙한 물체, 성공 여부, 기록 여부)를 보여 줍니다.
 
 ### Unreal 창을 보며 조종하기 (`-UnrealView`)
@@ -40,7 +40,7 @@
 | Backspace | B | 이번 비행 버리기 |
 | Esc | | 종료 |
 
-비행 전: **N / P** 물체, **T** LAND / APPROACH, **L** layout, **M** 장면(field / lot), **Enter** (pad Start) 출발.
+비행 전: **N / P** 물체, **T** LAND / APPROACH, **L** layout(공 위 착륙판 layout 포함), **M** 장면(field / lot), **D** 거리 단계, **R** 무작위 목표 켜고 끄기, **Enter** (pad Start) 출발.
 
 - **세 축을 동시에 조작할 수 있습니다.** 전진·후진하면서 상승·하강하고 회전까지 함께 됩니다(W와 ↑를 같이 누르면 앞으로 가며 올라감). 확인 비행에서 앞으로 가며 올라간 0.5초가 label 하나에 전진 1.0m, 상승 0.5m로 함께 기록됐습니다.
 - **축은 정책과 같은 셋(전진, 상하, 회전)입니다.** 옆으로 미끄러지기는 없습니다. 정책은 옆으로 갈 수 없어서, 그 움직임은 label로 바꿀 수 없기 때문입니다.
@@ -82,7 +82,7 @@ Dataset builder는 이 표시가 붙은 decision이 든 label window를 뺍니�
 
 **어떤 비행이 data가 되는가.** 문장대로 했고, 사람이 끝냈거나 착륙했고, 아무것도 부딪치지 않았고, simulator가 실시간의 0.8배 이상을 유지한 비행만 `episodes/`에 들어갑니다. 문장대로 했는지는 이렇게 읽습니다.
 
-- LAND: surface evaluator의 접지 기준. 이름의 물체 윗면, 착륙 영역 안, 접지 속도 0.75 m/s 이하, 그 뒤 멈춰 서 있음(`stable_physical_landing`).
+- LAND: surface evaluator의 접지 기준. 이름의 물체 윗면, 착륙 영역 안, 접지 속도 0.75 m/s 이하, 그 뒤 멈춰 서 있음(`stable_physical_landing`). 그리고 **정밀 착륙**: 윗면 가운데에서 1.75m 안(pad, cube, cylinder), 공 위 착륙판은 1.3m 안.
 - APPROACH: canonical 판정(그 물체 가까이에서 멈춤).
 
 LAND에 canonical 판정을 쓰지 않는 이유가 있습니다. Canonical 판정은 simulator가 보고하는 수직 속도가 가라앉은 순간을 접지로 봅니다. 사람 비행의 마지막 4번(2초) 동안에는 이 값이 늦게 가라앉거나 아예 가라앉지 않을 수 있습니다. 실제로 첫 사람 비행 여섯 번 중에 두 번이 틀리게 분류됐습니다. 2.25 m/s의 세게 닿은 착륙은 들어갔고, 0.41 m/s로 가운데에 닿은 착륙은 수직 속도 보고가 0.06에 머물러 빠졌습니다. 기준을 고친 뒤 이 두 비행의 파일을 옮겼습니다. 나머지는 `rejected/`에 사진과 함께 남아 볼 수 있지만, builder는 읽지 않습니다.
@@ -133,9 +133,45 @@ outputs/human_pilot/flights.jsonl            비행마다 한 줄: 결과, label
 
 **Checkpoint.** 기본은 Interactive Mission Control의 기본값인 동결 baseline `grounding_film`입니다. `-Checkpoint`로 다른 것을 날릴 수 있고, 그때는 확인되지 않은 checkpoint라는 경고가 나옵니다.
 
+## 정밀 착륙
+
+착륙 지점이 큽니다. pad는 14×14m, cube·cylinder는 8m라서 윗면 어디에 내려도 착륙으로 인정됩니다. 그런 data로 배우면 모델도 대충 내립니다. 그래서 사람 비행이 data가 되려면 **윗면 가운데 가까이** 내려야 합니다.
+
+| 표면 | 가운데에서 | 근거 |
+|---|---:|---|
+| pad (14m), cube (8m), cylinder (지름 8m) | 1.75m | canonical teacher가 하강을 시작하는 반경(pad 폭의 1/8, `configs/targets/landing_pads.json` teacher.align_radius_m) |
+| 공 위 착륙판 (지름 6m) | 1.3m | 위와 같은 반경이되, 표면의 착륙 영역 반경(2.6m)의 절반을 넘지 않음 |
+
+- 장면은 바꾸지 않았습니다. pad와 물체의 크기, canonical 착륙 판정, 이전 평가는 그대로입니다. 바뀐 것은 사람 비행 중 어떤 것을 data로 남기느냐뿐입니다.
+- pad에는 흰 H가 있습니다. 아래 카메라에서 H 가운데를 맞추면 됩니다.
+- 비행이 끝나면 메뉴에 `landed 2.4 m from the middle (data needs 1.75 m or less)`처럼 결과가 나옵니다. 비행 중에는 거리를 보여 주지 않습니다(모델도 모르는 정보).
+
+## 시작 거리
+
+| 단계 (D) | 목표에서 | 뜻 |
+|---|---:|---|
+| near | 12–44m | canonical 평가가 확인한 범위. 대개 출발할 때 목표가 보임 |
+| mid (기본) | 44–100m | 평가 범위 밖. 목표가 안 보이는 경우가 많아 찾아야 함 |
+| far | 100–160m | 맵의 먼 쪽까지. 찾기와 긴 이동 |
+
+- 160m까지는 두 장면의 모든 녹화 layout, 모든 물체에서 시작을 뽑을 수 있음을 확인했습니다.
+- 단계는 비행 기록에 `distance_band`로 남습니다. 나중에 거리별로 나눠 학습하거나 평가할 수 있습니다.
+- 먼 단계는 비행이 길어집니다. 4단계(부스트)로 빨리 가도 되지만, 그 구간은 학습에 쓰이지 않습니다.
+
+## 목표: 모든 물체, 무작위
+
+- 녹화 layout마다 물체 8개가 있습니다: blue·red pad, blue·red cube, blue·green cylinder, orange ball, blue cone. **N / P**로 고르고 **T**로 LAND / APPROACH를 바꿉니다. cone은 끝이 뾰족해서 APPROACH만 됩니다.
+- **R**(또는 `-Random`)을 켜면 비행마다 layout(공 위 착륙판이 있는 것 포함), 물체, LAND / APPROACH가 무작위로 정해집니다. 착륙할 수 있는 물체는 절반은 LAND, 절반은 APPROACH입니다. 장면(field / lot)은 M으로 고른 것을 유지합니다. 무작위 비행은 기록에 `random_target: true`로 남습니다.
+
+### 공 위 착륙판
+
+- 공은 윗면이 둥글어서 그대로는 착륙할 수 없습니다. 녹화 layout마다 공 위에 평평한 둥근 판을 얹은 변형 `<layout>_cap`(예: `a_cap`)을 두었습니다. 판 외에는 원래 layout과 똑같습니다.
+- 판은 Interactive Mission Control의 `mission_cap` 판과 같은 모양입니다: 지름 6m, 두께 1.2m, 흰색. 판의 가장자리에서 공의 표면에 걸쳐 놓이고, 판 윗면은 공 꼭대기보다 0.2m 위입니다. 판 위에 내리면 공에 착륙한 것으로 판정되고, 공의 다른 곳에 닿으면 충돌입니다(`configs/landing/surfaces.json`의 `cap` 규칙).
+- 판 layout은 실행할 때 메모리에서 만듭니다. `configs/maps/field.json`과 `lot.json`은 동결 baseline의 fingerprint에 들어 있어서 고치지 않았습니다(고치면 동결 확인이 실패하고 개입 모드가 시작되지 않음).
+
 ## 어디서 날 수 있는가
 
-- 장면: `field`, `lot`. Layout: `a b c d k l m n` (모든 generic landing 단계가 녹화한 layout).
+- 장면: `field`, `lot`. Layout: `a b c d k l m n` (모든 generic landing 단계가 녹화한 layout)과 각각의 공 위 착륙판 변형 `a_cap … n_cap`.
 - Check를 비행하는 layout(`t u p q r s`)과 canonical layout(`e g h i j`)은 거절합니다. 시작은 저장소의 모든 check 시작(봉인한 gate 포함)에서 6m 이상 떨어집니다. 사람이 나중의 평가 장면을 미리 보지 않게 하기 위해서입니다.
 
 ## 실행 옵션
@@ -147,6 +183,9 @@ outputs/human_pilot/flights.jsonl            비행마다 한 줄: 결과, label
 - `-Takeover`: 개입 모드(위). `-Checkpoint DIR`로 다른 checkpoint를, `-Distro`로 다른 WSL 배포판을 씁니다.
 - `-UnrealView`: simulator 창을 1280×720으로 띄우고 그 창을 보며 조종합니다(`view: unreal`로 기록).
 - `-ViewPx 1024`: 표시용 카메라 해상도(기본 768). 기록되는 사진에는 영향이 없습니다.
+- `-Band near|mid|far`: 시작 거리 단계(기본 mid). 메뉴에서 D로도 바꿉니다.
+- `-Random`: 비행마다 layout, 물체, LAND / APPROACH를 무작위로 정합니다. 메뉴에서 R로도 켜고 끕니다.
+- `-Layout a_cap`: 공 위 착륙판 layout에서 시작합니다.
 - `-Seed 24`: 같은 시작에서 다시 날립니다. 시작은 seed로 정해지므로, 같은 seed는 같은 자리·방향입니다(비행마다 1씩 늘어남).
 - `-NoRecord`: 기록하지 않고 연습합니다.
 - `-Record DIR`: 다른 dataset 폴더에 기록합니다.
@@ -176,6 +215,13 @@ outputs/human_pilot/flights.jsonl            비행마다 한 줄: 결과, label
 - `-UnrealView`: simulator 창 안쪽이 1280×720, 화면 (8, 31)에 놓였고(제목 표시줄이 화면 안), 조종 창은 그 오른쪽 (1300, 0)에 붙었습니다. Unreal 창을 띄운 접근 비행 일곱 번의 실시간 비율은 0.90–1.00이었습니다.
 - 회귀 확인: 비행 loop를 개입 모드에 맞게 바꾼 뒤 위의 2단계 pad 착륙(기록됨, label 34)과 후진·부스트 비행(`backward` 6, `over_bound` 4)을 다시 날려 같은 결과를 얻었습니다.
 - 첫 버전 비행에서 decision 간격이 0.5초보다 길었던 것(0.6–0.78초)은 0.5초를 사진을 요청하는 순간부터 세도록 고쳐 0.52초가 됐습니다. Canonical loop은 0.51초입니다.
+
+### 거리 단계, 무작위 목표, 공 위 착륙판 확인
+
+- **공과 판의 실제 위치(simulator에서 측정):** field와 lot 모두 공은 지면에서 0–10.0m, 판은 9.0–10.2m에 있습니다. 계산한 대로 판이 공 위에 걸쳐 있습니다.
+- **판 위 착륙:** 공의 위치를 아는 간단한 제어기로 두 장면의 `a_cap`에서 판 위에 내렸습니다(장면과 판정 점검용, data 아님). 두 번 다 접지가 공(`orange_ball`)으로 판정됐고, 가운데에서 0.30m, 0.20 m/s, 멈춰 섬, 정밀 착륙 기준(1.3m) 통과였습니다.
+- **조종 loop에서:** `-Layout a_cap -Target orange_ball -Task land -Band far`로 153m에서 출발했고, 판이 있는 장면이 그대로 떴습니다. `-Random -Band near`는 layout c, red cube, APPROACH, 24m 시작을 뽑았습니다. 개입 모드도 같은 메뉴로 날려 이전과 같은 결과를 얻었습니다.
+- **정밀 착륙 기준을 이미 기록된 비행에 적용:** 사람 조종 2개와 개입 모드 7개가 data로 남아 있었는데, 모두 가운데 1.75m 안(개입 모드는 0.29–1.62m)이라 옮겨진 것이 없습니다. 반면 사람이 넘겨받지 않은 동결 모델의 pad 착륙 6번은 가운데에서 1.77–3.46m로 모두 기준 밖입니다. 기준을 바꾸면 `scripts/refile_human_flights.py --apply`로 다시 나눕니다.
 
 ### 개입 모드 확인 비행
 

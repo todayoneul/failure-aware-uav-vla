@@ -133,7 +133,11 @@ GIF: [탐색](outputs/examples/generalization/search_g1.gif) · [놓친 뒤 다�
 .\scripts\run_human_pilot.ps1 -UnrealView    # Unreal 창도 띄워 보며 조종
 ```
 
-사람이 Front·Down 카메라와 문장을 보고 조종합니다. 화면은 모델 카메라와 같은 위치·화각의 표시용 카메라가 768×768로 보내는 영상이고(초당 약 28장), 기록되는 사진은 모델이 받는 256×256 그대로입니다. 비행 전에 물체 이름과 LAND / APPROACH만 고르고, 시작은 12–44m 떨어진 무작위 자리입니다.
+사람이 Front·Down 카메라와 문장을 보고 조종합니다. 화면은 모델 카메라와 같은 위치·화각의 표시용 카메라가 768×768로 보내는 영상이고(초당 약 28장), 기록되는 사진은 모델이 받는 256×256 그대로입니다. 비행 전에 물체와 LAND / APPROACH, 거리 단계만 고르고, 시작은 그 단계 안의 무작위 자리입니다.
+
+- **시작 거리(D):** near 12–44m, mid 44–100m(기본), far 100–160m. 멀수록 목표를 찾아야 합니다.
+- **목표(N/P, T, R):** 물체 8개(pad 2, cube 2, cylinder 2, 공, cone) 중에서 고릅니다. R을 켜면 비행마다 layout, 물체, LAND / APPROACH가 무작위로 정해집니다. 공에는 평평한 착륙판을 얹은 layout(`a_cap` 등)이 있어 착륙도 됩니다. 장면 파일은 바꾸지 않았습니다.
+- **정밀 착륙:** 착륙은 윗면 가운데 1.75m 안(공 위 판은 1.3m)에 내려야 data로 남습니다. pad는 14m, cube·cylinder는 8m로 커서, 아무 데나 내린 착륙까지 배우지 않게 하려는 것입니다.
 
 - 키보드: **W/S 전진·후진, A/D 회전, ↑/↓ 상승·하강, 1–4 속도, Enter 끝.** 세 축을 동시에 조작할 수 있습니다(앞으로 가며 올라가기). Xbox식 pad도 됩니다. 명령은 1초에 20번 갱신됩니다.
 - 속도 1–3은 모델이 낼 수 있는 범위(최고 2 m/s), 4는 부스트(5 m/s)입니다. 부스트와 후진 구간은 기록되지만 학습에서 빠지게 표시되고, 화면에 `BEYOND THE MODEL`이 뜹니다.
@@ -261,7 +265,7 @@ configs/generic_landing/  Generic Landing의 녹화 계획과 pilot·validation�
 configs/generic_landing_stage1b/  Stage 1b의 같은 것 (configs/generic_landing_stage1b.json에 숫자와 stop-safety 규칙)
 configs/generic_landing_stage1c/  Stage 1c의 녹화 계획과 pilot·gate A·gate B·regression 시작 (configs/generic_landing_stage1c.json에 숫자, 강제 상태, 선택 규칙)
 configs/generic_landing_stage1d/  Stage 1d의 녹화 계획과 pilot·qualification 시작 (configs/generic_landing_stage1d.json에 숫자, 두 반경, 강제 상태 넷; gate는 Stage 1c의 파일)
-tests/               simulator 없이 도는 테스트 (Python 477개 + PowerShell 4개)
+tests/               simulator 없이 도는 테스트 (Python 480개 + PowerShell 4개)
 docs/                아래 문서
 outputs/examples/    README에 쓰는 실제 화면과 GIF
 outputs/generalization/  동결한 결과 표와 실패 분류 (원자료는 로컬에만)

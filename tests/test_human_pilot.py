@@ -120,13 +120,58 @@ class SessionTests(unittest.TestCase):
             for index,(layout,target,task) in enumerate((('a','blue_cube','land'),('k','green_cylinder','land'),('n','orange_ball','approach'))):
                 episode=self.s.draw(settings,self.config,self.maps[scene],layout,target,task,1000+index,checks,stamp='20261023T000000')
                 self.assertEqual((episode['map'],episode['layout'],episode['target'],episode['task'],episode['pilot']),(scene,layout,target,task,'human'))
-                centre=self.maps[scene]['objects'][target];self.assertTrue(settings['distance_m'][0]<=episode['start_distance_m']<=settings['distance_m'][1]+1e-6)
+                low,high=settings['distance_bands'][settings['default_band']];self.assertTrue(low<=episode['start_distance_m']<=high+1e-6)
+                self.assertEqual(episode['distance_band'],settings['default_band'])
                 self.assertTrue(all(math.dist(episode['start_xy'],point)>=6. for point in checks))
                 self.assertEqual(episode['id'],f'hp-20261023T000000-{target}-{task}');self.assertEqual(episode['max_ticks'],settings['max_ticks'])
                 self.assertFalse(any(letter.isdigit() for letter in episode['instruction']))
         for layout in ('t','p','e'):
             with self.assertRaises(ValueError):self.s.draw(settings,self.config,self.maps['field'],layout,'blue_cube','land',1)
         with self.assertRaises(ValueError):self.s.draw(dict(settings,scenes=['lot']),self.config,self.maps['field'],'a','blue_cube','land',1)
+
+    def test_every_band_starts_where_it_says_and_the_far_band_reaches_160_m(self):
+        settings=self.settings;bands=settings['distance_bands']
+        self.assertEqual(bands,{'near':[12.,44.],'mid':[44.,100.],'far':[100.,160.]});self.assertEqual(settings['default_band'],'mid')
+        for scene in ('field','lot'):
+            checks=self.s.check_starts(scene)
+            for index,band in enumerate(bands):
+                episode=self.s.draw(settings,self.config,self.maps[scene],'d','red_pad','land',2000+index,checks,band=band)
+                self.assertTrue(bands[band][0]<=episode['start_distance_m']<=bands[band][1]+1e-6,(scene,band,episode['start_distance_m']))
+
+    def test_the_plate_layouts_make_the_ball_a_landing_surface_without_changing_the_map(self):
+        from src.landing.surface import SurfaceSet
+        from src.visual_search.maps import load_map,scene_objects,lighting
+        for scene in ('field','lot'):
+            base=load_map(scene);capped=self.s.with_caps(base,self.settings)
+            self.assertEqual(base,load_map(scene))      # the map itself (part of the frozen baseline's fingerprints) is untouched
+            self.assertEqual(self.s.recording_layouts(self.settings)[8:],[layout+'_cap' for layout in self.settings['layouts']])
+            for layout in self.settings['layouts']:
+                plain,cap=SurfaceSet(capped,layout)['orange_ball'],SurfaceSet(capped,layout+'_cap')['orange_ball']
+                self.assertFalse(plain.landable);self.assertTrue(cap.landable,cap.reason)
+                self.assertEqual(capped['layouts'][layout+'_cap'],capped['layouts'][layout]);self.assertEqual(lighting(capped,layout+'_cap'),lighting(capped,layout))
+                plates=[item for item in scene_objects(capped,layout+'_cap') if item['name'].startswith('BallCap')]
+                self.assertEqual(len(plates),1);self.assertFalse(any(item['name'].startswith('BallCap') for item in scene_objects(capped,layout)))
+                # Every other thing spawned is the plain layout's.
+                self.assertEqual([item['name'] for item in scene_objects(capped,layout+'_cap') if not item['name'].startswith('BallCap')],[item['name'] for item in scene_objects(capped,layout)])
+                # The plate rests on the ball: its underside where the ball's surface is at its edge, its top just above the ball's.
+                plate=plates[0];self.assertEqual(plate['position'],list(cap.centre_xy));self.assertAlmostEqual(plate['lift_m'],9.);self.assertAlmostEqual(cap.top_m,10.2)
+            episode=self.s.draw(self.settings,self.config,capped,'k_cap','orange_ball','land',5,band='near')
+            self.assertEqual((episode['layout'],episode['task']),('k_cap','land'))
+
+    def test_a_landing_is_data_only_near_the_middle_of_its_surface(self):
+        from src.landing.surface import SurfaceSet
+        capped=self.s.with_caps(self.maps['field'],self.settings);surfaces=SurfaceSet(capped,'a_cap')
+        radius={name:self.s.precision_m(surfaces[name].describe()) for name in ('blue_pad','red_pad','blue_cube','green_cylinder','orange_ball')}
+        self.assertEqual(radius,{'blue_pad':1.75,'red_pad':1.75,'blue_cube':1.75,'green_cylinder':1.75,'orange_ball':1.3})
+        summary={'reason':'human_stop','hit':None,'task':'land'};pad=surfaces['blue_pad'].describe()
+        landed=lambda error:{'success':True,'stable_physical_landing':True,'target_surface':pad,'horizontal_error_m':error}
+        self.assertTrue(self.s.kept(landed(1.7),summary,.95,self.settings));self.assertFalse(self.s.kept(landed(1.8),summary,.95,self.settings))
+        self.assertFalse(self.s.kept({**landed(1.),'stable_physical_landing':False},summary,.95,self.settings))
+        # Recorded flights are judged again from their summaries alone; a takeover flight also needs a label of the pilot's.
+        from scripts.refile_human_flights import verdict
+        stored={**summary,'surface_landing':landed(1.),'real_time_factor':.95,'labels':{'labels':3}}
+        self.assertTrue(verdict(stored,self.settings));self.assertFalse(verdict({**stored,'surface_landing':landed(2.)},self.settings))
+        self.assertFalse(verdict({**stored,'pilot':'takeover','labels':{'labels':0}},self.settings));self.assertTrue(verdict({**stored,'pilot':'takeover'},self.settings))
 
     def test_a_landing_is_asked_only_of_an_object_with_a_top(self):
         objects={item['name']:item['landable'] for item in self.s.targets_of(self.maps['field'],'a')}
@@ -165,10 +210,10 @@ class SessionTests(unittest.TestCase):
         self.assertTrue(self.s.kept(good,summary,.95,settings));self.assertTrue(self.s.kept(good,summary,None,settings))
         self.assertFalse(self.s.kept({'success':False},summary,.95,settings));self.assertFalse(self.s.kept(good,{**summary,'reason':'gave_up'},.95,settings))
         self.assertFalse(self.s.kept(good,{**summary,'hit':'Wall'},.95,settings));self.assertFalse(self.s.kept(good,summary,.7,settings))
-        # A landing: the surface evaluator's own soft touchdown that stood, whatever the canonical rule read.
-        land={**summary,'task':'land'}
-        self.assertFalse(self.s.kept({'success':True,'stable_physical_landing':False},land,.95,settings))
-        self.assertTrue(self.s.kept({'success':False,'stable_physical_landing':True},land,.95,settings))
+        # A landing: the surface evaluator's own soft touchdown that stood, whatever the canonical rule read (and near the middle).
+        land={**summary,'task':'land'};pad={'landable':True,'outline':'rectangle','usable_half_extent_m':[6.6,6.6]}
+        self.assertFalse(self.s.kept({'success':True,'stable_physical_landing':False,'target_surface':pad,'horizontal_error_m':.5},land,.95,settings))
+        self.assertTrue(self.s.kept({'success':False,'stable_physical_landing':True,'target_surface':pad,'horizontal_error_m':.5},land,.95,settings))
         # Takeover mode: the pilot may accept the model's own stop at the end.
         self.assertTrue(self.s.kept(good,{**summary,'reason':'model_stop'},.95,settings))
 
@@ -265,6 +310,9 @@ class WindowTests(unittest.TestCase):
         self.assertEqual(canvas[100+300,20+300].tolist(),[200,200,200]);self.assertEqual(canvas[100+300,20+560+20+300].tolist(),[50,50,50])
         # The policy's 256 x 256 pictures (when no stream has come yet) fill the same panel.
         self.assertEqual(pilot.render(np.full((256,256,3),90,np.uint8),None,[],size=560)[100+500,20+500].tolist(),[90,90,90])
+        # More than three lines of text (the menu) push the pictures down instead of being hidden under them.
+        lines=[(f'line {index}',(0,0,0),False) for index in range(5)];canvas=pilot.render(np.full((256,256,3),90,np.uint8),None,lines,size=560)
+        self.assertEqual(canvas[156+5,20+5].tolist(),[90,90,90]);self.assertEqual(canvas[150,20+5].tolist(),[245,245,245])
         source=inspect.getsource(pilot.fly);status=source[source.index('lines=['):];self.assertNotIn('decision',status[:status.index(chr(10))])
         # What the flight loop puts on the window: the sentence, its own state, the decision count, the speed, recording; never
         # what the simulator knows of the object.

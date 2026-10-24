@@ -1,4 +1,4 @@
-param([string]$Scene='field',[string]$Layout='a',[string]$Target='',[ValidateSet('','land','approach')][string]$Task='',[switch]$NoRecord,[string]$Record='',[switch]$UnrealView,[int]$ViewPx=0,[string]$Script='',[int]$Episodes=0,[int]$Seed=-1,[int]$TopicsPort=8989,[int]$ServicesPort=8990,[string]$Snapshot='',[switch]$Takeover,[string]$Checkpoint='',[string]$Distro='Ubuntu',[int]$PolicyPort=8995)
+param([string]$Scene='field',[string]$Layout='a',[string]$Target='',[ValidateSet('','land','approach')][string]$Task='',[switch]$NoRecord,[string]$Record='',[switch]$UnrealView,[int]$ViewPx=0,[string]$Script='',[int]$Episodes=0,[int]$Seed=-1,[int]$TopicsPort=8989,[int]$ServicesPort=8990,[string]$Snapshot='',[switch]$Takeover,[string]$Checkpoint='',[string]$Distro='Ubuntu',[int]$PolicyPort=8995,[ValidateSet('','near','mid','far')][string]$Band='',[switch]$Random)
 # Human pilot mode (docs/human_pilot_mode.md): a person flies the vehicle from the front and down pictures alone, and the
 # flight is recorded as data in the format of the teacher's recordings. No model is loaded; nothing runs in WSL.
 # The pilot window shows the front and down views (display cameras with the policy cameras' pose and field of view, at a
@@ -6,6 +6,9 @@ param([string]$Scene='field',[string]$Layout='a',[string]$Target='',[ValidateSet
 # from outside, which a policy never sees) is hidden; -UnrealView shows it at 1280 x 720 beside the pilot window, keys work
 # in either window, and the flights are recorded with view: unreal. -NoRecord flies without writing anything. -Script FILE
 # flies a fixed list of inputs instead of a person (a check of the whole loop).
+# -Band near|mid|far: how far from the object flights start (12-44, 44-100, 100-160 m; mid by default; D in the menu).
+# -Random: the layout (with or without the plate on the orange ball), the object and LAND / APPROACH are drawn for every
+# flight (R in the menu). A landing is data only within 1.75 m of the middle of its surface (1.3 m on the ball's plate).
 # -Takeover: the model flies first and the pilot takes over when it goes wrong (Space, or any flight key) and gives it back
 # (Space). The checkpoint (-Checkpoint; the interactive map's frozen grounding_film by default) is checked here, then
 # served from WSL by src/human_pilot/remote.py; the flights go to datasets/projectairsim_visual_search/takeover.
@@ -28,6 +31,8 @@ if ($Seed -ge 0) { $taskArgs+='--seed'; $taskArgs+="$Seed" }
 if ($Snapshot) { $taskArgs+='--snapshot'; $taskArgs+=$Snapshot }
 if ($UnrealView) { $taskArgs+='--unreal-view' }
 if ($ViewPx -gt 0) { $taskArgs+='--view-px'; $taskArgs+="$ViewPx" }
+if ($Band) { $taskArgs+='--band'; $taskArgs+=$Band }
+if ($Random) { $taskArgs+='--random' }
 if ($Checkpoint -and -not $Takeover) { throw '-Checkpoint is for -Takeover' }
 if ($Takeover) {
     . (Join-Path $PSScriptRoot 'native_process_args.ps1')
@@ -51,7 +56,7 @@ if ($Takeover) {
     $taskArgs+='--takeover'; $taskArgs+=$taskReady
 }
 Write-Host 'HUMAN PILOT'
-Write-Host 'Before a flight: N/P object | T land/approach | L layout | M scene | Enter fly | Esc quit'
+Write-Host 'Before a flight: N/P object | T land/approach | L layout | M scene | D distance | R random | Enter fly | Esc quit'
 Write-Host 'Flying: W/S forward/back | A D turn | Up/Down climb/descend | 1-4 speed (4 and backward: not used for training) | Enter done | Backspace discard'
 Write-Host 'Pad (Xbox-style): left stick forward/back and turn | right stick up/down | A done | B discard | Start fly | LB/RB speed'
 Write-Host 'The pilot window shows the front and down views and the sentence; -UnrealView also shows the simulator window.'

@@ -26,6 +26,7 @@ import asyncio
 import copy
 import json
 import math
+import random
 import statistics
 import sys
 import threading
@@ -153,16 +154,17 @@ def bar(canvas,x,y,width,value,top,label):
 def render(front,down,lines,rates=None,limits=None,size=560,footer=''):
     """The pilot's window: the sentence and state on top, the two views (`size` pixels square), the pilot's own commands.
     Nothing else."""
-    width=max(2*size+60,780);height=size+190;canvas=np.full((height,width,3),245,np.uint8)
+    # The views start below the text: at 100 px for up to three lines, lower for more (the menu).
+    top=max(100,28*len(lines)+16);width=max(2*size+60,780);height=top+size+90;canvas=np.full((height,width,3),245,np.uint8)
     for row,(text,colour,big) in enumerate(lines):
         cv2.putText(canvas,text,(20,32+row*28),cv2.FONT_HERSHEY_SIMPLEX,.8 if big else .55,colour,2 if big else 1,cv2.LINE_AA)
     for column,(name,frame) in enumerate((('FRONT',front),('DOWN',down))):
-        x=20+column*(size+20);y=100
+        x=20+column*(size+20);y=top
         if frame is None:cv2.rectangle(canvas,(x,y),(x+size,y+size),(30,30,30),-1)
         else:canvas[y:y+size,x:x+size]=cv2.resize(frame,(size,size),interpolation=cv2.INTER_AREA if frame.shape[0]>size else cv2.INTER_LINEAR)
         cv2.putText(canvas,name,(x+8,y+24),cv2.FONT_HERSHEY_SIMPLEX,.6,(255,255,255),2,cv2.LINE_AA)
     if rates is not None and limits is not None:
-        y=size+125
+        y=top+size+25
         width_bar=max(160,(width-80)//3)
         bar(canvas,20,y,width_bar,rates.forward,limits.forward,f'forward {rates.forward:+.2f} m/s')
         bar(canvas,40+width_bar,y,width_bar,-rates.down,limits.down,f'up {0.-rates.down:+.2f} m/s')
@@ -174,7 +176,7 @@ def render(front,down,lines,rates=None,limits=None,size=560,footer=''):
 KEYS_FLYING='W/S forward/back | A D turn | Up/Down climb/descend | 1-4 speed | Enter done | Backspace discard | Esc quit'
 KEYS_MODEL='Space or any flight key: take over | 1-4 your speed | Enter: end (after the model stops) | Backspace discard | Esc quit'
 KEYS_TAKEN='W/S | A D | Up/Down | 1-4 speed | Space: give back to the model | Enter done | Backspace discard | Esc quit'
-KEYS_MENU='N/P object | T land/approach | L layout | M scene | Enter fly | Esc quit'
+KEYS_MENU='N/P object | T land/approach | L layout | M scene | D distance | R random | Enter fly | Esc quit'
 
 
 def show(canvas):
@@ -334,8 +336,9 @@ async def main(args):
     from src.visual_search.finalizer import LandingFinalizer
     from src.visual_search.maps import load_map
     settings=session.load(args.config);config=load_config();oft=load_oft();size=settings['display_px_unreal' if args.unreal_view else 'display_px']
-    scenes=settings['scenes'];scene=args.scene or scenes[0];layout=args.layout or settings['layouts'][0]
-    if scene not in scenes or layout not in settings['layouts']:raise SystemExit(f'scene and layout must be recording ones: {scenes}, {settings["layouts"]}')
+    scenes=settings['scenes'];layouts=session.recording_layouts(settings);bands=list(settings['distance_bands'])
+    scene=args.scene or scenes[0];layout=args.layout or layouts[0];band=args.band or settings['default_band'];drawn=bool(args.random)
+    if scene not in scenes or layout not in layouts:raise SystemExit(f'scene and layout must be recording ones: {scenes}, {layouts}')
     record_root=None if args.no_record else Path(args.record or ROOT/(settings['takeover']['dataset'] if args.takeover else settings['dataset']))
     policy=None;model=None
     if args.takeover:
@@ -345,11 +348,14 @@ async def main(args):
     output=Path(args.output);output.mkdir(parents=True,exist_ok=True)
     from src.human_pilot.devices import Devices
     devices=Script(args.script) if args.script else Devices(WINDOW,also=(UNREAL,) if args.unreal_view else ())
-    maps={name:load_map(name) for name in scenes};avoid={name:session.check_starts(name) for name in scenes}
+    # Each scene with the variants of its recording layouts that have the plate on the ball (built in memory).
+    maps={name:session.with_caps(load_map(name),settings) for name in scenes};avoid={name:session.check_starts(name) for name in scenes}
     objects=session.targets_of(maps[scene],layout);chosen=next((index for index,item in enumerate(objects) if item['name']==args.target),0)
     task=args.task or ('land' if objects[chosen]['landable'] else 'approach');seed=args.seed if args.seed is not None else int(time.time())%100000
     client=ProjectAirSimClient(address=args.host,port_topics=args.ports[0],port_services=args.ports[1]);client.connect();client.socket_services.recv_timeout=60000
     env=environment(canonical,args.view_px or settings['view_px'],(1280,720) if args.unreal_view else None)(client,config,oft,output);env.stream=Stream();flown=0;message=''
+    # The environment reads a map by its name through this cache: it is given the maps with the plate layouts.
+    env.maps.update(maps)
     cv2.namedWindow(WINDOW,cv2.WINDOW_AUTOSIZE)
     # Beside the simulator's window (1280 x 720 at the top left) when it is shown.
     if args.unreal_view:cv2.moveWindow(WINDOW,1300,0)
@@ -358,7 +364,8 @@ async def main(args):
             item=objects[chosen]
             if task=='land' and not item['landable']:task='approach'
             lines=[('TAKEOVER - the model flies, you take over' if policy else 'HUMAN PILOT - choose what to fly',(20,20,20),True),
-                   (f'scene {scene} | layout {layout} | {item["noun"]} | {task.upper()} | start: a random place {settings["distance_m"][0]:.0f}-{settings["distance_m"][1]:.0f} m away',(20,20,20),False),
+                   (f'scene {scene} | layout {layout} | {item["noun"]} | {task.upper()}' if not drawn else f'scene {scene} | RANDOM: layout, object and LAND / APPROACH drawn for each flight',(20,20,20),False),
+                   (f'start: {band.upper()}, a random place {settings["distance_bands"][band][0]:.0f}-{settings["distance_bands"][band][1]:.0f} m from the object (D: change)',(20,20,20),False),
                    (message,(0,110,0) if message.startswith('KEPT') else (0,0,170),False)]
             status=policy.status() if policy else 'ready'
             if policy:
@@ -371,8 +378,10 @@ async def main(args):
             if 'n' in pressed:chosen=(chosen+1)%len(objects)
             if 'p' in pressed:chosen=(chosen-1)%len(objects)
             if 't' in pressed:task='approach' if task=='land' else ('land' if item['landable'] else 'approach')
+            if 'd' in pressed:band=bands[(bands.index(band)+1)%len(bands)]
+            if 'r' in pressed:drawn=not drawn
             if 'l' in pressed or 'm' in pressed:
-                if 'l' in pressed:layout=settings['layouts'][(settings['layouts'].index(layout)+1)%len(settings['layouts'])]
+                if 'l' in pressed:layout=layouts[(layouts.index(layout)+1)%len(layouts)]
                 if 'm' in pressed:scene=scenes[(scenes.index(scene)+1)%len(scenes)]
                 objects=session.targets_of(maps[scene],layout);chosen=min(chosen,len(objects)-1)
             if not ({'enter','pad_start'}&pressed):
@@ -380,7 +389,13 @@ async def main(args):
             if args.episodes and flown>=args.episodes:break
             if status!='ready':
                 await asyncio.sleep(.05);continue
-            episode=session.draw(settings,config,maps[scene],layout,item['name'],task,seed,avoid[scene]);seed+=1
+            if drawn:
+                # The layout, the object and the task of this flight, from the flight's own seed.
+                rng=random.Random(f'human-pilot|{scene}|{seed}');layout=rng.choice(layouts);objects=session.targets_of(maps[scene],layout)
+                chosen=rng.randrange(len(objects));item=objects[chosen]
+                task='land' if item['landable'] and rng.random()<settings['random_land_share'] else 'approach'
+            episode=session.draw(settings,config,maps[scene],layout,item['name'],task,seed,avoid[scene],band=band);seed+=1
+            episode['random_target']=drawn
             if policy:episode.update(id='tk'+episode['id'][2:],kind='takeover',pilot='takeover')
             show(render(None,None,[(episode['instruction'],(20,20,20),True),('PREPARING: loading the scene and flying to the start ...',(0,0,170),False)],size=size))
             recorder=session.Recorder(record_root,episode) if record_root else None
@@ -411,23 +426,29 @@ async def main(args):
             good=session.kept(reading,summary,factor,settings);rows=session.label_rows(steps)
             # A takeover flight is data only for what the pilot flew: with no decision of the pilot's a label, there is none.
             if policy:good=good and rows['labels']>0
+            target_surface=reading.get('target_surface') or {}
+            landing=({'precision_m':round(session.precision_m(target_surface),3),'error_m':reading.get('horizontal_error_m'),'precise':session.precise(reading)}
+                     if task=='land' and target_surface.get('landable') else None)
             extra={'takeover':{'checkpoint':model.get('checkpoint'),'model':model.get('name'),'frozen':(model.get('frozen') or {}).get('state'),
                                'loaded':policy.info.get('loaded'),'switches':switches,'takeovers':sum(item['to']=='human' for item in switches)}} if policy else {}
             if recorder:
                 recorder.finish({**summary,'surface_landing':reading,'real_time_factor':factor,'pilot':'takeover' if policy else 'human','controls':'script' if args.script else 'keyboard/pad','labels':rows,
-                                 'view':'unreal' if args.unreal_view else 'cameras','view_px':args.view_px or settings['view_px'],**extra},
+                                 'view':'unreal' if args.unreal_view else 'cameras','view_px':args.view_px or settings['view_px'],'distance_band':band,
+                                 'random_target':drawn,'precision':landing,**extra},
                                 steps,good,settings['keep_rejected_frames'])
             await env.close()
             line={'id':episode['id'],'scene':scene,'layout':layout,'target':item['name'],'task':task,'reason':reason,'success':bool(reading.get('success')),
                   'landed_on':reading.get('landed_on'),'collision':reading.get('collision'),'decisions':len(steps),'labels':rows,'real_time_factor':factor,'kept':good and bool(recorder),
                   # The median: in takeover mode the vehicle may wait between two decisions after the model's stop.
                   'decision_period_s':round(statistics.median([b['epoch']-a['epoch'] for a,b in zip(steps,steps[1:])] or [0.]),3),'stream_frames':dict(env.stream.counts),
-                  'view':'unreal' if args.unreal_view else 'cameras','mode':'takeover' if policy else 'human'}
+                  'view':'unreal' if args.unreal_view else 'cameras','mode':'takeover' if policy else 'human','band':band,'random':drawn,
+                  'start_distance_m':round(steps[0]['distance_m'],1),'precision':landing}
             if policy:line.update(model=model.get('name'),takeovers=extra['takeover']['takeovers'],switches=[[item['decision'],item['to']] for item in switches])
             with (output/'flights.jsonl').open('a',encoding='utf-8') as file:file.write(json.dumps(line)+'\n')
             print('FLIGHT',json.dumps(line),flush=True)
             message=(f'KEPT {episode["id"]}' if good and recorder else f'NOT KEPT {episode["id"]}')+f': {reason}, success={bool(reading.get("success"))}, {rows["labels"]} labels, {rows["decisions"]-rows["labels"]-rows["terminal"]} left out'
             if policy:message+=f', taken over {extra["takeover"]["takeovers"]} times'
+            if landing and landing['error_m'] is not None:message+=f', landed {landing["error_m"]:.1f} m from the middle (data needs {landing["precision_m"]:.2f} m or less)'
             if args.episodes and flown>=args.episodes:break
     finally:
         cv2.destroyAllWindows()
@@ -448,5 +469,7 @@ if __name__=='__main__':
     parser.add_argument('--snapshot',help='save the window once, at the twelfth decision of a flight (to show what the pilot sees)')
     parser.add_argument('--view-px',type=int,help='resolution of the display cameras (default: the configuration\'s)')
     parser.add_argument('--unreal-view',action='store_true',help='the simulator\'s own window is shown; keys work in it too; the flights are recorded with view: unreal')
+    parser.add_argument('--band',choices=('near','mid','far'),help='distance band of the starts (default: the configuration\'s); D changes it before a flight')
+    parser.add_argument('--random',action='store_true',help='draw the layout, the object and the task for every flight; R toggles it before a flight')
     parser.add_argument('--takeover',metavar='READY_FILE',help='takeover mode: the model served by src/human_pilot/remote.py (which writes READY_FILE once loaded) flies first')
     asyncio.run(main(parser.parse_args()))

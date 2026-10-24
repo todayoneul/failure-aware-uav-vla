@@ -15,13 +15,42 @@
   "n"
  ],
  "layouts_from": "the recording layouts of every generic landing stage (configs/generic_landing_stage1d.json, layouts.train). The layouts checks are flown in (t, u, p, q, r, s) and the canonical ones (e, g, h, i, j) are refused.",
- "distance_m": [
-  12.0,
-  44.0
- ],
- "distance_from": "the validated range of the canonical evaluation (44 m); 12 m keeps the object out of reach of the first decision",
+ "ball_cap": {
+  "object": "orange_ball",
+  "plate_radius_m": 3.0,
+  "thickness_m": 1.2,
+  "color": [
+   0.95,
+   0.95,
+   0.95
+  ],
+  "ball_top_m": {
+   "field": 10.0,
+   "lot": 10.0
+  },
+  "from": "the interactive map's plate on its orange ball (configs/mission/grounding_film_demo.json, OrangeBallCap): 3 m radius, 1.2 m thick, its underside where the ball's surface lies at the plate's edge (1.0 m below the top of a 10 m ball), so it rests on the ball all round and its top stands 0.2 m above it. ball_top_m: the top of the spawned ball above the ground, measured in the simulator (bounding box of SceneOrangeBall in field and lot: 0.0 to 10.0 m; the plate then stands from 9.0 to 10.2 m, measured too).",
+  "layouts": "every recording layout X has a variant X_cap with the plate (src/human_pilot/session.with_caps); built in memory, the map files are not changed (they are part of the frozen baseline's fingerprints)"
+ },
+ "distance_bands": {
+  "near": [
+   12.0,
+   44.0
+  ],
+  "mid": [
+   44.0,
+   100.0
+  ],
+  "far": [
+   100.0,
+   160.0
+  ]
+ },
+ "default_band": "mid",
+ "bands_from": "near: the validated range of the canonical evaluation (44 m); 12 m keeps the object out of reach of the first decision. mid and far: beyond it, where the object is often out of sight at the start and has to be searched for. 160 m: starts up to it were drawn for every object of every recording layout of both scenes. The band is chosen before a flight (D) and recorded with it.",
  "separation_from_check_starts_m": 6.0,
  "max_ticks": 400,
+ "random_land_share": 0.5,
+ "random_from": "random targets (R before a flight): the scene stays; the layout (with or without the plate), the object, and for an object with a landing surface LAND or APPROACH are drawn for every flight, LAND half of the time",
  "instructions": {
   "land": "land",
   "approach": "approach"
