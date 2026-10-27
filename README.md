@@ -265,7 +265,7 @@ configs/generic_landing/  Generic Landing의 녹화 계획과 pilot·validation�
 configs/generic_landing_stage1b/  Stage 1b의 같은 것 (configs/generic_landing_stage1b.json에 숫자와 stop-safety 규칙)
 configs/generic_landing_stage1c/  Stage 1c의 녹화 계획과 pilot·gate A·gate B·regression 시작 (configs/generic_landing_stage1c.json에 숫자, 강제 상태, 선택 규칙)
 configs/generic_landing_stage1d/  Stage 1d의 녹화 계획과 pilot·qualification 시작 (configs/generic_landing_stage1d.json에 숫자, 두 반경, 강제 상태 넷; gate는 Stage 1c의 파일)
-tests/               simulator 없이 도는 테스트 (Python 480개 + PowerShell 4개)
+tests/               simulator 없이 도는 테스트 (Python 482개 + PowerShell 4개)
 docs/                아래 문서
 outputs/examples/    README에 쓰는 실제 화면과 GIF
 outputs/generalization/  동결한 결과 표와 실패 분류 (원자료는 로컬에만)
@@ -287,6 +287,7 @@ outputs/generic_landing_1d/ Stage 1d의 실패 감사, teacher pilot, pilot 표,
 | [mission_demo](docs/mission_demo.md) · [full_map_grounding](docs/full_map_grounding.md) | 미션 데모 조작, 지도와 Inspector |
 | [grounding_film_interactive_demo](docs/grounding_film_interactive_demo.md) | 동결한 baseline으로 나는 Interactive Mission Control: 구조, 모델에 들어가는 것과 아닌 것, 장면과 launch 자세, 조작, 수동 확인 기록, 한계 |
 | [human_pilot_mode](docs/human_pilot_mode.md) | 사람이 Front/Down 카메라(또는 Unreal 창)를 보고 조종하는 모드와 개입 모드: 보이는 것, Unreal 창 모드, 조작, 속도 단계, 넘겨받기와 돌려주기, 조작을 모델 action으로 바꾸는 법, 학습에서 빼는 decision, 기록 형식, 확인 비행 |
+| [human_takeover_r1](docs/human_takeover_r1.md) | 개입 data 학습 1회차 계획 (초안): 시작 checkpoint, 학습 전에 모을 data(data gate), data 구성과 비율, 학습 설정, pilot / 봉인 gate / regression 기준, 결정 규칙. 진행 상황: `scripts/human_data_status.py` |
 | [model_evaluation](docs/model_evaluation.md) | 하네스 수정, 69회 평가, 연속 비행, 디코더, 블록 위 목표, 지시문 |
 | [aerovla_oft](docs/aerovla_oft.md) | Visual Search Mode와 AeroVLA-OFT pilot |
 | [aerovla_oft_generalization](docs/aerovla_oft_generalization.md) | 맵 정의, held-out 시작 상태, teacher, Gen-v1의 G0–G4 결과와 대조 시험 |

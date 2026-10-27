@@ -158,6 +158,30 @@ class SessionTests(unittest.TestCase):
             episode=self.s.draw(self.settings,self.config,capped,'k_cap','orange_ball','land',5,band='near')
             self.assertEqual((episode['layout'],episode['task']),('k_cap','land'))
 
+    def test_random_flights_come_in_five_kinds_equally_often(self):
+        import collections
+        import random
+        from src.landing.surface import SurfaceSet
+        capped=self.s.with_caps(self.maps['lot'],self.settings);count=collections.Counter()
+        for seed in range(500):
+            layout,target,task=self.s.draw_target(random.Random(f'test|{seed}'),capped,self.settings)
+            self.assertIn(layout,self.s.recording_layouts(self.settings));surface=SurfaceSet(capped,layout)[target]
+            kind=self.s.surface_kind(surface.describe()) if task=='land' else 'approach'
+            if task=='land':self.assertTrue(surface.landable,(layout,target))
+            if kind=='plate':self.assertTrue(layout.endswith('_cap'))
+            count[kind]+=1
+        self.assertEqual(set(count),{'pad','cube','cylinder','plate','approach'})
+        self.assertTrue(all(70<=value<=130 for value in count.values()),count)
+
+    def test_the_data_status_counts_kept_flights_against_the_plans_gate(self):
+        import collections
+        from scripts.human_data_status import lines
+        plan=json.loads((ROOT/'configs/human_takeover_r1.json').read_text(encoding='utf-8'))
+        self.assertEqual(plan['start_checkpoint'],'outputs/aerovla_oft/checkpoints/grounding_film');self.assertLess(sum(plan['fine_tune']['share'].values()),1)
+        counts={'flights':100,'kind':collections.Counter(pad=12,cube=12,cylinder=12,plate=11,approach=15),'band':collections.Counter(near=70,mid=20,far=10),
+                'scene':collections.Counter(field=50,lot=50)}
+        missing=[what for what,have,need in lines(counts,plan['data_gate']) if have<need];self.assertEqual(missing,['landings on a plate'])
+
     def test_a_landing_is_data_only_near_the_middle_of_its_surface(self):
         from src.landing.surface import SurfaceSet
         capped=self.s.with_caps(self.maps['field'],self.settings);surfaces=SurfaceSet(capped,'a_cap')

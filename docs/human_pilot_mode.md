@@ -161,7 +161,7 @@ outputs/human_pilot/flights.jsonl            비행마다 한 줄: 결과, label
 ## 목표: 모든 물체, 무작위
 
 - 녹화 layout마다 물체 8개가 있습니다: blue·red pad, blue·red cube, blue·green cylinder, orange ball, blue cone. **N / P**로 고르고 **T**로 LAND / APPROACH를 바꿉니다. cone은 끝이 뾰족해서 APPROACH만 됩니다.
-- **R**(또는 `-Random`)을 켜면 비행마다 layout(공 위 착륙판이 있는 것 포함), 물체, LAND / APPROACH가 무작위로 정해집니다. 착륙할 수 있는 물체는 절반은 LAND, 절반은 APPROACH입니다. 장면(field / lot)은 M으로 고른 것을 유지합니다. 무작위 비행은 기록에 `random_target: true`로 남습니다.
+- **R**(또는 `-Random`)을 켜면 비행마다 layout(공 위 착륙판이 있는 것 포함), 물체, LAND / APPROACH가 무작위로 정해집니다. 먼저 비행 종류 다섯 가지(pad 착륙, cube 착륙, cylinder 착륙, 공 위 판 착륙, 아무 물체에 접근)를 같은 확률로 고르고, 그 종류에 맞는 layout과 물체를 고릅니다. 물체부터 고르면 판 착륙이 30번에 한 번꼴이라 종류부터 고릅니다. 장면(field / lot)과 거리 단계는 M과 D로 고른 것을 유지합니다. 무작위 비행은 기록에 `random_target: true`로 남습니다.
 
 ### 공 위 착륙판
 

@@ -391,9 +391,8 @@ async def main(args):
                 await asyncio.sleep(.05);continue
             if drawn:
                 # The layout, the object and the task of this flight, from the flight's own seed.
-                rng=random.Random(f'human-pilot|{scene}|{seed}');layout=rng.choice(layouts);objects=session.targets_of(maps[scene],layout)
-                chosen=rng.randrange(len(objects));item=objects[chosen]
-                task='land' if item['landable'] and rng.random()<settings['random_land_share'] else 'approach'
+                layout,target,task=session.draw_target(random.Random(f'human-pilot|{scene}|{seed}'),maps[scene],settings)
+                objects=session.targets_of(maps[scene],layout);chosen=next(index for index,entry in enumerate(objects) if entry['name']==target);item=objects[chosen]
             episode=session.draw(settings,config,maps[scene],layout,item['name'],task,seed,avoid[scene],band=band);seed+=1
             episode['random_target']=drawn
             if policy:episode.update(id='tk'+episode['id'][2:],kind='takeover',pilot='takeover')

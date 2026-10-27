@@ -49,8 +49,14 @@
  "bands_from": "near: the validated range of the canonical evaluation (44 m); 12 m keeps the object out of reach of the first decision. mid and far: beyond it, where the object is often out of sight at the start and has to be searched for. 160 m: starts up to it were drawn for every object of every recording layout of both scenes. The band is chosen before a flight (D) and recorded with it.",
  "separation_from_check_starts_m": 6.0,
  "max_ticks": 400,
- "random_land_share": 0.5,
- "random_from": "random targets (R before a flight): the scene stays; the layout (with or without the plate), the object, and for an object with a landing surface LAND or APPROACH are drawn for every flight, LAND half of the time",
+ "random_cells": {
+  "land_pad": 1,
+  "land_cube": 1,
+  "land_cylinder": 1,
+  "land_plate": 1,
+  "approach": 1
+ },
+ "random_from": "random targets (R before a flight): the scene and the distance band stay; a kind of flight is drawn first, each with its weight in random_cells (a landing on a pad, a cube, a cylinder or the plate on the ball, or an approach to any object), then a layout (one with the plate for a landing on it) and an object of that kind (src/human_pilot/session.draw_target)",
  "instructions": {
   "land": "land",
   "approach": "approach"

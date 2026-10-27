@@ -80,6 +80,27 @@ def with_caps(map_config,settings):
     return config
 
 
+def surface_kind(surface):
+    """pad, cube, cylinder or plate (the ball's plate) for a landing surface as src/landing/surface describes it; None for
+    an object without one."""
+    if not surface or not surface.get('landable'):return None
+    return 'plate' if surface.get('surface')=='cap' else surface.get('shape')
+
+
+def draw_target(rng,map_config,settings):
+    """The layout, the object and the task of a random flight. First a kind of flight, each as likely as its weight in
+    `random_cells` (a landing on each kind of surface, and an approach), then a layout (one with the plate for a landing on
+    the plate) and an object of that kind. Drawing the kind first keeps every kind as frequent as the others: drawing the
+    object first would give a landing on the plate once in about thirty flights."""
+    from src.landing.surface import SurfaceSet
+    cells=settings['random_cells'];cell=rng.choices(list(cells),weights=list(cells.values()))[0]
+    layouts=[layout for layout in recording_layouts(settings) if cell!='land_plate' or layout.endswith(CAP)]
+    layout=rng.choice(layouts)
+    if cell=='approach':return layout,rng.choice(list(map_config['layouts'][layout])),'approach'
+    names=[name for name,surface in SurfaceSet(map_config,layout).items() if surface_kind(surface.describe())==cell[len('land_'):]]
+    return layout,rng.choice(names),'land'
+
+
 def targets_of(map_config,layout):
     """The objects of a layout, in the map's order, with their noun and whether a landing on them can be asked for."""
     from src.landing.surface import SurfaceSet
