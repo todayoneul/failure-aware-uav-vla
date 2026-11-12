@@ -102,7 +102,7 @@ uv run python scripts/carla_check.py --quality Low --offscreen     # simulator �
 
 | 항목 | 값 |
 |---|---|
-| 받은 파일 | `CARLA_0.9.16.zip` 7,812,252,810 bytes (서버가 알린 크기와 같음), `assets/downloads/carla-0.9.16/` |
+| 받은 파일 | `CARLA_0.9.16.zip` 7,812,252,810 bytes (서버가 알린 크기와 같음). 푼 뒤 2026-11-13에 지웠다 |
 | 푼 위치 | `assets/carla-0.9.16/` (19.4GB, 32,841개 파일) |
 | 맵 | Town01, Town02, Town03, Town04, Town05, Town10HD와 각각의 `_Opt`(층으로 나뉜 판) |
 | 차량 blueprint | 41개: car 23, van 4, truck 4, motorcycle 4, bicycle 3, bus 1, 분류 없음 2 |
