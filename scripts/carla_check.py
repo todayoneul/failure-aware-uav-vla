@@ -12,9 +12,8 @@ Run from the repository root:
 import argparse
 import json
 import math
-import queue
 import random
-import subprocess
+import sys
 import time
 from datetime import datetime
 from pathlib import Path
@@ -24,55 +23,11 @@ import cv2
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_SERVER = ROOT / "assets" / "carla-0.9.16" / "CarlaUE4.exe"
+sys.path.insert(0, str(ROOT))
+from src.car_follow.sim import (DEFAULT_SERVER, bgr, camera, connect, frame_at, gpu_memory_mib,  # noqa: E402
+                                look_at, server_args, start_server, stop_server)
+
 OUTPUT = ROOT / "outputs" / "phase2" / "carla_check"
-
-
-def gpu_memory_mib():
-    out = subprocess.run(
-        ["nvidia-smi", "--query-gpu=memory.used,memory.total", "--format=csv,noheader,nounits"],
-        capture_output=True, text=True, check=True).stdout
-    used, total = (int(v) for v in out.strip().splitlines()[0].split(","))
-    return used, total
-
-
-def server_args(quality, port, offscreen):
-    args = [f"-quality-level={quality}", f"-carla-rpc-port={port}", "-nosound"]
-    return args + (["-RenderOffScreen"] if offscreen else ["-windowed", "-ResX=640", "-ResY=360"])
-
-
-def start_server(exe, args):
-    # With the console handles inherited, the very first start never answered within 10 minutes; detached, every
-    # start answered within seconds (the cause was not isolated: it may also have been the first shader warm-up).
-    return subprocess.Popen([str(exe), *args], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-
-def stop_server(process):
-    # CarlaUE4.exe starts the shipping binary as a child, so end the whole tree.
-    subprocess.run(["taskkill", "/T", "/F", "/PID", str(process.pid)], capture_output=True)
-    process.wait(timeout=60)
-
-
-def connect(port, timeout_s):
-    client = carla.Client("localhost", port)
-    client.set_timeout(10.0)
-    deadline = time.monotonic() + timeout_s
-    while True:
-        try:
-            client.get_server_version()
-            return client
-        except RuntimeError:
-            if time.monotonic() > deadline:
-                raise
-            time.sleep(2.0)
-
-
-def look_at(eye, target):
-    """Rotation that points a camera at eye towards target (CARLA: x forward, y right, z up, degrees)."""
-    d = target - eye
-    yaw = math.degrees(math.atan2(d.y, d.x))
-    pitch = math.degrees(math.atan2(d.z, math.hypot(d.x, d.y)))
-    return carla.Rotation(pitch=pitch, yaw=yaw, roll=0.0)
 
 
 def drone_pose(vehicle, distance, height):
@@ -89,28 +44,6 @@ def chase_pose(drone, target_location, back, up):
     norm = math.hypot(forward.x, forward.y) or 1.0
     eye = drone.location - carla.Location(forward.x / norm * back, forward.y / norm * back, -up)
     return carla.Transform(eye, look_at(eye, target_location))
-
-
-def camera(world, kind, width, height, fov, transform):
-    bp = world.get_blueprint_library().find(kind)
-    bp.set_attribute("image_size_x", str(width))
-    bp.set_attribute("image_size_y", str(height))
-    bp.set_attribute("fov", str(fov))
-    sensor = world.spawn_actor(bp, transform)
-    frames = queue.Queue()
-    sensor.listen(frames.put)
-    return sensor, frames
-
-
-def frame_at(frames, frame, timeout=10.0):
-    while True:
-        image = frames.get(timeout=timeout)
-        if image.frame == frame:
-            return image
-
-
-def bgr(image):
-    return np.frombuffer(image.raw_data, dtype=np.uint8).reshape(image.height, image.width, 4)[:, :, :3].copy()
 
 
 def project_box(vehicle, cam_transform, width, height, fov):
