@@ -66,7 +66,7 @@ Phase 1은 VLA를 직접 통합하고, 다시 학습하고, 엄격하게 평가�
 **진행 순서.**
 
 1. Phase 1 정리와 README 개편 (완료)
-2. CARLA 설치 점검: 버전, 용량, GPU 12GB에서 시뮬레이터와 인식 모델을 함께 돌릴 수 있는지
+2. CARLA 설치 점검: 버전, 용량, GPU 12GB에서 시뮬레이터와 인식 모델을 함께 돌릴 수 있는지 (진행 중: uv Python 환경 완료, CARLA 0.9.16 선택, [phase2_setup](docs/phase2_setup.md))
 3. 첫 데모 계획
 
 ## 4. Phase 1 데모
@@ -271,6 +271,7 @@ simulator는 Windows에서, 모델은 WSL2 Ubuntu에서 실행하고 직접 통�
 ## 7. 저장소 구조
 
 ```text
+pyproject.toml, uv.lock  Phase 2 Python 환경 (uv, CARLA client)
 src/integration/     모델 loader, 카메라·행동 변환, 실행기
 src/mission/         지도 좌표, landmark, 미션 상태와 판정
 src/failures/        Gaussian Blur와 control protocol
@@ -300,7 +301,8 @@ outputs/generic_landing*/ Generic Landing 각 단계의 표와 그림 (비행, d
 | 문서 | 내용 |
 |---|---|
 | [phase1_vla_report](docs/phase1_vla_report.md) | **Phase 1 보고서.** 목표와 연구 질문, 배경 개념(수식), 실험 환경과 평가 원칙, 여덟 작업의 목적·방법·결과·배운 것, 개념과 작업의 대응표, 논의, 한계, 참고문헌 24편 |
-| [setup](docs/setup.md) | 환경 준비와 실행 순서 |
+| [phase2_setup](docs/phase2_setup.md) | **Phase 2 환경.** uv Python 환경, CARLA 버전 선택, 설치 확인 계획 |
+| [setup](docs/setup.md) | Phase 1 환경 준비와 실행 순서 |
 | [baseline](docs/baseline.md) | 초기 closed loop 측정 |
 | [model_evaluation](docs/model_evaluation.md) | 하네스 수정, 69회 평가, 연속 비행, 디코더, 블록 위 목표, 지시문 |
 | [mission_demo](docs/mission_demo.md) · [full_map_grounding](docs/full_map_grounding.md) | 미션 데모 조작, 지도와 Inspector |
