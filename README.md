@@ -67,7 +67,8 @@ Phase 1은 VLA를 직접 통합하고, 다시 학습하고, 엄격하게 평가�
 
 1. Phase 1 정리와 README 개편 (완료)
 2. CARLA 설치 점검 (완료, [phase2_setup](docs/phase2_setup.md)): uv Python 환경, CARLA 0.9.16. 차량 40대와 카메라 2–3대로 52–74 FPS. simulator는 Town03/05에서 약 2.6GB를 쓰고, Town10HD에서는 모델이 6GB를 잡아도 함께 돌아 인식 모델 예산은 약 6GB
-3. 첫 데모 계획
+3. 첫 데모 계획 (완료, [phase2_demo1_plan](docs/phase2_demo1_plan.md)): Town05에서 문장으로 지정한 차를 따라가되, 같은 차종·색의 차 2–3대 사이에서 다른 차로 바뀌지 않는지 봅니다. 차량 탐지와 추적은 매 프레임, VLM은 처음 지정할 때만 씁니다. 땅 투영과 Kalman filter로 차 뒤 20m, 위 15m를 유지합니다. 합격선은 본평가 30회에서 처음 지정 90%, 바뀜 없는 시험 90%, 목표 유지 95%, 거리 오차 3m
+4. 첫 데모 구현 (다음 차례, 계획의 4절 순서대로)
 
 ## 4. Phase 1 데모
 
@@ -301,6 +302,7 @@ outputs/generic_landing*/ Generic Landing 각 단계의 표와 그림 (비행, d
 | 문서 | 내용 |
 |---|---|
 | [phase1_vla_report](docs/phase1_vla_report.md) | **Phase 1 보고서.** 목표와 연구 질문, 배경 개념(수식), 실험 환경과 평가 원칙, 여덟 작업의 목적·방법·결과·배운 것, 개념과 작업의 대응표, 논의, 한계, 참고문헌 24편 |
+| [phase2_demo1_plan](docs/phase2_demo1_plan.md) | **Phase 2 첫 데모 계획.** 범위, 구성(처음 지정, 추적, 추종 제어, 화면), 채점 지표와 합격선, 구현 순서, 이후 단계 |
 | [phase2_setup](docs/phase2_setup.md) | **Phase 2 환경.** uv Python 환경, CARLA 버전 선택, 설치 확인(속도, GPU 메모리, 자동 정답, 다른 GPU 작업과 함께) |
 | [setup](docs/setup.md) | Phase 1 환경 준비와 실행 순서 |
 | [baseline](docs/baseline.md) | 초기 closed loop 측정 |
