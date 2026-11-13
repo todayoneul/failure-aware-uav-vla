@@ -1,6 +1,6 @@
 # Phase 2 첫 데모 구현 기록
 
-이 문서는 [첫 데모 계획](phase2_demo1_plan.md) 4절의 구현 순서를 따라, 단계마다 한 일과 결과를 적는다.
+이 문서는 [첫 데모 계획](demo1_plan.md) 4절의 구현 순서를 따라, 단계마다 한 일과 결과를 적는다. 경로와 명령은 `car_follow/` 폴더 기준이다.
 
 | 단계 | 내용 | 상태 |
 |---|---|---|
@@ -19,17 +19,17 @@
 
 | 파일 | 내용 |
 |---|---|
-| `configs/phase2/vehicle_types.json` | 차종 이름표 (1.1절) |
-| `configs/phase2/demo1_trials.json` | dev, pilot, smoke 시험과 본평가의 봉인 기록 |
-| `configs/phase2/demo1_trials_main.json` | 본평가 30회 (봉인, 1.6절) |
+| `configs/vehicle_types.json` | 차종 이름표 (1.1절) |
+| `configs/demo1_trials.json` | dev, pilot, smoke 시험과 본평가의 봉인 기록 |
+| `configs/demo1_trials_main.json` | 본평가 30회 (봉인, 1.6절) |
 | `src/car_follow/sim.py` | simulator 시작·종료·연결, 동기 모드, 카메라, 화면 투영 |
 | `src/car_follow/trials.py` | 색 이름, 문장, 시험 만들기, 봉인 |
 | `scripts/make_demo1_trials.py` | 시험 목록 생성. `--catalog`는 색 확인 그림(그림 1)만 그림 |
-| `tests/phase2/test_demo1_trials.py` | simulator 없이 도는 테스트 10개 |
+| `tests/test_demo1_trials.py` | simulator 없이 도는 테스트 10개 |
 
 ```powershell
 uv run python scripts/make_demo1_trials.py             # simulator를 켜고 네 목록을 만든 뒤 끈다
-uv run python -m unittest discover -s tests/phase2
+uv run python -m unittest discover -s tests
 ```
 
 ### 1.1 차종 이름표
@@ -76,7 +76,7 @@ CARLA 차의 색은 RGB 값(예: `217,217,217`)이다. 이 값을 HSV(색상 h°
 
 남은 애매한 점도 있다. Mini와 Audi A2는 지붕이 흰색이라 위에서 보면 흰 부분이 크다. 사람은 이런 차를 차체 색으로 부르므로("빨간 Mini") 그대로 두었다. 옛 Nissan Patrol의 검은색은 지붕 위 은색 짐받이 때문에 짙은 회색으로도 보인다.
 
-![목표 차와 색 확인 그림](../outputs/examples/phase2/demo1_color_catalog.jpg)
+![목표 차와 색 확인 그림](../outputs/examples/demo1_color_catalog.jpg)
 
 *그림 1. 목표가 될 수 있는 차 60대(차종 × 분명한 색)를 드론 시작 위치에서 본 모습.*
 
@@ -187,7 +187,7 @@ CARLA 차의 색은 RGB 값(예: `217,217,217`)이다. 이 값을 HSV(색상 h°
 
 본평가 30회의 구성은 봉인되어 있어 표현 배분(16/7/7)과 개수 외에는 모른다.
 
-![시험 시작 예시](../outputs/examples/phase2/demo1_trials.jpg)
+![시험 시작 예시](../outputs/examples/demo1_trials.jpg)
 
 *그림 2. dev 시험의 시작 화면. 위부터 lane, front, back 표현 두 개씩이다. 초록 상자가 목표, 주황 상자가 비슷한 차이며, 위 띠의 문장이 목표 한 대만 가리킨다.*
 
@@ -201,11 +201,10 @@ CARLA 차의 색은 RGB 값(예: `217,217,217`)이다. 이 값을 HSV(색상 h°
 
 - **공통 함수 정리.** simulator 시작·종료·연결과 카메라 함수를 `src/car_follow/sim.py`로 모았다. `scripts/carla_check.py`도 이 함수를 쓰도록 바꿨고, Town05 Low에서 다시 실행해 정상 동작을 확인했다.
 - **simulator 시작 보호.**
-  - 이번 작업 중 한 번, 시험 생성이 simulator의 응답을 10분 동안 받지 못했다. 설치 확인 때에 이어 두 번째다.
-  - 바로 다시 실행하자 5초 만에 응답했다. 원인은 찾지 못했다.
-  - 그래서 `sim.session`에 두 가지를 넣었다. 포트 2000을 이미 무언가가 쓰고 있으면 시작하지 않는다. 120초 안에 응답이 없으면 simulator를 끄고 한 번 더 시작한다.
-- **테스트 위치.**
-  - Phase 2 테스트는 `tests/phase2/`에 있고 uv 환경에서 돈다.
-  - 이 폴더에는 `__init__.py`를 두지 않았다. 그래서 carla가 없는 WSL에서 Phase 1 테스트(`-s tests`)를 돌릴 때 이 테스트가 섞이지 않는다.
+  - simulator가 시작 요청에 응답하지 않은 일이 약 20번의 시작 중 세 번 있었다. 설치 확인 때 한 번, 이번 시험 생성 때 한 번, 폴더 정리 뒤 확인 실행 때 한 번이다.
+  - 세 번째 때 살펴보니, simulator는 포트 2000–2002를 열고 화면도 그리고 있었지만 어떤 client에도 답하지 않았다. 새로 띄운 client도 마찬가지였다. 그래서 client 쪽 문제가 아니라 simulator가 시작 중에 멈춘 것으로 본다.
+  - 다시 시작하면 매번 몇 초 만에 응답했다. 원인은 찾지 못했다.
+  - 그래서 `sim.session`과 `carla_check.py`에 두 가지를 넣었다. 포트 2000을 이미 무언가가 쓰고 있으면 시작하지 않는다. 120초 안에 응답이 없으면 simulator를 끄고 한 번 더 시작한다.
+- **테스트 위치.** Phase 2 테스트는 `car_follow/tests/`에 있고 uv 환경에서 돈다. carla가 없는 WSL의 Phase 1 테스트(`landing_vla/tests/`)와는 폴더가 달라 섞이지 않는다.
 
 **다음 단계.** 2단계는 드론 이동과 추종 제어다(구성 1). dev 시험에서 simulator의 정답 위치로 따라가며, 속도·가속도·회전 제한과 목표 지점, 카메라 조준을 맞춘다.

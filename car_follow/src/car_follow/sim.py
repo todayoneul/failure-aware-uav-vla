@@ -51,8 +51,9 @@ def port_in_use(port, host="localhost"):
 def start_and_connect(exe, args, port, timeout_s, tries=2):
     """Start the simulator and connect to it, starting it again if it does not answer within `timeout_s`.
 
-    Twice a start never answered (the first install check and a start right after another run's stop); started
-    again it answered within seconds. The cause was not found."""
+    Three times in about twenty starts the simulator never answered: it listened on its ports and rendered, but no
+    client (not even a fresh one) got an answer within 10 minutes. Started again it answered within seconds. The
+    cause was not found."""
     if port_in_use(port):
         raise RuntimeError(f"something already listens on port {port}: stop the running simulator first")
     for attempt in range(tries):
@@ -160,7 +161,7 @@ def bgr(image):
 
 
 def instance_ids(image):
-    """Actor id of every pixel of an instance segmentation image (CARLA 0.9.16: G + 256 * B, see phase2_setup 4.4)."""
+    """Actor id of every pixel of an instance segmentation image (CARLA 0.9.16: G + 256 * B, see docs/setup.md 4.4)."""
     raw = np.frombuffer(image.raw_data, dtype=np.uint8).reshape(image.height, image.width, 4).astype(np.int32)
     return raw[:, :, 1] + 256 * raw[:, :, 0]
 

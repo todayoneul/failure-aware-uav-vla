@@ -9,7 +9,7 @@
 | CARLA simulator 설치와 실행 확인 | 완료 (2026-11-12, 4절) |
 | 결론: 12GB GPU에서 simulator와 인식 모델을 함께 돌릴 수 있는가 | 가능. 인식 모델 예산은 약 6GB (5절) |
 
-Phase 1의 환경(WSL의 inference env, `assets/projectairsim-env`)은 바꾸지 않았다. Phase 1 환경은 [setup](setup.md)에 기록되어 있다.
+Phase 1의 환경(WSL의 inference env, `landing_vla/assets/projectairsim-env`)은 바꾸지 않았다. Phase 1 환경은 [Phase 1 setup](../../landing_vla/docs/setup.md)에 기록되어 있다. 이 문서의 경로와 명령은 `car_follow/` 폴더 기준이다.
 
 ## 1. 구성
 
@@ -40,14 +40,14 @@ WSL은 지금 쓰지 않는다. lock 파일은 Linux x64도 함께 풀어 두었
 
 ### 2.2 만들기와 확인
 
-저장소 루트에서 실행한다.
+`car_follow/` 폴더에서 실행한다.
 
 ```powershell
 uv sync
 uv run python -c "import carla; print(carla.Client('localhost', 2000).get_client_version())"
 ```
 
-두 번째 명령은 `0.9.16`을 출력한다. 이 명령은 simulator에 연결하지 않고 client 라이브러리만 확인한다. 환경은 저장소의 `.venv/`에 만들어지며 Git에는 올리지 않는다.
+두 번째 명령은 `0.9.16`을 출력한다. 이 명령은 simulator에 연결하지 않고 client 라이브러리만 확인한다. 환경은 `car_follow/.venv/`에 만들어지며 Git에는 올리지 않는다.
 
 ### 2.3 Python 설치 위치
 
@@ -91,7 +91,7 @@ uv run python scripts/carla_check.py --quality Low --map Town05_Opt
 uv run python scripts/carla_check.py --quality Low --offscreen     # simulator 창 없이
 ```
 
-결과(요약 JSON과 화면)는 `outputs/phase2/carla_check/<시각>/`에 남는다. 공통 조건은 다음과 같다.
+결과(요약 JSON과 화면)는 `outputs/carla_check/<시각>/`에 남는다. 공통 조건은 다음과 같다.
 
 - 동기 모드, 20Hz(tick당 0.05초)
 - 차량 40대, Traffic Manager 자동 주행, seed 7
@@ -123,7 +123,7 @@ uv run python scripts/carla_check.py --quality Low --offscreen     # simulator �
 - **드론 몸체.** 드론 blueprint가 없으므로 3인칭 화면에는 debug 상자로 표시했다.
 - **debug 상자 주의점.** debug 도형은 모든 RGB 카메라에 찍힌다. 처음에는 상자를 드론 카메라 위치에 그려서, 1인칭 화면이 상자 안쪽에 가려 노랗게 바랬다. 그래서 상자를 카메라 1m 뒤에 그린다. instance segmentation 카메라에는 debug 도형이 찍히지 않았다.
 
-![CARLA 확인 화면](../outputs/examples/phase2/carla_check_views.jpg)
+![CARLA 확인 화면](../outputs/examples/carla_check_views.jpg)
 
 *그림 1. 위: Town10HD_Opt, 아래: Town05_Opt (둘 다 Low).*
 

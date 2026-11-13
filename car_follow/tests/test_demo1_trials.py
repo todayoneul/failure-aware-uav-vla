@@ -1,9 +1,8 @@
 """Demo 1 trials: colour names, lane names, how the target is named among look-alikes, the road split and the sealed
 main list. No simulator (the carla package must be importable: run with `uv run`).
 
-Run from the repository root:
-    uv run python -m unittest discover -s tests/phase2
-(tests/phase2 has no __init__.py so that the Phase 1 run, `-s tests` in WSL without carla, does not collect it.)
+Run from the car_follow folder:
+    uv run python -m unittest discover -s tests
 """
 import json
 import tempfile

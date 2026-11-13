@@ -1,5 +1,5 @@
 {
-  "_comment": "Phase 2 vehicle names for the sentences (docs/phase2_demo1.md 1.1). Written by hand for the 4-wheel blueprints of CARLA 0.9.16. target: may be the named car (ordinary cars and vans; not police, taxi, emergency, trucks, buses or the micro car, nor cars whose body colour does not show from above: the two-tone T2 vans and the Wrangler, see why). ko_obj: the Korean name with its object particle.",
+  "_comment": "Phase 2 vehicle names for the sentences (docs/demo1.md 1.1). Written by hand for the 4-wheel blueprints of CARLA 0.9.16. target: may be the named car (ordinary cars and vans; not police, taxi, emergency, trucks, buses or the micro car, nor cars whose body colour does not show from above: the two-tone T2 vans and the Wrangler, see why). ko_obj: the Korean name with its object particle.",
   "vehicles": {
     "vehicle.audi.a2": {"type": "hatchback", "ko": "해치백", "ko_obj": "해치백을", "target": true},
     "vehicle.audi.etron": {"type": "SUV", "ko": "SUV", "ko_obj": "SUV를", "target": true},

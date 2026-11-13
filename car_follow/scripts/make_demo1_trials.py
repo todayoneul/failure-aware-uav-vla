@@ -1,12 +1,12 @@
-"""Make the demo 1 trial lists (docs/phase2_demo1.md 1): dev, pilot and smoke (open) and main (sealed).
+"""Make the demo 1 trial lists (docs/demo1.md 1): dev, pilot and smoke (open) and main (sealed).
 
 Each trial is drawn, spawned in Town05 and looked at from the drone start before it is kept: the target and every
 look-alike must spawn, the target must show at least 300 pixels, at least one look-alike must be in view, and the
 sentence built for the trial must name the target among the matches in view. The main trials start in map cells of
-their own (trials.cell_split). Pictures of the open trials' starts go to outputs/phase2/demo1_trials/; none are made of
+their own (trials.cell_split). Pictures of the open trials' starts go to outputs/demo1_trials/; none are made of
 the main trials. --catalog only draws every target blueprint in every clear colour, to check the colour names by eye.
 
-Run from the repository root (starts and stops the simulator):
+Run from the car_follow folder (starts and stops the simulator):
     uv run python scripts/make_demo1_trials.py
 """
 import argparse
@@ -23,7 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from src.car_follow import sim, trials  # noqa: E402
 
-OUT = ROOT / "outputs" / "phase2" / "demo1_trials"
+OUT = ROOT / "outputs" / "demo1_trials"
 SEED_BASE = {"dev": 100000, "pilot": 200000, "smoke": 300000, "main": 900000}
 POOL = {"dev": "dev", "pilot": "gate", "smoke": "gate", "main": "main"}
 
@@ -148,7 +148,7 @@ def main():
     parser.add_argument("--max-attempts", type=int, default=400, help="per split")
     parser.add_argument("--no-start", action="store_true", help="use a simulator that is already running")
     parser.add_argument("--catalog", action="store_true",
-                        help="only draw every target blueprint in every clear colour (outputs/phase2/demo1_trials/)")
+                        help="only draw every target blueprint in every clear colour (outputs/demo1_trials/)")
     args = parser.parse_args()
 
     types = trials.load_types()

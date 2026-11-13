@@ -6,7 +6,7 @@ A chase camera behind the drone gives the third-person view. Each run also check
 ground truth: the target's bounding box projected into the drone image, and the target's visible pixels
 in an instance segmentation image.
 
-Run from the repository root:
+Run from the car_follow folder:
     uv run python scripts/carla_check.py --quality Low Epic
 """
 import argparse
@@ -25,9 +25,9 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from src.car_follow.sim import (DEFAULT_SERVER, bgr, camera, connect, frame_at, gpu_memory_mib,  # noqa: E402
-                                look_at, server_args, start_server, stop_server)
+                                look_at, server_args, start_and_connect, stop_server)
 
-OUTPUT = ROOT / "outputs" / "phase2" / "carla_check"
+OUTPUT = ROOT / "outputs" / "carla_check"
 
 
 def drone_pose(vehicle, distance, height):
@@ -70,16 +70,17 @@ def instance_ids(image):
 
 def run_quality(args, quality, out_dir):
     record = {"quality": quality}
-    process = None
+    process = client = None
+    started = time.monotonic()
     if not args.no_start:
         record["server_args"] = server_args(quality, args.port, args.offscreen)
         record["gpu_before_server_mib"] = gpu_memory_mib()[0]
-        process = start_server(args.server, record["server_args"])
+        process, client = start_and_connect(args.server, record["server_args"], args.port, args.connect_timeout)
     actors, sensors = [], []
     world = original = None
     try:
-        started = time.monotonic()
-        client = connect(args.port, args.connect_timeout)
+        if client is None:
+            client = connect(args.port, args.connect_timeout)
         record["connect_s"] = round(time.monotonic() - started, 1)
         record["client_version"] = client.get_client_version()
         record["server_version"] = client.get_server_version()
@@ -225,7 +226,8 @@ def main():
     parser.add_argument("--label", default="", help="suffix for the output folder of each quality")
     parser.add_argument("--port", type=int, default=2000)
     parser.add_argument("--tm-port", type=int, default=8000)
-    parser.add_argument("--connect-timeout", type=float, default=600.0)
+    parser.add_argument("--connect-timeout", type=float, default=120.0,
+                        help="seconds to wait for the simulator before starting it once more")
     parser.add_argument("--map", default=None, help="map to load, e.g. Town03 (default: the one the simulator opens)")
     parser.add_argument("--vehicles", type=int, default=40)
     parser.add_argument("--hz", type=float, default=20.0)

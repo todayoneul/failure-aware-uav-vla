@@ -1,5 +1,5 @@
 # Phase 2 environment (CARLA car following), managed by uv.
-# Phase 1 (landing VLA) keeps its own environments, recorded in docs/setup.md.
+# Phase 1 (landing VLA) keeps its own environments, recorded in ../landing_vla/docs/setup.md.
 [project]
 name = "drone-car-follow"
 version = "0.1.0"

@@ -1,7 +1,7 @@
 """Demo 1 trials: a named car with 2-3 look-alikes (same blueprint, same colour) close by in Town05, and the sentence
-that names it (docs/phase2_demo1_plan.md 2.1, 2.5; docs/phase2_demo1.md 1).
+that names it (docs/demo1_plan.md 2.1, 2.5; docs/demo1.md 1).
 
-A trial is a plain dict, written to configs/phase2/demo1_trials.json (main: demo1_trials_main.json, sealed):
+A trial is a plain dict, written to configs/demo1_trials.json (main: demo1_trials_main.json, sealed):
     id, split, seed, map, duration_s
     target       blueprint, color, transform, road, lane, index_from_left, lanes
     lookalikes   [{color, transform, lane_offset, along_m}]  same blueprint and colour as the target
@@ -30,9 +30,9 @@ import numpy as np
 from . import sim
 
 ROOT = Path(__file__).resolve().parents[2]
-TYPES_PATH = ROOT / "configs" / "phase2" / "vehicle_types.json"
-TRIALS_PATH = ROOT / "configs" / "phase2" / "demo1_trials.json"
-MAIN_PATH = ROOT / "configs" / "phase2" / "demo1_trials_main.json"
+TYPES_PATH = ROOT / "configs" / "vehicle_types.json"
+TRIALS_PATH = ROOT / "configs" / "demo1_trials.json"
+MAIN_PATH = ROOT / "configs" / "demo1_trials_main.json"
 
 MAP = "Town05_Opt"
 DURATION_S = 60.0
@@ -97,7 +97,7 @@ def clear_color(color):
         return v >= 0.83 and s <= 0.12
     if family == "gray":
         # In Town05's light grays above 0.5 render nearly white and grays below 0.38 nearly black seen from the drone
-        # (docs/phase2_demo1.md 1.2).
+        # (docs/demo1.md 1.2).
         return s <= 0.12 and 0.38 <= v <= 0.5
     margin = _hue_family(h)[1]
     return s >= 0.5 and v >= (0.6 if family in ("orange", "yellow") else 0.35) and margin >= 5.0
@@ -194,7 +194,7 @@ def load_trials(split, open_sealed=False, index_path=TRIALS_PATH):
     if split != "main":
         return index["splits"][split]
     if not open_sealed:
-        raise PermissionError("the main trials are sealed until the main evaluation (docs/phase2_demo1_plan.md 3.3)")
+        raise PermissionError("the main trials are sealed until the main evaluation (docs/demo1_plan.md 3.3)")
     path = Path(index_path).parent / index["main"]["file"]
     if sha256_file(path) != index["main"]["sha256"]:
         raise ValueError(f"{path} does not match its sealed sha256")
