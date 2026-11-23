@@ -14,11 +14,12 @@ CARLA에서 자연어로 지정한 차량("오른쪽 차선의 흰색 SUV를 따
 | 연구 계획: 주제, 가설, 실패 시험 설계, 진행 순서 | 완료 | [research_plan](docs/research_plan.md) |
 | CARLA-Air 확인 (CARLA 0.9.16 + 쿼드로터 비행 모델) | 완료. 쓰지 않음(드론 물리가 동기 모드 tick을 따르지 않음). CARLA 0.9.16 + 자체 동역학으로 감 | [carla_air_check](docs/carla_air_check.md) |
 | 첫 데모 구현 2: 드론 이동과 추종 제어 (자체 동역학, 정답 위치로 추종, dev 20개) | 완료. 25m/s, 6m/s², 지연 0.5초, 방향 거르기 1초로 dev 20개 모두 거리 오차 3m 이하(평균 1.22m) | [demo1](docs/demo1.md) 2절 |
-| 첫 데모 구현 3: 화면 (1인칭, 3인칭 드론, 위에서 본 지도) | 진행 중 | [demo1](docs/demo1.md) 3절 |
+| 첫 데모 구현 3: 화면 (1인칭 락온, 3인칭 드론 그리기, 위에서 본 지도) | 완료 | [demo1](docs/demo1.md) 3절 |
+| 첫 데모 구현 4: 채점기 | 다음 | |
 
-![시험 시작 예시](outputs/examples/demo1_trials.jpg)
+![첫 데모 화면](outputs/examples/demo1_screen.jpg)
 
-*첫 데모 시험의 시작 화면. 초록 상자가 목표, 주황 상자가 같은 차종·색의 차이고, 위 띠의 문장이 목표 한 대만 가리킵니다.*
+*첫 데모 화면. 왼쪽은 드론 카메라(락온 상자와 문장), 오른쪽 위는 드론이 그려진 3인칭, 오른쪽 아래는 위에서 본 지도(초록 목표, 주황 비슷한 차)입니다. 지금은 정답 위치로 따라가는 구성 1입니다.*
 
 ## 2. 실행
 
@@ -37,7 +38,7 @@ uv run python -m unittest discover -s tests          # simulator 없이 도는 �
 ```text
 pyproject.toml, uv.lock, .python-version   Python 환경 (uv)
 src/car_follow/    simulator 시작·연결과 카메라(sim.py), 첫 데모의 시험·문장·봉인(trials.py),
-                   드론 모델(drone.py), 추종 제어(follow.py), 추종 품질 지표(metrics.py)
+                   드론 모델(drone.py), 추종 제어(follow.py), 추종 품질 지표(metrics.py), 화면(screen.py)
 scripts/           설치 확인(carla_check.py), 시험 목록 생성(make_demo1_trials.py),
                    교통 기록·추종 비행(demo1_follow.py), CARLA-Air 확인(carla_air/)
 configs/           차종 이름표, 첫 데모 시험 목록 (본평가는 봉인)

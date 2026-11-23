@@ -5,8 +5,9 @@ can be flown offline over recorded traffic, as many times as needed:
 
     record   run trials in CARLA with every car on autopilot and record each car's pose and velocity every tick
     offline  fly the follow loop over the recordings with several settings and score each flight
-    live     fly the loop inside CARLA with the drone camera (a check video), recording the traffic again; the
-             recording is compared with an earlier one to see whether the trial replays the same way
+    live     fly the loop inside CARLA, recording the traffic again (compared with an earlier recording to see
+             whether the trial replays the same way); --video writes the demo screen (docs/demo1.md 3): first
+             person with the lock-on box, chase view with the drone drawn in, top-down map
 
 Every trial starts from the same state: traffic lights reset, the trial's Traffic Manager seed, cars spawned in a
 fixed order. Outputs go to outputs/demo1_follow/ (local only).
@@ -26,9 +27,10 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from src.car_follow import drone, follow, metrics, sim, trials  # noqa: E402
+from src.car_follow import drone, follow, metrics, screen, sim, trials  # noqa: E402
 
 OUT = ROOT / "outputs" / "demo1_follow"
+XODR = ROOT / "assets" / "carla-0.9.16" / "CarlaUE4" / "Content" / "Carla" / "Maps" / "OpenDrive" / f"{trials.MAP}.xodr"
 HZ = 20.0
 DT = 1.0 / HZ
 
@@ -167,24 +169,6 @@ def cmd_offline(args):
     print(f"wrote {out.relative_to(ROOT)}")
 
 
-def overlay(image, target, cam_tf, err, rng, height, speed, t):
-    import cv2
-    cam = trials.CAMERA
-    w2c = np.array(cam_tf.get_inverse_matrix())
-    verts = [[v.x, v.y, v.z] for v in target.bounding_box.get_world_vertices(target.get_transform())]
-    box = sim.image_box(w2c, verts, cam["width"], cam["height"], cam["fov"])
-    if box:
-        x0, y0, x1, y1 = (int(round(c)) for c in box)
-        cv2.rectangle(image, (x0, y0), (x1, y1), (0, 220, 0), 2)
-    cx, cy = cam["width"] // 2, cam["height"] // 2
-    cv2.line(image, (cx - 12, cy), (cx + 12, cy), (255, 255, 255), 1)
-    cv2.line(image, (cx, cy - 12), (cx, cy + 12), (255, 255, 255), 1)
-    text = f"t {t:5.1f}s  goal error {err:4.1f} m  range {rng:4.1f} m  height {height:4.1f} m  speed {speed:4.1f} m/s"
-    cv2.rectangle(image, (0, 0), (cam["width"], 26), (0, 0, 0), -1)
-    cv2.putText(image, text, (8, 18), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
-    return image
-
-
 def cmd_live(args):
     import carla
     import cv2
@@ -193,6 +177,7 @@ def cmd_live(args):
     gains = follow.Gains(heading_s=args.heading[0])
     run = args.run or f"live_v{args.speed[0]:g}_a{args.accel[0]:g}_lag{args.lag[0]:g}_h{args.heading[0]:g}"
     report = []
+    raster = screen.MapRaster.cached(XODR, OUT / "map", trials.MAP) if args.video else None
     with sim.session(trials.MAP, hz=HZ, start=not args.no_start) as (client, world, tm):
         for trial in select(args.split, args.ids):
             actors = start_trial(client, world, tm, trial)
@@ -200,28 +185,31 @@ def cmd_live(args):
             target = actors["target"]
             state = follow.start_state(trial["drone_start"])
             follower = follow.Follower(limits, gains)
-            cam = trials.CAMERA
-            pose = carla.Transform(carla.Location(*state.position), carla.Rotation(pitch=state.pitch, yaw=state.yaw))
-            rgb, frames = sim.camera(world, "sensor.camera.rgb", cam["width"], cam["height"], cam["fov"], pose) \
-                if args.video else (None, None)
-            writer = None
+            cams, writer, scr = None, None, None
             if args.video:
+                pose = carla.Transform(carla.Location(*state.position), carla.Rotation(pitch=state.pitch, yaw=state.yaw))
+                cams = {"first": sim.camera(world, "sensor.camera.rgb", *screen.FIRST, trials.CAMERA["fov"], pose),
+                        "chase": sim.camera(world, "sensor.camera.rgb", *screen.SIDE, trials.CAMERA["fov"], pose)}
                 (OUT / "video").mkdir(parents=True, exist_ok=True)
                 writer = cv2.VideoWriter(str(OUT / "video" / f"{trial['id']}_{run}.mp4"),
-                                         cv2.VideoWriter_fourcc(*"mp4v"), HZ, (cam["width"], cam["height"]))
+                                         cv2.VideoWriter_fourcc(*"mp4v"), HZ, screen.SIZE)
+                scr = screen.Screen(raster, trial["sentence"]["en"], trial["sentence"]["ko"], hz=HZ,
+                                    fov=trials.CAMERA["fov"])
+            aim = np.array(trial["target"]["transform"][:3]) + [0.0, 0.0, 0.8]
             log = {k: np.zeros((ticks, 3)) for k in ("position", "velocity", "acceleration", "goal", "command")}
             log["yaw"], log["pitch"] = np.zeros(ticks), np.zeros(ticks)
             w = time.monotonic()
             try:
                 for k in range(ticks):
-                    pose = carla.Transform(carla.Location(*state.position),
-                                           carla.Rotation(pitch=state.pitch, yaw=state.yaw))
-                    if rgb is not None:
-                        rgb.set_transform(pose)
+                    if cams:
+                        cams["first"][0].set_transform(carla.Transform(
+                            carla.Location(*state.position), carla.Rotation(pitch=state.pitch, yaw=state.yaw)))
+                        eye, (cyaw, cpitch) = screen.chase_pose(state.position, state.yaw, aim)
+                        cams["chase"][0].set_transform(carla.Transform(carla.Location(*eye),
+                                                                       carla.Rotation(pitch=cpitch, yaw=cyaw)))
                     world.tick()
                     frame = rec.take(world, k)
-                    i = 0
-                    tpos, tyaw, aim = rec.pos[k, i].astype(float), float(rec.rot[k, i, 1]), rec.aim[k]
+                    tpos, tyaw, aim = rec.pos[k, 0].astype(float), float(rec.rot[k, 0, 1]), rec.aim[k].copy()
                     cmd, goal = follower.command(state, tpos, tyaw, aim, DT)
                     for key, val in (("position", state.position), ("velocity", state.velocity),
                                      ("acceleration", state.acceleration), ("goal", goal),
@@ -229,18 +217,22 @@ def cmd_live(args):
                         log[key][k] = val
                     log["yaw"][k], log["pitch"][k] = state.yaw, state.pitch
                     if writer is not None:
-                        true_goal = follow.goal_point(tpos, tyaw)
-                        rel = state.position - tpos
-                        image = overlay(sim.bgr(sim.frame_at(frames, frame)), target, pose,
-                                        float(np.linalg.norm(state.position - true_goal)),
-                                        float(np.linalg.norm(rel[:2])), float(rel[2]),
-                                        float(np.linalg.norm(state.velocity[:2])), k * DT)
+                        err = float(np.linalg.norm(state.position - follow.goal_point(tpos, tyaw)))
+                        status = (f"t {k * DT:4.1f} s    config 1 (ground truth)    drone {np.linalg.norm(state.velocity[:2]):4.1f} m/s"
+                                  f"    goal error {err:4.1f} m")
+                        cars = [(rec.pos[k, i], rec.rot[k, i], rec.box_center[i], rec.box_extent[i], str(rec.kind[i]))
+                                for i in range(len(rec.ids))]
+                        image = scr.frame(sim.bgr(sim.frame_at(cams["first"][1], frame)),
+                                          sim.bgr(sim.frame_at(cams["chase"][1], frame)),
+                                          screen.Camera(eye, cyaw, cpitch, *screen.SIDE, trials.CAMERA["fov"]),
+                                          state.position, state.yaw, state.pitch, cars, 0, f"GT #{target.id}",
+                                          status, goal)
                         writer.write(image)
                     state = drone.step(state, cmd, limits, DT)
             finally:
-                if rgb is not None:
-                    rgb.stop()
-                    rgb.destroy()
+                for cam, _ in (cams or {}).values():
+                    cam.stop()
+                    cam.destroy()
                 if writer is not None:
                     writer.release()
             wall = time.monotonic() - w
