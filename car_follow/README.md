@@ -17,7 +17,7 @@ CARLA에서 자연어로 지정한 차량("오른쪽 차선의 흰색 SUV를 따
 | 첫 데모 구현 3: 화면 (1인칭 락온, 3인칭 드론 그리기, 위에서 본 지도) | 완료 | [demo1](docs/demo1.md) 3절 |
 | 첫 데모 구현 4: 채점기 (기록한 교통을 재생해 모든 구성이 같은 교통을 봄) | 완료. 구성 1(정답 상자)로 dev 20개 바뀜 없음 100%, 목표 유지 100%, 거리 오차 1.22m. dev 5개에서 목표가 고가도로에 5–22초 가려짐 | [demo1](docs/demo1.md) 4절 |
 | 첫 데모 구현 4 보완: 2초 넘는 가림 전·후 따로 채점, 깊이 카메라로 고도 높이기 | 완료. 구성 1 그대로 합격. 가려진 시간 59.8초 → 37.0초, 앞의 깊이 점이 3m 안에 들어온 적 없음, 속도 63–72 tick/s, GPU 변화 없음 | [demo1](docs/demo1.md) 4.5–4.7절 |
-| 첫 데모 구현 5: 탐지기와 추적기 (구성 2) | 진행 중. 위치 추정: 땅 평면 투영은 고가도로 위에서 중앙값 11.3m 틀려 깊이 맵(0.12m)을 씀. 세계 좌표 ByteTrack 방식 추적기를 완벽한 탐지로 재 보니 본 구간 바뀜 없음 20/20, 목표 유지 99.97%, 거리 오차 1.49m. 실제 탐지기는 PyTorch 설치와 탐지기 선택 뒤에 붙임 | [demo1](docs/demo1.md) 5절 |
+| 첫 데모 구현 5: 탐지기와 추적기 (구성 2) | 진행 중. 위치 추정: 땅 평면 투영은 고가도로 위에서 중앙값 11.3m 틀려 깊이 맵(0.12m)을 씀. 세계 좌표 ByteTrack 방식 추적기를 완벽한 탐지로 재 보니 본 구간 바뀜 없음 20/20, 목표 유지 99.97%, 거리 오차 1.49m. 실제 탐지기는 RF-DETR-Small(Apache-2.0)로 정해 설치함: 8ms/영상, 0.5GB. 목표 탐지율 95%(점수 0.3)지만 50m 넘는 작은 차와 위에서 본 일부 차(회색 승합차, 주황 Mini)를 놓침 | [demo1](docs/demo1.md) 5절 |
 
 ![첫 데모 화면](outputs/examples/demo1_screen.jpg)
 
@@ -36,6 +36,7 @@ uv run python scripts/make_demo1_trials.py           # 첫 데모 시험 목록�
 uv run python -m unittest discover -s tests          # simulator 없이 도는 테스트
 ```
 
+- `uv sync`는 PyTorch(CUDA 12.8 빌드)와 RF-DETR까지 설치합니다(`.venv` 약 4.7GB). RF-DETR 가중치(368MB)는 처음 쓸 때 패키지가 `assets/models/rfdetr/`로 받습니다.
 - CARLA 0.9.16 Windows 패키지는 `assets/carla-0.9.16/`에 풀어 둡니다. Git에는 없고, 받는 곳은 [setup](docs/setup.md) 3절에 있습니다.
 - Claude 데스크톱 앱 안에서 환경을 새로 만들 때의 주의점은 [setup](docs/setup.md) 2.3절에 있습니다.
 
@@ -46,15 +47,17 @@ pyproject.toml, uv.lock, .python-version   Python 환경 (uv)
 src/car_follow/    simulator 시작·연결과 카메라(sim.py), 첫 데모의 시험·문장·봉인(trials.py),
                    드론 모델(drone.py), 추종 제어(follow.py), 추종 품질 지표(metrics.py), 화면(screen.py),
                    교통 재생(replay.py), 채점(scorer.py), 깊이 카메라 고도 회피(clearance.py),
-                   상자에서 목표 위치와 Kalman filter(estimate.py), 다중 객체 추적기(tracker.py)
+                   상자에서 목표 위치와 Kalman filter(estimate.py), 다중 객체 추적기(tracker.py),
+                   탐지기 인터페이스와 RF-DETR adapter(detector.py)
 scripts/           설치 확인(carla_check.py), 시험 목록 생성(make_demo1_trials.py),
                    교통 기록·추종 비행(demo1_follow.py), 재생 확인(demo1_replay_check.py),
-                   재생 위 채점(demo1_eval.py), 위치 추정 오차(demo1_estimate.py), CARLA-Air 확인(carla_air/)
+                   재생 위 채점(demo1_eval.py), 위치 추정 오차(demo1_estimate.py), 탐지율(demo1_detector_check.py),
+                   CARLA-Air 확인(carla_air/)
 configs/           차종 이름표, 첫 데모 시험 목록 (본평가는 봉인)
 tests/             simulator 없이 도는 테스트
 docs/              아래 문서
 outputs/examples/  문서에 쓰는 그림 (나머지 실행 결과는 로컬에만)
-assets/            (로컬에만) CARLA 0.9.16
+assets/            (로컬에만) CARLA 0.9.16, 탐지기 가중치(models/)
 ```
 
 ## 4. 문서

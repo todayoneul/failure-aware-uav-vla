@@ -3,10 +3,10 @@ trial (src/car_follow/replay.py), keep per-tick evidence, and score it (src/car_
 
     config 1  the tracking box is the target's ground-truth 2D box (around its visible instance pixels) and the drone
               follows the target's true position (docs/demo1_plan.md 3.4)
-    config 2  detections -> world positions from the depth map -> tracker (src/car_follow/tracker.py); the target's
-              track is picked by ground truth at its first detection and the drone follows that track's Kalman
-              estimate (docs/demo1.md 5). --detector gt gives every visible car's ground-truth box with score 1
-              (a perfect detector, to measure the tracker alone); real detectors come next.
+    config 2  detections (src/car_follow/detector.py) -> world positions from the depth map -> tracker
+              (src/car_follow/tracker.py); the target's track is picked by ground truth at its first detection and
+              the drone follows that track's Kalman estimate (docs/demo1.md 5). --detector gt gives every visible
+              car's ground-truth box with score 1 (a perfect detector); rfdetr-small etc. run a model on the RGB frame.
 
 The altitude guard (src/car_follow/clearance.py, docs/demo1.md 4.6) reads a 160 x 120 depth camera on the drone:
     --guard on       it raises the follow goal (default)
@@ -32,14 +32,17 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from scripts.demo1_follow import DT, HZ, OUT as FOLLOW_OUT, XODR, select, target_track  # noqa: E402
-from src.car_follow import clearance, drone, estimate, follow, replay, scorer, screen, sim, tracker, trials  # noqa: E402
+from src.car_follow import (clearance, detector, drone, estimate, follow, replay, scorer, screen, sim,  # noqa: E402
+                            tracker, trials)
 
 OUT = ROOT / "outputs" / "demo1_eval"
 WARMUP_TICKS = 2   # camera warm-up before each trial (see fly_trial)
 
 
 def fly_trial(client, world, trial, rec, config, guard_mode="on", raster=None, video=None, measure=False,
-              detector="gt"):
+              det=None, probe=None):
+    """`det`: the config 2 detector (detector.make). `probe(k, bgr, ids_img, replay, rec, state)`: called every tick
+    with the drone's RGB frame (scripts/demo1_detector_check.py)."""
     """One trial on replayed traffic. Returns the per-tick evidence, the drone log and the wall time."""
     ticks = len(rec["pos"])
     cam = trials.CAMERA
@@ -66,8 +69,10 @@ def fly_trial(client, world, trial, rec, config, guard_mode="on", raster=None, v
     if guard is not None:
         cams["depth"] = sim.camera(world, "sensor.camera.depth", dcam.width, dcam.height, dcam.fov, depth_pose())
     writer = scr = None
-    if video:
+    need_rgb = bool(video) or probe is not None or (config == 2 and det is not None and det.name != "gt")
+    if need_rgb:
         cams["rgb"] = sim.camera(world, "sensor.camera.rgb", cam["width"], cam["height"], cam["fov"], pose())
+    if video:
         cams["chase"] = sim.camera(world, "sensor.camera.rgb", *screen.SIDE, cam["fov"], pose())
         writer = cv2.VideoWriter(str(video), cv2.VideoWriter_fourcc(*"mp4v"), HZ, screen.SIZE)
         scr = screen.Screen(raster, trial["sentence"]["en"], trial["sentence"]["ko"], hz=HZ, fov=cam["fov"])
@@ -77,7 +82,8 @@ def fly_trial(client, world, trial, rec, config, guard_mode="on", raster=None, v
           "los_state": np.full(ticks, "unseen", dtype="<U11"), "nearest": np.full(ticks, np.inf),
           "guard_s": np.zeros(ticks), "depth_at_target": np.full(ticks, np.nan),
           "target_depth": np.full(ticks, np.nan), "track_id": np.full(ticks, -1),
-          "est_pos": np.full((ticks, 3), np.nan), "tracks": np.zeros(ticks, int), "detections": np.zeros(ticks, int)}
+          "est_pos": np.full((ticks, 3), np.nan), "tracks": np.zeros(ticks, int), "detections": np.zeros(ticks, int),
+          "detect_s": np.zeros(ticks)}
     if measure:  # raw position measurements of the box (src/car_follow/estimate.py), for scripts/demo1_estimate.py
         for key in ("m_flat", "m_depth", "ray_b", "ray_c"):
             ev[key] = np.full((ticks, 3), np.nan)
@@ -106,12 +112,24 @@ def fly_trial(client, world, trial, rec, config, guard_mode="on", raster=None, v
             seg_img = sim.frame_at(cams["seg"][1], frame)
             ids_img = sim.instance_ids(seg_img)
             depth = sim.depth_m(sim.frame_at(cams["depth"][1], frame)) if guard is not None else None
+            bgr = sim.bgr(sim.frame_at(cams["rgb"][1], frame)) if need_rgb else None
+            if probe is not None:
+                probe(k, bgr, ids_img, rp, rec, state)
             p0 = time.monotonic()
             if config == 1:
                 box = scorer.mask_box(ids_img, target_id)
                 tpos, tyaw, aim = track["position"][k], track["yaw"][k], track["aim"][k]
             else:
-                dets, target_det = detect(ids_img, car_index, target_id, state, cam, depth, dcam, detector)
+                boxes, ev["detect_s"][k] = detector.timed(det, detector.Frame(bgr, ids_img, tuple(rp.ids)))
+                dets = [tracker.Detection(b.xyxy, b.score, estimate.locate(b.xyxy, state.position, state.yaw,
+                                                                           state.pitch, cam, depth, dcam))
+                        for b in boxes]
+                target_det = None
+                if target_track_id is None:  # config 2's first pick is ground truth: the box on the target
+                    truth = scorer.mask_box(ids_img, target_id) if ev_target_px(ids_img, target_id) else None
+                    if truth is not None and dets:
+                        best = max(dets, key=lambda d: detector.iou(d.box, truth))
+                        target_det = best if detector.iou(best.box, truth) >= 0.5 else None
                 mot.update(dets, DT)
                 ev["detections"][k], ev["tracks"][k] = len(dets), len(mot.tracks)
                 if target_track_id is None and target_det is not None:  # config 2: the first pick is ground truth
@@ -182,7 +200,7 @@ def fly_trial(client, world, trial, rec, config, guard_mode="on", raster=None, v
                 status = (f"t {k * DT:4.1f} s    config {config}    box on "
                           f"{'target' if owner == 0 else ('none' if owner < 0 else rec['kind'][owner])}"
                           f"    goal error {err:4.1f} m{climb}")
-                writer.write(scr.frame(sim.bgr(sim.frame_at(cams["rgb"][1], frame)),
+                writer.write(scr.frame(bgr,
                                        sim.bgr(sim.frame_at(cams["chase"][1], frame)),
                                        screen.Camera(eye, cyaw, cpitch, *screen.SIDE, cam["fov"]), state.position,
                                        state.yaw, state.pitch, cars, 0, *lock_label(config, ev, k, target_id, box,
@@ -202,23 +220,8 @@ def fly_trial(client, world, trial, rec, config, guard_mode="on", raster=None, v
     return ev, log, wall
 
 
-def detect(ids_img, car_index, target_id, state, cam, depth, dcam, detector):
-    """Config 2 detections ([tracker.Detection], the target's detection or None). `gt`: every recorded car with
-    at least `scorer.VISIBLE_PX` visible pixels, its visible-mask box, score 1 (a perfect detector)."""
-    if detector != "gt":
-        raise NotImplementedError(f"detector {detector!r} comes with the detector choice (docs/demo1.md 5.3)")
-    ids, counts = np.unique(ids_img, return_counts=True)
-    dets, target_det = [], None
-    for a, n in zip(ids.tolist(), counts.tolist()):
-        if a not in car_index or n < scorer.VISIBLE_PX:
-            continue
-        box = scorer.mask_box(ids_img, a)
-        pos = estimate.locate(box, state.position, state.yaw, state.pitch, cam, depth, dcam)
-        d = tracker.Detection(box, 1.0, pos)
-        dets.append(d)
-        if a == target_id:
-            target_det = d
-    return dets, target_det
+def ev_target_px(ids_img, target_id):
+    return int((ids_img == target_id).sum()) >= scorer.VISIBLE_PX
 
 
 def lock_label(config, ev, k, target_id, box, eye, aim):
@@ -251,6 +254,8 @@ def tracking_record(ev, track):
         "estimate_error_m": round(float(err.mean()), 3) if len(err) else None,
         "estimate_error_p95_m": round(float(np.percentile(err, 95)), 3) if len(err) else None,
         "detections_mean": round(float(ev["detections"].mean()), 1),
+        "detect_ms_mean": round(1000 * float(ev["detect_s"].mean()), 2),
+        "detect_ms_p95": round(1000 * float(np.percentile(ev["detect_s"], 95)), 2),
         "tracks_mean": round(float(ev["tracks"].mean()), 1),
     }
 
@@ -267,7 +272,8 @@ def errors(log, track, offset):
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--config", type=int, default=1, choices=(1, 2))
-    p.add_argument("--detector", default="gt", help="config 2 detector (gt: ground-truth boxes of all visible cars)")
+    p.add_argument("--detector", default="gt", choices=sorted(detector.MODELS),
+                   help="config 2 detector (gt: ground-truth boxes of all visible cars)")
     p.add_argument("--split", default="dev", choices=("dev", "pilot", "smoke"))
     p.add_argument("--ids", nargs="*", default=None)
     p.add_argument("--run", default="rec1", help="the traffic recording to replay (outputs/demo1_follow/traffic/<run>)")
@@ -285,6 +291,7 @@ def main():
     out = OUT / name
     out.mkdir(parents=True, exist_ok=True)
     raster = screen.MapRaster.cached(XODR, FOLLOW_OUT / "map", trials.MAP) if args.video else None
+    det = detector.make(args.detector) if args.config == 2 else None
     rows = {}
     t0 = time.monotonic()
     with sim.session(trials.MAP, hz=HZ, start=not args.no_start) as (client, world, _tm):
@@ -295,7 +302,7 @@ def main():
             world.reset_all_traffic_lights()
             video = out / f"{trial['id']}.mp4" if args.video is not None and trial["id"] in args.video else None
             ev, log, wall = fly_trial(client, world, trial, rec, args.config, args.guard, raster, video,
-                                      args.measure, args.detector)
+                                      args.measure, det)
             track = target_track(rec)
             applied = ev["offset"] if args.guard == "on" else np.zeros(len(ev["offset"]))  # observe: not flown
             dist, horiz, rise = errors(log, track, applied)
@@ -327,6 +334,7 @@ def main():
                   + f", {row['ticks_per_s']} ticks/s, {row['gpu_mib']} MiB", flush=True)
     summary = scorer.summarize(list(rows.values()))
     result = {"config": args.config, "split": args.split, "recording": args.run, "guard": args.guard,
+              "detector": det.info() if det is not None else None,
               "summary": summary, "trials": rows}
     (OUT / f"{name}.json").write_text(json.dumps(result, indent=1), encoding="utf-8")
     print(json.dumps(summary, indent=1))

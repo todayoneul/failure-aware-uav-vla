@@ -13,6 +13,11 @@ dependencies = [
     "numpy>=2",
     "opencv-python>=4.11",
     "pillow>=11",
+    # Step 5 detector (docs/demo1.md 5): PyTorch built for CUDA 12.8 (the RTX 50 series needs 12.8 or later)
+    # and RF-DETR (Apache-2.0), chosen over AGPL detectors with a real drone in mind.
+    "torch>=2.7",
+    "torchvision>=0.22",
+    "rfdetr==1.12.1",
 ]
 
 [tool.uv]
@@ -23,3 +28,13 @@ environments = [
     "sys_platform == 'win32' and platform_machine == 'AMD64'",
     "sys_platform == 'linux' and platform_machine == 'x86_64'",
 ]
+
+# PyTorch with CUDA 12.8 from the PyTorch index; everything else from PyPI.
+[tool.uv.sources]
+torch = [{ index = "pytorch-cu128" }]
+torchvision = [{ index = "pytorch-cu128" }]
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
