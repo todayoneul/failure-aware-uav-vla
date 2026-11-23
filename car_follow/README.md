@@ -17,12 +17,15 @@ CARLA에서 자연어로 지정한 차량("오른쪽 차선의 흰색 SUV를 따
 | 첫 데모 구현 3: 화면 (1인칭 락온, 3인칭 드론 그리기, 위에서 본 지도) | 완료 | [demo1](docs/demo1.md) 3절 |
 | 첫 데모 구현 4: 채점기 (기록한 교통을 재생해 모든 구성이 같은 교통을 봄) | 완료. 구성 1(정답 상자)로 dev 20개 바뀜 없음 100%, 목표 유지 100%, 거리 오차 1.22m. dev 5개에서 목표가 고가도로에 5–22초 가려짐 | [demo1](docs/demo1.md) 4절 |
 | 첫 데모 구현 4 보완: 2초 넘는 가림 전·후 따로 채점, 깊이 카메라로 고도 높이기 | 완료. 구성 1 그대로 합격. 가려진 시간 59.8초 → 37.0초, 앞의 깊이 점이 3m 안에 들어온 적 없음, 속도 63–72 tick/s, GPU 변화 없음 | [demo1](docs/demo1.md) 4.5–4.7절 |
-| 첫 데모 구현 5: 탐지기와 추적기 (구성 2) | 진행 중 | [demo1](docs/demo1.md) 5절 |
-| 첫 데모 구현 5: 탐지기와 추적기 (구성 2) | 다음 | |
+| 첫 데모 구현 5: 탐지기와 추적기 (구성 2) | 진행 중. 정답 상자로 위치 추정을 먼저 잼: 땅 평면 투영은 고가도로 위에서 중앙값 11.3m 틀리고, 깊이 맵은 0.12m라 깊이 맵을 씀. 탐지기는 PyTorch 설치와 탐지기 선택 뒤에 붙임 | [demo1](docs/demo1.md) 5절 |
 
 ![첫 데모 화면](outputs/examples/demo1_screen.jpg)
 
 *첫 데모 화면. 왼쪽은 드론 카메라(락온 상자와 문장), 오른쪽 위는 드론이 그려진 3인칭, 오른쪽 아래는 위에서 본 지도(초록 목표, 주황 비슷한 차)입니다. 지금은 정답 위치로 따라가는 구성 1입니다.*
+
+![깊이 카메라로 고도를 높여 다시 보이는 목표](outputs/examples/demo1_guard_climb.jpg)
+
+*깊이 카메라 고도 회피. 고가도로 난간이 시선을 가리자 드론이 6.9m 올라가, 난간 너머 신호에 멈춘 목표가 다시 보입니다([demo1](docs/demo1.md) 4.6–4.7절).*
 
 ## 2. 실행
 
@@ -42,10 +45,11 @@ uv run python -m unittest discover -s tests          # simulator 없이 도는 �
 pyproject.toml, uv.lock, .python-version   Python 환경 (uv)
 src/car_follow/    simulator 시작·연결과 카메라(sim.py), 첫 데모의 시험·문장·봉인(trials.py),
                    드론 모델(drone.py), 추종 제어(follow.py), 추종 품질 지표(metrics.py), 화면(screen.py),
-                   교통 재생(replay.py), 채점(scorer.py)
+                   교통 재생(replay.py), 채점(scorer.py), 깊이 카메라 고도 회피(clearance.py),
+                   상자에서 목표 위치와 Kalman filter(estimate.py)
 scripts/           설치 확인(carla_check.py), 시험 목록 생성(make_demo1_trials.py),
                    교통 기록·추종 비행(demo1_follow.py), 재생 확인(demo1_replay_check.py),
-                   재생 위 채점(demo1_eval.py), CARLA-Air 확인(carla_air/)
+                   재생 위 채점(demo1_eval.py), 위치 추정 오차(demo1_estimate.py), CARLA-Air 확인(carla_air/)
 configs/           차종 이름표, 첫 데모 시험 목록 (본평가는 봉인)
 tests/             simulator 없이 도는 테스트
 docs/              아래 문서
@@ -61,4 +65,4 @@ assets/            (로컬에만) CARLA 0.9.16
 | [carla_air_check](docs/carla_air_check.md) | CARLA-Air 확인 기록: client 연결, 동기 모드, 드론에 붙인 카메라, 속도 응답, 지도와 자원, 판정 |
 | [setup](docs/setup.md) | uv Python 환경, CARLA 버전 선택, 설치 확인(속도, GPU 메모리, 자동 정답, 다른 GPU 작업과 함께) |
 | [demo1_plan](docs/demo1_plan.md) | 첫 데모 계획: 범위, 구성(처음 지정, 추적, 추종 제어, 화면), 채점 지표와 합격선, 구현 순서 |
-| [demo1](docs/demo1.md) | 첫 데모 구현 기록: 차종 이름표, 색 이름 규칙, 시험 구성과 문장, 확인과 버림, 나누기와 봉인 |
+| [demo1](docs/demo1.md) | 첫 데모 구현 기록: 장면과 시험 목록(1절), 드론 모델과 추종 제어(2절), 화면(3절), 교통 재생·채점·가림 구간·깊이 카메라 고도 회피(4절), 탐지기와 추적기(5절, 진행 중) |
