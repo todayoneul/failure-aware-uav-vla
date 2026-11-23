@@ -294,6 +294,9 @@ def top_map(raster, text, centre, cars, drone_position, drone_yaw, goal=None, tr
                                                                       WHITE, False)])
 
 
+GROUND_TRUTH = object()   # Screen.frame: draw the followed car's projected 3D box
+
+
 class Screen:
     """Builds the frames of one flight: keeps the trails and the text renderer between ticks."""
 
@@ -307,9 +310,10 @@ class Screen:
         return Camera(position, yaw, pitch, *FIRST, self.fov)
 
     def frame(self, first_img, chase_img, chase_cam, drone_position, drone_yaw, drone_pitch, cars, target_index,
-              label, status, goal=None):
+              label, status, goal=None, track_box=GROUND_TRUTH, distance=None):
         """One composed frame. `cars` are (position, (pitch, yaw, roll), box centre, box extent, kind) at this tick;
-        `target_index` picks the followed car in it."""
+        `target_index` picks the followed car in it. The lock-on box is the followed car's projected 3D box unless
+        `track_box` gives the tracker's box (or None: no box this tick); `distance` overrides the shown distance."""
         tpos, trot, tcen, text_, _ = cars[target_index]
         cam = self.first_camera(drone_position, drone_yaw, drone_pitch)
         uv, depth = cam.project(box_vertices(tpos, trot, tcen, text_))
@@ -319,8 +323,11 @@ class Screen:
             x1, y1 = uv.max(0)
             if x1 > 0 and y1 > 0 and x0 < FIRST[0] and y0 < FIRST[1]:
                 box = (x0, y0, x1, y1)
-        centre_point = box_vertices(tpos, trot, tcen, (0, 0, 0))[0]
-        distance = float(np.linalg.norm(centre_point - np.asarray(drone_position)))
+        if track_box is not GROUND_TRUTH:
+            box = track_box
+        if distance is None:
+            centre_point = box_vertices(tpos, trot, tcen, (0, 0, 0))[0]
+            distance = float(np.linalg.norm(centre_point - np.asarray(drone_position)))
         first = first_person(first_img, self.text, box, label, distance, *self.sentence, status)
         chase = chase_view(chase_img, self.text, chase_cam, drone_position, drone_yaw)
         for key, p in (("target", tpos), ("drone", drone_position)):

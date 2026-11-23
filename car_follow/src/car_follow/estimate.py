@@ -18,6 +18,12 @@ import numpy as np
 from . import clearance
 
 
+# Fitted on dev 20 with ground-truth boxes (docs/demo1.md 5.2): the depth point lands on the car's near surface.
+DEPTH_PUSH_M = 1.30   # on along the box-centre ray, horizontally, to the car's origin
+DEPTH_LIFT_M = -1.38  # and down to its ground point
+AIM_ABOVE_M = 0.75    # the camera aims this far above the estimated ground point (about the box centre)
+
+
 def pixel_ray(eye, yaw, pitch, width, height, fov, pixel):
     """Unit world direction of the ray through `pixel` (x, y) of a camera at `eye` looking along (yaw, pitch)."""
     f, r, u = clearance.axes(yaw, pitch)
@@ -62,6 +68,15 @@ def measure(box, eye, yaw, pitch, cam, depth=None, dcam=None, ground_z=0.0):
         if t is not None:
             out["depth"] = np.asarray(eye, dtype=float) + t * centre
     return out
+
+
+def locate(box, eye, yaw, pitch, cam, depth, dcam):
+    """The car's origin (ground point) from a box by the depth map, with the dev-fitted correction; None if the
+    box-centre ray finds no depth."""
+    m = measure(box, eye, yaw, pitch, cam, depth, dcam)
+    if m["depth"] is None:
+        return None
+    return push(m["depth"], m["ray_centre"], DEPTH_PUSH_M) + np.array([0.0, 0.0, DEPTH_LIFT_M])
 
 
 @dataclass(frozen=True)
