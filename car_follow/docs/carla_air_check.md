@@ -139,9 +139,9 @@ CARLA를 동기 모드 20Hz(tick당 0.05초)로 두고, 드론에 앞으로 5m/s
 
 ## 5. 남은 것
 
-- **파일.**
-  - 풀어 둔 빌드: `assets/carla-air-v0.1.7/`, 16.4GB
-  - 받은 조각과 합친 zip: `assets/downloads/carla-air-v0.1.7/`, 약 13GB
-  - AirSim 설정 파일: `%USERPROFILE%\Documents\AirSim\settings.json`
-  - 셋 다 지우지 않았다. 지울지는 사용자가 정한다.
-- **확인용 Python 3.10 환경.** 임시 폴더에 있다. 다시 쓰려면 1절대로 새로 만든다.
+- **파일.** 2026-11-23에 사용자의 결정으로 모두 지웠다.
+  - 풀어 둔 빌드(16.4GB)
+  - 받은 조각과 합친 zip(12.5GB)
+  - AirSim 설정 파일(`%USERPROFILE%\Documents\AirSim\`)
+  - 확인용 Python 3.10 환경
+- **다시 쓰려면.** 1절대로 받아서 풀고, 환경을 새로 만든다. 확인용 스크립트는 `scripts/carla_air/`에 남아 있다.
