@@ -91,9 +91,11 @@ class Follower:
             self.direction = d / n if n > 1e-6 else h
         return self.direction
 
-    def command(self, state, target_position, target_yaw, aim_point, dt):
-        """The velocity, yaw and pitch command for this tick, and the goal point it aims for."""
-        goal = goal_from(target_position, self._direction(target_yaw, dt), self.behind, self.above)
+    def command(self, state, target_position, target_yaw, aim_point, dt, offset=0.0):
+        """The velocity, yaw and pitch command for this tick, and the goal point it aims for. `offset` raises the
+        goal (the altitude guard's climb, src/car_follow/clearance.py); it must change smoothly, because the goal's
+        own motion is the feedforward."""
+        goal = goal_from(target_position, self._direction(target_yaw, dt), self.behind, self.above + offset)
         if self.prev_goal is not None:
             alpha = dt / (self.gains.smooth_s + dt)
             raw = (goal - self.prev_goal) / dt

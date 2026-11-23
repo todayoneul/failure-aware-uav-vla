@@ -171,6 +171,13 @@ def semantic_tags(image):
     return np.frombuffer(image.raw_data, dtype=np.uint8).reshape(image.height, image.width, 4)[:, :, 2].copy()
 
 
+def depth_m(image):
+    """Depth in metres of every pixel of a depth camera image (CARLA: (R + 256 G + 65536 B) / (256^3 - 1) x 1000 m,
+    along the optical axis)."""
+    raw = np.frombuffer(image.raw_data, dtype=np.uint8).reshape(image.height, image.width, 4).astype(np.float32)
+    return (raw[:, :, 2] + 256.0 * raw[:, :, 1] + 65536.0 * raw[:, :, 0]) * (1000.0 / 16777215.0)
+
+
 def image_box(world_to_camera, vertices, width, height, fov):
     """Pixel box (x0, y0, x1, y1) of 3D points (N x 3, world) seen by a camera, or None if any is behind it.
 

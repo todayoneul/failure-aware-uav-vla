@@ -54,28 +54,78 @@ class SwitchTests(unittest.TestCase):
 
 class ScoreTests(unittest.TestCase):
     def test_trial_and_summary(self):
-        n = 100
+        n = 200
         owner = np.zeros(n, int)
-        owner[40:50] = 1                  # a 10-tick switch to the look-alike
+        owner[140:150] = 1                # a 10-tick switch to the look-alike
         target_px = np.full(n, 500)
-        target_px[:10] = 0                # not visible at first
+        target_px[:10] = 0                # not visible at first (camera warm-up)
+        target_px[60:90] = 0              # hidden 1.5 s: normal tracking, stays in the main window
+        owner[60:90] = -1
         pos = np.zeros((n, 3, 3))
         pos[:, 1, 0] = 8.0                # the look-alike drives 8 m beside the target the whole time
         pos[:, 2, 0] = 50.0
-        row = scorer.score_trial(owner, target_px, KIND, pos, 1.5)
+        dist = np.full(n, 1.5)
+        dist[:100] = 9.0                  # the first 5 s are left out
+        row = scorer.score_trial(owner, target_px, KIND, pos, dist, np.full(n, 1.0))
         self.assertFalse(row["switch_free"])
         self.assertEqual(row["switches"][0]["kind"], "lookalike")
-        self.assertEqual(row["visible_ticks"], 90)
-        self.assertEqual(row["held_ticks"], 80)
-        self.assertAlmostEqual(row["near_lookalike_s"], 5.0)
-        clean = scorer.score_trial(np.zeros(n, int), target_px, KIND, pos, 2.0, first_pick=True)
+        self.assertEqual(row["visible_ticks"], 160)
+        self.assertEqual(row["held_ticks"], 150)
+        self.assertEqual(row["distance_error_m"], 1.5)
+        self.assertEqual(row["horizontal_error_m"], 1.0)
+        self.assertEqual(row["long_occlusions"], [])
+        self.assertIsNone(row["after"])
+        self.assertAlmostEqual(row["near_lookalike_s"], 10.0)
+        clean = scorer.score_trial(np.zeros(n, int), target_px, KIND, pos, np.full(n, 2.0), first_pick=True)
         s = scorer.summarize([row, clean])
         self.assertEqual(s["switch_free"], 0.5)
-        self.assertAlmostEqual(s["hold"], 170 / 180, places=4)
+        self.assertAlmostEqual(s["hold"], 310 / 320, places=4)
         self.assertEqual(s["first_pick"], 1.0)
         self.assertEqual(s["switch_partners"], {"lookalike": 1, "background": 0})
         self.assertFalse(s["pass"]["switch_free"])
         self.assertTrue(s["pass"]["distance_error_m"])
+        self.assertEqual(s["after_long_occlusion"]["trials"], 0)
+
+    def test_a_long_occlusion_splits_the_trial(self):
+        n = 400
+        target_px = np.full(n, 500)
+        target_px[150:210] = 0            # hidden 3 s from 7.5 s
+        owner = np.zeros(n, int)
+        owner[150:210] = -1
+        owner[210:230] = 2                # back on a background car first ...
+        pos = np.zeros((n, 3, 3))
+        pos[:, 1, 0], pos[:, 2, 0] = 30.0, 50.0
+        dist = np.r_[np.full(150, 1.0), np.full(n - 150, 6.0)]
+        row = scorer.score_trial(owner, target_px, KIND, pos, dist)
+        self.assertEqual(row["long_occlusions"], [{"start_s": 7.5, "length_s": 3.0}])
+        self.assertEqual(row["main_s"], 7.5)
+        self.assertTrue(row["switch_free"])           # the main window is clean
+        self.assertEqual(row["hold"], 1.0)
+        self.assertEqual(row["distance_error_m"], 1.0)
+        after = row["after"]
+        self.assertFalse(after["switch_free"])        # the box came back on another car
+        self.assertTrue(after["reacquired"])          # ... and then on the target
+        self.assertEqual(after["reacquired_after_s"], 1.0)
+        self.assertEqual(after["distance_error_m"], 6.0)
+        s = scorer.summarize([row])
+        self.assertEqual(s["after_long_occlusion"]["trials"], 1)
+        self.assertEqual(s["after_long_occlusion"]["reacquired"], 1)
+        self.assertTrue(s["pass"]["switch_free"])
+
+    def test_avoidance_record(self):
+        dt = 0.05
+        offset = np.zeros(200)
+        offset[50:100] = 3.0              # one 2.5 s climb
+        need = np.where(offset > 0, 3.0, 0.0)
+        rise = offset * 0.9
+        nearest = np.full(200, 12.0)
+        nearest[0] = 0.5                  # camera warm-up, left out
+        nearest[60] = 2.0
+        a = scorer.avoidance(offset, need, np.zeros(200), ["clear"] * 200, rise, nearest, dt)
+        self.assertEqual((a["time_s"], a["events"], a["offset_max_m"]), (2.5, 1, 3.0))
+        self.assertEqual(a["rise_max_m"], 2.7)
+        self.assertEqual((a["path_need_s"], a["los_need_s"]), (2.5, 0.0))
+        self.assertEqual((a["nearest_min_m"], a["nearest_below_clearance_s"]), (2.0, 0.05))
 
 
 if __name__ == "__main__":
