@@ -13,7 +13,8 @@ CARLA에서 자연어로 지정한 차량("오른쪽 차선의 흰색 SUV를 따
 | 첫 데모 구현 1: 장면과 시험 목록 (시험 63개, 본평가 30개 봉인) | 완료 | [demo1](docs/demo1.md) 1절 |
 | 연구 계획: 주제, 가설, 실패 시험 설계, 진행 순서 | 완료 | [research_plan](docs/research_plan.md) |
 | CARLA-Air 확인 (CARLA 0.9.16 + 쿼드로터 비행 모델) | 완료. 쓰지 않음(드론 물리가 동기 모드 tick을 따르지 않음). CARLA 0.9.16 + 자체 동역학으로 감 | [carla_air_check](docs/carla_air_check.md) |
-| 첫 데모 구현 2: 드론 이동과 추종 제어 (자체 동역학, 정답 위치로 추종, dev 20개) | 구현과 확인 완료. 드론 한계 값 결정 대기 | [demo1](docs/demo1.md) 2절 |
+| 첫 데모 구현 2: 드론 이동과 추종 제어 (자체 동역학, 정답 위치로 추종, dev 20개) | 완료. 25m/s, 6m/s², 지연 0.5초, 방향 거르기 1초로 dev 20개 모두 거리 오차 3m 이하(평균 1.22m) | [demo1](docs/demo1.md) 2절 |
+| 첫 데모 구현 3: 화면 (1인칭, 3인칭 드론, 위에서 본 지도) | 진행 중 | [demo1](docs/demo1.md) 3절 |
 
 ![시험 시작 예시](outputs/examples/demo1_trials.jpg)
 

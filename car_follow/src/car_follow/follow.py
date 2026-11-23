@@ -68,7 +68,7 @@ class Gains:
     kp: float = None             # 1/s; None: default_kp(lag)
     lead: bool = True            # add lag x goal acceleration
     smooth_s: float = 0.25       # time constant of the goal velocity / acceleration filters, s
-    heading_s: float = 2.0       # time constant of the heading filter that places the goal, s (0: none)
+    heading_s: float = 1.0       # time constant of the heading filter that places the goal, s (0: none; docs/demo1.md 2.7)
     correction_accel: float = 2.0  # deceleration the correction plans with, m/s^2 (half the horizontal limit)
 
 

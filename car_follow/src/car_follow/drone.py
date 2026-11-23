@@ -14,15 +14,15 @@ import numpy as np
 
 @dataclass(frozen=True)
 class Limits:
-    speed_h: float = 20.0      # horizontal speed, m/s (docs/demo1_plan.md 2.3)
-    accel_h: float = 4.0       # horizontal acceleration, m/s^2 (docs/demo1_plan.md 2.3)
+    speed_h: float = 25.0      # horizontal speed, m/s (docs/demo1.md 2.7; the plan began at 20)
+    accel_h: float = 6.0       # horizontal acceleration, m/s^2 (docs/demo1.md 2.7; the plan began at 4)
     speed_v: float = 4.0       # vertical speed, m/s
     accel_v: float = 2.0       # vertical acceleration, m/s^2
     yaw_rate: float = 60.0     # body turn rate, deg/s (docs/demo1_plan.md 2.3)
     pitch_rate: float = 90.0   # gimbal pitch rate, deg/s
     pitch_min: float = -90.0   # gimbal looks straight down at most
     pitch_max: float = 0.0     # and level at least
-    lag_s: float = 0.5         # time constant of the velocity response, s (0: none)
+    lag_s: float = 0.5         # time constant of the velocity response, s (0: none; docs/demo1.md 2.7)
 
 
 @dataclass
