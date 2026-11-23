@@ -83,7 +83,7 @@ def fly_trial(client, world, trial, rec, config, guard_mode="on", raster=None, v
           "guard_s": np.zeros(ticks), "depth_at_target": np.full(ticks, np.nan),
           "target_depth": np.full(ticks, np.nan), "track_id": np.full(ticks, -1),
           "est_pos": np.full((ticks, 3), np.nan), "tracks": np.zeros(ticks, int), "detections": np.zeros(ticks, int),
-          "detect_s": np.zeros(ticks)}
+          "detect_s": np.zeros(ticks), "target_score": np.full(ticks, np.nan), "target_det_score": np.full(ticks, np.nan)}
     if measure:  # raw position measurements of the box (src/car_follow/estimate.py), for scripts/demo1_estimate.py
         for key in ("m_flat", "m_depth", "ray_b", "ray_c"):
             ev[key] = np.full((ticks, 3), np.nan)
@@ -125,11 +125,13 @@ def fly_trial(client, world, trial, rec, config, guard_mode="on", raster=None, v
                                                                            state.pitch, cam, depth, dcam))
                         for b in boxes]
                 target_det = None
-                if target_track_id is None:  # config 2's first pick is ground truth: the box on the target
-                    truth = scorer.mask_box(ids_img, target_id) if ev_target_px(ids_img, target_id) else None
-                    if truth is not None and dets:
-                        best = max(dets, key=lambda d: detector.iou(d.box, truth))
-                        target_det = best if detector.iou(best.box, truth) >= 0.5 else None
+                truth = scorer.mask_box(ids_img, target_id) if ev_target_px(ids_img, target_id) else None
+                if truth is not None and dets:  # the detector's best box on the target (for the record)
+                    best = max(dets, key=lambda d: detector.iou(d.box, truth))
+                    if detector.iou(best.box, truth) >= 0.5:
+                        ev["target_det_score"][k] = best.score
+                        if target_track_id is None:  # config 2's first pick is ground truth: the box on the target
+                            target_det = best
                 mot.update(dets, DT)
                 ev["detections"][k], ev["tracks"][k] = len(dets), len(mot.tracks)
                 if target_track_id is None and target_det is not None:  # config 2: the first pick is ground truth
@@ -140,6 +142,8 @@ def fly_trial(client, world, trial, rec, config, guard_mode="on", raster=None, v
                 # Once the tracker drops the target's track (hidden longer than its buffer), its last estimate stays
                 # frozen and the drone holds behind it: re-acquiring is outside demo 1 (docs/demo1.md 4.5).
                 box = live.box if live is not None else None
+                if live is not None and live.matched:
+                    ev["target_score"][k] = live.score
                 ev["track_id"][k] = target_track_id if live is not None else -1
                 if follow_filter is not None:
                     tpos = follow_filter.position
@@ -254,10 +258,22 @@ def tracking_record(ev, track):
         "estimate_error_m": round(float(err.mean()), 3) if len(err) else None,
         "estimate_error_p95_m": round(float(np.percentile(err, 95)), 3) if len(err) else None,
         "detections_mean": round(float(ev["detections"].mean()), 1),
+        "first_detected_s": first_tick(np.isfinite(ev["target_det_score"])),
+        "first_high_s": first_tick(ev["target_det_score"] >= tracker.TrackerParams().new),
+        "matched_low_share": share(ev["target_score"] < tracker.TrackerParams().high, np.isfinite(ev["target_score"])),
         "detect_ms_mean": round(1000 * float(ev["detect_s"].mean()), 2),
         "detect_ms_p95": round(1000 * float(np.percentile(ev["detect_s"], 95)), 2),
         "tracks_mean": round(float(ev["tracks"].mean()), 1),
     }
+
+
+def first_tick(mask):
+    hits = np.flatnonzero(mask)
+    return round(float(hits[0] * DT), 2) if len(hits) else None
+
+
+def share(part, whole):
+    return round(float((part & whole).sum() / whole.sum()), 4) if whole.any() else None
 
 
 def errors(log, track, offset):
