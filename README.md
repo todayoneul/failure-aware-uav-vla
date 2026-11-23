@@ -72,7 +72,7 @@ Phase 1은 VLA를 직접 통합하고, 다시 학습하고, 엄격하게 평가�
 3. 첫 데모 계획 (완료, [demo1_plan](car_follow/docs/demo1_plan.md)): Town05에서 문장으로 지정한 차를 따라가되, 같은 차종·색의 차 2–3대 사이에서 다른 차로 바뀌지 않는지 봅니다. 차량 탐지와 추적은 매 프레임, VLM은 처음 지정할 때만 씁니다. 땅 투영과 Kalman filter로 차 뒤 20m, 위 15m를 유지합니다. 합격선은 본평가 30회에서 처음 지정 90%, 바뀜 없는 시험 90%, 목표 유지 95%, 거리 오차 3m
 4. 첫 데모 구현 (진행 중, [demo1](car_follow/docs/demo1.md)): 1단계 장면과 시험 목록 완료. Town05에 시험 63개(dev 20, pilot 3, smoke 10, 봉인한 본평가 30)를 만들었고, 각 시험은 simulator에서 시작 화면을 확인한 뒤 남겼습니다. 다음은 2단계 드론 이동과 추종 제어
 5. 연구 계획 (완료, [research_plan](car_follow/docs/research_plan.md)): 주제, 가설 세 개, 방해 차 세 단계(다른 차, 닮은 차, 쌍둥이), 층으로 나눈 감시기, 실패 종류별 대응, 지표, 진행 순서
-6. CARLA-Air 확인 (진행 중): CARLA 0.9.16에 AirSim 쿼드로터 비행 모델을 더한 simulator로 바꿀지 정합니다. 기준은 [research_plan](car_follow/docs/research_plan.md) 7.1절
+6. CARLA-Air 확인 (완료, [carla_air_check](car_follow/docs/carla_air_check.md)): CARLA 0.9.16에 AirSim 쿼드로터 비행 모델을 더한 simulator입니다. 드론 비행 물리가 동기 모드 tick을 따르지 않고 실제 시간으로 돌아, 시험을 재현할 수 없으므로 쓰지 않습니다. 지금의 CARLA 0.9.16을 유지하고 드론은 자체 동역학 모델로 움직입니다. 다음은 첫 데모 2단계 드론 이동과 추종 제어
 
 ## 4. 저장소 구조
 

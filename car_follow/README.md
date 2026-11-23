@@ -12,7 +12,7 @@ CARLA에서 자연어로 지정한 차량("오른쪽 차선의 흰색 SUV를 따
 | 첫 데모 계획: 같은 차종·색의 차 2–3대 사이에서 지정한 차 따라가기 (Town05) | 완료 | [demo1_plan](docs/demo1_plan.md) |
 | 첫 데모 구현 1: 장면과 시험 목록 (시험 63개, 본평가 30개 봉인) | 완료 | [demo1](docs/demo1.md) 1절 |
 | 연구 계획: 주제, 가설, 실패 시험 설계, 진행 순서 | 완료 | [research_plan](docs/research_plan.md) |
-| CARLA-Air 확인 (CARLA 0.9.16 + 쿼드로터 비행 모델) | 진행 중 | [research_plan](docs/research_plan.md) 7.1절 |
+| CARLA-Air 확인 (CARLA 0.9.16 + 쿼드로터 비행 모델) | 완료. 쓰지 않음(드론 물리가 동기 모드 tick을 따르지 않음). CARLA 0.9.16 + 자체 동역학으로 감 | [carla_air_check](docs/carla_air_check.md) |
 | 첫 데모 구현 2: 드론 이동과 추종 제어 | 다음 | |
 
 ![시험 시작 예시](outputs/examples/demo1_trials.jpg)
@@ -36,7 +36,7 @@ uv run python -m unittest discover -s tests          # simulator 없이 도는 �
 ```text
 pyproject.toml, uv.lock, .python-version   Python 환경 (uv)
 src/car_follow/    simulator 시작·연결과 카메라(sim.py), 첫 데모의 시험·문장·봉인(trials.py)
-scripts/           설치 확인(carla_check.py), 시험 목록 생성(make_demo1_trials.py)
+scripts/           설치 확인(carla_check.py), 시험 목록 생성(make_demo1_trials.py), CARLA-Air 확인(carla_air/)
 configs/           차종 이름표, 첫 데모 시험 목록 (본평가는 봉인)
 tests/             simulator 없이 도는 테스트
 docs/              아래 문서
@@ -49,6 +49,7 @@ assets/            (로컬에만) CARLA 0.9.16
 | 문서 | 내용 |
 |---|---|
 | [research_plan](docs/research_plan.md) | 연구 계획: 주제와 차별점, 가설, 실패 종류와 방해 차 단계, 감시기와 대응, 지표, 진행 순서, CARLA-Air 확인 항목 |
+| [carla_air_check](docs/carla_air_check.md) | CARLA-Air 확인 기록: client 연결, 동기 모드, 드론에 붙인 카메라, 속도 응답, 지도와 자원, 판정 |
 | [setup](docs/setup.md) | uv Python 환경, CARLA 버전 선택, 설치 확인(속도, GPU 메모리, 자동 정답, 다른 GPU 작업과 함께) |
 | [demo1_plan](docs/demo1_plan.md) | 첫 데모 계획: 범위, 구성(처음 지정, 추적, 추종 제어, 화면), 채점 지표와 합격선, 구현 순서 |
 | [demo1](docs/demo1.md) | 첫 데모 구현 기록: 차종 이름표, 색 이름 규칙, 시험 구성과 문장, 확인과 버림, 나누기와 봉인 |
