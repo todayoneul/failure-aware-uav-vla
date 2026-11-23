@@ -63,6 +63,8 @@ class Recorder:
                                      a.bounding_box.location.z] for _, a in self.roles])
         self.box_extent = np.array([[a.bounding_box.extent.x, a.bounding_box.extent.y,
                                      a.bounding_box.extent.z] for _, a in self.roles])
+        self.type_id = np.array([a.type_id for _, a in self.roles])
+        self.color = np.array([a.attributes.get("color", "") for _, a in self.roles])
         self.pos = np.zeros((ticks, n, 3), np.float32)
         self.rot = np.zeros((ticks, n, 3), np.float32)
         self.vel = np.zeros((ticks, n, 3), np.float32)
@@ -86,8 +88,9 @@ class Recorder:
 
     def save(self, path, trial):
         path.parent.mkdir(parents=True, exist_ok=True)
-        np.savez_compressed(path, trial_id=trial["id"], ids=self.ids, kind=self.kind, box_center=self.box_center,
-                            box_extent=self.box_extent, pos=self.pos, rot=self.rot, vel=self.vel, aim=self.aim)
+        np.savez_compressed(path, trial_id=trial["id"], ids=self.ids, kind=self.kind, type_id=self.type_id,
+                            color=self.color, box_center=self.box_center, box_extent=self.box_extent, pos=self.pos,
+                            rot=self.rot, vel=self.vel, aim=self.aim)
 
 
 def target_track(rec):

@@ -15,7 +15,8 @@ CARLA에서 자연어로 지정한 차량("오른쪽 차선의 흰색 SUV를 따
 | CARLA-Air 확인 (CARLA 0.9.16 + 쿼드로터 비행 모델) | 완료. 쓰지 않음(드론 물리가 동기 모드 tick을 따르지 않음). CARLA 0.9.16 + 자체 동역학으로 감 | [carla_air_check](docs/carla_air_check.md) |
 | 첫 데모 구현 2: 드론 이동과 추종 제어 (자체 동역학, 정답 위치로 추종, dev 20개) | 완료. 25m/s, 6m/s², 지연 0.5초, 방향 거르기 1초로 dev 20개 모두 거리 오차 3m 이하(평균 1.22m) | [demo1](docs/demo1.md) 2절 |
 | 첫 데모 구현 3: 화면 (1인칭 락온, 3인칭 드론 그리기, 위에서 본 지도) | 완료 | [demo1](docs/demo1.md) 3절 |
-| 첫 데모 구현 4: 채점기 | 다음 | |
+| 첫 데모 구현 4: 채점기 (기록한 교통을 재생해 모든 구성이 같은 교통을 봄) | 완료. 구성 1(정답 상자)로 dev 20개 바뀜 없음 100%, 목표 유지 100%, 거리 오차 1.22m. dev 5개에서 목표가 고가도로에 5–22초 가려짐 | [demo1](docs/demo1.md) 4절 |
+| 첫 데모 구현 5: 탐지기와 추적기 (구성 2) | 다음 | |
 
 ![첫 데모 화면](outputs/examples/demo1_screen.jpg)
 
@@ -38,9 +39,11 @@ uv run python -m unittest discover -s tests          # simulator 없이 도는 �
 ```text
 pyproject.toml, uv.lock, .python-version   Python 환경 (uv)
 src/car_follow/    simulator 시작·연결과 카메라(sim.py), 첫 데모의 시험·문장·봉인(trials.py),
-                   드론 모델(drone.py), 추종 제어(follow.py), 추종 품질 지표(metrics.py), 화면(screen.py)
+                   드론 모델(drone.py), 추종 제어(follow.py), 추종 품질 지표(metrics.py), 화면(screen.py),
+                   교통 재생(replay.py), 채점(scorer.py)
 scripts/           설치 확인(carla_check.py), 시험 목록 생성(make_demo1_trials.py),
-                   교통 기록·추종 비행(demo1_follow.py), CARLA-Air 확인(carla_air/)
+                   교통 기록·추종 비행(demo1_follow.py), 재생 확인(demo1_replay_check.py),
+                   재생 위 채점(demo1_eval.py), CARLA-Air 확인(carla_air/)
 configs/           차종 이름표, 첫 데모 시험 목록 (본평가는 봉인)
 tests/             simulator 없이 도는 테스트
 docs/              아래 문서

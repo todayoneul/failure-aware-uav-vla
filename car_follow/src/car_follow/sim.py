@@ -166,6 +166,11 @@ def instance_ids(image):
     return raw[:, :, 1] + 256 * raw[:, :, 0]
 
 
+def semantic_tags(image):
+    """Semantic tag of every pixel of an instance segmentation image (its red channel)."""
+    return np.frombuffer(image.raw_data, dtype=np.uint8).reshape(image.height, image.width, 4)[:, :, 2].copy()
+
+
 def image_box(world_to_camera, vertices, width, height, fov):
     """Pixel box (x0, y0, x1, y1) of 3D points (N x 3, world) seen by a camera, or None if any is behind it.
 
