@@ -18,6 +18,9 @@ dependencies = [
     "torch>=2.7",
     "torchvision>=0.22",
     "rfdetr==1.12.1",
+    # Step 6 VLM pick (docs/demo1.md 6): bitsandbytes for the 4-bit / 8-bit candidate, accelerate for loading it.
+    "bitsandbytes==0.50.2",
+    "accelerate>=1.0",
 ]
 
 [tool.uv]
