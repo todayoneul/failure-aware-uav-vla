@@ -7,6 +7,8 @@ trial (src/car_follow/replay.py), keep per-tick evidence, and score it (src/car_
               (src/car_follow/tracker.py); the target's track is picked by ground truth at its first detection and
               the drone follows that track's Kalman estimate (docs/demo1.md 5). --detector gt gives every visible
               car's ground-truth box with score 1 (a perfect detector); rfdetr-small etc. run a model on the RGB frame.
+    config 3  as config 2, but the target is the car the trained VLM names from the sentence (src/car_follow/
+              first_pick.py). One flight per trial and language; the VLM loads after the map is up.
 
 The altitude guard (src/car_follow/clearance.py, docs/demo1.md 4.6) reads a 160 x 120 depth camera on the drone:
     --guard on       it raises the follow goal (default)
@@ -18,6 +20,7 @@ and the scores to outputs/demo1_eval/<name>.json (local only).
 
 Run from the car_follow folder:
     uv run python scripts/demo1_eval.py --config 1 --split dev --run rec1
+    uv run python scripts/demo1_eval.py --config 3 --split dev --run rec1
 """
 import argparse
 import json
@@ -32,17 +35,18 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from scripts.demo1_follow import DT, HZ, OUT as FOLLOW_OUT, XODR, select, target_track  # noqa: E402
-from src.car_follow import (clearance, detector, drone, estimate, follow, replay, scorer, screen, sim,  # noqa: E402
-                            tracker, trials)
+from src.car_follow import (clearance, detector, drone, estimate, first_pick, follow, replay, scorer,  # noqa: E402
+                            screen, sim, tracker, trials, vlm)
 
 OUT = ROOT / "outputs" / "demo1_eval"
 WARMUP_TICKS = 2   # camera warm-up before each trial (see fly_trial)
 
 
 def fly_trial(client, world, trial, rec, config, guard_mode="on", raster=None, video=None, measure=False,
-              det=None, probe=None):
-    """`det`: the config 2 detector (detector.make). `probe(k, bgr, ids_img, replay, rec, state)`: called every tick
-    with the drone's RGB frame (scripts/demo1_detector_check.py)."""
+              det=None, probe=None, request=None):
+    """`det`: the config 2 and 3 detector (detector.make). `request`: config 3's first pick (first_pick.Request).
+    `probe(k, bgr, ids_img, replay, rec, state)`: called every tick with the drone's RGB frame
+    (scripts/demo1_detector_check.py)."""
     """One trial on replayed traffic. Returns the per-tick evidence, the drone log and the wall time."""
     ticks = len(rec["pos"])
     cam = trials.CAMERA
@@ -54,8 +58,9 @@ def fly_trial(client, world, trial, rec, config, guard_mode="on", raster=None, v
     follower = follow.Follower(limits, gains)
     dcam = clearance.DepthCamera()
     guard = clearance.AltitudeGuard(dcam) if guard_mode != "off" else None
-    mot = tracker.Tracker() if config == 2 else None
+    mot = tracker.Tracker() if config >= 2 else None
     target_track_id, follow_filter = None, None
+    pending, lock_tick, handoff = None, None, None   # config 3: the picked track, until the pick's time has passed
     car_index = {int(a): i for i, a in enumerate(rp.ids)}
 
     def pose():
@@ -69,7 +74,8 @@ def fly_trial(client, world, trial, rec, config, guard_mode="on", raster=None, v
     if guard is not None:
         cams["depth"] = sim.camera(world, "sensor.camera.depth", dcam.width, dcam.height, dcam.fov, depth_pose())
     writer = scr = None
-    need_rgb = bool(video) or probe is not None or (config == 2 and det is not None and det.name != "gt")
+    need_rgb = bool(video) or probe is not None or config == 3 or (config == 2 and det is not None
+                                                                   and det.name != "gt")
     if need_rgb:
         cams["rgb"] = sim.camera(world, "sensor.camera.rgb", cam["width"], cam["height"], cam["fov"], pose())
     if video:
@@ -130,7 +136,7 @@ def fly_trial(client, world, trial, rec, config, guard_mode="on", raster=None, v
                     best = max(dets, key=lambda d: detector.iou(d.box, truth))
                     if detector.iou(best.box, truth) >= 0.5:
                         ev["target_det_score"][k] = best.score
-                        if target_track_id is None:  # config 2's first pick is ground truth: the box on the target
+                        if config == 2 and target_track_id is None:  # config 2's first pick is ground truth
                             target_det = best
                 mot.update(dets, DT)
                 ev["detections"][k], ev["tracks"][k] = len(dets), len(mot.tracks)
@@ -138,6 +144,35 @@ def fly_trial(client, world, trial, rec, config, guard_mode="on", raster=None, v
                     picked = next((t for t in mot.tracks if t.box is target_det.box), None)
                     if picked is not None:
                         target_track_id, follow_filter = picked.id, picked.filter
+                if config == 3 and request.record is None:  # the VLM sees the frame, the boxes and the sentence only
+                    chosen = first_pick.choose(request, bgr, dets)
+                    if chosen is not None:
+                        lock_tick = k + int(round(request.delay_s / DT))
+                        owner_i, _ = scorer.box_owner(ids_img, chosen.box, rp.ids)   # scoring only from here on
+                        request.record.update(
+                            tick=k, lock_tick=None, right=bool(owner_i == 0),
+                            picked_kind=str(rec["kind"][owner_i]) if owner_i >= 0 else "none",
+                            target_is_candidate=bool(truth is not None and any(
+                                detector.iou(b, truth) >= 0.5 for b in request.record["boxes"])),
+                            picked_has_position=chosen.position is not None, track_started=False,
+                            handoff_ticks=0, handoff_lost=False)
+                        if chosen.position is not None:
+                            pending = mot.adopt(chosen, DT)
+                            request.record["track_started"] = True
+                        else:   # outside the depth camera: carried in the image until it has a position
+                            handoff = first_pick.Handoff(chosen.box, DT)
+                elif handoff is not None:
+                    found = handoff.step(dets)
+                    request.record["handoff_ticks"] = handoff.ticks
+                    if found is not None:
+                        pending, handoff = mot.adopt(found, DT), None
+                        request.record["track_started"] = True
+                    elif handoff.lost:
+                        request.record["handoff_lost"], handoff = True, None
+                if pending is not None and k >= lock_tick:
+                    target_track_id, follow_filter = pending.id, pending.filter
+                    request.record["lock_tick"] = k
+                    pending = None
                 live = mot.get(target_track_id) if target_track_id is not None else None
                 # Once the tracker drops the target's track (hidden longer than its buffer), its last estimate stays
                 # frozen and the drone holds behind it: re-acquiring is outside demo 1 (docs/demo1.md 4.5).
@@ -285,11 +320,67 @@ def errors(log, track, offset):
     return np.linalg.norm(raised, axis=1), np.linalg.norm(d[:, :2], axis=1), d[:, 2]
 
 
+def flight_row(rec, ev, log, wall, config, guard_mode, request=None):
+    """The scores of one flight."""
+    track = target_track(rec)
+    applied = ev["offset"] if guard_mode == "on" else np.zeros(len(ev["offset"]))  # observe: not flown
+    dist, horiz, rise = errors(log, track, applied)
+    first = None if request is None else bool(request.record and request.record["right"]
+                                              and request.record["track_started"])
+    row = scorer.score_trial(ev["owner"], ev["target_px"], rec["kind"], rec["pos"], dist, horiz, first_pick=first,
+                             dt=DT)
+    if guard_mode != "off":
+        row["avoidance"] = scorer.avoidance(ev["offset"], ev["need_path"], ev["need_los"], ev["los_state"], rise,
+                                            ev["nearest"], DT)
+        row["guard_ms_mean"] = round(1000 * float(ev["guard_s"].mean()), 2)
+    hidden = ev["hidden_by"][ev["hidden_by"] >= 0]
+    tags, counts = np.unique(hidden, return_counts=True)
+    row.update(hidden_by={scorer.TAGS.get(int(t), str(t)): int(c) for t, c in zip(tags, counts)},
+               ticks_per_s=round(len(ev["owner"]) / wall, 1), gpu_mib=sim.gpu_memory_mib(),
+               perceive_ms_mean=round(1000 * float(ev["perceive_s"].mean()), 2))
+    if config >= 2:
+        row["tracking"] = tracking_record(ev, track)
+    if request is not None:
+        row["pick"] = request.record
+        if request.record and request.record["lock_tick"] is not None:
+            # the hold once the lock exists, next to the plan's hold that also counts the pick's wait
+            lock, stop = request.record["lock_tick"], int(round(row["main_s"] / DT))
+            visible = ev["target_px"][lock:stop] >= scorer.VISIBLE_PX
+            row["visible_after_lock"] = int(visible.sum())
+            row["held_after_lock"] = int((visible & (ev["owner"][lock:stop] == 0)).sum())
+    return row
+
+
+def print_row(label, row):
+    a = row.get("avoidance") or {}
+    after = row["after"]
+    pick = row.get("pick")
+    print(f"{label}: "
+          + (f"pick {'right' if row['first_pick'] else 'WRONG'} ({pick['signal']}, {pick['candidates']} candidates, "
+             f"log ratio {pick['log_ratio']}, {pick['seconds']} s), " if pick else
+             ("no pick, " if "pick" in row else ""))
+          + f"switches {len(row['switches'])}, hold {row['hold']}, distance error "
+          f"{row['distance_error_m']}, horizontal {row['horizontal_error_m']}, main {row['main_s']} s, "
+          f"long occlusions {[o['length_s'] for o in row['long_occlusions']]}"
+          + (f", after: reacquired {after['reacquired']}" if after else "")
+          + (f", climb {a.get('time_s')} s / {a.get('events')} events / max +{a.get('offset_max_m')} m "
+             f"(path {a.get('path_need_s')} s, LOS {a.get('los_need_s')} s, unreachable "
+             f"{a.get('los_unreachable_s')} s), nearest {a.get('nearest_min_m')} m" if a else "")
+          + (f", tracking {row['tracking']}" if "tracking" in row and "pick" not in row else "")
+          + f", {row['ticks_per_s']} ticks/s, {row['gpu_mib']} MiB", flush=True)
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--config", type=int, default=1, choices=(1, 2))
-    p.add_argument("--detector", default="gt", choices=sorted(detector.MODELS),
-                   help="config 2 detector (gt: ground-truth boxes of all visible cars)")
+    p.add_argument("--config", type=int, default=1, choices=(1, 2, 3))
+    p.add_argument("--detector", default=None, choices=sorted(detector.MODELS),
+                   help="config 2 default gt (ground-truth boxes of all visible cars), config 3 default rfdetr-small")
+    p.add_argument("--vlm", default="qwen3-vl-4b-4bit", choices=sorted(vlm.MODELS), help="config 3's first pick")
+    p.add_argument("--adapter", default="outputs/demo1_vlm/lora/qlora1/best",
+                   help="config 3: the trained LoRA folder (kept outside git)")
+    p.add_argument("--prompt", default="v2", choices=sorted(vlm.PROMPTS))
+    p.add_argument("--langs", nargs="+", default=["en", "ko"], choices=("en", "ko"),
+                   help="config 3: one flight per trial and language")
     p.add_argument("--split", default="dev", choices=("dev", "pilot", "smoke"))
     p.add_argument("--ids", nargs="*", default=None)
     p.add_argument("--run", default="rec1", help="the traffic recording to replay (outputs/demo1_follow/traffic/<run>)")
@@ -299,61 +390,72 @@ def main():
     p.add_argument("--measure", action="store_true", help="also keep the raw position measurements of the box")
     p.add_argument("--no-start", action="store_true")
     args = p.parse_args()
+    args.detector = args.detector or ("rfdetr-small" if args.config == 3 else "gt")
+    adapter = (ROOT / args.adapter).resolve() if args.config == 3 else None
     name = args.name or f"config{args.config}_{args.split}_{args.run}_guard-{args.guard}" + (
-        f"_{args.detector}" if args.config == 2 else "") + (
+        f"_{args.detector}" if args.config >= 2 else "") + (
+        f"_{adapter.parent.name}" if adapter is not None else "") + (
         "_measure" if args.measure else "")
-    if (args.measure or args.config == 2) and args.guard == "off":
-        p.error("--measure and config 2 need the depth camera (--guard on or observe)")
+    if (args.measure or args.config >= 2) and args.guard == "off":
+        p.error("--measure and configs 2 and 3 need the depth camera (--guard on or observe)")
+    threshold = None
+    if adapter is not None:
+        threshold = first_pick.load_threshold(ROOT / "outputs" / "demo1_vlm" /
+                                              f"ambiguity_threshold_{adapter.parent.name}.json")
     out = OUT / name
     out.mkdir(parents=True, exist_ok=True)
     raster = screen.MapRaster.cached(XODR, FOLLOW_OUT / "map", trials.MAP) if args.video else None
-    det = detector.make(args.detector) if args.config == 2 else None
-    rows = {}
+    det = detector.make(args.detector) if args.config == 2 else None   # config 3: after the map is up
+    picker = None
+    langs = args.langs if args.config == 3 else [None]
+    rows = {lang: {} for lang in langs}
     t0 = time.monotonic()
     with sim.session(trials.MAP, hz=HZ, start=not args.no_start) as (client, world, _tm):
         sim.clear(client, world)
         world.tick()
+        if args.config == 3:
+            det = detector.make(args.detector)
+            picker = vlm.make(args.vlm, adapter=adapter)
         for trial in select(args.split, args.ids):
             rec = dict(np.load(FOLLOW_OUT / "traffic" / args.run / f"{trial['id']}.npz"))
-            world.reset_all_traffic_lights()
-            video = out / f"{trial['id']}.mp4" if args.video is not None and trial["id"] in args.video else None
-            ev, log, wall = fly_trial(client, world, trial, rec, args.config, args.guard, raster, video,
-                                      args.measure, det)
-            track = target_track(rec)
-            applied = ev["offset"] if args.guard == "on" else np.zeros(len(ev["offset"]))  # observe: not flown
-            dist, horiz, rise = errors(log, track, applied)
-            row = scorer.score_trial(ev["owner"], ev["target_px"], rec["kind"], rec["pos"], dist, horiz,
-                                     first_pick=None, dt=DT)
-            if args.guard != "off":
-                row["avoidance"] = scorer.avoidance(ev["offset"], ev["need_path"], ev["need_los"], ev["los_state"], rise,
-                                                    ev["nearest"], DT)
-                row["guard_ms_mean"] = round(1000 * float(ev["guard_s"].mean()), 2)
-            hidden = ev["hidden_by"][ev["hidden_by"] >= 0]
-            tags, counts = np.unique(hidden, return_counts=True)
-            row.update(hidden_by={scorer.TAGS.get(int(t), str(t)): int(c) for t, c in zip(tags, counts)},
-                       ticks_per_s=round(len(ev["owner"]) / wall, 1), gpu_mib=sim.gpu_memory_mib(),
-                       perceive_ms_mean=round(1000 * float(ev["perceive_s"].mean()), 2))
-            if args.config == 2:
-                row["tracking"] = tracking_record(ev, track)
-            np.savez_compressed(out / f"{trial['id']}.npz", **ev, **{f"log_{k}": v for k, v in log.items()})
-            rows[trial["id"]] = row
-            a = row.get("avoidance") or {}
-            after = row["after"]
-            print(f"{trial['id']}: switches {len(row['switches'])}, hold {row['hold']}, distance error "
-                  f"{row['distance_error_m']}, horizontal {row['horizontal_error_m']}, main {row['main_s']} s, "
-                  f"long occlusions {[o['length_s'] for o in row['long_occlusions']]}"
-                  + (f", after: reacquired {after['reacquired']}" if after else "")
-                  + (f", climb {a.get('time_s')} s / {a.get('events')} events / max +{a.get('offset_max_m')} m "
-                     f"(path {a.get('path_need_s')} s, LOS {a.get('los_need_s')} s, unreachable "
-                     f"{a.get('los_unreachable_s')} s), nearest {a.get('nearest_min_m')} m" if a else "")
-                  + (f", tracking {row['tracking']}" if "tracking" in row else "")
-                  + f", {row['ticks_per_s']} ticks/s, {row['gpu_mib']} MiB", flush=True)
-    summary = scorer.summarize(list(rows.values()))
-    result = {"config": args.config, "split": args.split, "recording": args.run, "guard": args.guard,
-              "detector": det.info() if det is not None else None,
-              "summary": summary, "trials": rows}
+            for lang in langs:
+                stem = trial["id"] if lang is None else f"{trial['id']}_{lang}"
+                world.reset_all_traffic_lights()
+                video = out / f"{stem}.mp4" if args.video is not None and trial["id"] in args.video else None
+                request = None if lang is None else first_pick.Request(
+                    picker, trial["sentence"][lang], first_pick.seed_for(trial["id"], lang), threshold,
+                    prompt=args.prompt)
+                ev, log, wall = fly_trial(client, world, trial, rec, args.config, args.guard, raster, video,
+                                          args.measure, det, request=request)
+                row = flight_row(rec, ev, log, wall, args.config, args.guard, request)
+                np.savez_compressed(out / f"{stem}.npz", **ev, **{f"log_{k}": v for k, v in log.items()})
+                rows[lang][trial["id"]] = row
+                print_row(stem, row)
+        vlm_info = picker.info() if picker is not None else None
+        if picker is not None:
+            picker.unload()
+    if args.config == 3:
+        by_lang = {lang: {"summary": scorer.summarize(list(rows[lang].values())),
+                          "picks": first_pick.summarize(rows[lang]), "trials": rows[lang]} for lang in langs}
+        gate = {lang: all(by_lang[lang]["summary"]["pass"].values()) for lang in langs}
+        result = {"config": 3, "split": args.split, "recording": args.run, "guard": args.guard,
+                  "detector": det.info(), "vlm": vlm_info, "prompt": args.prompt,
+                  "adapter": str(adapter.relative_to(ROOT)),
+                  "adapter_sha256": first_pick.file_sha256(adapter / "adapter_model.safetensors"),
+                  "ambiguity_threshold": threshold, "pick_delay_s": first_pick.PICK_DELAY_S,
+                  "pass_lines": scorer.PASS, "gate": {"by_language": gate, "passed": all(gate.values())},
+                  "languages": by_lang}
+        for lang in langs:
+            print(lang, json.dumps({k: v for k, v in by_lang[lang]["summary"].items()}, indent=1))
+            print(lang, "picks", json.dumps(by_lang[lang]["picks"], indent=1))
+        print("gate", json.dumps(result["gate"]))
+    else:
+        summary = scorer.summarize(list(rows[None].values()))
+        result = {"config": args.config, "split": args.split, "recording": args.run, "guard": args.guard,
+                  "detector": det.info() if det is not None else None,
+                  "summary": summary, "trials": rows[None]}
+        print(json.dumps(summary, indent=1))
     (OUT / f"{name}.json").write_text(json.dumps(result, indent=1), encoding="utf-8")
-    print(json.dumps(summary, indent=1))
     print(f"wrote {(OUT / f'{name}.json').relative_to(ROOT)}, elapsed {time.monotonic() - t0:.0f} s")
 
 

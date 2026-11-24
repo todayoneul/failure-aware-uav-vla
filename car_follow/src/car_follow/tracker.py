@@ -85,6 +85,16 @@ class Tracker:
     def get(self, track_id):
         return next((t for t in self.tracks if t.id == track_id), None)
 
+    def adopt(self, det, dt):
+        """The track holding `det` after this tick's update, started here if the detection was too weak to start one
+        (the VLM's first pick may name a box under the `new` score). None if it has no world position."""
+        found = next((t for t in self.tracks if t.box is det.box), None)
+        if found is None and det.position is not None:
+            found = Track(self.next_id, det, dt, self.fp)
+            self.tracks.append(found)
+            self.next_id += 1
+        return found
+
     def update(self, detections, dt):
         """One tick. `detections`: [Detection]; those without a position are ignored. Returns the live tracks."""
         p = self.p
