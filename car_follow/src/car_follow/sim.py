@@ -13,6 +13,8 @@ from pathlib import Path
 import carla
 import numpy as np
 
+from . import gpu_order
+
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_SERVER = ROOT / "assets" / "carla-0.9.16" / "CarlaUE4.exe"
 
@@ -88,6 +90,7 @@ def session(map_name, hz=20.0, quality="Low", start=True, offscreen=False, port=
     Starts the simulator first unless `start` is false, and on the way out destroys every vehicle and sensor,
     switches synchronous mode off and stops the simulator it started."""
     if start:
+        gpu_order.before_map_load()
         process, client = start_and_connect(server, server_args(quality, port, offscreen), port, connect_timeout)
     else:
         process, client = None, connect(port, connect_timeout)
@@ -96,6 +99,7 @@ def session(map_name, hz=20.0, quality="Low", start=True, offscreen=False, port=
         client.set_timeout(60.0)
         world = client.get_world()
         if world.get_map().name.split("/")[-1] != map_name:
+            gpu_order.before_map_load()
             world = client.load_world(map_name)
         settings = world.get_settings()
         settings.synchronous_mode = True
@@ -104,8 +108,10 @@ def session(map_name, hz=20.0, quality="Low", start=True, offscreen=False, port=
         tm = client.get_trafficmanager(tm_port)
         tm.set_synchronous_mode(True)
         tm.set_random_device_seed(seed)
+        gpu_order.simulator_ready()
         yield client, world, tm
     finally:
+        gpu_order.simulator_ready(False)
         if world is not None:
             clear(client, world)
             settings = world.get_settings()

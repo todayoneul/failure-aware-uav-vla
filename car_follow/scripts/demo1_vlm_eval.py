@@ -23,7 +23,7 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from src.car_follow import detector, scorer, vlm  # noqa: E402
+from src.car_follow import detector, scorer, trials, vlm, vlm_data, vlm_metrics  # noqa: E402
 
 BASE = ROOT / "outputs" / "demo1_vlm"
 SCENES = BASE / "scenes"
@@ -33,6 +33,19 @@ CANDIDATE_SCORE = 0.3
 def load_scenes(which):
     metas = [json.loads(p.read_text(encoding="utf-8")) for p in sorted(SCENES.glob("*.json"))]
     return [m for m in metas if m["source"] == which]
+
+
+def scene_plans():
+    """{scene id: its trial entry} for the VLM dev and dev scenes (target car, lane, start)."""
+    vlm_dev = json.loads((ROOT / "configs" / "demo1_vlm_dev.json").read_text(encoding="utf-8"))["scenes"]
+    return {t["id"]: t for t in vlm_dev + trials.load_trials("dev")}
+
+
+def held_out_sentence(plan, lang, types):
+    """The scene's command in the wording never used in training (src/car_follow/vlm_data.py)."""
+    t = plan["target"]
+    return vlm_data.render(vlm_data.HELD_OUT[lang][plan["sentence"]["expression"]], lang,
+                           trials.color_family(t["color"]), types[t["blueprint"]], t["index_from_left"], t["lanes"])
 
 
 def candidate_table(scenes, det_name):
@@ -101,6 +114,8 @@ def summarize(rows):
             "accuracy_when_agreement_all_3": round(np.mean([x["right"] for x in r if x["agreement"] == 1.0]), 3)
             if any(x["agreement"] == 1.0 for x in r) else None,
             "seconds_per_pick": round(float(np.mean([x["seconds"] for x in r])), 3),
+            "reliability": vlm_metrics.reliability(r),
+            "unseen_cells": vlm_metrics.reliability([x for x in r if x.get("unseen_cell")]),
         }
     return out
 
@@ -115,13 +130,19 @@ def main():
     p.add_argument("--langs", nargs="+", default=["en", "ko"])
     p.add_argument("--limit", type=int, default=None, help="only the first N scenes (quick checks)")
     p.add_argument("--tag", default="", help="suffix of the output name")
+    p.add_argument("--adapter", default=None, help="a trained LoRA folder (scripts/demo1_vlm_train.py)")
+    p.add_argument("--wording", default="trial", choices=("trial", "held_out"),
+                   help="held_out: the commands in a wording never used in training")
     args = p.parse_args()
     import torch
     scenes = load_scenes(args.set)[:args.limit]
     table = candidate_table(scenes, args.detector)
+    plans = scene_plans()
+    types = trials.load_types()
+    unseen = {i for i, t in plans.items() if vlm_data.unseen_cell(trials.cell_of(*t["target"]["transform"][:2]))}
     results = {}
     for name in args.models:
-        model = vlm.make(name)
+        model = vlm.make(name, offline=True, adapter=args.adapter)
         first = scenes[0]
         bgr = cv2.imread(str(SCENES / f"{first['id']}.png"))
         c = table[first["id"]]
@@ -135,7 +156,9 @@ def main():
             c = table[s["id"]]
             bgr = cv2.imread(str(SCENES / f"{s['id']}.png"))
             for lang in args.langs:
-                r = vlm.pick(model, bgr, c["boxes"], s["sentence"][lang], args.permutations, args.prompt,
+                said = (s["sentence"][lang] if args.wording == "trial"
+                        else held_out_sentence(plans[s["id"]], lang, types))
+                r = vlm.pick(model, bgr, c["boxes"], said, args.permutations, args.prompt,
                              seed=zlib.crc32(f"{s['id']}/{lang}".encode()))
                 if r is None:
                     rows.append({"scene": s["id"], "lang": lang, "right": False, "target_in_candidates": False,
@@ -143,8 +166,8 @@ def main():
                                  "agreement": 0.0, "seconds": 0.0})
                     continue
                 right = c["target"] is not None and r.top == c["target"]
-                rows.append({"scene": s["id"], "lang": lang, "right": bool(right),
-                             "target_in_candidates": c["target"] is not None,
+                rows.append({"scene": s["id"], "lang": lang, "right": bool(right), "said": said,
+                             "unseen_cell": s["id"] in unseen, "target_in_candidates": c["target"] is not None,
                              "expression": s["sentence"]["expression"], "candidates": len(c["boxes"]),
                              "picked": r.top, "picked_kind": c["kinds"][r.top], "target": c["target"],
                              "probs": r.probs.round(4).tolist(), "margin": round(r.margin, 4),
@@ -158,7 +181,7 @@ def main():
                         cv2.rectangle(img, (x0 - 3, y0 - 3), (x1 + 3, y1 + 3), (0, 220, 0), 2)
                     x0, y0, x1, y1 = (int(v) for v in c["boxes"][r.top])
                     cv2.rectangle(img, (x0 - 6, y0 - 6), (x1 + 6, y1 + 6), (0, 0, 255), 2)
-                    cv2.putText(img, f"{lang}: {s['sentence'][lang][:60]}  p={r.probs.max():.2f} m={r.margin:.2f}",
+                    cv2.putText(img, f"{lang}: {said[:60]}  p={r.probs.max():.2f} m={r.margin:.2f}",
                                 (8, 528), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 255, 255), 1, cv2.LINE_AA)
                     cv2.imwrite(str(bad / f"{s['id']}_{lang}.jpg"), img, [cv2.IMWRITE_JPEG_QUALITY, 85])
         info = model.info()
@@ -172,6 +195,7 @@ def main():
     path = BASE / f"eval_{args.set}_{args.prompt}{args.tag}.json"
     path.write_text(json.dumps({"set": args.set, "scenes": len(scenes), "detector": args.detector,
                                 "candidate_score": CANDIDATE_SCORE, "permutations": args.permutations,
+                                "adapter": args.adapter, "wording": args.wording,
                                 "prompt": vlm.PROMPTS[args.prompt], "results": results}, indent=1,
                                ensure_ascii=False), encoding="utf-8")
     print(f"wrote {path.relative_to(ROOT)}")

@@ -60,13 +60,16 @@ def main():
     p.add_argument("--trial", default="dev-013")
     p.add_argument("--run", default="rec1")
     p.add_argument("--unload-after-pick", action="store_true")
+    p.add_argument("--adapter", default=None, help="a trained LoRA folder (scripts/demo1_vlm_train.py)")
+    p.add_argument("--prompt", default="v2", choices=sorted(vlm.PROMPTS))
     p.add_argument("--no-start", action="store_true")
     args = p.parse_args()
     import torch
     torch.cuda.init()
     sampler = Sampler()
     sampler.start()
-    out = {"vlm": args.vlm, "trial": args.trial, "unload_after_pick": args.unload_after_pick}
+    out = {"vlm": args.vlm, "adapter": args.adapter, "prompt": args.prompt, "trial": args.trial,
+           "unload_after_pick": args.unload_after_pick}
     with sim.session(trials.MAP, hz=HZ, start=not args.no_start) as (client, world, _tm):
         sim.clear(client, world)
         world.tick()
@@ -75,7 +78,7 @@ def main():
         time.sleep(2.0)
         sampler.phase = "loading models"
         det = detector.make("rfdetr-small")
-        picker = vlm.make(args.vlm)
+        picker = vlm.make(args.vlm, adapter=args.adapter)
         sampler.phase = "models loaded"
         time.sleep(1.0)
         trial = select("dev", [args.trial])[0]
@@ -89,7 +92,7 @@ def main():
                 boxes = [b for b in det.detect(detector.Frame(bgr)) if b.score >= 0.3]
                 keep = vlm.candidates([b.xyxy for b in boxes], [b.score for b in boxes])
                 boxes = [boxes[i].xyxy for i in keep]
-                r = vlm.pick(state["picker"], bgr, boxes, trial["sentence"]["en"])
+                r = vlm.pick(state["picker"], bgr, boxes, trial["sentence"]["en"], prompt=args.prompt)
                 truth = scorer.mask_box(ids_img, rp.ids[0])
                 out["pick"] = {"candidates": len(boxes), "right": bool(truth and detector.iou(boxes[r.top], truth)
                                                                        >= 0.5),
@@ -116,7 +119,8 @@ def main():
     out["headroom_mib"] = round(total - out["peak_mib"])
     out["this_process_torch_peak_mib"] = round(torch.cuda.max_memory_allocated() / 2 ** 20)
     print(json.dumps(out, indent=1))
-    path = EVAL_OUT / f"vlm_memory_{args.vlm}{'_unload' if args.unload_after_pick else ''}.json"
+    lora = f"_{Path(args.adapter).parent.name}" if args.adapter else ""
+    path = EVAL_OUT / f"vlm_memory_{args.vlm}{lora}{'_unload' if args.unload_after_pick else ''}.json"
     path.write_text(json.dumps(out, indent=1), encoding="utf-8")
     print(f"wrote {path.relative_to(ROOT)}")
 

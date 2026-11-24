@@ -33,6 +33,8 @@ from pathlib import Path
 import cv2
 import numpy as np
 
+from . import gpu_order
+
 ROOT = Path(__file__).resolve().parents[2]
 HF_CACHE = ROOT / "assets" / "models" / "hf"
 MAX_CANDIDATES = 9        # the numbers 1-9 are single tokens
@@ -136,7 +138,7 @@ def pick(picker, bgr, boxes, sentence, permutations=3, prompt="v1", seed=0):
 class TransformersVLM:
     """A VLM whose code ships with transformers, loaded from the local cache (offline)."""
 
-    def __init__(self, name, repo, quant=None, max_pixels=None):
+    def __init__(self, name, repo, quant=None, max_pixels=None, adapter=None):
         os.environ.setdefault("HF_HUB_OFFLINE", "1")
         os.environ.setdefault("HF_HUB_DISABLE_TELEMETRY", "1")
         import torch
@@ -157,6 +159,10 @@ class TransformersVLM:
         proc_kwargs = {"max_pixels": max_pixels} if max_pixels else {}
         self.processor = AutoProcessor.from_pretrained(path, **proc_kwargs)
         self.model = AutoModelForImageTextToText.from_pretrained(path, **kwargs).eval()
+        self.adapter = str(adapter) if adapter else None
+        if adapter:                                 # a trained LoRA (scripts/demo1_vlm_train.py)
+            from peft import PeftModel
+            self.model = PeftModel.from_pretrained(self.model, str(adapter)).eval()
         self.load_s = time.perf_counter() - t0
         self.weights_mib = (torch.cuda.memory_allocated() - before) / 2 ** 20
         self.tokenizer = self.processor.tokenizer
@@ -195,7 +201,8 @@ class TransformersVLM:
 
     def info(self):
         t = self._torch
-        return {"name": self.name, "repo": self.repo, "quant": self.quant or "bf16", "load_s": round(self.load_s, 1),
+        return {"name": self.name, "repo": self.repo, "adapter": self.adapter, "quant": self.quant or "bf16",
+                "load_s": round(self.load_s, 1),
                 "weights_mib": round(self.weights_mib), "peak_mib_since_load": round(t.cuda.max_memory_allocated()
                                                                                      / 2 ** 20),
                 "license": "Apache-2.0"}
@@ -204,17 +211,25 @@ class TransformersVLM:
         self.model = None
         gc.collect()
         self._torch.cuda.empty_cache()
+        gpu_order.vlm_unloaded(self.name)
 
 
 MODELS = {
-    "qwen3-vl-2b": lambda: TransformersVLM("qwen3-vl-2b", "Qwen/Qwen3-VL-2B-Instruct"),
-    "qwen3-vl-4b-4bit": lambda: TransformersVLM("qwen3-vl-4b-4bit", "Qwen/Qwen3-VL-4B-Instruct", quant="4bit"),
-    "qwen3-vl-4b-8bit": lambda: TransformersVLM("qwen3-vl-4b-8bit", "Qwen/Qwen3-VL-4B-Instruct", quant="8bit"),
-    "internvl3.5-2b": lambda: TransformersVLM("internvl3.5-2b", "OpenGVLab/InternVL3_5-2B-HF"),
+    "qwen3-vl-2b": lambda **kw: TransformersVLM("qwen3-vl-2b", "Qwen/Qwen3-VL-2B-Instruct", **kw),
+    "qwen3-vl-4b-4bit": lambda **kw: TransformersVLM("qwen3-vl-4b-4bit", "Qwen/Qwen3-VL-4B-Instruct", quant="4bit",
+                                                      **kw),
+    "qwen3-vl-4b-8bit": lambda **kw: TransformersVLM("qwen3-vl-4b-8bit", "Qwen/Qwen3-VL-4B-Instruct", quant="8bit",
+                                                      **kw),
+    "internvl3.5-2b": lambda **kw: TransformersVLM("internvl3.5-2b", "OpenGVLab/InternVL3_5-2B-HF", **kw),
 }
 
 
-def make(name):
+def make(name, offline=False, adapter=None):
+    """Load a VLM, with a trained LoRA `adapter` if given. Live (default) it must come after the simulator; `offline`
+    is for saved frames and training with no simulator running (src/car_follow/gpu_order.py)."""
     if name not in MODELS:
         raise ValueError(f"unknown VLM {name!r}; known: {', '.join(MODELS)}")
-    return MODELS[name]()
+    gpu_order.before_vlm_load(name, offline)
+    model = MODELS[name](adapter=adapter) if adapter else MODELS[name]()
+    gpu_order.vlm_loaded(name)
+    return model
