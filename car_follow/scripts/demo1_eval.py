@@ -16,7 +16,9 @@ The altitude guard (src/car_follow/clearance.py, docs/demo1.md 4.6) reads a 160 
     --guard off      no depth camera
 
 Per trial the evidence (owner of the box, target pixels, guard, drone log) goes to outputs/demo1_eval/<name>/<trial>.npz
-and the scores to outputs/demo1_eval/<name>.json (local only).
+and the scores to outputs/demo1_eval/<name>.json (local only). --video <trial ids> also writes the three-view screen
+(src/car_follow/screen.py); for config 3 it adds the steps and the VLM's pick (src/car_follow/pick_view.py, display
+only) and <trial>_<lang>_pick.png, what the VLM saw in its first question with its answer (docs/demo1.md 8.7).
 
 Run from the car_follow folder:
     uv run python scripts/demo1_eval.py --config 1 --split dev --run rec1
@@ -35,8 +37,8 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from scripts.demo1_follow import DT, HZ, OUT as FOLLOW_OUT, XODR, select, target_track  # noqa: E402
-from src.car_follow import (clearance, detector, drone, estimate, first_pick, follow, replay, scorer,  # noqa: E402
-                            screen, sim, tracker, trials, vlm)
+from src.car_follow import (clearance, detector, drone, estimate, first_pick, follow, pick_view,  # noqa: E402
+                            replay, scorer, screen, sim, tracker, trials, vlm)
 
 OUT = ROOT / "outputs" / "demo1_eval"
 WARMUP_TICKS = 2   # camera warm-up before each trial (see fly_trial)
@@ -73,7 +75,7 @@ def fly_trial(client, world, trial, rec, config, guard_mode="on", raster=None, v
                               pose())}
     if guard is not None:
         cams["depth"] = sim.camera(world, "sensor.camera.depth", dcam.width, dcam.height, dcam.fov, depth_pose())
-    writer = scr = None
+    writer = scr = view = None
     need_rgb = bool(video) or probe is not None or config == 3 or (config == 2 and det is not None
                                                                    and det.name != "gt")
     if need_rgb:
@@ -81,7 +83,12 @@ def fly_trial(client, world, trial, rec, config, guard_mode="on", raster=None, v
     if video:
         cams["chase"] = sim.camera(world, "sensor.camera.rgb", *screen.SIDE, cam["fov"], pose())
         writer = cv2.VideoWriter(str(video), cv2.VideoWriter_fourcc(*"mp4v"), HZ, screen.SIZE)
-        scr = screen.Screen(raster, trial["sentence"]["en"], trial["sentence"]["ko"], hz=HZ, fov=cam["fov"])
+        given = None
+        if request is not None:   # config 3 flies one language: show that sentence and the pick (display only)
+            given = "ko" if request.sentence == trial["sentence"]["ko"] else "en"
+            view = pick_view.PickView(request.threshold, request.delay_s, DT)
+        scr = screen.Screen(raster, trial["sentence"]["en"], trial["sentence"]["ko"], hz=HZ, fov=cam["fov"],
+                            given=given)
     ev = {"owner": np.full(ticks, -1), "share": np.zeros(ticks), "target_px": np.zeros(ticks, int),
           "box": np.full((ticks, 4), np.nan), "perceive_s": np.zeros(ticks), "hidden_by": np.full(ticks, -1),
           "offset": np.zeros(ticks), "need_path": np.zeros(ticks), "need_los": np.zeros(ticks),
@@ -236,15 +243,25 @@ def fly_trial(client, world, trial, rec, config, guard_mode="on", raster=None, v
                     why = "hold" if need < ev["offset"][k] - 0.25 else (
                         "LOS" if ev["need_los"][k] >= ev["need_path"][k] else "path")
                     climb = f"    climb +{ev['offset'][k]:.1f} m ({why})"
+                if view is not None and request.record is not None and view.boxes is None:
+                    # the pick's tick: what the VLM saw in its first question, with its answer (display only)
+                    still = pick_view.still(bgr.copy(), request.record, request.threshold, request.sentence, given)
+                    ok, png = cv2.imencode(".png", still)
+                    if ok:
+                        Path(video).with_name(Path(video).stem + "_pick.png").write_bytes(png.tobytes())
                 status = (f"t {k * DT:4.1f} s    config {config}    box on "
                           f"{'target' if owner == 0 else ('none' if owner < 0 else rec['kind'][owner])}"
                           f"    goal error {err:4.1f} m{climb}")
-                writer.write(scr.frame(bgr,
-                                       sim.bgr(sim.frame_at(cams["chase"][1], frame)),
-                                       screen.Camera(eye, cyaw, cpitch, *screen.SIDE, cam["fov"]), state.position,
-                                       state.yaw, state.pitch, cars, 0, *lock_label(config, ev, k, target_id, box,
-                                                                                     state.position, aim),
-                                       status, goal, **lock_overrides(config, box, state.position, aim)))
+                img = scr.frame(bgr, sim.bgr(sim.frame_at(cams["chase"][1], frame)),
+                                screen.Camera(eye, cyaw, cpitch, *screen.SIDE, cam["fov"]), state.position,
+                                state.yaw, state.pitch, cars, 0, *lock_label(config, ev, k, target_id, box,
+                                                                              state.position, aim),
+                                status, goal, **lock_overrides(config, box, state.position, aim))
+                if view is not None:
+                    view.carry(request.record, dets)
+                    view.draw(img[:, :screen.FIRST[0]], k, request.record, bool(ev["track_id"][k] >= 0),
+                              pick_view.climb(offset, scorer.ACTIVE_M))
+                writer.write(img)
             state = drone.step(state, cmd, limits, DT)
         wall = time.monotonic() - w0
     finally:

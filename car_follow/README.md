@@ -52,7 +52,7 @@ src/car_follow/    simulator 시작·연결과 카메라(sim.py), 첫 데모의 
                    교통 재생(replay.py), 채점(scorer.py), 깊이 카메라 고도 회피(clearance.py),
                    상자에서 목표 위치와 Kalman filter(estimate.py), 다중 객체 추적기(tracker.py),
                    탐지기 인터페이스와 RF-DETR adapter(detector.py), VLM 처음 지정(vlm.py),
-                   구성 3의 첫 지정(first_pick.py), GPU 로드 순서(gpu_order.py), VLM 학습 데이터와 신뢰도 지표(vlm_data.py, vlm_metrics.py)
+                   구성 3의 첫 지정(first_pick.py)과 그 영상 표시(pick_view.py), GPU 로드 순서(gpu_order.py), VLM 학습 데이터와 신뢰도 지표(vlm_data.py, vlm_metrics.py)
 scripts/           설치 확인(carla_check.py), 시험 목록 생성(make_demo1_trials.py),
                    교통 기록·추종 비행(demo1_follow.py), 재생 확인(demo1_replay_check.py),
                    재생 위 채점(demo1_eval.py), 위치 추정 오차(demo1_estimate.py), 탐지율(demo1_detector_check.py),

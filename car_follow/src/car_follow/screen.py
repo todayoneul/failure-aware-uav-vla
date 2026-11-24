@@ -33,6 +33,7 @@ ORANGE = (0, 150, 255)      # look-alikes
 GRAY = (170, 170, 170)      # other cars
 CYAN = (230, 200, 0)        # the drone
 WHITE = (255, 255, 255)
+LANGS = {"en": "영어", "ko": "한국어"}
 
 
 # --- geometry ---
@@ -131,8 +132,10 @@ def lock_box(image, box, color=GREEN, corner=0.25, thickness=2):
         cv2.line(image, (ax, ay), (ax, ay + dy * cy), color, thickness, cv2.LINE_AA)
 
 
-def first_person(image, text, box, label, distance, sentence_en, sentence_ko, status):
-    """The drone camera view with the lock-on box (or None), its label and distance, the sentence and a status line."""
+def first_person(image, text, box, label, distance, sentence_en, sentence_ko, status, given=None):
+    """The drone camera view with the lock-on box (or None), its label and distance, the sentence and a status line.
+    `given` ("en" or "ko"): only the sentence of that language, on the bottom line (config 3 flies one language;
+    the line above is left free for its overlay, src/car_follow/pick_view.py)."""
     h, w = image.shape[:2]
     cv2.line(image, (w // 2 - 10, h // 2), (w // 2 + 10, h // 2), WHITE, 1, cv2.LINE_AA)
     cv2.line(image, (w // 2, h // 2 - 10), (w // 2, h // 2 + 10), WHITE, 1, cv2.LINE_AA)
@@ -147,9 +150,13 @@ def first_person(image, text, box, label, distance, sentence_en, sentence_ko, st
         lines.append((tag, (x0 + 5, ty + 1), 15, (0, 0, 0), True))
     band(image, 0, 28)
     band(image, h - 58, h)
-    lines += [(status, (10, 5), 15, WHITE, False),
-              (f'"{sentence_en}"', (12, h - 54), 18, WHITE, True),
-              (sentence_ko, (12, h - 28), 17, (220, 220, 220), False)]
+    lines.append((status, (10, 5), 15, WHITE, False))
+    if given is None:
+        lines += [(f'"{sentence_en}"', (12, h - 54), 18, WHITE, True),
+                  (sentence_ko, (12, h - 28), 17, (220, 220, 220), False)]
+    else:
+        sentence = sentence_en if given == "en" else sentence_ko
+        lines.append((f'지시 ({LANGS[given]})  "{sentence}"', (12, h - 28), 18, WHITE, True))
     return text.draw(image, lines)
 
 
@@ -300,9 +307,9 @@ GROUND_TRUTH = object()   # Screen.frame: draw the followed car's projected 3D b
 class Screen:
     """Builds the frames of one flight: keeps the trails and the text renderer between ticks."""
 
-    def __init__(self, raster, sentence_en, sentence_ko, trail_s=10.0, hz=20.0, fov=90.0):
+    def __init__(self, raster, sentence_en, sentence_ko, trail_s=10.0, hz=20.0, fov=90.0, given=None):
         self.raster, self.text, self.fov = raster, Text(), fov
-        self.sentence = (sentence_en, sentence_ko)
+        self.sentence, self.given = (sentence_en, sentence_ko), given
         self.trail_len = int(trail_s * hz)
         self.trails = {"target": [], "drone": []}
 
@@ -328,7 +335,7 @@ class Screen:
         if distance is None:
             centre_point = box_vertices(tpos, trot, tcen, (0, 0, 0))[0]
             distance = float(np.linalg.norm(centre_point - np.asarray(drone_position)))
-        first = first_person(first_img, self.text, box, label, distance, *self.sentence, status)
+        first = first_person(first_img, self.text, box, label, distance, *self.sentence, status, given=self.given)
         chase = chase_view(chase_img, self.text, chase_cam, drone_position, drone_yaw)
         for key, p in (("target", tpos), ("drone", drone_position)):
             self.trails[key] = (self.trails[key] + [np.asarray(p, dtype=float)])[-self.trail_len:]
