@@ -23,6 +23,7 @@ only) and <trial>_<lang>_pick.png, what the VLM saw in its first question with i
 Run from the car_follow folder:
     uv run python scripts/demo1_eval.py --config 1 --split dev --run rec1
     uv run python scripts/demo1_eval.py --config 3 --split dev --run rec1
+    uv run python scripts/demo1_eval.py --config 3 --split main --open-sealed --run main_a   # the main evaluation only
 """
 import argparse
 import json
@@ -398,7 +399,9 @@ def main():
     p.add_argument("--prompt", default="v2", choices=sorted(vlm.PROMPTS))
     p.add_argument("--langs", nargs="+", default=["en", "ko"], choices=("en", "ko"),
                    help="config 3: one flight per trial and language")
-    p.add_argument("--split", default="dev", choices=("dev", "pilot", "smoke"))
+    p.add_argument("--split", default="dev", choices=("dev", "pilot", "smoke", "main"))
+    p.add_argument("--open-sealed", action="store_true",
+                   help="needed with --split main: opens the sealed main trials (docs/demo1_plan.md 3.3)")
     p.add_argument("--ids", nargs="*", default=None)
     p.add_argument("--run", default="rec1", help="the traffic recording to replay (outputs/demo1_follow/traffic/<run>)")
     p.add_argument("--guard", default="on", choices=("on", "observe", "off"))
@@ -413,6 +416,8 @@ def main():
         f"_{args.detector}" if args.config >= 2 else "") + (
         f"_{adapter.parent.name}" if adapter is not None else "") + (
         "_measure" if args.measure else "")
+    if args.split == "main" and not args.open_sealed:
+        p.error("--split main needs --open-sealed (the main trials are sealed, docs/demo1_plan.md 3.3)")
     if (args.measure or args.config >= 2) and args.guard == "off":
         p.error("--measure and configs 2 and 3 need the depth camera (--guard on or observe)")
     threshold = None
@@ -433,7 +438,7 @@ def main():
         if args.config == 3:
             det = detector.make(args.detector)
             picker = vlm.make(args.vlm, adapter=adapter)
-        for trial in select(args.split, args.ids):
+        for trial in select(args.split, args.ids, args.open_sealed):
             rec = dict(np.load(FOLLOW_OUT / "traffic" / args.run / f"{trial['id']}.npz"))
             for lang in langs:
                 stem = trial["id"] if lang is None else f"{trial['id']}_{lang}"

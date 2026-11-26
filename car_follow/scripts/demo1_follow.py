@@ -16,6 +16,7 @@ Run from the car_follow folder:
     uv run python scripts/demo1_follow.py record --split dev --run rec1
     uv run python scripts/demo1_follow.py offline --run rec1 --lag 0 0.5 1 2
     uv run python scripts/demo1_follow.py live --split dev --ids dev-001 --lag 0.5 --compare rec1 --video
+    uv run python scripts/demo1_follow.py record --split main --open-sealed --run main_a   # the main evaluation only
 """
 import argparse
 import json
@@ -100,8 +101,9 @@ def target_track(rec):
             "aim": rec["aim"].astype(float)}
 
 
-def select(split, ids):
-    found = trials.load_trials(split)
+def select(split, ids, open_sealed=False):
+    """The trials of a split (the sealed main split only with `open_sealed`, trials.load_trials)."""
+    found = trials.load_trials(split, open_sealed=open_sealed)
     return [t for t in found if not ids or t["id"] in ids]
 
 
@@ -109,7 +111,7 @@ def cmd_record(args):
     ticks = int(trials.DURATION_S * HZ)
     out = OUT / "traffic" / args.run
     with sim.session(trials.MAP, hz=HZ, start=not args.no_start) as (client, world, tm):
-        for trial in select(args.split, args.ids):
+        for trial in select(args.split, args.ids, args.open_sealed):
             w = time.monotonic()
             actors = start_trial(client, world, tm, trial)
             rec = Recorder(actors, ticks)
@@ -263,7 +265,9 @@ def cmd_live(args):
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("mode", choices=("record", "offline", "live"))
-    p.add_argument("--split", default="dev", choices=("dev", "pilot", "smoke"))
+    p.add_argument("--split", default="dev", choices=("dev", "pilot", "smoke", "main"))
+    p.add_argument("--open-sealed", action="store_true",
+                   help="needed with --split main: opens the sealed main trials (docs/demo1_plan.md 3.3)")
     p.add_argument("--ids", nargs="*", default=None)
     p.add_argument("--run", default=None, help="name of the traffic recording (record, offline) or of the live run")
     p.add_argument("--compare", default=None, help="live: a recording to compare the replay with")
@@ -278,6 +282,8 @@ def main():
     args = p.parse_args()
     if args.mode in ("record", "offline") and not args.run:
         p.error("--run is needed")
+    if args.split == "main" and (args.mode != "record" or not args.open_sealed):
+        p.error("the main trials are only recorded, and only with --open-sealed")
     {"record": cmd_record, "offline": cmd_offline, "live": cmd_live}[args.mode](args)
 
 
