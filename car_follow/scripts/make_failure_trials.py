@@ -5,7 +5,10 @@ event happened. A condition passes when the event happened in 70% or more of its
 
 Run from the car_follow folder (starts and stops the simulator):
     uv run python scripts/make_failure_trials.py pilot --conditions A1 A2 A3 --count 10
-Outputs go to outputs/failure_trials/pilot/ (local only): pilot.json and traffic/<id>.npz.
+    uv run python scripts/make_failure_trials.py pilot --conditions A4a A4b A4c --list dev --name a4_dev
+Outputs go to outputs/failure_trials/<name>/ (local only): pilot.json, trials/<id>.json and traffic/<id>.npz.
+--list dev names the trials dev-<condition>-NN with split dev and draws them from their own seeds (A4 only for now:
+the lane-change condition added on 2026-11-26 is checked on its own dev trials, apart from batch A's dev list).
 """
 import argparse
 import collections
@@ -24,7 +27,24 @@ from src.car_follow import failure_trials, sim, trials  # noqa: E402
 
 OUT = ROOT / "outputs" / "failure_trials"
 PILOT_SEED = 1_050_000       # the pilot's own seeds (the dev list starts at 1,100,000, docs/failure_plan.md 4.3)
+# A4 (the target changes lanes) seeds below the pilot's: generator 1,010,000-1,039,999, its dev trials 1,040,000+
+A4_SEED = {"generator": {"A4a": 1_010_000, "A4b": 1_020_000, "A4c": 1_030_000},
+           "dev": {"A4a": 1_040_000, "A4b": 1_043_000, "A4c": 1_046_000}}
 PASS_YIELD = 0.70
+
+
+def seed_for(condition, listing, offset, attempt):
+    if condition in A4_SEED[listing]:
+        return A4_SEED[listing][condition] + offset + attempt
+    if listing != "generator":
+        raise ValueError(f"no {listing} seeds for {condition}: batch A's lists are made in step 5")
+    return PILOT_SEED + 10_000 * failure_trials.CONDITIONS.index(condition) + offset + attempt
+
+
+def level_of(condition, kept):
+    if condition in ("A1", "A2"):
+        return failure_trials.LEVELS[kept % 3]
+    return "near_twin" if condition == "A4c" else "twin"
 
 
 def draw(client, world, world_map, rng, condition, level, cells, types, colors, spawn_points):
@@ -34,9 +54,10 @@ def draw(client, world, world_map, rng, condition, level, cells, types, colors, 
         return None, "no distractor or no slot for it"
     t = trial["target"]
     wp = world_map.get_waypoint(trials.as_transform(t["transform"]).location)
-    if condition == "A1":
-        free = failure_trials.junction_free(failure_trials.straight_route(wp, failure_trials.A1_FREE_M + 20.0))
-        if free < failure_trials.A1_FREE_M:
+    if condition == "A1" or condition.startswith("A4"):
+        free_m = failure_trials.A1_FREE_M if condition == "A1" else failure_trials.A4_FREE_M[condition]
+        free = failure_trials.junction_free(failure_trials.straight_route(wp, free_m + 20.0))
+        if free < free_m:
             return None, "a junction too close on the straight-on route"
         trial["event"]["junction_free_m"] = free
     if condition == "A2":
@@ -96,12 +117,18 @@ def record(client, world, tm, trial, path):
         event = failure_trials.script(trial, DT)
         event.setup(world, tm, actors)
         probe = failure_trials.OcclusionProbe(ticks)
+        # The map lanes of the word-match cars (target, look-alikes, distractor), read from the client's map copy
+        lanes = failure_trials.LaneProbe(ticks, list(enumerate([actors["target"]] + actors["lookalikes"] + d)))
+        world_map = world.get_map()
         for k in range(ticks):
             event.step(k, world, tm, actors)
             world.tick()
             rec.take(world, k)
             probe.step(k, world, actors["target"])
+            lanes.step(k, world_map)
         rec.save(path, trial)
+        saved = dict(np.load(path))
+        np.savez_compressed(path, **saved, **lanes.arrays())
         occluded = probe.per_tick()
         result = failure_trials.check(trial, dict(np.load(path)), occluded, DT)
         return event.log, result, occluded
@@ -149,8 +176,8 @@ def cmd_pilot(args):
             for attempt in range(args.max_draws):
                 if kept == args.count:
                     break
-                seed = PILOT_SEED + 10_000 * failure_trials.CONDITIONS.index(condition) + args.seed_offset + attempt
-                level = failure_trials.LEVELS[kept % 3] if condition in ("A1", "A2") else "twin"
+                seed = seed_for(condition, args.list, args.seed_offset, attempt)
+                level = level_of(condition, kept)
                 trial, why = draw(client, world, world_map, random.Random(seed), condition, level, cells, types, colors,
                                   spawn_points)
                 if trial is None:
@@ -158,7 +185,8 @@ def cmd_pilot(args):
                     continue
                 kept += 1
                 # 'gen-': the generator's own trial run, not the gate list called pilot (docs/failure_plan.md 4.4)
-                trial = {"id": f"gen-{condition}-{kept:02d}", "split": "generator", "seed": seed, **trial}
+                prefix = "gen" if args.list == "generator" else args.list
+                trial = {"id": f"{prefix}-{condition}-{kept:02d}", "split": args.list, "seed": seed, **trial}
                 w = time.monotonic()
                 log, result, occluded = record(client, world, tm, trial, out / "traffic" / f"{trial['id']}.npz")
                 row = {"id": trial["id"], "condition": condition, "level": level, "seed": seed,
@@ -171,8 +199,8 @@ def cmd_pilot(args):
                 (out / "trials").mkdir(exist_ok=True)
                 (out / "trials" / f"{trial['id']}.json").write_text(json.dumps(trial, indent=1, ensure_ascii=False),
                                                                      encoding="utf-8")
-                print(f"{trial['id']} [{level}] script {log.get('state')}, event {result}, {row['seconds']} s",
-                      flush=True)
+                print(f"{trial['id']} [{level}] script {log.get('state')}, blocked {log.get('blocked_ticks')}, event {result}, "
+                      f"{row['seconds']} s", flush=True)
     summary = {}
     for condition in args.conditions:
         rs = [r for r in rows if r["condition"] == condition]
@@ -182,7 +210,8 @@ def cmd_pilot(args):
         summary[condition] = {"recorded": len(rs), "happened": ok, "yield": round(ok / len(rs), 3) if rs else None,
                               "passes": bool(rs) and ok / len(rs) >= PASS_YIELD, "by_level": by_level,
                               "draws_rejected": dict(rejected[condition])}
-    result = {"seed_base": PILOT_SEED, "seed_offset": args.seed_offset, "pass_yield": PASS_YIELD, "window_s": list(failure_trials.WINDOW_S),
+    result = {"list": args.list, "seed_base": {c: seed_for(c, args.list, 0, 0) for c in args.conditions},
+              "seed_offset": args.seed_offset, "pass_yield": PASS_YIELD, "window_s": list(failure_trials.WINDOW_S),
               "summary": summary, "trials": rows, "elapsed_s": round(time.monotonic() - t0, 1)}
     (out / "pilot.json").write_text(json.dumps(result, indent=1, ensure_ascii=False), encoding="utf-8")
     print(json.dumps(summary, indent=1, ensure_ascii=False))
@@ -199,6 +228,8 @@ def main():
     s.add_argument("--seed-offset", type=int, default=0,
                    help="draw from other seeds (the tuning used offset 0; the confirming run fresh ones)")
     s.add_argument("--name", default="pilot", help="output folder under outputs/failure_trials")
+    s.add_argument("--list", default="generator", choices=("generator", "dev"),
+                   help="dev: the trials are dev trials (ids dev-..., split dev, own seeds; A4 only)")
     s.add_argument("--no-start", action="store_true", help="use a simulator that is already running")
     args = p.parse_args()
     {"pilot": cmd_pilot}[args.cmd](args)

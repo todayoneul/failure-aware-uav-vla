@@ -8,14 +8,22 @@ Batch A (docs/failure_plan.md table 4):
     A2  queue       a distractor right ahead of or behind the target in its lane; the light ahead of the pair is
                     held red until both have stood for HOLD_RED_S, then turned green (main-024's pattern)
     A3  occlusion   a start whose straight-on route passes under a structure (the elevated road), twins near
+Added on the user's request (2026-11-26), outside batch A: the target itself changes lanes (A4)
+    A4a lane_single  the target changes lanes once
+    A4b lane_weave   the target changes lanes out, back and out again (WEAVE_CHANGES), as soon as the Traffic
+                     Manager allows the next change
+    A4c lane_swap    a near-twin escorting the target in the next lane, ahead or behind, changes into the target's
+                     lane at the same tick as the target changes into its lane: the two cross
 Distractor levels (A1, A2): other (the sentence's words do not fit it: same car type, another colour family),
 near_twin (same car-type word and colour family: another blueprint, or the same blueprint in another RGB) and
-twin (same blueprint and colour).
+twin (same blueprint and colour). A4c's partner is always a near_twin.
 
 A trial is a demo 1 trial (trials.py) plus
     condition, distractor (level), intent, event {kind, window_s}, distractor_car {blueprint, color, transform,
-    lane_offset, along_m, near_twin_way} (A1, A2)
-The recording keeps the distractor right after the look-alikes, with kind 'distractor'.
+    lane_offset, along_m, near_twin_way} (A1, A2, A4c); A4 events also carry first_side (left or right)
+The recording keeps the distractor right after the look-alikes, with kind 'distractor'. A4 recordings also keep,
+per tick, the map lane of the target, the look-alikes and the distractor (LaneProbe), so whether a car changed lanes
+is read from the recording alone.
 
 Event scripts run inside the recording loop (scripts/make_failure_trials.py). They only steer the Traffic Manager
 and the lights. Whether the event really happened is decided afterwards from the recording alone (check_*), as the
@@ -29,8 +37,11 @@ import numpy as np
 from . import trials
 
 WINDOW_S = (15.0, 45.0)
-CONDITIONS = ("A0", "A1", "A2", "A3")
-EVENT_KIND = {"A0": None, "A1": "cut_in", "A2": "queue", "A3": "occlusion"}
+CONDITIONS = ("A0", "A1", "A2", "A3", "A4a", "A4b", "A4c")
+EVENT_KIND = {"A0": None, "A1": "cut_in", "A2": "queue", "A3": "occlusion",
+              "A4a": "lane_single", "A4b": "lane_weave", "A4c": "lane_swap"}
+LANE_KINDS = ("lane_single", "lane_weave", "lane_swap")
+WITH_DISTRACTOR = ("A1", "A2", "A4c")
 LEVELS = ("other", "near_twin", "twin")
 ROUTE = ["Straight"] * 40            # the pair takes the same turns
 DEFAULT_SPEED_DIFF = 30.0            # the Traffic Manager's own default (% under the speed limit)
@@ -56,6 +67,44 @@ QUEUE_GAP_M, QUEUE_STOP_S, STOP_MPS, GO_MPS = 10.0, 3.0, 1.0, 2.0
 OCCLUDED_S = 2.0
 # Lights slow the targets: in the pilot they had driven 35-117 m by 15 s and 105-372 m by 45 s. The recording decides.
 UNDERPASS_FROM_M, UNDERPASS_TO_M, UNDERPASS_MIN_M = 60.0, 140.0, 8.0
+# A4 (the target changes lanes)
+A4_FREE_M = {"A4a": A1_FREE_M, "A4b": 300.0, "A4c": A1_FREE_M}   # starts: no junction this far along the
+                                     # straight-on route (weave needs about 36 s of driving; with 180 m half the
+                                     # weaves stood at lights before their second change in the tuning run)
+A4C_SLOTS = [(k, a) for k in (-1, 1) for a in (-12.0, -9.0, 9.0, 12.0)]   # the near-twin: next lane, ahead/behind
+LANE_CLEAR_AHEAD_M = 50.0            # no junction this far ahead when a change starts (a change takes 20-30 m; at
+                                     # 30 m a target slowing for a light ignored the forced change in the debug run)
+STRAIGHT_AHEAD_M, STRAIGHT_BEHIND_M, STRAIGHT_DEG = 60.0, 30.0, 10.0   # single and swap: a change starts only
+                                     # where the lane keeps its heading within 10 deg from 30 m behind to 60 m ahead
+                                     # (in the pilot flight a curve right after the change made most of the 'after'
+                                     # distance error). Most changes then start just out of a curve, which fills part
+                                     # of the 'before' phase; 60 m behind cut that (target yaw rate 4 -> 2 deg/s) but
+                                     # also the yield (A4a 7/10, A4c 6/10), so the comparison reports the target's yaw
+                                     # rate per phase instead (docs/failure.md 6). Not for weave: its 300 m
+                                     # junction-free starts lie mostly on the curved ring road, where 80 m / 8 deg let
+                                     # 1 weave of 10 happen
+STRAIGHT_KINDS = ("lane_single", "lane_swap")
+NUDGE_S = 3.0                        # single, weave: a car beside it this long slows the target until a gap opens
+LANE_GAP_M = (6.0, 10.0)             # no other car this close behind / ahead in the lane moved into
+OWN_AHEAD_M = 15.0                   # nor this close ahead in the own lane (other cars are ignored for the change)
+LANE_HOLD_S = 4.0                    # a change not made in time is tried again after this
+# The Traffic Manager ignored a forced change 4-5 s after the last one and took it 14 s after (tuning run): it changes
+# lanes again only some distance past the last change (by our reading of its code, 10 x speed). Weave waits for it.
+TM_GAP_S, TM_GAP_MARGIN_M = 10.0, 15.0   # with a 5 m margin 2 of 10 second changes still timed out
+SLOWING_MPS = 1.0                    # no change starts while the target lost this much speed in the last second
+                                     # (braking for a light, it ignored the forced change)
+WEAVE_CHANGES = 3
+LATE_CHANGE_S = 50.0                 # weave: later changes may start until here (the first starts in the window)
+LANE_IGNORE_PCT = 100.0              # other cars ignored for the change only (with 0 the Traffic Manager did not
+                                     # change lanes in 6 s in the debug run although the lane was free)
+SWAP_ALONG_M = (6.0, 16.0)           # swap: the partner's distance along the target when the change starts
+SWAP_WITHIN_S = 2.0                  # swap: the two cars cross into each other's lane this close in time
+PARTNER_SWITCH_S, SWAP_OTHER_SIDE_M = 4.0, 9.0   # swap: a partner off its place (PARTNER_OFF_M) this long
+PARTNER_OFF_M = 3.0                              # holds 9 m on the other side of the target (a partner stuck 3-5 m
+                                                 # ahead never switched with a 6 m tolerance in the dev run)
+SETTLE_M = 0.4                       # a car this close to its lane's centre is not changing lanes
+SETTLE_CAP_S = 4.0                   # a change's start and end are looked for this far around its crossing
+MIN_STAY_S = 1.0                     # a lane entered and left again faster than this is a wobble on the line
 STRUCTURES = {carla.CityObjectLabel.Bridge, carla.CityObjectLabel.Roads, carla.CityObjectLabel.Sidewalks,
               carla.CityObjectLabel.Buildings, carla.CityObjectLabel.Static, carla.CityObjectLabel.GuardRail,
               carla.CityObjectLabel.Fences, carla.CityObjectLabel.Walls}
@@ -98,10 +147,12 @@ def plan(rng, condition, level, world_map, cells, types, colors, spawn_points):
     else:
         intent = rng.choice(trials.INTENTS)
     trial = trials.plan(rng, intent, cells, types, colors, spawn_points)
-    trial.update(condition=condition, distractor=level if condition in ("A1", "A2") else "twin", intent=intent,
+    trial.update(condition=condition, distractor=level if condition in WITH_DISTRACTOR else "twin", intent=intent,
                  event=None if EVENT_KIND[condition] is None else {"kind": EVENT_KIND[condition],
                                                                    "window_s": list(WINDOW_S)})
-    if condition not in ("A1", "A2"):
+    if condition in ("A4a", "A4b"):
+        trial["event"]["first_side"] = rng.choice(("left", "right"))
+    if condition not in WITH_DISTRACTOR:
         return trial
     t = trial["target"]
     car = distractor_car(rng, level, t["blueprint"], t["color"], types, colors)
@@ -110,7 +161,8 @@ def plan(rng, condition, level, world_map, cells, types, colors, spawn_points):
     wp = world_map.get_waypoint(trials.as_transform(t["transform"]).location)
     match = level != "other"
     side = 1.0 if intent == "back" else -1.0      # a word-match car ahead of the target needs 'back', behind 'front'
-    slots = list(A1_SLOTS) if condition == "A1" else [(0, side * a) for a in A2_ALONG_M]
+    slots = (list(A1_SLOTS) if condition == "A1" else list(A4C_SLOTS) if condition == "A4c"
+             else [(0, side * a) for a in A2_ALONG_M])
     rng.shuffle(slots)
     for k, along in slots:
         if match and not trials.slot_fits(intent, k, along):
@@ -120,12 +172,17 @@ def plan(rng, condition, level, world_map, cells, types, colors, spawn_points):
         if condition == "A2" and any(c["lane_offset"] == 0 and 0 < c["along_m"] / along < 1
                                      for c in trial["lookalikes"]):
             continue   # a look-alike between the pair
+        if condition == "A4c" and any(c["lane_offset"] in (0, k) and abs(c["along_m"] - a) < trials.MIN_GAP_M
+                                      for c in trial["lookalikes"] for a in (0.0, along)):
+            continue   # a look-alike where one of the two cars moves to
         slot = trials.shifted(wp, k, along)
         if slot is None:
             continue
         trial["distractor_car"] = {"blueprint": car[0], "color": car[1], "near_twin_way": car[2],
                                    "transform": trials.as_list(trials.spawn_transform(slot)), "lane_offset": k,
                                    "along_m": along}
+        if condition == "A4c":
+            trial["event"]["first_side"] = "right" if k > 0 else "left"
         return trial
     return None
 
@@ -415,7 +472,260 @@ class Occlusion(Event):
         tm.set_route(actors["target"], list(ROUTE))
 
 
-SCRIPTS = {None: NoEvent, "cut_in": CutIn, "queue": Queue, "occlusion": Occlusion}
+def straight_here(wp, ahead=STRAIGHT_AHEAD_M, behind=STRAIGHT_BEHIND_M, step=4.0):
+    """The largest heading change (deg) of the lane from `behind` metres back to `ahead` metres on (the
+    successor that turns least at forks)."""
+    yaw0, worst = wp.transform.rotation.yaw, 0.0
+    for walk, dist in ((lambda w: w.next(step), ahead), (lambda w: w.previous(step), behind)):
+        cur, gone = wp, 0.0
+        while gone < dist:
+            nxt = walk(cur)
+            if not nxt:
+                break
+            yaw = cur.transform.rotation.yaw
+            cur = min(nxt, key=lambda w: abs((w.transform.rotation.yaw - yaw + 180.0) % 360.0 - 180.0))
+            worst = max(worst, abs((cur.transform.rotation.yaw - yaw0 + 180.0) % 360.0 - 180.0))
+            gone += step
+    return worst
+
+
+def lane_key(wp):
+    """An integer naming the lane of a waypoint (road, section, lane), or -1 for None."""
+    if wp is None:
+        return -1
+    return (wp.road_id * 100 + wp.section_id) * 100 + wp.lane_id + 50
+
+
+def neighbour(wp, side):
+    """The driving lane next to `wp` on `side` ('left' or 'right') going the same way, or None."""
+    nb = wp.get_left_lane() if side == "left" else wp.get_right_lane()
+    if nb is None or nb.lane_type != carla.LaneType.Driving or nb.lane_id * wp.lane_id <= 0:
+        return None
+    return nb
+
+
+def lane_state(wp, location):
+    """(own key, left key, right key, signed offset of `location` from the lane centre (+ right), lane width)."""
+    c, r = wp.transform.location, wp.transform.get_right_vector()
+    off = (location.x - c.x) * r.x + (location.y - c.y) * r.y
+    return (lane_key(wp), lane_key(neighbour(wp, "left")), lane_key(neighbour(wp, "right")), off, wp.lane_width)
+
+
+class LaneChange(Event):
+    """A4: the target changes lanes (lane_single: once; lane_weave: out, back and out again, each once the target
+    is TM_GAP_S x its speed plus TM_GAP_MARGIN_M past the last crossing; lane_swap: with the near-twin beside it,
+    which changes into the target's lane at the same tick).
+
+    A change starts in the window (weave's later ones until LATE_CHANGE_S) once the target moves without braking
+    (SLOWING_MPS), no light holds it, no junction lies within LANE_CLEAR_AHEAD_M, (single, swap) the lane is
+    straight from STRAIGHT_BEHIND_M back to STRAIGHT_AHEAD_M on (STRAIGHT_DEG), the lane it moves into has no other
+    car within LANE_GAP_M behind or ahead and the own lane none within OWN_AHEAD_M ahead (swap: the partner is
+    expected in the other lane, beside it within SWAP_ALONG_M, and in the map's next lane; a partner off its place
+    by PARTNER_OFF_M for PARTNER_SWITCH_S holds SWAP_OTHER_SIDE_M on the other side of the target instead; the
+    partner too must move without braking and not be held by a light). The first change goes to
+    the trial's first_side if that lane exists and may be entered, else to the other side; weave then alternates.
+    When a car beside the target keeps the lane shut for NUDGE_S, the target is slowed (TARGET_SLOW_DIFF) until the
+    change starts. A change is forced as A1's cut-in (automatic lane changes on, force_lane_change every tick, other
+    cars ignored; in a swap each moves into the other's lane) and ends when the map puts the car in the neighbouring
+    lane it was sent to; a change not made within CHANGE_TIMEOUT_S is stopped and tried again after LANE_HOLD_S.
+    Until the swap the partner escorts the target, holding its
+    planned distance along; afterwards it keeps holding it."""
+
+    def __init__(self, trial, dt):
+        super().__init__(trial, dt)
+        self.kind = trial["event"]["kind"]
+        self.wanted = WEAVE_CHANGES if self.kind == "lane_weave" else 1
+        self.side = trial["event"].get("first_side", "left")
+        self.hold_along = (trial.get("distractor_car") or {}).get("along_m", 0.0)
+        self.log.update(changes=[], attempts=0)
+        self.prev = {}
+        self.shut, self.slowed = 0, False
+        self.last_cross = None
+        self.off_hold = 0
+        self.speeds, self.partner_speeds = [], []
+
+    def setup(self, world, tm, actors):
+        cars = [actors["target"]] + ([actors["distractor"]] if self.kind == "lane_swap" else [])
+        for a in cars:
+            tm.set_route(a, list(ROUTE))
+            tm.auto_lane_change(a, False)
+
+    @staticmethod
+    def drive(tm, d, mps):
+        tm.set_desired_speed(d, max(0.0, mps) * 3.6)
+
+    def crossed(self, name, wp, side):
+        """Whether the car's lane is now the `side` neighbour of its lane at the previous tick."""
+        prev = self.prev.get(name)
+        if prev is None:
+            return False
+        key = lane_key(wp)
+        return key != prev[0] and key == (prev[1] if side == "left" else prev[2])
+
+    def remember(self, name, wp):
+        self.prev[name] = (lane_key(wp), lane_key(neighbour(wp, "left")), lane_key(neighbour(wp, "right")))
+
+    def clear(self, world, t, dest_side, partner, width):
+        """Why the change to `dest_side` may not start (None if it may): another car within LANE_GAP_M behind or
+        ahead in the lane moved into, or within OWN_AHEAD_M ahead in the own lane."""
+        sign = 1.0 if dest_side == "right" else -1.0
+        for v in world.get_actors().filter("vehicle.*"):
+            if v.id == t.id or (partner is not None and v.id == partner.id):
+                continue
+            a, lat, _ = relation(t, v)
+            if -LANE_GAP_M[0] < a < LANE_GAP_M[1] and abs(lat - sign * width) < LANE_HALF_M + 0.5:
+                return "a car in the lane moved into"
+            if 0.0 < a < OWN_AHEAD_M and abs(lat) < LANE_HALF_M:
+                return "a car close ahead"
+        return None
+
+    def start(self, k, tm, cars, sides):
+        ignore = LANE_IGNORE_PCT
+        if self.slowed:
+            tm.vehicle_percentage_speed_difference(cars[0], DEFAULT_SPEED_DIFF)
+            self.slowed = False
+        # Known: after a forced change about half the targets speed up from 8 to 13-14 m/s for a few seconds (dev run).
+        # Setting the desired speed exactly did not stop it and made the speed swing (4-7 m/s), so it is left as it
+        # is and the comparison splits the drone's motion into along and across the target's heading (lane_phases.py).
+        for car, side in zip(cars, sides):
+            tm.auto_lane_change(car, True)
+            tm.ignore_vehicles_percentage(car, ignore)
+            tm.force_lane_change(car, side == "right")
+        self.log["attempts"] += 1
+        self.log.update(state="change", change_tick=k, sides=list(sides), crossed=[None] * len(cars))
+
+    def stop(self, tm, cars):
+        for car in cars:
+            tm.auto_lane_change(car, False)
+            tm.ignore_vehicles_percentage(car, 0.0)
+
+    def step(self, k, world, tm, actors):
+        t, d = actors["target"], actors.get("distractor")
+        swap = self.kind == "lane_swap"
+        now, s = k * self.dt, self.log["state"]
+        m = world.get_map()
+        twp = m.get_waypoint(t.get_location())
+        vt = _speed(t)
+        self.speeds = (self.speeds + [vt])[-int(round(1.0 / self.dt)) - 1:]
+        dwp = m.get_waypoint(d.get_location()) if swap else None
+        if swap:
+            along, lateral, dyaw = relation(t, d)
+            self.drive(tm, d, min(vt + ESCORT_GAIN * (self.hold_along - along), vt + OVERTAKE_MPS))
+            # A partner that cannot hold its place (a slower car ahead of it, in the tuning run) holds the other side
+            vd = _speed(d)
+            self.partner_speeds = (self.partner_speeds + [vd])[-int(round(1.0 / self.dt)) - 1:]
+            self.off_hold = self.off_hold + 1 if s == "wait" and abs(along - self.hold_along) > PARTNER_OFF_M else 0
+            if self.off_hold * self.dt >= PARTNER_SWITCH_S:
+                self.hold_along = -math.copysign(SWAP_OTHER_SIDE_M, self.hold_along)
+                self.off_hold = 0
+                self.log.setdefault("partner_switched_ticks", []).append(k)
+        try:
+            if s in ("wait", "hold"):
+                if now < self.window[0]:
+                    return
+                if s == "hold" and (k - self.log["hold_tick"]) * self.dt < LANE_HOLD_S:
+                    return
+                gone = t.get_location().distance(self.last_cross) if self.last_cross is not None else None
+                if s == "hold" and gone is not None and gone < TM_GAP_S * vt + TM_GAP_MARGIN_M:
+                    self.block("too soon after the last change")
+                    return
+                last = self.window[1] if not self.log["changes"] else LATE_CHANGE_S
+                if now > last:
+                    self.log["state"] = ("missed: no change started in the window" if not self.log["changes"]
+                                         else f"stopped after {len(self.log['changes'])} changes")
+                    if self.slowed:
+                        tm.vehicle_percentage_speed_difference(t, DEFAULT_SPEED_DIFF)
+                        self.slowed = False
+                    return
+                side = self.side
+                blocked = ("not moving" if vt <= 2.0
+                           else "slowing down" if self.speeds[0] - vt > SLOWING_MPS
+                           else "at a light" if t.is_at_traffic_light()
+                           else "in a junction" if twp.is_junction
+                           else "junction ahead" if not trials.free_of_junctions(twp, LANE_CLEAR_AHEAD_M)
+                           else "curved road" if self.kind in STRAIGHT_KINDS and straight_here(twp) > STRAIGHT_DEG
+                           else None)
+                if blocked is None and not swap:
+                    # The first change may go either way (first_side first); later ones alternate.
+                    sides = [side] + ([("left" if side == "right" else "right")] if not self.log["changes"] else [])
+                    why = {}
+                    for sd in sides:
+                        why[sd] = ("no lane on that side" if neighbour(twp, sd) is None
+                                   else self.clear(world, t, sd, None, twp.lane_width))
+                        if why[sd] is None:
+                            side = sd
+                            break
+                    else:
+                        blocked = why[side]
+                    if blocked is None:
+                        self.shut = 0
+                        self.start(k, tm, [t], [side])
+                        return
+                    self.shut = self.shut + 1 if "a car in the lane moved into" in why.values() else 0
+                    if self.shut * self.dt >= NUDGE_S and not self.slowed:
+                        tm.vehicle_percentage_speed_difference(t, TARGET_SLOW_DIFF)
+                        self.slowed = True
+                        self.log.setdefault("slowed_ticks", []).append(k)
+                elif blocked is None and neighbour(twp, side) is None:
+                    blocked = "no lane on that side"
+                if blocked is None and swap:
+                    other = "left" if side == "right" else "right"
+                    beside = (NEXT_LANE_M[0] <= abs(lateral) <= NEXT_LANE_M[1] and dyaw < SAME_WAY_DEG
+                              and (lateral > 0) == (side == "right"))
+                    blocked = ("partner not in the next lane" if not beside
+                               else "partner too far along" if not SWAP_ALONG_M[0] <= abs(along) <= SWAP_ALONG_M[1]
+                               else "partner in a junction" if dwp.is_junction
+                               else "partner not moving" if vd <= 2.0
+                               else "partner slowing down" if self.partner_speeds[0] - vd > SLOWING_MPS
+                               else "partner at a light" if d.is_at_traffic_light()
+                               else "partner not in the map's next lane"
+                               if lane_key(neighbour(dwp, other)) != lane_key(twp) else None)
+                if blocked is None:
+                    blocked = self.clear(world, t, side, d, twp.lane_width)
+                if blocked:
+                    self.block(blocked)
+                    return
+                self.start(k, tm, [t, d], [side, "left" if side == "right" else "right"])
+                self.log["change_along_m"] = round(along, 2)
+            elif s == "change":
+                cars = [t, d] if swap else [t]
+                wps = [twp, dwp] if swap else [twp]
+                for i, (car, wp, side) in enumerate(zip(cars, wps, self.log["sides"])):
+                    if self.log["crossed"][i] is None and self.crossed(("t", "d")[i], wp, side):
+                        self.log["crossed"][i] = k
+                        if i == 0:
+                            self.last_cross = car.get_location()
+                        tm.auto_lane_change(car, False)
+                        tm.ignore_vehicles_percentage(car, 0.0)
+                    elif self.log["crossed"][i] is None:
+                        tm.force_lane_change(car, side == "right")
+                if all(c is not None for c in self.log["crossed"]):
+                    self.log["changes"].append({"side": self.log["sides"][0], "start_tick": self.log["change_tick"],
+                                                "crossed_ticks": list(self.log["crossed"])})
+                    if len(self.log["changes"]) >= self.wanted:
+                        self.log["state"] = "done"
+                    else:
+                        self.side = "left" if self.log["sides"][0] == "right" else "right"
+                        self.log.update(state="hold", hold_tick=k)
+                elif (k - self.log["change_tick"]) * self.dt > CHANGE_TIMEOUT_S:
+                    self.stop(tm, cars)
+                    self.block("change timed out")
+                    self.log.setdefault("timed_out", []).append(
+                        {"start_tick": self.log["change_tick"], "side": self.log["sides"][0],
+                         "since_last_s": round((self.log["change_tick"] - self.log["changes"][-1]["crossed_ticks"][0])
+                                               * self.dt, 2) if self.log["changes"] else None})
+                    if any(c is not None for c in self.log["crossed"]):   # swap: only one of the two crossed
+                        self.log["state"] = "failed: only one car changed lanes"
+                    else:
+                        self.log.update(state="hold", hold_tick=k)   # try again after a hold
+        finally:
+            self.remember("t", twp)
+            if swap:
+                self.remember("d", dwp)
+
+
+SCRIPTS = {None: NoEvent, "cut_in": CutIn, "queue": Queue, "occlusion": Occlusion,
+           "lane_single": LaneChange, "lane_weave": LaneChange, "lane_swap": LaneChange}
 
 
 def script(trial, dt):
@@ -451,6 +761,30 @@ class OcclusionProbe:
         for a, b in zip(idx, list(idx[1:]) + [len(out)]):
             out[a:b] = self.flags[a]
         return out
+
+
+class LaneProbe:
+    """Per tick, the map lane of some recorded cars (lane_state: own, left and right lane keys, offset from the lane
+    centre, lane width), saved with the recording as lane_cars (their recording indices), lane_key, lane_left,
+    lane_right, lane_off, lane_width (ticks x cars). The map is the client's copy: no simulator call."""
+
+    def __init__(self, ticks, cars):
+        self.cars = list(cars)          # [(recording index, actor)]
+        n = len(self.cars)
+        self.key, self.left, self.right = (np.full((ticks, n), -1, np.int64) for _ in range(3))
+        self.off, self.width = np.zeros((ticks, n), np.float32), np.zeros((ticks, n), np.float32)
+
+    def step(self, k, world_map):
+        for j, (_, actor) in enumerate(self.cars):
+            loc = actor.get_location()
+            wp = world_map.get_waypoint(loc)
+            if wp is not None:
+                (self.key[k, j], self.left[k, j], self.right[k, j], self.off[k, j],
+                 self.width[k, j]) = lane_state(wp, loc)
+
+    def arrays(self):
+        return {"lane_cars": np.array([i for i, _ in self.cars]), "lane_key": self.key, "lane_left": self.left,
+                "lane_right": self.right, "lane_off": self.off, "lane_width": self.width}
 
 
 # --- checks on the recording alone (pure numpy) ---
@@ -521,10 +855,103 @@ def check_occlusion(occluded, window=WINDOW_S, dt=0.05):
     return {"happened": False, "reason": "no occlusion of 2 s or more starting in the window"}
 
 
+def lane_changes(rec, car, dt=0.05):
+    """The lane changes of recorded car `car` (a recording index in lane_cars), from the lane record alone:
+    [{tick (its first tick in the new lane), t_s, side, start_tick, end_tick, start_s, end_s}]. A change is a tick
+    whose lane is the left or right neighbour of the lane at the tick before (a new road segment is not one); a lane
+    entered and left again within MIN_STAY_S is a wobble on the line and dropped with the change into it. The change
+    lasts from the first tick it leaves the old lane's centre (over SETTLE_M) to the last before it settles in the
+    new one, looked for within SETTLE_CAP_S of the crossing."""
+    col = list(np.asarray(rec["lane_cars"]).tolist()).index(car)
+    key, left, right = (np.asarray(rec[f"lane_{n}"])[:, col] for n in ("key", "left", "right"))
+    off = np.abs(np.asarray(rec["lane_off"], dtype=float)[:, col])
+    found = []
+    for k in range(1, len(key)):
+        if key[k] < 0 or key[k] == key[k - 1]:
+            continue
+        side = "left" if key[k] == left[k - 1] else "right" if key[k] == right[k - 1] else None
+        if side is None:
+            continue
+        if found and found[-1][1] != side and k - found[-1][0] < int(round(MIN_STAY_S / dt)):
+            found.pop()
+            continue
+        found.append((k, side))
+    cap, n, out = int(round(SETTLE_CAP_S / dt)), len(key), []
+    for k, side in found:
+        a = k - 1
+        while a - 1 >= 0 and off[a - 1] > SETTLE_M and k - (a - 1) <= cap:
+            a -= 1
+        b = k
+        while b + 1 < n and off[b + 1] > SETTLE_M and b + 1 - k <= cap:
+            b += 1
+        out.append({"tick": int(k), "t_s": round(k * dt, 2), "side": side, "start_tick": int(a), "end_tick": int(b),
+                    "start_s": round(a * dt, 2), "end_s": round(b * dt, 2)})
+    return out
+
+
+def lateral_track(rec, car, dt=0.05):
+    """Per tick: car `car`'s lateral position (m, + right) measured from the lane it started in, continuous across
+    its lane changes (offset from the current lane's centre plus the lane widths crossed)."""
+    col = list(np.asarray(rec["lane_cars"]).tolist()).index(car)
+    off = np.asarray(rec["lane_off"], dtype=float)[:, col].copy()
+    width = np.asarray(rec["lane_width"], dtype=float)[:, col]
+    for c in lane_changes(rec, car, dt):
+        k = c["tick"]
+        w = 0.5 * (width[k - 1] + width[k])
+        off[k:] += -w if c["side"] == "left" else w
+    return off
+
+
+def check_lane(trial, rec, window=WINDOW_S, dt=0.05):
+    """A4: the target's lane changes, read from the lane record. lane_single: exactly one; lane_weave: two or more,
+    each the other way from the one before; lane_swap: exactly one, and the partner exactly one the other way within
+    SWAP_WITHIN_S, the two ending up in each other's lane. The first change must cross between the window's start
+    and CHANGE_TIMEOUT_S after its end."""
+    kind = trial["event"]["kind"]
+    if "lane_key" not in rec:
+        return {"happened": False, "reason": "no lane record"}
+    ch = lane_changes(rec, 0, dt)
+    out = {"changes": ch, "count": len(ch)}
+    lo, hi = int(window[0] / dt), int((window[1] + CHANGE_TIMEOUT_S) / dt)
+    if not ch:
+        return {**out, "happened": False, "reason": "the target never changed lanes"}
+    if not lo <= ch[0]["tick"] <= hi:
+        return {**out, "happened": False, "reason": f"the first change crossed at {ch[0]['t_s']} s, outside the window"}
+    out.update(tick=ch[0]["tick"], t_s=ch[0]["t_s"])
+    if kind == "lane_single":
+        ok = len(ch) == 1
+        return {**out, "happened": ok, **({} if ok else {"reason": f"{len(ch)} changes, not one"})}
+    if kind == "lane_weave":
+        alternate = all(a["side"] != b["side"] for a, b in zip(ch, ch[1:]))
+        ok = len(ch) >= 2 and alternate
+        return {**out, "happened": ok, **({} if ok else {"reason": "one change only" if len(ch) < 2
+                                                         else "two changes the same way"})}
+    d = int(np.flatnonzero(np.asarray(rec["kind"]) == "distractor")[0])
+    dch = lane_changes(rec, d, dt)
+    out["partner_changes"] = dch
+    if len(ch) != 1 or len(dch) != 1:
+        return {**out, "happened": False, "reason": f"target {len(ch)} and partner {len(dch)} changes, not one each"}
+    a, b = ch[0], dch[0]
+    if a["side"] == b["side"] or abs(a["tick"] - b["tick"]) > int(round(SWAP_WITHIN_S / dt)):
+        return {**out, "happened": False, "reason": "the partner did not change the other way at the same time"}
+    along, lateral, _, _, _ = pair_relation(rec, 0, d)
+    pre, post = max(0, min(a["start_tick"], b["start_tick"]) - int(1.0 / dt)), \
+        min(len(along) - 1, max(a["end_tick"], b["end_tick"]) + int(1.0 / dt))
+    span = slice(min(a["start_tick"], b["start_tick"]), max(a["end_tick"], b["end_tick"]) + 1)
+    gap = np.hypot(along[span], lateral[span])
+    out.update(lateral_before_m=round(float(lateral[pre]), 2), lateral_after_m=round(float(lateral[post]), 2),
+               along_m=round(float(along[a["tick"]]), 2), min_gap_m=round(float(gap.min()), 2))
+    if np.sign(lateral[pre]) == np.sign(lateral[post]):
+        return {**out, "happened": False, "reason": "the two did not end up in each other's lane"}
+    return {**out, "happened": True}
+
+
 def check(trial, rec, occluded=None, dt=0.05):
     kind = (trial.get("event") or {}).get("kind")
     if kind is None:
         return {"happened": None}
+    if kind in LANE_KINDS:
+        return check_lane(trial, rec, trial["event"]["window_s"], dt)
     d = int(np.flatnonzero(np.asarray(rec["kind"]) == "distractor")[0]) if kind in ("cut_in", "queue") else None
     if kind == "cut_in":
         return check_cut_in(rec, d, trial["event"]["window_s"], dt)

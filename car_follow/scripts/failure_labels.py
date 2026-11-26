@@ -2,7 +2,8 @@
 evidence, the traffic it flew over and its trials. No simulator: nothing is flown again.
 
 Reads outputs/demo1_eval/<run>.json and <run>/<trial>[_<lang>].npz, writes outputs/failure_labels/<run>.json (local
-only) and prints one line per flight. A run on a sealed split needs --open-sealed.
+only) and prints one line per flight. A run on a sealed split needs --open-sealed. A run that flew a failure trial
+run (demo1_eval.py --failure-run) takes its trials and recordings from outputs/failure_trials/<name>.
 
 Run from the car_follow folder:
     uv run python scripts/failure_labels.py --run config3_dev_rec1_qlora1_v2
@@ -22,6 +23,7 @@ from src.car_follow import labels, replay, trials  # noqa: E402
 
 EVAL = ROOT / "outputs" / "demo1_eval"
 TRAFFIC = ROOT / "outputs" / "demo1_follow" / "traffic"
+FAILURE = ROOT / "outputs" / "failure_trials"
 OUT = ROOT / "outputs" / "failure_labels"
 SEALED = ("main", "calibration")
 
@@ -44,6 +46,17 @@ def flights(result):
     return [(tid, None, row) for tid, row in result["trials"].items()]
 
 
+def sources(result, open_sealed=False):
+    """({trial id: trial}, traffic folder) of an evaluation run: a demo 1 split, or a failure trial run."""
+    if "failure_run" in result:
+        base = FAILURE / result["failure_run"]
+        found = [json.loads(f.read_text(encoding="utf-8")) for f in sorted((base / "trials").glob("*.json"))]
+        return {t["id"]: t for t in found}, base / "traffic"
+    split = result["split"]
+    return ({t["id"]: t for t in trials.load_trials(split, open_sealed=split in SEALED and open_sealed)},
+            TRAFFIC / result["recording"])
+
+
 def lock_and_pick(row, ev):
     pick = row.get("pick")
     if "pick" in row:   # config 3: the VLM's first pick
@@ -63,9 +76,9 @@ def main():
     args = p.parse_args()
     result = json.loads((EVAL / f"{args.run}.json").read_text(encoding="utf-8"))
     split = result["split"]
-    if split in SEALED and not args.open_sealed:
+    if set(split.split("+")) & set(SEALED) and not args.open_sealed:
         p.error(f"{args.run} flew the sealed {split} split: --open-sealed is needed")
-    by_id = {t["id"]: t for t in trials.load_trials(split, open_sealed=split in SEALED)}
+    by_id, traffic = sources(result, args.open_sealed)
     types = trials.load_types()
     t0 = time.monotonic()
     rows = []
@@ -74,7 +87,7 @@ def main():
             continue
         stem = tid if lang is None else f"{tid}_{lang}"
         ev = dict(np.load(EVAL / args.run / f"{stem}.npz"))
-        rec = dict(np.load(TRAFFIC / result["recording"] / f"{tid}.npz"))
+        rec = dict(np.load(traffic / f"{tid}.npz"))
         match = word_match(rec, by_id[tid], types)
         lock, pick = lock_and_pick(row, ev)
         lab = labels.label_flight(ev, rec, match, lock, pick)

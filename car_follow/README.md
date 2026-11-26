@@ -24,6 +24,7 @@ CARLA에서 자연어로 지정한 차량("오른쪽 차선의 흰색 SUV를 따
 | 연구 3단계 구현 1: 실패 라벨, 지표, 보정 코드 | 완료. 바뀜(상자, 추정), 이탈, 소실, 위기, 교차·대기열·깊이 시야 노출을 기록에서 자동으로 붙임. 첫 데모 공개 72회 비행에서 바뀜·이탈·위기 0, 소실 11(긴 가림 10, 탐지 누락으로 트랙 지움 1). main-024는 한국어 "이탈 47.3초 → 바뀜(추정) 50.15초 → 바뀜(상자) 51.3초", 영어는 위기만 | [failure](docs/failure.md) |
 | 연구 3단계 구현 2: 비행 기록 늘리기와 비회귀 확인 | 완료. 모든 차의 pixel, 모든 탐지·트랙, 목표 트랙의 연결(예측, 문턱, 혁신)을 기록. 시뮬레이터가 bit 단위로 반복되지 않아(깊이 값이 첫 tick부터 mm–cm 다름) bit 비교 대신, 기록된 탐지로 추적기를 다시 돌려 26개 비행 모두 bit 단위로 같음을 확인하고, 구성 2 dev 20이 반복 잡음 범위 안, 구성 3 dev 3개 × 2언어 통과 | [failure](docs/failure.md) 4절 |
 | 연구 3단계 구현 3: 사건 대본과 생성기 예행 | 완료. 교통을 기록하며 사건을 넣음: A1 끼어들기(옆 차선에서 호위하던 방해 차가 앞질러 목표 차선으로), A2 대기열(신호를 빨강으로 잡아 두 차를 한 차선에 세움), A3 가림(고가 아래를 지나는 시작). 조정에 쓰지 않은 seed에서 사건 비율 A1 8/10, A2 9/10, A3 8/10(기준 70%) | [failure](docs/failure.md) 5절 |
+| 연구 3단계 추가: 목표 차선 변경 조건(A4) | 완료. 목표의 단일 변경, 좌우 반복 변경, 닮은 차와 동시에 서로 차선 맞바꾸기를 교통 기록에 넣고, 기록의 지도 차선으로 변경을 확인(새 seed에서 A4a 9/10, A4b 7/10, A4c 8/10). 기준 구성 3 그대로 dev 24개 × 2언어 48회 비행: 처음 지정한 차 48/48 유지, 바뀜·이탈·소실·위기 0. 변경 중 추정 오차 p95가 0.3–0.5m에서 1.0–1.1m로, 거리 오차 옆 성분이 1.5–2.0m(곧은 길의 변경 후 0.5–0.8m)로 커짐. 실패 유발 조건이 아니라 정상 주행의 어려운 음성으로 보고, 묶음 A 본 목록은 키우지 않고 오경보 점검용 보조 묶음으로 둠 | [failure](docs/failure.md) 6절 |
 
 ![구성 3 비행: 말 입력, VLM 선택, 락온, 추종](outputs/examples/demo1_config3_flow.gif)
 
@@ -66,7 +67,8 @@ src/car_follow/    simulator 시작·연결과 카메라(sim.py), 첫 데모의 
                    탐지기 인터페이스와 RF-DETR adapter(detector.py), VLM 처음 지정(vlm.py),
                    구성 3의 첫 지정(first_pick.py)과 그 영상 표시(pick_view.py), GPU 로드 순서(gpu_order.py), VLM 학습 데이터와 신뢰도 지표(vlm_data.py, vlm_metrics.py)
                    연구 3단계의 실패 라벨(labels.py), 경보 지표(failure_metrics.py), 시험 단위 보정(calibrate.py),
-                   비행 기록 늘리기(flight_log.py), 실패 시험의 조건과 사건 대본(failure_trials.py)
+                   비행 기록 늘리기(flight_log.py), 실패 시험의 조건과 사건 대본(failure_trials.py),
+                   목표 차선 변경 전·중·후 비교(lane_phases.py)
 scripts/           설치 확인(carla_check.py), 시험 목록 생성(make_demo1_trials.py),
                    교통 기록·추종 비행(demo1_follow.py), 재생 확인(demo1_replay_check.py),
                    재생 위 채점(demo1_eval.py), 채점된 비행 다시 그리기(demo1_scene.py), 위치 추정 오차(demo1_estimate.py), 탐지율(demo1_detector_check.py),
@@ -74,7 +76,7 @@ scripts/           설치 확인(carla_check.py), 시험 목록 생성(make_demo
                    VLM 학습과 신뢰도 시험(demo1_vlm_train_scenes.py, demo1_vlm_train.py, demo1_vlm_report.py,
                    demo1_vlm_stress.py),
                    실패 라벨 붙이기(failure_labels.py), 기록 확인과 비교(check_flight_record.py, compare_runs.py,
-                   compare_noise.py), 실패 시험 생성(make_failure_trials.py),
+                   compare_noise.py), 실패 시험 생성(make_failure_trials.py), 차선 변경 비교(lane_change_report.py),
                    CARLA-Air 확인(carla_air/)
 configs/           차종 이름표, 첫 데모 시험 목록 (본평가는 봉인)
 tests/             simulator 없이 도는 테스트
@@ -91,7 +93,7 @@ assets/            (로컬에만) CARLA 0.9.16, 탐지기와 VLM 가중치(model
 |---|---|
 | [research_plan](docs/research_plan.md) | 연구 계획: 주제와 차별점, 가설, 실패 종류와 방해 차 단계, 감시기와 대응, 지표, 진행 순서, CARLA-Air 확인 항목 |
 | [failure_plan](docs/failure_plan.md) | 연구 3단계 계획: main-024에서 본 신호, 결과·노출·조건 라벨, 사건을 넣은 실패 시험 목록과 나누기, 감시 신호 후보와 늘릴 기록, 시험 단위 보정 |
-| [failure](docs/failure.md) | 연구 3단계 구현 기록: 라벨, 지표, 보정 코드(1단계)와 첫 데모 기록 위의 확인 |
+| [failure](docs/failure.md) | 연구 3단계 구현 기록: 라벨, 지표, 보정 코드, 기록 늘리기, 사건 대본과 생성기 예행, 목표 차선 변경 조건(A4)의 확인 비행 |
 | [carla_air_check](docs/carla_air_check.md) | CARLA-Air 확인 기록: client 연결, 동기 모드, 드론에 붙인 카메라, 속도 응답, 지도와 자원, 판정 |
 | [setup](docs/setup.md) | uv Python 환경, CARLA 버전 선택, 설치 확인(속도, GPU 메모리, 자동 정답, 다른 GPU 작업과 함께) |
 | [demo1_plan](docs/demo1_plan.md) | 첫 데모 계획: 범위, 구성(처음 지정, 추적, 추종 제어, 화면), 채점 지표와 합격선, 구현 순서 |

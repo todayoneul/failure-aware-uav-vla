@@ -31,6 +31,36 @@ def recording(cars=3):
             "kind": np.array(["target", "distractor", "background"][:cars])}
 
 
+def lane_recording(changes, partner=None, width=3.5, move_s=3.0):
+    """Cars along +x at 8 m/s; car 0 (the target) changes lanes at the given crossing times (s, side) with a smooth
+    move over `move_s`; with `partner`, car 1 is a distractor starting in the left lane 10 m ahead. The lane record
+    keys lanes 10 + lane number (left: -1), as the map's neighbours would."""
+    rec = recording()
+    cars = [0] + ([1] if partner is not None else [])
+    rec["kind"] = np.array(["target", "distractor" if partner is not None else "lookalike", "background"])
+    t = np.arange(N) * DT
+    if partner is not None:
+        rec["pos"][:, 1, 0] += 10.0
+    shape = {"key": np.zeros((N, len(cars)), np.int64), "left": np.zeros((N, len(cars)), np.int64),
+             "right": np.zeros((N, len(cars)), np.int64), "off": np.zeros((N, len(cars)), np.float32)}
+    for j, (car, plan) in enumerate(zip(cars, [changes] + ([partner] if partner is not None else []))):
+        start_lane = 0 if car == 0 else -1
+        y = np.full(N, start_lane * width)          # lateral position (+ right, as CARLA's y)
+        for when, side in plan:
+            step = -width if side == "left" else width
+            ramp = np.clip((t - (when - move_s / 2)) / move_s, 0.0, 1.0)
+            y = y + step * (0.5 - 0.5 * np.cos(np.pi * ramp))
+        lane = np.round(y / width)
+        rec["pos"][:, car, 1] = y
+        shape["key"][:, j] = 10 + lane
+        shape["left"][:, j] = 10 + lane - 1
+        shape["right"][:, j] = 10 + lane + 1
+        shape["off"][:, j] = y - lane * width
+    rec.update(lane_cars=np.array(cars), lane_key=shape["key"], lane_left=shape["left"], lane_right=shape["right"],
+               lane_off=shape["off"], lane_width=np.full((N, len(cars)), width, np.float32))
+    return rec
+
+
 class DistractorTests(unittest.TestCase):
     def test_levels(self):
         rng = random.Random(0)
@@ -95,6 +125,40 @@ class CheckTests(unittest.TestCase):
                 self.is_junction = j
         self.assertEqual(ft.junction_free([W(False)] * 5 + [W(True)] + [W(False)] * 3), 20.0)
         self.assertEqual(ft.junction_free([W(False)] * 4), 16.0)
+
+    def test_lane_changes(self):
+        rec = lane_recording(changes=[(20.0, "left"), (26.0, "right")])
+        ch = ft.lane_changes(rec, 0)
+        self.assertEqual([c["side"] for c in ch], ["left", "right"])
+        for c, k in zip(ch, (400, 520)):
+            self.assertLessEqual(abs(c["tick"] - k), 1)                 # the crossing, mid-move
+        self.assertTrue(ch[0]["start_tick"] < 400 <= ch[0]["end_tick"])
+        # a 3 s cosine move of 3.5 m is over 0.4 m from both lane centres for 0.56 of it (1.68 s)
+        self.assertAlmostEqual(ch[0]["end_s"] - ch[0]["start_s"], 1.68, delta=0.1)
+        np.testing.assert_allclose(ft.lateral_track(rec, 0), rec["pos"][:, 0, 1], atol=1e-5)   # continuous
+        rec = lane_recording(changes=[(20.0, "left"), (20.5, "right")])           # back within 1 s: a wobble
+        self.assertEqual(ft.lane_changes(rec, 0), [])
+        rec = lane_recording(changes=[])
+        rec["lane_key"][600:, 0] = 999                                              # a new road segment
+        self.assertEqual(ft.lane_changes(rec, 0), [])
+
+    def test_check_lane(self):
+        single = {"event": {"kind": "lane_single", "window_s": [15.0, 45.0]}}
+        weave = {"event": {"kind": "lane_weave", "window_s": [15.0, 45.0]}}
+        self.assertTrue(ft.check_lane(single, lane_recording(changes=[(20.0, "left")]))["happened"])
+        self.assertFalse(ft.check_lane(single, lane_recording(changes=[(10.0, "left")]))["happened"])   # too early
+        self.assertFalse(ft.check_lane(single, lane_recording(changes=[(20.0, "left"), (30.0, "right")]))["happened"])
+        out = ft.check_lane(weave, lane_recording(changes=[(20.0, "left"), (27.0, "right"), (34.0, "left")]))
+        self.assertEqual((out["happened"], out["count"]), (True, 3))
+        self.assertFalse(ft.check_lane(weave, lane_recording(changes=[(20.0, "left")]))["happened"])
+        swap = {"event": {"kind": "lane_swap", "window_s": [15.0, 45.0]}}
+        rec = lane_recording(changes=[(20.0, "left")], partner=[(20.2, "right")])
+        out = ft.check_lane(swap, rec)
+        self.assertTrue(out["happened"], out)
+        self.assertLess(out["lateral_before_m"], 0)                     # the partner was on the left ...
+        self.assertGreater(out["lateral_after_m"], 0)                   # ... and ends on the right
+        rec = lane_recording(changes=[(20.0, "left")], partner=[(25.0, "right")])
+        self.assertFalse(ft.check_lane(swap, rec)["happened"])          # not at the same time
 
     def test_relation_signs(self):
         rec = recording()

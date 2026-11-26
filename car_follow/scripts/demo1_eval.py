@@ -22,10 +22,15 @@ and the scores to outputs/demo1_eval/<name>.json (local only). --video <trial id
 (src/car_follow/screen.py); for config 3 it adds the steps and the VLM's pick (src/car_follow/pick_view.py, display
 only) and <trial>_<lang>_pick.png, what the VLM saw in its first question with its answer (docs/demo1.md 8.7).
 
+Stage 3: --failure-run <name> flies the trials of a failure trial run (outputs/failure_trials/<name>, scripts/
+make_failure_trials.py) over their own recordings instead of a demo 1 split; by default only the trials whose event
+the recording shows happened (--events all: every trial). A run holding sealed trials needs --open-sealed.
+
 Run from the car_follow folder:
     uv run python scripts/demo1_eval.py --config 1 --split dev --run rec1
     uv run python scripts/demo1_eval.py --config 3 --split dev --run rec1
     uv run python scripts/demo1_eval.py --config 3 --split main --open-sealed --run main_a   # the main evaluation only
+    uv run python scripts/demo1_eval.py --config 3 --failure-run a4_dev
 """
 import argparse
 import json
@@ -44,6 +49,8 @@ from src.car_follow import (clearance, detector, drone, estimate, first_pick, fl
                             pick_view, replay, scorer, screen, sim, tracker, trials, vlm)
 
 OUT = ROOT / "outputs" / "demo1_eval"
+FAILURE_OUT = ROOT / "outputs" / "failure_trials"
+SEALED = ("main", "calibration")
 WARMUP_TICKS = 2   # camera warm-up before each trial (see fly_trial)
 
 
@@ -376,6 +383,20 @@ def flight_row(rec, ev, log, wall, config, guard_mode, request=None):
     return row
 
 
+def failure_selection(name, ids=None, events="happened", open_sealed=False):
+    """(trials, traffic folder, split) of a failure trial run: its trials whose event happened (or all of them with
+    events='all'), refusing sealed trials without `open_sealed`."""
+    base = FAILURE_OUT / name
+    checks = {r["id"]: r["check"] for r in json.loads((base / "pilot.json").read_text(encoding="utf-8"))["trials"]}
+    found = [json.loads(f.read_text(encoding="utf-8")) for f in sorted((base / "trials").glob("*.json"))]
+    splits = sorted({t["split"] for t in found})
+    if set(splits) & set(SEALED) and not open_sealed:
+        raise PermissionError(f"{name} holds sealed trials ({splits}): --open-sealed is needed")
+    keep = [t for t in found if (not ids or t["id"] in ids)
+            and (events == "all" or checks.get(t["id"], {}).get("happened"))]
+    return keep, base / "traffic", "+".join(splits)
+
+
 def print_row(label, row):
     a = row.get("avoidance") or {}
     after = row["after"]
@@ -415,16 +436,31 @@ def main():
     p.add_argument("--name", default=None, help="output name (default: config<N>_<split>_<run>_guard-<mode>)")
     p.add_argument("--video", nargs="*", default=None, help="trial ids to write the screen video for")
     p.add_argument("--measure", action="store_true", help="also keep the raw position measurements of the box")
+    p.add_argument("--failure-run", default=None,
+                   help="fly a failure trial run (outputs/failure_trials/<name>) over its own recordings instead of "
+                        "--split and --run")
+    p.add_argument("--events", default="happened", choices=("happened", "all"),
+                   help="with --failure-run: only the trials whose event happened (default), or all")
     p.add_argument("--no-start", action="store_true")
     args = p.parse_args()
     args.detector = args.detector or ("rfdetr-small" if args.config == 3 else "gt")
     adapter = (ROOT / args.adapter).resolve() if args.config == 3 else None
-    name = args.name or f"config{args.config}_{args.split}_{args.run}_guard-{args.guard}" + (
+    source = f"{args.split}_{args.run}" if args.failure_run is None else args.failure_run
+    name = args.name or f"config{args.config}_{source}_guard-{args.guard}" + (
         f"_{args.detector}" if args.config >= 2 else "") + (
         f"_{adapter.parent.name}" if adapter is not None else "") + (
         "_measure" if args.measure else "")
-    if args.split == "main" and not args.open_sealed:
+    if args.failure_run is None and args.split == "main" and not args.open_sealed:
         p.error("--split main needs --open-sealed (the main trials are sealed, docs/demo1_plan.md 3.3)")
+    if args.failure_run is not None:
+        try:
+            chosen, traffic, split = failure_selection(args.failure_run, args.ids, args.events, args.open_sealed)
+        except PermissionError as e:
+            p.error(str(e))
+        recording = f"failure_trials/{args.failure_run}"
+    else:
+        chosen, traffic, split = None, FOLLOW_OUT / "traffic" / args.run, args.split
+        recording = args.run
     if (args.measure or args.config >= 2) and args.guard == "off":
         p.error("--measure and configs 2 and 3 need the depth camera (--guard on or observe)")
     threshold = None
@@ -445,8 +481,8 @@ def main():
         if args.config == 3:
             det = detector.make(args.detector)
             picker = vlm.make(args.vlm, adapter=adapter)
-        for trial in select(args.split, args.ids, args.open_sealed):
-            rec = dict(np.load(FOLLOW_OUT / "traffic" / args.run / f"{trial['id']}.npz"))
+        for trial in chosen if chosen is not None else select(args.split, args.ids, args.open_sealed):
+            rec = dict(np.load(traffic / f"{trial['id']}.npz"))
             for lang in langs:
                 stem = trial["id"] if lang is None else f"{trial['id']}_{lang}"
                 world.reset_all_traffic_lights()
@@ -467,7 +503,7 @@ def main():
         by_lang = {lang: {"summary": scorer.summarize(list(rows[lang].values())),
                           "picks": first_pick.summarize(rows[lang]), "trials": rows[lang]} for lang in langs}
         gate = {lang: all(by_lang[lang]["summary"]["pass"].values()) for lang in langs}
-        result = {"config": 3, "split": args.split, "recording": args.run, "guard": args.guard,
+        result = {"config": 3, "split": split, "recording": recording, "guard": args.guard,
                   "detector": det.info(), "vlm": vlm_info, "prompt": args.prompt,
                   "adapter": str(adapter.relative_to(ROOT)),
                   "adapter_sha256": first_pick.file_sha256(adapter / "adapter_model.safetensors"),
@@ -480,10 +516,12 @@ def main():
         print("gate", json.dumps(result["gate"]))
     else:
         summary = scorer.summarize(list(rows[None].values()))
-        result = {"config": args.config, "split": args.split, "recording": args.run, "guard": args.guard,
+        result = {"config": args.config, "split": split, "recording": recording, "guard": args.guard,
                   "detector": det.info() if det is not None else None,
                   "summary": summary, "trials": rows[None]}
         print(json.dumps(summary, indent=1))
+    if args.failure_run is not None:
+        result["failure_run"] = args.failure_run
     (OUT / f"{name}.json").write_text(json.dumps(result, indent=1), encoding="utf-8")
     print(f"wrote {(OUT / f'{name}.json').relative_to(ROOT)}, elapsed {time.monotonic() - t0:.0f} s")
 

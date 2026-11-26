@@ -13,6 +13,8 @@ Run from the car_follow folder:
     uv run python ../.claude/skills/phase2-analysis/scripts/analyze.py signals --runs config3_dev_rec1_qlora1_v2
     uv run python ../.claude/skills/phase2-analysis/scripts/analyze.py signals --runs config3_dev_rec1_qlora1_v2 \
         --flight dev-017_ko
+    uv run python ../.claude/skills/phase2-analysis/scripts/analyze.py events --name a4_dev
+    uv run python ../.claude/skills/phase2-analysis/scripts/analyze.py lanes --run config3_a4_dev_guard-on_rfdetr-small_qlora1
 Outputs go to outputs/analysis/<command>_<name>/ (local only, like the rest of outputs/).
 """
 import argparse
@@ -597,14 +599,20 @@ def cmd_events(args):
     for r in rows:
         if r["check"].get("happened") and r["condition"] not in examples:
             examples[r["condition"]] = r
-    for col, cond in enumerate(("A1", "A2", "A3")):
+    shown = [c for c in d["summary"]][:3]
+    for col in range(3):
         ax = axes[0, col]
+        cond = shown[col] if col < len(shown) else None
         r = examples.get(cond)
         if r is None:
             ax.set_axis_off()
             continue
         rec = dict(np.load(OUTPUTS / "failure_trials" / args.name / "traffic" / f"{r['id']}.npz"))
         t = np.arange(len(rec["pos"])) * DT
+        if cond.startswith("A4"):   # the target's lateral position from its start lane (and the swap partner's)
+            lane_example(ax, rec, r, cond, t)
+            ax.set_xlabel("s")
+            continue
         if cond in ("A1", "A2"):
             di = int(np.flatnonzero(rec["kind"] == "distractor")[0])
             along, lateral, _, vt, vd = ft.pair_relation(rec, 0, di)
@@ -645,6 +653,117 @@ def cmd_events(args):
           [("fig_events.png", fig)])
 
 
+LANE_NAMES = {"A4a": "single", "A4b": "weave", "A4c": "swap"}
+
+
+def lane_example(ax, rec, r, cond, t):
+    """One A4 trial: the target's lateral position from its start lane (+ right), and in a swap the partner's
+    (from the same lane), with each change's span shaded."""
+    from src.car_follow import failure_trials as ft
+    ax.plot(t, ft.lateral_track(rec, 0), color=SLOTS[0], label="target")
+    if cond == "A4c":
+        di = int(np.flatnonzero(rec["kind"] == "distractor")[0])
+        _, lateral, _, _, _ = ft.pair_relation(rec, 0, di)
+        start = float(np.median(lateral[:20]))   # the partner's side and lane at the start
+        ax.plot(t, ft.lateral_track(rec, di) + start, color=SLOTS[1], label="near-twin")
+        ax.legend(loc="best", fontsize=6)
+    ch = ft.lane_changes(rec, 0)
+    for c in ch:
+        ax.axvspan(c["start_s"], c["end_s"], color=SHADE, zorder=0, linewidth=0)
+    if ch:
+        ax.set_xlim(max(0.0, ch[0]["start_s"] - 8.0), min(t[-1], ch[-1]["end_s"] + 8.0))
+    ax.set_ylabel("lateral from start lane, m (+ right)")
+    ax.set_title(f"{cond} {LANE_NAMES.get(cond, '')} ({r['id']})")
+
+
+def cmd_lanes(args):
+    """The lane-change comparison of an evaluation run over A4 trials (scripts/lane_change_report.py writes
+    outputs/failure_labels/<run>_lanes.json): switches, losses, errors and jitter before, during, between and after
+    the target's lane changes, per condition, and one flight per condition over time."""
+    d = json.loads((LABELS / f"{args.run}_lanes.json").read_text(encoding="utf-8"))
+    if set(d["split"].split("+")) & set(SEALED) and not args.allow_sealed:
+        refuse(f"the lane comparison of {args.run}")
+    conds = list(d["by_condition"])
+    phases = [p for p in ("before", "during", "between", "after")
+              if any(p in part["pooled"] for part in d["by_condition"].values())]
+    md = [f"평가 실행 `{args.run}` (실패 시험 `{d['failure_run']}`, {d['split']}), 구간 규칙 {d['rules']}"]
+    md.append("## 1. 같은 차 유지\n\n" + md_table(
+        ["조건", "비행", "처음 지정 맞음", "같은 차 유지", "차선 변경 수", "첫 실패 (시험, 언어, 종류, 시각, 구간)"],
+        [[f"{c} {LANE_NAMES.get(c, '')}", part["flights"], part["first_pick_right"], part["kept_same_car"],
+          part["changes"], "; ".join(f"{f['trial']} {f['language']} {f['kind']} {f['t_s']} s {f['phase']}"
+                                     for f in part["first_failures"]) or "없음"]
+         for c, part in d["by_condition"].items()]))
+    rows, motion = [], []
+    for c, part in d["by_condition"].items():
+        for ph in phases:
+            r = part["pooled"].get(ph)
+            if r is None:
+                continue
+            e = r["events"]
+            rows.append([c, ph, r["flights"], r["seconds"], r["wrong_box_s"], r["no_box_s"], r["hold"], r["lost_s"],
+                         f"{e['switch_box']}/{e['switch_estimate']}/{e['drift']}/{e['loss']}",
+                         r["estimate_error_mean"], r["estimate_error_p95_worst"]])
+            motion.append([c, ph, r["distance_error_mean"], r["distance_error_p95_worst"], r["across_error_mean"],
+                           r["along_error_mean"], r["accel_rms"], r["accel_across_rms"], r["accel_along_rms"],
+                           r["jerk_rms"], r["yaw_rate_rms"], r["target_yaw_rate"], r["target_accel_rms"]])
+    md.append("## 2. 구간별 추적 (비행을 합침)\n\n사건 열은 상자 바뀜/추정 바뀜/이탈/소실 수다.\n\n" + md_table(
+        ["조건", "구간", "비행", "초", "다른 차 상자 s", "상자 없음 s", "유지율", "트랙 없음 s", "사건",
+         "추정 오차 평균 m", "p95 최대 m"], rows))
+    md.append("## 3. 구간별 비행 (비행을 합침)\n\n옆과 진행은 목표 진행 방향 기준이다. 목표 yaw 속도는 굽은 길, 목표 가속은 "
+              "목표의 속도 변화를 보인다.\n\n" + md_table(
+                  ["조건", "구간", "거리 오차 평균 m", "p95 최대 m", "옆 m", "진행 m", "가속 RMS m/s²", "옆 가속",
+                   "진행 가속", "저크 RMS m/s³", "드론 yaw 속도 RMS °/s", "목표 yaw 속도 RMS °/s",
+                   "목표 가속 RMS m/s²"], motion))
+    plt = pyplot()
+    fig, axes = plt.subplots(3, 3, figsize=(7.2, 6.4), gridspec_kw={"height_ratios": [1.15, 1, 1]})
+    for col in range(3):
+        ax = axes[0, col]
+        cond = conds[col] if col < len(conds) else None
+        fl = next((f for f in d["flights"] if f["condition"] == cond), None)
+        if fl is None:
+            ax.set_axis_off()
+            continue
+        rec = dict(np.load(OUTPUTS / "failure_trials" / d["failure_run"] / "traffic" / f"{fl['trial']}.npz"))
+        lane_example(ax, rec, {"id": fl["trial"]}, cond, np.arange(len(rec["pos"])) * DT)
+        ax.set_xlabel("s")
+    panels = [("wrong_box_s", True, "Box on another car", "s per min"),
+              ("lost_s", True, "Target track gone", "s per min"),
+              ("estimate_error_mean", False, "Estimate error, mean", "m"),
+              ("across_error_mean", False, "Distance error across heading", "m, mean"),
+              ("accel_across_rms", False, "Drone accel. across heading", "m/s², RMS"),
+              ("target_yaw_rate", False, "Target yaw rate (curves)", "deg/s, RMS")]
+    x = np.arange(len(phases))
+    for i, (key, per_min, title, unit) in enumerate(panels):
+        ax = axes[1 + i // 3, i % 3]
+        for j, c in enumerate(conds[:3]):
+            pooled = d["by_condition"][c]["pooled"]
+            ys = []
+            for ph in phases:
+                r = pooled.get(ph)
+                v = None if r is None else r[key]
+                if v is not None and per_min:
+                    v = 60.0 * v / r["seconds"] if r["seconds"] else None
+                ys.append(np.nan if v is None else v)
+            ok = [i for i, y in enumerate(ys) if np.isfinite(y)]   # phases a condition has (no 'between' in one change)
+            ax.plot(x[ok], np.asarray(ys)[ok], color=SLOTS[j], marker="o", markersize=4, markeredgecolor=SURFACE,
+                    markeredgewidth=0.6, label=f"{c} {LANE_NAMES.get(c, '')}")
+        ax.set_xticks(x, phases)
+        ax.grid(axis="x", visible=False)
+        ax.set_ylim(bottom=0)
+        if per_min:
+            ax.set_ylim(top=max(1.0, ax.get_ylim()[1]))   # all zero: keep a readable scale
+        ax.set_ylabel(unit)
+        ax.set_title(title)
+        if i == 0 and len(conds) > 1:
+            ax.legend(loc="best", fontsize=6)
+    fig.tight_layout()
+    md.append("위 줄은 조건마다 비행 하나의 목표 횡위치(시작 차선 기준, 오른쪽 +)이고 회색 띠는 차선 변경 구간이다. 아래 두 줄은 "
+              "구간별로 합친 값이다. 거리 오차와 드론 가속은 목표 진행 방향에 수직인 성분이다(차선 변경이 만드는 쪽). 마지막 칸은 "
+              "목표 자신의 yaw 속도로, 굽은 길이 섞인 정도를 보인다. ![lanes](fig_lanes.png)")
+    write(f"lanes_{args.run}", "\n\n".join(md), {"run": args.run, "by_condition": d["by_condition"]},
+          [("fig_lanes.png", fig)])
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     common = argparse.ArgumentParser(add_help=False)
@@ -668,9 +787,12 @@ def main():
     s.add_argument("--index", default="configs/demo1_trials.json", help="the trial index the runs flew")
     s = sub.add_parser("events", parents=[common], help="the failure-trial generator's event yield and examples")
     s.add_argument("--name", default="confirm", help="a run under outputs/failure_trials")
+    s = sub.add_parser("lanes", parents=[common],
+                       help="lane-change comparison (A4): before / during / after the target's lane changes")
+    s.add_argument("--run", required=True, help="an evaluation run with outputs/failure_labels/<run>_lanes.json")
     args = p.parse_args()
     {"inventory": cmd_inventory, "trials": cmd_trials, "run": cmd_run, "labels": cmd_labels,
-     "signals": cmd_signals, "events": cmd_events}[args.cmd](args)
+     "signals": cmd_signals, "events": cmd_events, "lanes": cmd_lanes}[args.cmd](args)
 
 
 if __name__ == "__main__":

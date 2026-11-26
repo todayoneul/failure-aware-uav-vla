@@ -41,7 +41,8 @@ uv run python ../.claude/skills/phase2-analysis/scripts/analyze.py <명령> [옵
 | `labels` | 실패 라벨: 결과 종류, 사슬, `t_fail`, 실패 비행 목록, 노출 시간 | `labels --runs config3_dev_rec1_qlora1_v2 config3_smoke_gate_a` |
 | `signals` | 감시 신호 후보의 비행별 분포(정상, 위기, 실패) | `signals --runs config3_dev_rec1_qlora1_v2` |
 | `signals --flight` | 비행 하나의 신호 시계열, `t_fail`과 위기 구간 표시 | `signals --runs config3_dev_rec1_qlora1_v2 --flight dev-017_ko` |
-| `events` | 실패 시험 생성기 실행(dev 칸)의 조건별 사건 비율, 사건 시각, 조건마다 예 하나의 시계열 | `events --name confirm_b` |
+| `events` | 실패 시험 생성기 실행(dev 칸)의 조건별 사건 비율, 사건 시각, 조건마다 예 하나의 시계열. A4는 목표(와 닮은 차)의 시작 차선 기준 횡위치 | `events --name confirm_b`, `events --name a4_dev` |
+| `lanes` | 목표 차선 변경(A4) 비행의 변경 전·중·사이·후 비교: 같은 차 유지, 다른 차 상자, 트랙 없음, 거리·추정 오차, 드론 가속·yaw 속도. 먼저 `scripts/lane_change_report.py --run <실행>`을 돌린다 | `lanes --run config3_a4_dev_guard-on_rfdetr-small_qlora1` |
 
 - `labels`는 `outputs/failure_labels/<실행>.json`을 읽는다. 없으면 먼저 `uv run python scripts/failure_labels.py --run <실행>`을 돌린다.
 - 실패 시험 목록이 생기면 `trials --index configs/failure_trials.json`, `signals --index configs/failure_trials.json`으로 그 색인을 준다.
@@ -79,7 +80,8 @@ dataviz skill의 기준 팔레트와 규칙을 따른다. 새 그림을 더할 �
 | `outputs/demo1_eval/<실행>/<시험>_<언어>.npz` | 비행 기록: 상자 소유자, 목표 pixel, 트랙, 추정 위치, 탐지 점수, 드론 기록 등 |
 | `outputs/demo1_follow/traffic/<기록>/<시험>.npz` | 교통 기록: 모든 차의 위치, 자세, 속도, 상자, blueprint, 색 |
 | `outputs/failure_labels/<실행>.json` | 실패 라벨(`scripts/failure_labels.py`) |
-| `outputs/failure_trials/<실행>/` | 실패 시험 생성기 실행(`scripts/make_failure_trials.py pilot`): `pilot.json`, 시험, 교통 기록. dev 칸만 |
+| `outputs/failure_trials/<실행>/` | 실패 시험 생성기 실행(`scripts/make_failure_trials.py pilot`): `pilot.json`, 시험, 교통 기록(A4는 차선 기록 포함). dev 칸만 |
+| `outputs/failure_labels/<실행>_lanes.json` | 차선 변경 비교(`scripts/lane_change_report.py`) |
 
 - 라벨, 지표, 보정의 정의는 `src/car_follow/labels.py`, `failure_metrics.py`, `calibrate.py`와 `docs/failure_plan.md`, `docs/failure.md`에 있다.
 - `signals`의 신호는 계획 2절 표 1을 따른다: 최근 2초 미연결 비율, 등속 예측과의 추정 점프, 최근 2초 탐지 점수, 추정의 아래 각도. 정답 신호(추정 오차, 실제 아래 각도)는 감시기가 볼 수 없는 값으로 따로 표시한다. 5단계에서 감시기 모듈이 생기면 그 정의로 바꾼다.

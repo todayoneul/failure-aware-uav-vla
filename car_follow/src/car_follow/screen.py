@@ -258,7 +258,8 @@ class MapRaster:
 def top_map(raster, text, centre, cars, drone_position, drone_yaw, goal=None, trails=(), size=SIDE, fov=90.0):
     """The map window of `size` pixels around `centre` (world x, y).
 
-    `cars` are (position, (pitch, yaw, roll), extent, kind) with kind "target", "lookalike" or "background";
+    `cars` are (position, (pitch, yaw, roll), extent, kind) with kind "target", "lookalike", "distractor" (a stage 3
+    failure trial's, drawn as a look-alike) or "background";
     `trails` are (N x 3 points, bgr colour)."""
     w, h = size
     corner = raster.to_pixel(centre) - np.array([w / 2.0, h / 2.0])
@@ -273,13 +274,13 @@ def top_map(raster, text, centre, cars, drone_position, drone_yaw, goal=None, tr
     for points, color in trails:
         if len(points) > 1:
             cv2.polylines(img, [px(points)], False, color, 1, cv2.LINE_AA)
-    order = {"background": 0, "lookalike": 1, "target": 2}
+    order = {"background": 0, "lookalike": 1, "distractor": 1, "target": 2}
     for pos, rot, extent, kind in sorted(cars, key=lambda c: order[c[3]]):
         y = math.radians(rot[1])
         f, r = np.array([math.cos(y), math.sin(y)]), np.array([-math.sin(y), math.cos(y)])
         ex, ey = max(extent[0], 1.0), max(extent[1], 0.6)
         quad = [np.asarray(pos[:2]) + sx * ex * f + sy * ey * r for sx, sy in ((1, 1), (1, -1), (-1, -1), (-1, 1))]
-        color = {"target": GREEN, "lookalike": ORANGE, "background": GRAY}[kind]
+        color = {"target": GREEN, "lookalike": ORANGE, "distractor": ORANGE, "background": GRAY}[kind]
         cv2.fillPoly(img, [px(quad)], color, cv2.LINE_AA)
     if goal is not None:
         g = tuple(px([goal])[0])

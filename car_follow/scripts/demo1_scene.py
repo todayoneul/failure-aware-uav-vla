@@ -8,9 +8,13 @@ again on the new instance image and compared with the scored owner of every tick
 Writes outputs/demo1_eval/<result>_scenes/<trial>_<lang>.mp4 (H.264) and, for --stills, one PNG per time and a JPG
 sheet of them.
 
+A result that flew a failure trial run (demo1_eval.py --failure-run) takes its trials and recordings from
+outputs/failure_trials/<name> (no --split or --run).
+
 Run from the car_follow folder:
     uv run python scripts/demo1_scene.py --result config3_main_main_a --split main --open-sealed --run main_a \\
         --scenes main-024:ko --stills main-024:ko:46,49,51.5,54
+    uv run python scripts/demo1_scene.py --result config3_a4_dev_guard-on_rfdetr-small_qlora1 --scenes dev-A4c-01:en
 """
 import argparse
 import json
@@ -26,6 +30,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from scripts.demo1_follow import DT, HZ, OUT as FOLLOW_OUT, XODR, select, target_track  # noqa: E402
+from scripts.failure_labels import sources  # noqa: E402
 from src.car_follow import estimate, follow, pick_view, replay, scorer, screen, sim, tracker, trials  # noqa: E402
 
 EVAL = ROOT / "outputs" / "demo1_eval"
@@ -136,14 +141,26 @@ def main():
     p.add_argument("--result", required=True, help="the evaluation's name (outputs/demo1_eval/<result>.json)")
     p.add_argument("--split", default="dev", choices=("dev", "pilot", "smoke", "main"))
     p.add_argument("--open-sealed", action="store_true", help="needed with --split main")
-    p.add_argument("--run", required=True, help="the traffic recording the evaluation replayed")
+    p.add_argument("--run", default=None, help="the traffic recording the evaluation replayed (demo 1 splits)")
     p.add_argument("--scenes", nargs="+", required=True, help="trial:lang, e.g. main-024:ko")
     p.add_argument("--stills", nargs="*", default=[], help="trial:lang:t1,t2,... seconds to save as pictures")
     p.add_argument("--no-start", action="store_true")
     args = p.parse_args()
-    if args.split == "main" and not args.open_sealed:
-        p.error("--split main needs --open-sealed")
+    global TAG
     result = json.loads((EVAL / f"{args.result}.json").read_text(encoding="utf-8"))
+    if "failure_run" in result:
+        if set(result["split"].split("+")) & {"main", "calibration"} and not args.open_sealed:
+            p.error(f"{args.result} flew sealed trials: --open-sealed is needed")
+        by_id, traffic = sources(result, args.open_sealed)
+        TAG = f"{result['split']} 비행 기록을 다시 그림"
+    else:
+        if args.split == "main" and not args.open_sealed:
+            p.error("--split main needs --open-sealed")
+        if args.run is None:
+            p.error("--run is needed for a demo 1 split")
+        by_id, traffic = None, FOLLOW_OUT / "traffic" / args.run
+        if args.split != "main":
+            TAG = f"{args.split} 비행 기록을 다시 그림"
     stills = {}
     for s in args.stills:
         tid, lang, times = s.split(":")
@@ -152,13 +169,14 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     raster = screen.MapRaster.cached(XODR, FOLLOW_OUT / "map", trials.MAP)
     scenes = [tuple(s.split(":")) for s in args.scenes]
-    found = {t["id"]: t for t in select(args.split, sorted({t for t, _ in scenes}), args.open_sealed)}
+    found = by_id if by_id is not None else {
+        t["id"]: t for t in select(args.split, sorted({t for t, _ in scenes}), args.open_sealed)}
     with sim.session(trials.MAP, hz=HZ, start=not args.no_start) as (client, world, _tm):
         sim.clear(client, world)
         world.tick()
         for tid, lang in scenes:
             w = time.monotonic()
-            rec = dict(np.load(FOLLOW_OUT / "traffic" / args.run / f"{tid}.npz"))
+            rec = dict(np.load(traffic / f"{tid}.npz"))
             z = np.load(EVAL / args.result / f"{tid}_{lang}.npz")
             row = result["languages"][lang]["trials"][tid]
             world.reset_all_traffic_lights()
