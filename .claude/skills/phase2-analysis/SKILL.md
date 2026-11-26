@@ -82,6 +82,8 @@ dataviz skill의 기준 팔레트와 규칙을 따른다. 새 그림을 더할 �
 | `outputs/failure_labels/<실행>.json` | 실패 라벨(`scripts/failure_labels.py`) |
 | `outputs/failure_trials/<실행>/` | 실패 시험 생성기 실행(`scripts/make_failure_trials.py pilot`): `pilot.json`, 시험, 교통 기록(A4는 차선 기록 포함). dev 칸만 |
 | `outputs/failure_labels/<실행>_lanes.json` | 차선 변경 비교(`scripts/lane_change_report.py`) |
+| `configs/failure_trials.json` | 3단계 5단계 목록 색인: `dev`, `aux` 공개, `calibration`, `pilot`, `smoke`, `main` 봉인(`failure_trials_<목록>.json`, sha256과 교통 기록 목록 sha256) |
+| `outputs/failure_trials/lists/<목록>/` | 5단계 목록의 시험과 교통 기록. 봉인 목록 폴더는 이름만으로 거부한다(`events --name lists/dev`는 됨) |
 
 - 라벨, 지표, 보정의 정의는 `src/car_follow/labels.py`, `failure_metrics.py`, `calibrate.py`와 `docs/failure_plan.md`, `docs/failure.md`에 있다.
 - `signals`의 신호는 계획 2절 표 1을 따른다: 최근 2초 미연결 비율, 등속 예측과의 추정 점프, 최근 2초 탐지 점수, 추정의 아래 각도. 정답 신호(추정 오차, 실제 아래 각도)는 감시기가 볼 수 없는 값으로 따로 표시한다. 5단계에서 감시기 모듈이 생기면 그 정의로 바꾼다.

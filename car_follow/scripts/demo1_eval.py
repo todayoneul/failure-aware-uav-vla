@@ -45,8 +45,8 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from scripts.demo1_follow import DT, HZ, OUT as FOLLOW_OUT, XODR, select, target_track  # noqa: E402
-from src.car_follow import (clearance, detector, drone, estimate, first_pick, flight_log, follow,  # noqa: E402
-                            pick_view, replay, scorer, screen, sim, tracker, trials, vlm)
+from src.car_follow import (clearance, detector, drone, estimate, failure_trials, first_pick,  # noqa: E402
+                            flight_log, follow, pick_view, replay, scorer, screen, sim, tracker, trials, vlm)
 
 OUT = ROOT / "outputs" / "demo1_eval"
 FAILURE_OUT = ROOT / "outputs" / "failure_trials"
@@ -387,13 +387,16 @@ def failure_selection(name, ids=None, events="happened", open_sealed=False):
     """(trials, traffic folder, split) of a failure trial run: its trials whose event happened (or all of them with
     events='all'), refusing sealed trials without `open_sealed`."""
     base = FAILURE_OUT / name
+    if base.parent.name == "lists" and base.name in failure_trials.SEALED_LISTS and not open_sealed:
+        raise PermissionError(f"{name} is a sealed list: --open-sealed is needed")
     checks = {r["id"]: r["check"] for r in json.loads((base / "pilot.json").read_text(encoding="utf-8"))["trials"]}
     found = [json.loads(f.read_text(encoding="utf-8")) for f in sorted((base / "trials").glob("*.json"))]
     splits = sorted({t["split"] for t in found})
-    if set(splits) & set(SEALED) and not open_sealed:
+    if set(splits) & (set(SEALED) | set(failure_trials.SEALED_LISTS)) and not open_sealed:
         raise PermissionError(f"{name} holds sealed trials ({splits}): --open-sealed is needed")
+    # 'happened' is None for a trial without an event (A0): it is flown too
     keep = [t for t in found if (not ids or t["id"] in ids)
-            and (events == "all" or checks.get(t["id"], {}).get("happened"))]
+            and (events == "all" or checks.get(t["id"], {}).get("happened") is not False)]
     return keep, base / "traffic", "+".join(splits)
 
 

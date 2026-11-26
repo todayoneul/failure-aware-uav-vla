@@ -41,6 +41,21 @@ CONDITIONS = ("A0", "A1", "A2", "A3", "A4a", "A4b", "A4c")
 EVENT_KIND = {"A0": None, "A1": "cut_in", "A2": "queue", "A3": "occlusion",
               "A4a": "lane_single", "A4b": "lane_weave", "A4c": "lane_swap"}
 LANE_KINDS = ("lane_single", "lane_weave", "lane_swap")
+# Step 5 lists (docs/failure_plan.md 4.4, option 1, decided 2026-11-26): trials per list and condition. A0's share of
+# lane changes is listed as A4a / A4c; the auxiliary list holds the weave alone (false-alarm checks).
+# A3 is in dev only (decided 2026-11-27, docs/failure.md 9.5): only 4 start candidates on the whole map pass its
+# screen, all in 2 dev cells, so the sealed lists were made without it (calibration 51, pilot 3, smoke 10, main 85);
+# their occlusion losses are the natural ones.
+LISTS = {
+    "dev": {"A0": 7, "A4a": 2, "A4c": 1, "A1": 7, "A2": 41, "A3": 10},
+    "aux": {"A4b": 10},
+    "calibration": {"A0": 6, "A4a": 2, "A4c": 1, "A1": 6, "A2": 36},
+    "pilot": {"A0": 1, "A1": 1, "A2": 1},
+    "smoke": {"A0": 1, "A4a": 1, "A1": 1, "A2": 7},
+    "main": {"A0": 10, "A4a": 3, "A4c": 2, "A1": 10, "A2": 60},
+}
+OPEN_LISTS = ("dev", "aux")
+SEALED_LISTS = ("calibration", "pilot", "smoke", "main")   # pooled cells; opened only with the user's permission
 WITH_DISTRACTOR = ("A1", "A2", "A4c")
 LEVELS = ("other", "near_twin", "twin")
 ROUTE = ["Straight"] * 40            # the pair takes the same turns

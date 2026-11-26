@@ -3,7 +3,15 @@ generator pilot of docs/failure_plan.md 7, step 3: in dev cells, draw trials of 
 as demo 1 does, record the traffic with the event script running, and check from the recording alone whether the
 event happened. A condition passes when the event happened in 70% or more of its recorded trials.
 
+Step 5 (docs/failure_plan.md 4.3-4.4): `lists` makes the lists of failure_trials.LISTS. dev and aux come from the
+dev cells (seeds from 1,100,000), calibration, pilot, smoke and main from the gate and main cells pooled (seeds from
+1,900,000), each trial's list fixed by its seed's sha256 before it is drawn. A trial is kept only when its event
+happened. Sealed lists print counts and reasons only; their trial files and traffic manifests get a sha256 in
+configs/failure_trials.json.
+
 Run from the car_follow folder (starts and stops the simulator):
+    uv run python scripts/make_failure_trials.py lists --lists dev aux
+    uv run python scripts/make_failure_trials.py lists --lists pooled
     uv run python scripts/make_failure_trials.py pilot --conditions A1 A2 A3 --count 10
     uv run python scripts/make_failure_trials.py pilot --conditions A4a A4b A4c --list dev --name a4_dev
 Outputs go to outputs/failure_trials/<name>/ (local only): pilot.json, trials/<id>.json and traffic/<id>.npz.
@@ -14,6 +22,7 @@ row with a distractor also reports how much of the target's image box (nominal f
 """
 import argparse
 import collections
+import hashlib
 import json
 import random
 import sys
@@ -239,6 +248,132 @@ def cmd_pilot(args):
     print(f"wrote {(out / 'pilot.json').relative_to(ROOT)}, {result['elapsed_s']} s")
 
 
+LIST_SEED = {"open": 1_100_000, "pooled": 1_900_000}   # docs/failure_plan.md 4.3
+SEED_STRIDE = 20_000                                       # per condition: CONDITIONS.index(condition) * SEED_STRIDE
+PREFIX = {"dev": "fdev", "aux": "faux", "calibration": "fcal", "pilot": "fpilot", "smoke": "fsmoke", "main": "fmain"}
+INDEX = ROOT / "configs" / "failure_trials.json"
+LISTS_OUT = OUT / "lists"
+
+
+def pooled_list(seed, condition):
+    """The pooled list a seed belongs to for `condition`: its sha256 against the lists' shares of the condition."""
+    need = [(name, failure_trials.LISTS[name].get(condition, 0)) for name in failure_trials.SEALED_LISTS]
+    total = sum(n for _, n in need)
+    u = int(hashlib.sha256(f"failure-list:{seed}".encode()).hexdigest(), 16) / float(16 ** 64)
+    acc = 0.0
+    for name, n in need:
+        acc += n / total
+        if u < acc:
+            return name
+    return need[-1][0]
+
+
+def sha256_bytes(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def write_list(name, trials_kept, rows, stats):
+    """configs/failure_trials_<name>.json, the run folder's pilot.json and traffic manifest, and the index entry."""
+    folder = LISTS_OUT / name
+    trials_kept = sorted(trials_kept, key=lambda t: t["id"])
+    body = (json.dumps({"list": name, "trials": trials_kept}, indent=1, ensure_ascii=False) + "\n").encode("utf-8")
+    path = ROOT / "configs" / f"failure_trials_{name}.json"
+    path.write_bytes(body)
+    manifest = "".join(f"{t['id']} {sha256_bytes((folder / 'traffic' / (t['id'] + '.npz')).read_bytes())}\n"
+                       for t in trials_kept)
+    (folder / "traffic_manifest.txt").write_text(manifest, encoding="utf-8", newline="\n")
+    (folder / "pilot.json").write_text(json.dumps({"list": name, "trials": rows, "stats": stats}, indent=1,
+                                                  ensure_ascii=False), encoding="utf-8")
+    index = json.loads(INDEX.read_text(encoding="utf-8")) if INDEX.exists() else {
+        "map": trials.MAP, "notes": {"plan": "docs/failure_plan.md 4.3-4.4 (option 1, 2026-11-26)",
+                                     "sizes": failure_trials.LISTS, "seeds": LIST_SEED, "seed_stride": SEED_STRIDE},
+        "splits": {}}
+    entry = {"file": path.name, "count": len(trials_kept), "sha256": sha256_bytes(body),
+             "traffic_manifest_sha256": sha256_bytes(manifest.encode("utf-8")),
+             "traffic_folder": str(folder.relative_to(ROOT)).replace("\\", "/"), "generation": stats}
+    if name in failure_trials.SEALED_LISTS:
+        index[name] = dict(entry, sealed=True)
+    else:
+        index["splits"][name] = trials_kept
+        index[f"{name}_info"] = entry
+    INDEX.write_text(json.dumps(index, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
+
+
+def cmd_lists(args):
+    types = trials.load_types()
+    groups = [["dev"], ["aux"]] if args.lists != ["pooled"] else [list(failure_trials.SEALED_LISTS)]
+    groups = [g for g in groups if g == list(failure_trials.SEALED_LISTS) or g[0] in args.lists]
+    t0 = time.monotonic()
+    with sim.session(trials.MAP, hz=HZ, start=not args.no_start) as (client, world, tm):
+        library = world.get_blueprint_library()
+        colors = {b: (list(library.find(b).get_attribute("color").recommended_values)
+                      if library.find(b).has_attribute("color") else []) for b in types}
+        world_map = world.get_map()
+        spawn_points = world_map.get_spawn_points()
+        for group in groups:
+            pooled = group == list(failure_trials.SEALED_LISTS)
+            cells = collections.defaultdict(list)
+            for wp in trials.candidate_waypoints(world_map):
+                cell = trials.cell_of(wp.transform.location.x, wp.transform.location.y)
+                if (trials.cell_split(cell) in ("gate", "main")) == pooled:
+                    cells[cell].append(wp)
+            kept = {name: [] for name in group}
+            rows = {name: [] for name in group}
+            stats = {name: {} for name in group}
+            conditions = [c for c in failure_trials.CONDITIONS if any(failure_trials.LISTS[n].get(c) for n in group)]
+            for condition in conditions:
+                quota = {n: failure_trials.LISTS[n].get(condition, 0) for n in group}
+                count = {n: 0 for n in group}
+                st = {n: {"quota": quota[n], "attempts": 0, "recorded": 0, "kept": 0,
+                          "rejected": collections.Counter()} for n in group if quota[n]}
+                base = LIST_SEED["pooled" if pooled else "open"] + SEED_STRIDE * failure_trials.CONDITIONS.index(condition)
+                for attempt in range(SEED_STRIDE):
+                    if all(count[n] >= quota[n] for n in group):
+                        break
+                    seed = base + attempt
+                    name = pooled_list(seed, condition) if pooled else group[0]
+                    if count[name] >= quota[name]:
+                        continue
+                    st[name]["attempts"] += 1
+                    level = level_of(condition, count[name])
+                    trial, why = draw(client, world, world_map, random.Random(seed), condition, level, cells, types,
+                                      colors, spawn_points)
+                    if trial is None:
+                        st[name]["rejected"][why] += 1
+                        continue
+                    tid = f"{PREFIX[name]}-{condition}-{count[name] + 1:03d}"
+                    trial = {"id": tid, "split": name, "seed": seed, **trial}
+                    traffic = LISTS_OUT / name / "traffic" / f"{tid}.npz"
+                    log, result, occluded = record(client, world, tm, trial, traffic)
+                    st[name]["recorded"] += 1
+                    if result.get("happened") is False:
+                        st[name]["rejected"]["event did not happen"] += 1
+                        traffic.unlink(missing_ok=True)
+                        continue
+                    count[name] += 1
+                    st[name]["kept"] += 1
+                    kept[name].append(trial)
+                    (LISTS_OUT / name / "trials").mkdir(parents=True, exist_ok=True)
+                    (LISTS_OUT / name / "trials" / f"{tid}.json").write_text(
+                        json.dumps(trial, indent=1, ensure_ascii=False), encoding="utf-8")
+                    rows[name].append({"id": tid, "split": name, "condition": condition, "level": level, "seed": seed,
+                                       "intent": trial["intent"], "event": trial["event"], "script": log,
+                                       "check": result, "cover": cover(traffic)})
+                    if name in failure_trials.OPEN_LISTS:
+                        print(f"{tid} [{level}, {trial['intent']}] event {result.get('happened')}", flush=True)
+                for n in st:
+                    st[n]["rejected"] = dict(st[n]["rejected"])
+                    stats[n][condition] = st[n]
+                    # sealed lists: counts and reasons only
+                    print(f"{n} {condition}: kept {st[n]['kept']}/{quota[n]}, recorded {st[n]['recorded']}, "
+                          f"draws {st[n]['attempts']}, rejected {st[n]['rejected']}", flush=True)
+            for name in group:
+                write_list(name, kept[name], rows[name], stats[name])
+                print(f"wrote {name}: {len(kept[name])} trials ({'sealed' if name in failure_trials.SEALED_LISTS else 'open'})",
+                      flush=True)
+    print(f"elapsed {time.monotonic() - t0:.0f} s")
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -256,8 +391,12 @@ def main():
     s.add_argument("--list", default="generator", choices=("generator", "dev"),
                    help="dev: the trials are dev trials (ids dev-..., split dev, own seeds; A4 only)")
     s.add_argument("--no-start", action="store_true", help="use a simulator that is already running")
+    s = sub.add_parser("lists", help="step 5: the lists of failure_trials.LISTS (sealed ones print counts only)")
+    s.add_argument("--lists", nargs="+", default=["dev", "aux"], choices=("dev", "aux", "pooled"),
+                   help="pooled: calibration, pilot, smoke and main together (their seeds are shared out by sha256)")
+    s.add_argument("--no-start", action="store_true", help="use a simulator that is already running")
     args = p.parse_args()
-    {"pilot": cmd_pilot}[args.cmd](args)
+    {"pilot": cmd_pilot, "lists": cmd_lists}[args.cmd](args)
 
 
 if __name__ == "__main__":

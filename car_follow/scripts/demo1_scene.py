@@ -149,7 +149,7 @@ def main():
     global TAG
     result = json.loads((EVAL / f"{args.result}.json").read_text(encoding="utf-8"))
     if "failure_run" in result:
-        if set(result["split"].split("+")) & {"main", "calibration"} and not args.open_sealed:
+        if set(result["split"].split("+")) & {"main", "calibration", "pilot", "smoke"} and not args.open_sealed:
             p.error(f"{args.result} flew sealed trials: --open-sealed is needed")
         by_id, traffic = sources(result, args.open_sealed)
         TAG = f"{result['split']} 비행 기록을 다시 그림"

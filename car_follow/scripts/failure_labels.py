@@ -26,6 +26,7 @@ TRAFFIC = ROOT / "outputs" / "demo1_follow" / "traffic"
 FAILURE = ROOT / "outputs" / "failure_trials"
 OUT = ROOT / "outputs" / "failure_labels"
 SEALED = ("main", "calibration")
+FAILURE_SEALED = ("calibration", "pilot", "smoke", "main")   # failure_trials.SEALED_LISTS (that module needs carla)
 
 
 def word_match(rec, trial, types):
@@ -76,7 +77,8 @@ def main():
     args = p.parse_args()
     result = json.loads((EVAL / f"{args.run}.json").read_text(encoding="utf-8"))
     split = result["split"]
-    if set(split.split("+")) & set(SEALED) and not args.open_sealed:
+    sealed = set(SEALED) | (set(FAILURE_SEALED) if "failure_run" in result else set())
+    if set(split.split("+")) & sealed and not args.open_sealed:
         p.error(f"{args.run} flew the sealed {split} split: --open-sealed is needed")
     by_id, traffic = sources(result, args.open_sealed)
     types = trials.load_types()

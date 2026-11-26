@@ -1,0 +1,5860 @@
+{
+ "list": "smoke",
+ "trials": [
+  {
+   "id": "fsmoke-A0-001",
+   "split": "smoke",
+   "seed": 1900005,
+   "map": "Town05_Opt",
+   "duration_s": 60.0,
+   "target": {
+    "blueprint": "vehicle.audi.etron",
+    "color": "0,39,105",
+    "transform": [
+     -187.745,
+     -180.534,
+     10.509,
+     360.009,
+     329.38,
+     0.0
+    ],
+    "road": 37,
+    "lane": 2,
+    "index_from_left": 0,
+    "lanes": 3
+   },
+   "lookalikes": [
+    {
+     "color": "0,39,105",
+     "transform": [
+      -168.298,
+      -181.863,
+      10.513,
+      360.01,
+      340.93,
+      0.0
+     ],
+     "lane_offset": 2,
+     "along_m": 20.0
+    },
+    {
+     "color": "0,39,105",
+     "transform": [
+      -195.018,
+      -171.394,
+      10.507,
+      360.008,
+      322.449,
+      0.0
+     ],
+     "lane_offset": 1,
+     "along_m": -12.0
+    }
+   ],
+   "background": [
+    {
+     "blueprint": "vehicle.mitsubishi.fusorosa",
+     "color": "255,255,255",
+     "transform": [
+      -164.732,
+      -95.142,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.bmw.grandtourer",
+     "color": "68,68,77",
+     "transform": [
+      -62.871,
+      -4.298,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.sprinter",
+     "color": "115,115,115",
+     "transform": [
+      19.207,
+      -91.365,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.tesla.model3",
+     "color": "75,86,173",
+     "transform": [
+      31.705,
+      -28.794,
+      0.3,
+      0.0,
+      -88.468,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe_2020",
+     "color": "187,187,187",
+     "transform": [
+      -95.267,
+      -95.037,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mini.cooper_s",
+     "color": "0,39,105",
+     "transform": [
+      -133.159,
+      -142.372,
+      0.6,
+      0.0,
+      -179.557,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mini.cooper_s_2021",
+     "color": "215,88,0",
+     "transform": [
+      -158.202,
+      -4.066,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.ambulance",
+     "color": "231,231,231",
+     "transform": [
+      27.369,
+      -128.487,
+      0.3,
+      0.0,
+      91.532,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.ambulance",
+     "color": "231,231,231",
+     "transform": [
+      -162.537,
+      -84.639,
+      0.3,
+      0.0,
+      0.086,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.toyota.prius",
+     "color": "215,255,143",
+     "transform": [
+      -82.602,
+      2.75,
+      0.3,
+      0.0,
+      -0.139,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.micro.microlino",
+     "color": "181,255,0",
+     "transform": [
+      -51.199,
+      -39.571,
+      0.45,
+      0.0,
+      89.663,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mini.cooper_s",
+     "color": "168,0,27",
+     "transform": [
+      31.399,
+      -12.339,
+      0.3,
+      0.0,
+      -89.801,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.tesla.model3",
+     "color": "17,37,103",
+     "transform": [
+      -18.794,
+      -84.422,
+      0.3,
+      0.0,
+      0.086,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.micra",
+     "color": "28,0,46",
+     "transform": [
+      -203.449,
+      -3.955,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2",
+     "color": "158,40,82",
+     "transform": [
+      -54.711,
+      -41.65,
+      0.45,
+      0.0,
+      89.663,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.tt",
+     "color": "16,44,21",
+     "transform": [
+      207.271,
+      -13.931,
+      0.3,
+      0.0,
+      -90.669,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.tt",
+     "color": "0,39,105",
+     "transform": [
+      55.864,
+      191.345,
+      0.3,
+      0.0,
+      -179.712,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.chevrolet.impala",
+     "color": "0,12,49",
+     "transform": [
+      -98.192,
+      2.788,
+      0.3,
+      0.0,
+      -0.139,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.lincoln.mkz_2020",
+     "color": "0,0,0",
+     "transform": [
+      35.238,
+      -30.0,
+      0.3,
+      0.0,
+      -88.468,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.lincoln.mkz_2017",
+     "color": "16,16,16",
+     "transform": [
+      -0.348,
+      -94.894,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe_2020",
+     "color": "187,187,187",
+     "transform": [
+      -115.981,
+      -138.739,
+      0.6,
+      0.0,
+      0.443,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.mustang",
+     "color": "0,12,58",
+     "transform": [
+      -64.943,
+      84.492,
+      0.3,
+      0.0,
+      -179.934,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.jeep.wrangler_rubicon",
+     "color": "16,44,21",
+     "transform": [
+      -275.63,
+      -21.208,
+      0.3,
+      0.0,
+      90.417,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.european_hgv",
+     "color": "127,127,127",
+     "transform": [
+      -188.056,
+      55.29,
+      0.6,
+      0.0,
+      -90.016,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.seat.leon",
+     "color": "155,0,0",
+     "transform": [
+      -96.772,
+      -91.54,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.chevrolet.impala",
+     "color": "0,0,0",
+     "transform": [
+      -188.079,
+      -29.37,
+      0.6,
+      0.0,
+      -90.016,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.european_hgv",
+     "color": "42,61,156",
+     "transform": [
+      -164.732,
+      -88.142,
+      0.3,
+      0.0,
+      0.086,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.etron",
+     "color": "168,0,27",
+     "transform": [
+      -132.024,
+      -23.866,
+      0.3,
+      0.0,
+      90.394,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.sprinter",
+     "color": "115,115,115",
+     "transform": [
+      -64.684,
+      -91.491,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.tt",
+     "color": "16,44,21",
+     "transform": [
+      151.525,
+      5.319,
+      0.6,
+      0.0,
+      89.947,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.crown",
+     "color": "255,185,0",
+     "transform": [
+      -124.457,
+      28.924,
+      0.3,
+      0.0,
+      -90.511,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.micra",
+     "color": "17,21,99",
+     "transform": [
+      -61.563,
+      -0.801,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_police",
+     "color": "0,0,0",
+     "transform": [
+      -127.747,
+      53.415,
+      0.3,
+      0.0,
+      89.489,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.carlacola",
+     "color": "255,68,0",
+     "transform": [
+      211.039,
+      13.863,
+      0.3,
+      0.0,
+      -89.335,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.jeep.wrangler_rubicon",
+     "color": "16,44,21",
+     "transform": [
+      28.678,
+      -177.437,
+      0.3,
+      0.0,
+      91.532,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2",
+     "color": "22,31,73",
+     "transform": [
+      -268.63,
+      -21.157,
+      0.3,
+      0.0,
+      -89.583,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_police",
+     "color": "8,53,0",
+     "transform": [
+      -131.776,
+      -60.014,
+      0.3,
+      0.0,
+      90.394,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2_2021",
+     "color": "22,31,73",
+     "transform": [
+      31.541,
+      178.36,
+      0.3,
+      0.0,
+      -89.977,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mini.cooper_s",
+     "color": "16,44,21",
+     "transform": [
+      1.047,
+      -91.392,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.a2",
+     "color": "33,33,33",
+     "transform": [
+      20.745,
+      191.169,
+      0.3,
+      0.0,
+      -179.712,
+      0.0
+     ]
+    }
+   ],
+   "drone_start": [
+    -204.956,
+    -170.347,
+    25.009,
+    -36.87,
+    -30.62,
+    0.0
+   ],
+   "condition": "A0",
+   "distractor": "twin",
+   "intent": "lane",
+   "event": null,
+   "sentence": {
+    "en": "follow the blue SUV in the left lane",
+    "ko": "왼쪽 차선의 파란색 SUV를 따라가",
+    "expression": "lane"
+   },
+   "check": {
+    "target_pixels": 2251,
+    "lookalike_pixels": [
+     688,
+     8662
+    ],
+    "visible_lookalikes": 2,
+    "expressions_possible": [
+     "lane"
+    ]
+   }
+  },
+  {
+   "id": "fsmoke-A1-001",
+   "split": "smoke",
+   "seed": 1920019,
+   "map": "Town05_Opt",
+   "duration_s": 60.0,
+   "target": {
+    "blueprint": "vehicle.nissan.micra",
+    "color": "243,243,243",
+    "transform": [
+     -209.08,
+     -182.546,
+     10.507,
+     -0.008,
+     140.139,
+     0.0
+    ],
+    "road": 37,
+    "lane": -3,
+    "index_from_left": 2,
+    "lanes": 3
+   },
+   "lookalikes": [
+    {
+     "color": "243,243,243",
+     "transform": [
+      -221.536,
+      -164.83,
+      10.504,
+      -0.006,
+      128.589,
+      0.0
+     ],
+     "lane_offset": -1,
+     "along_m": 20.0
+    },
+    {
+     "color": "243,243,243",
+     "transform": [
+      -209.16,
+      -173.12,
+      10.506,
+      -0.007,
+      136.674,
+      0.0
+     ],
+     "lane_offset": -2,
+     "along_m": 6.0
+    },
+    {
+     "color": "243,243,243",
+     "transform": [
+      -221.873,
+      -158.592,
+      10.504,
+      -0.006,
+      125.701,
+      0.0
+     ],
+     "lane_offset": -2,
+     "along_m": 25.0
+    }
+   ],
+   "background": [
+    {
+     "blueprint": "vehicle.nissan.patrol",
+     "color": "0,0,0",
+     "transform": [
+      28.241,
+      -30.187,
+      0.3,
+      0.0,
+      91.532,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.european_hgv",
+     "color": "28,28,28",
+     "transform": [
+      190.041,
+      13.618,
+      0.3,
+      0.0,
+      90.665,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.ambulance",
+     "color": "231,231,231",
+     "transform": [
+      37.588,
+      -117.87,
+      0.3,
+      0.0,
+      -88.468,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.tesla.model3",
+     "color": "137,0,0",
+     "transform": [
+      155.015,
+      -5.702,
+      0.6,
+      0.0,
+      -90.053,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.chevrolet.impala",
+     "color": "61,86,143",
+     "transform": [
+      -62.871,
+      -4.298,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.ambulance",
+     "color": "231,231,231",
+     "transform": [
+      -128.51,
+      -25.942,
+      0.3,
+      0.0,
+      90.394,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.bmw.grandtourer",
+     "color": "109,109,109",
+     "transform": [
+      24.571,
+      55.747,
+      0.3,
+      0.0,
+      90.023,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_police_2020",
+     "color": "0,0,0",
+     "transform": [
+      -124.229,
+      55.411,
+      0.3,
+      0.0,
+      -90.511,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2",
+     "color": "158,40,82",
+     "transform": [
+      -110.7,
+      -88.061,
+      0.3,
+      0.0,
+      0.086,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.tesla.cybertruck",
+     "color": null,
+     "transform": [
+      -17.588,
+      -4.414,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.micro.microlino",
+     "color": "145,255,181",
+     "transform": [
+      8.572,
+      -203.989,
+      0.68,
+      0.767,
+      179.757,
+      -0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mitsubishi.fusorosa",
+     "color": "255,255,255",
+     "transform": [
+      -121.397,
+      -42.367,
+      0.3,
+      0.0,
+      -89.606,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2_2021",
+     "color": "158,40,82",
+     "transform": [
+      -47.807,
+      -59.76,
+      0.45,
+      0.0,
+      -90.337,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.patrol",
+     "color": "201,147,0",
+     "transform": [
+      -114.023,
+      151.177,
+      0.5,
+      0.0,
+      0.27,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.patrol",
+     "color": "22,24,43",
+     "transform": [
+      -159.694,
+      -0.562,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.lincoln.mkz_2020",
+     "color": "0,0,0",
+     "transform": [
+      30.588,
+      -117.968,
+      0.3,
+      0.0,
+      91.532,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe_2020",
+     "color": "0,0,0",
+     "transform": [
+      20.745,
+      191.169,
+      0.3,
+      0.0,
+      -179.712,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.citroen.c3",
+     "color": "168,0,27",
+     "transform": [
+      143.922,
+      -1.962,
+      0.5,
+      0.0,
+      -179.745,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mini.cooper_s",
+     "color": "16,44,21",
+     "transform": [
+      -191.555,
+      57.061,
+      0.6,
+      0.0,
+      89.984,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mitsubishi.fusorosa",
+     "color": "255,255,255",
+     "transform": [
+      1.047,
+      -91.392,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.european_hgv",
+     "color": "42,61,156",
+     "transform": [
+      -108.283,
+      91.443,
+      0.3,
+      0.0,
+      0.066,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.etron",
+     "color": "195,168,228",
+     "transform": [
+      -159.077,
+      94.885,
+      0.3,
+      0.0,
+      0.066,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe_2020",
+     "color": "73,0,0",
+     "transform": [
+      7.087,
+      -200.483,
+      0.3,
+      0.767,
+      179.757,
+      -0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.carlacola",
+     "color": "255,68,0",
+     "transform": [
+      33.727,
+      -104.399,
+      0.3,
+      0.0,
+      -88.468,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.micra",
+     "color": "83,83,86",
+     "transform": [
+      17.847,
+      -4.494,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe_2020",
+     "color": "187,187,187",
+     "transform": [
+      58.146,
+      194.857,
+      0.3,
+      0.0,
+      -179.712,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe_2020",
+     "color": "187,187,187",
+     "transform": [
+      -123.665,
+      118.618,
+      0.3,
+      0.0,
+      -90.511,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe_2020",
+     "color": "73,0,0",
+     "transform": [
+      30.915,
+      -130.183,
+      0.3,
+      0.0,
+      91.532,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2",
+     "color": "22,31,73",
+     "transform": [
+      -9.641,
+      87.992,
+      0.3,
+      0.0,
+      -179.934,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.tt",
+     "color": "33,33,33",
+     "transform": [
+      58.183,
+      187.857,
+      0.3,
+      0.0,
+      -179.72,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.european_hgv",
+     "color": "28,28,28",
+     "transform": [
+      0.562,
+      -4.458,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.european_hgv",
+     "color": "127,127,127",
+     "transform": [
+      -268.63,
+      -21.157,
+      0.3,
+      0.0,
+      -89.583,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2_2021",
+     "color": "73,12,12",
+     "transform": [
+      -61.563,
+      -0.801,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mini.cooper_s_2021",
+     "color": "22,31,73",
+     "transform": [
+      16.211,
+      84.585,
+      0.3,
+      0.0,
+      -179.934,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.patrol",
+     "color": "201,147,0",
+     "transform": [
+      -10.121,
+      95.555,
+      0.3,
+      0.0,
+      -0.416,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mini.cooper_s_2021",
+     "color": "215,88,0",
+     "transform": [
+      27.72,
+      -141.613,
+      0.3,
+      0.0,
+      91.532,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe_2020",
+     "color": "73,0,0",
+     "transform": [
+      28.241,
+      -52.241,
+      0.3,
+      0.0,
+      91.532,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_police_2020",
+     "color": "0,0,0",
+     "transform": [
+      -44.188,
+      -39.611,
+      0.45,
+      0.0,
+      -90.337,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.ambulance",
+     "color": "231,231,231",
+     "transform": [
+      197.04,
+      13.699,
+      0.3,
+      0.0,
+      90.665,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.patrol_2021",
+     "color": "159,0,0",
+     "transform": [
+      -35.058,
+      91.527,
+      0.3,
+      0.0,
+      0.066,
+      0.0
+     ]
+    }
+   ],
+   "drone_start": [
+    -193.728,
+    -195.365,
+    25.007,
+    -36.87,
+    140.139,
+    0.0
+   ],
+   "condition": "A1",
+   "distractor": "other",
+   "intent": "back",
+   "event": {
+    "kind": "cut_in",
+    "window_s": [
+     15.0,
+     45.0
+    ],
+    "junction_free_m": 204.0
+   },
+   "distractor_car": {
+    "blueprint": "vehicle.citroen.c3",
+    "color": "0,39,105",
+    "near_twin_way": null,
+    "transform": [
+     -202.017,
+     -183.649,
+     10.508,
+     -0.008,
+     143.503,
+     0.0
+    ],
+    "lane_offset": -1,
+    "along_m": -6.0
+   },
+   "sentence": {
+    "en": "follow the white hatchback furthest back",
+    "ko": "가장 뒤에 있는 흰색 해치백을 따라가",
+    "expression": "back"
+   },
+   "check": {
+    "target_pixels": 1555,
+    "lookalike_pixels": [
+     428,
+     1065,
+     353
+    ],
+    "visible_lookalikes": 3,
+    "expressions_possible": [
+     "lane",
+     "back"
+    ]
+   }
+  },
+  {
+   "id": "fsmoke-A2-001",
+   "split": "smoke",
+   "seed": 1940164,
+   "map": "Town05_Opt",
+   "duration_s": 60.0,
+   "target": {
+    "blueprint": "vehicle.dodge.charger_2020",
+    "color": "0,0,0",
+    "transform": [
+     -128.918,
+     -190.121,
+     10.521,
+     360.01,
+     0.076,
+     0.0
+    ],
+    "road": 37,
+    "lane": 3,
+    "index_from_left": 1,
+    "lanes": 3
+   },
+   "lookalikes": [
+    {
+     "color": "0,0,0",
+     "transform": [
+      -103.923,
+      -186.588,
+      10.525,
+      360.01,
+      0.076,
+      0.0
+     ],
+     "lane_offset": 1,
+     "along_m": 25.0
+    },
+    {
+     "color": "0,0,0",
+     "transform": [
+      -116.914,
+      -193.605,
+      10.523,
+      360.01,
+      0.076,
+      0.0
+     ],
+     "lane_offset": -1,
+     "along_m": 12.0
+    },
+    {
+     "color": "0,0,0",
+     "transform": [
+      -128.923,
+      -186.621,
+      10.521,
+      360.01,
+      0.076,
+      0.0
+     ],
+     "lane_offset": 1,
+     "along_m": 0.0
+    }
+   ],
+   "background": [
+    {
+     "blueprint": "vehicle.micro.microlino",
+     "color": "21,158,255",
+     "transform": [
+      22.263,
+      187.676,
+      0.3,
+      0.0,
+      -179.72,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.chevrolet.impala",
+     "color": "71,12,12",
+     "transform": [
+      35.082,
+      76.119,
+      0.3,
+      0.0,
+      -89.977,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.a2",
+     "color": "0,39,105",
+     "transform": [
+      -88.963,
+      91.465,
+      0.3,
+      0.0,
+      0.066,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.crown",
+     "color": "255,185,0",
+     "transform": [
+      -162.537,
+      -91.639,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.sprinter",
+     "color": "255,255,255",
+     "transform": [
+      41.803,
+      92.057,
+      0.3,
+      0.0,
+      -0.416,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.firetruck",
+     "color": "234,0,0",
+     "transform": [
+      -36.262,
+      95.025,
+      0.3,
+      0.0,
+      0.066,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe",
+     "color": "168,0,27",
+     "transform": [
+      31.599,
+      55.988,
+      0.3,
+      0.0,
+      -89.977,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.tesla.model3",
+     "color": "17,37,103",
+     "transform": [
+      24.547,
+      161.944,
+      0.3,
+      0.0,
+      90.023,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.european_hgv",
+     "color": "231,0,0",
+     "transform": [
+      33.727,
+      -104.399,
+      0.3,
+      0.0,
+      -88.468,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.firetruck",
+     "color": "234,0,0",
+     "transform": [
+      -35.058,
+      91.527,
+      0.3,
+      0.0,
+      0.066,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.ambulance",
+     "color": "231,231,231",
+     "transform": [
+      -62.871,
+      -4.298,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2",
+     "color": "0,33,5",
+     "transform": [
+      -18.794,
+      -84.422,
+      0.3,
+      0.0,
+      0.086,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.sprinter",
+     "color": "167,166,175",
+     "transform": [
+      31.705,
+      -28.794,
+      0.3,
+      0.0,
+      -88.468,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_2020",
+     "color": "0,39,105",
+     "transform": [
+      -120.98,
+      27.293,
+      0.3,
+      0.0,
+      -90.511,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.citroen.c3",
+     "color": "168,0,27",
+     "transform": [
+      -143.807,
+      -91.61,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.sprinter",
+     "color": "167,166,175",
+     "transform": [
+      -158.202,
+      -4.066,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.carlacola",
+     "color": "255,68,0",
+     "transform": [
+      -195.079,
+      -29.399,
+      0.6,
+      0.0,
+      89.984,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.chevrolet.impala",
+     "color": "61,86,143",
+     "transform": [
+      18.012,
+      -94.867,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.firetruck",
+     "color": "234,0,0",
+     "transform": [
+      -110.894,
+      6.319,
+      0.3,
+      0.0,
+      -0.139,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_police_2020",
+     "color": "0,0,0",
+     "transform": [
+      24.707,
+      -28.981,
+      0.3,
+      0.0,
+      91.532,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.firetruck",
+     "color": "234,0,0",
+     "transform": [
+      -114.023,
+      151.177,
+      0.5,
+      0.0,
+      0.27,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.european_hgv",
+     "color": "255,255,255",
+     "transform": [
+      204.04,
+      13.781,
+      0.3,
+      0.0,
+      -89.335,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.micro.microlino",
+     "color": "145,255,181",
+     "transform": [
+      24.707,
+      -51.035,
+      0.3,
+      0.0,
+      91.532,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.bmw.grandtourer",
+     "color": "109,109,109",
+     "transform": [
+      44.273,
+      -145.965,
+      0.6,
+      0.0,
+      -1.313,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.etron",
+     "color": "0,39,105",
+     "transform": [
+      -184.575,
+      -13.592,
+      0.6,
+      0.0,
+      -90.016,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.european_hgv",
+     "color": "231,0,0",
+     "transform": [
+      -81.394,
+      6.247,
+      0.3,
+      0.0,
+      -0.139,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.sprinter",
+     "color": "255,255,255",
+     "transform": [
+      28.082,
+      12.414,
+      0.3,
+      0.0,
+      89.488,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.mustang",
+     "color": "0,0,0",
+     "transform": [
+      -131.776,
+      -60.014,
+      0.3,
+      0.0,
+      90.394,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.carlacola",
+     "color": "255,68,0",
+     "transform": [
+      -121.555,
+      -11.948,
+      0.3,
+      0.0,
+      -90.424,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.a2",
+     "color": "16,44,21",
+     "transform": [
+      -112.302,
+      2.823,
+      0.3,
+      0.0,
+      -0.139,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.sprinter",
+     "color": "255,255,255",
+     "transform": [
+      -63.547,
+      87.994,
+      0.3,
+      0.0,
+      -179.934,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.mustang",
+     "color": "0,21,0",
+     "transform": [
+      -61.563,
+      -0.801,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.tesla.cybertruck",
+     "color": null,
+     "transform": [
+      -159.694,
+      -0.562,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.tesla.cybertruck",
+     "color": null,
+     "transform": [
+      193.272,
+      -13.768,
+      0.3,
+      0.0,
+      89.331,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.european_hgv",
+     "color": "231,0,0",
+     "transform": [
+      28.047,
+      163.646,
+      0.3,
+      0.0,
+      90.023,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mini.cooper_s_2021",
+     "color": "0,28,0",
+     "transform": [
+      -124.911,
+      -40.291,
+      0.3,
+      0.0,
+      -89.606,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe",
+     "color": "217,217,217",
+     "transform": [
+      155.015,
+      -5.702,
+      0.6,
+      0.0,
+      -90.053,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.citroen.c3",
+     "color": "0,39,105",
+     "transform": [
+      -120.974,
+      -103.917,
+      0.3,
+      0.0,
+      -89.606,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.chevrolet.impala",
+     "color": "71,12,12",
+     "transform": [
+      58.146,
+      194.857,
+      0.3,
+      0.0,
+      -179.712,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mini.cooper_s_2021",
+     "color": "0,28,0",
+     "transform": [
+      -127.151,
+      120.222,
+      0.3,
+      0.0,
+      89.489,
+      0.0
+     ]
+    }
+   ],
+   "drone_start": [
+    -148.918,
+    -190.148,
+    25.021,
+    -36.87,
+    0.076,
+    0.0
+   ],
+   "condition": "A2",
+   "distractor": "other",
+   "intent": "lane",
+   "event": {
+    "kind": "queue",
+    "window_s": [
+     15.0,
+     45.0
+    ],
+    "queue_distance_m": 1.0,
+    "distractor_ahead": true,
+    "light_m": 148.0
+   },
+   "distractor_car": {
+    "blueprint": "vehicle.dodge.charger_2020",
+    "color": "0,39,105",
+    "near_twin_way": null,
+    "transform": [
+     -117.094,
+     -190.105,
+     10.523,
+     360.01,
+     0.076,
+     0.0
+    ],
+    "lane_offset": 0,
+    "along_m": 12.0
+   },
+   "sentence": {
+    "en": "follow the black sedan in the middle lane",
+    "ko": "가운데 차선의 검은색 세단을 따라가",
+    "expression": "lane"
+   },
+   "check": {
+    "target_pixels": 2260,
+    "lookalike_pixels": [
+     478,
+     955,
+     2377
+    ],
+    "visible_lookalikes": 3,
+    "expressions_possible": [
+     "lane"
+    ]
+   }
+  },
+  {
+   "id": "fsmoke-A2-002",
+   "split": "smoke",
+   "seed": 1940189,
+   "map": "Town05_Opt",
+   "duration_s": 60.0,
+   "target": {
+    "blueprint": "vehicle.audi.tt",
+    "color": "0,39,105",
+    "transform": [
+     -179.542,
+     -180.98,
+     10.51,
+     360.01,
+     334.0,
+     0.0
+    ],
+    "road": 37,
+    "lane": 3,
+    "index_from_left": 1,
+    "lanes": 3
+   },
+   "lookalikes": [
+    {
+     "color": "0,39,105",
+     "transform": [
+      -168.298,
+      -181.863,
+      10.513,
+      360.01,
+      340.93,
+      0.0
+     ],
+     "lane_offset": 1,
+     "along_m": 12.0
+    },
+    {
+     "color": "0,39,105",
+     "transform": [
+      -158.719,
+      -191.729,
+      10.515,
+      360.01,
+      348.438,
+      0.0
+     ],
+     "lane_offset": -1,
+     "along_m": 25.0
+    }
+   ],
+   "background": [
+    {
+     "blueprint": "vehicle.audi.tt",
+     "color": "33,33,33",
+     "transform": [
+      26.42,
+      -207.565,
+      0.3,
+      0.0,
+      179.757,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.european_hgv",
+     "color": "42,61,156",
+     "transform": [
+      -188.074,
+      -11.59,
+      0.6,
+      0.0,
+      -90.016,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.sprinter",
+     "color": "167,166,175",
+     "transform": [
+      -47.06,
+      34.942,
+      0.6,
+      0.0,
+      -89.621,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2",
+     "color": "105,103,0",
+     "transform": [
+      -191.561,
+      38.001,
+      0.6,
+      0.0,
+      89.984,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.micra",
+     "color": "0,0,0",
+     "transform": [
+      -191.555,
+      57.061,
+      0.6,
+      0.0,
+      89.984,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.firetruck",
+     "color": "234,0,0",
+     "transform": [
+      35.238,
+      -52.053,
+      0.3,
+      0.0,
+      -88.468,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.lincoln.mkz_2020",
+     "color": "0,0,0",
+     "transform": [
+      -184.58,
+      -31.771,
+      0.6,
+      0.0,
+      -90.016,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_2020",
+     "color": "0,39,105",
+     "transform": [
+      -51.092,
+      -21.431,
+      0.45,
+      0.0,
+      89.663,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.european_hgv",
+     "color": "255,255,255",
+     "transform": [
+      -132.024,
+      -23.866,
+      0.3,
+      0.0,
+      90.394,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.micro.microlino",
+     "color": "255,33,0",
+     "transform": [
+      38.52,
+      205.258,
+      0.3,
+      0.0,
+      0.288,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.bmw.grandtourer",
+     "color": "255,21,0",
+     "transform": [
+      28.071,
+      102.152,
+      0.3,
+      0.0,
+      90.023,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.carlacola",
+     "color": "255,68,0",
+     "transform": [
+      31.705,
+      -50.847,
+      0.3,
+      0.0,
+      -88.468,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.chevrolet.impala",
+     "color": "71,12,12",
+     "transform": [
+      -268.63,
+      -21.157,
+      0.3,
+      0.0,
+      -89.583,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mini.cooper_s",
+     "color": "33,33,33",
+     "transform": [
+      -95.267,
+      -95.037,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.crown",
+     "color": "255,185,0",
+     "transform": [
+      -82.611,
+      -4.25,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe",
+     "color": "168,0,27",
+     "transform": [
+      -177.55,
+      2.981,
+      0.3,
+      0.0,
+      -0.139,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.crown",
+     "color": "255,185,0",
+     "transform": [
+      35.057,
+      163.657,
+      0.3,
+      0.0,
+      -89.977,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.european_hgv",
+     "color": "231,0,0",
+     "transform": [
+      31.557,
+      161.955,
+      0.3,
+      0.0,
+      -89.977,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mini.cooper_s",
+     "color": "217,217,217",
+     "transform": [
+      1.036,
+      -84.392,
+      0.3,
+      0.0,
+      0.086,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.jeep.wrangler_rubicon",
+     "color": "33,33,33",
+     "transform": [
+      -195.061,
+      36.201,
+      0.6,
+      0.0,
+      89.984,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mini.cooper_s",
+     "color": "217,217,217",
+     "transform": [
+      -9.641,
+      87.992,
+      0.3,
+      0.0,
+      -179.934,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.citroen.c3",
+     "color": "168,0,27",
+     "transform": [
+      41.941,
+      5.247,
+      0.3,
+      0.0,
+      0.25,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.citroen.c3",
+     "color": "168,0,27",
+     "transform": [
+      -124.047,
+      75.872,
+      0.3,
+      0.0,
+      -90.511,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.micro.microlino",
+     "color": "145,255,181",
+     "transform": [
+      -18.783,
+      -91.422,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.firetruck",
+     "color": "234,0,0",
+     "transform": [
+      -54.711,
+      -41.65,
+      0.45,
+      0.0,
+      89.663,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.micra",
+     "color": "243,243,243",
+     "transform": [
+      -62.878,
+      -94.989,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.crown",
+     "color": "255,185,0",
+     "transform": [
+      30.588,
+      -117.968,
+      0.3,
+      0.0,
+      91.532,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.lincoln.mkz_2020",
+     "color": "0,0,0",
+     "transform": [
+      151.525,
+      5.319,
+      0.6,
+      0.0,
+      89.947,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.patrol_2021",
+     "color": "217,217,217",
+     "transform": [
+      24.707,
+      -28.981,
+      0.3,
+      0.0,
+      91.532,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.a2",
+     "color": "168,0,27",
+     "transform": [
+      -123.521,
+      134.803,
+      0.3,
+      0.0,
+      -90.511,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.patrol_2021",
+     "color": "0,38,105",
+     "transform": [
+      28.071,
+      54.348,
+      0.3,
+      0.0,
+      90.023,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.carlacola",
+     "color": "255,68,0",
+     "transform": [
+      -141.602,
+      -95.107,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.seat.leon",
+     "color": "155,0,0",
+     "transform": [
+      -50.685,
+      53.868,
+      0.6,
+      0.0,
+      90.379,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2_2021",
+     "color": "73,12,12",
+     "transform": [
+      -131.66,
+      -76.911,
+      0.3,
+      0.0,
+      90.394,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.chevrolet.impala",
+     "color": "0,0,0",
+     "transform": [
+      17.807,
+      88.087,
+      0.3,
+      0.0,
+      -179.934,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe",
+     "color": "16,44,21",
+     "transform": [
+      -188.079,
+      -29.37,
+      0.6,
+      0.0,
+      -90.016,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.mustang",
+     "color": "0,21,0",
+     "transform": [
+      35.079,
+      -154.97,
+      0.3,
+      0.0,
+      -88.468,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.jeep.wrangler_rubicon",
+     "color": "168,0,27",
+     "transform": [
+      -78.577,
+      -95.012,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2",
+     "color": "0,33,5",
+     "transform": [
+      -98.192,
+      2.788,
+      0.3,
+      0.0,
+      -0.139,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.sprinter",
+     "color": "167,166,175",
+     "transform": [
+      -110.894,
+      6.319,
+      0.3,
+      0.0,
+      -0.139,
+      0.0
+     ]
+    }
+   ],
+   "drone_start": [
+    -197.517,
+    -172.213,
+    25.01,
+    -36.87,
+    -26.0,
+    0.0
+   ],
+   "condition": "A2",
+   "distractor": "near_twin",
+   "intent": "back",
+   "event": {
+    "kind": "queue",
+    "window_s": [
+     15.0,
+     45.0
+    ],
+    "queue_distance_m": 1.0,
+    "distractor_ahead": true,
+    "light_m": 204.0
+   },
+   "distractor_car": {
+    "blueprint": "vehicle.mercedes.coupe",
+    "color": "0,39,105",
+    "near_twin_way": "blueprint",
+    "transform": [
+     -169.506,
+     -185.149,
+     10.513,
+     360.01,
+     340.887,
+     0.0
+    ],
+    "lane_offset": 0,
+    "along_m": 12.0
+   },
+   "sentence": {
+    "en": "follow the blue coupe furthest back",
+    "ko": "가장 뒤에 있는 파란색 쿠페를 따라가",
+    "expression": "back"
+   },
+   "check": {
+    "target_pixels": 2021,
+    "lookalike_pixels": [
+     925,
+     524,
+     1127
+    ],
+    "visible_lookalikes": 3,
+    "expressions_possible": [
+     "back"
+    ]
+   }
+  },
+  {
+   "id": "fsmoke-A2-003",
+   "split": "smoke",
+   "seed": 1940324,
+   "map": "Town05_Opt",
+   "duration_s": 60.0,
+   "target": {
+    "blueprint": "vehicle.audi.tt",
+    "color": "33,33,33",
+    "transform": [
+     -161.161,
+     206.84,
+     9.249,
+     -0.605,
+     10.547,
+     0.0
+    ],
+    "road": 37,
+    "lane": -3,
+    "index_from_left": 2,
+    "lanes": 3
+   },
+   "lookalikes": [
+    {
+     "color": "33,33,33",
+     "transform": [
+      -171.721,
+      196.987,
+      9.375,
+      -0.605,
+      17.618,
+      0.0
+     ],
+     "lane_offset": -2,
+     "along_m": -12.0
+    },
+    {
+     "color": "33,33,33",
+     "transform": [
+      -187.019,
+      198.482,
+      9.512,
+      -0.605,
+      25.277,
+      0.0
+     ],
+     "lane_offset": 0,
+     "along_m": -25.0
+    }
+   ],
+   "background": [
+    {
+     "blueprint": "vehicle.dodge.charger_police",
+     "color": "0,0,0",
+     "transform": [
+      24.571,
+      55.747,
+      0.3,
+      0.0,
+      90.023,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mitsubishi.fusorosa",
+     "color": "255,255,255",
+     "transform": [
+      -110.7,
+      -88.061,
+      0.3,
+      0.0,
+      0.086,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.tesla.cybertruck",
+     "color": null,
+     "transform": [
+      -120.005,
+      136.572,
+      0.3,
+      0.0,
+      -90.511,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe",
+     "color": "217,217,217",
+     "transform": [
+      -50.685,
+      53.868,
+      0.6,
+      0.0,
+      90.379,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.toyota.prius",
+     "color": "0,0,0",
+     "transform": [
+      -191.58,
+      -31.799,
+      0.6,
+      0.0,
+      89.984,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.european_hgv",
+     "color": "42,61,156",
+     "transform": [
+      -159.062,
+      87.885,
+      0.3,
+      0.0,
+      -179.934,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2",
+     "color": "105,103,0",
+     "transform": [
+      -47.6,
+      -22.85,
+      0.45,
+      0.0,
+      -90.337,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2",
+     "color": "0,33,5",
+     "transform": [
+      -54.081,
+      14.434,
+      0.6,
+      0.0,
+      88.908,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.firetruck",
+     "color": "234,0,0",
+     "transform": [
+      -127.813,
+      -127.426,
+      0.3,
+      0.0,
+      90.394,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mitsubishi.fusorosa",
+     "color": "255,255,255",
+     "transform": [
+      -159.701,
+      6.438,
+      0.3,
+      0.0,
+      -0.139,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.firetruck",
+     "color": "234,0,0",
+     "transform": [
+      8.572,
+      -203.989,
+      0.68,
+      0.767,
+      179.757,
+      -0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.sprinter",
+     "color": "115,115,115",
+     "transform": [
+      -51.3,
+      -58.54,
+      0.45,
+      0.0,
+      89.663,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.carlacola",
+     "color": "255,68,0",
+     "transform": [
+      -47.06,
+      34.942,
+      0.6,
+      0.0,
+      -89.621,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.tesla.cybertruck",
+     "color": null,
+     "transform": [
+      -78.577,
+      -95.012,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_police_2020",
+     "color": "0,0,0",
+     "transform": [
+      37.918,
+      -130.206,
+      0.3,
+      0.0,
+      -88.468,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.mustang",
+     "color": "0,21,0",
+     "transform": [
+      58.146,
+      194.857,
+      0.3,
+      0.0,
+      -179.712,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.toyota.prius",
+     "color": "227,227,227",
+     "transform": [
+      34.041,
+      -116.165,
+      0.3,
+      0.0,
+      -88.468,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.patrol",
+     "color": "183,187,162",
+     "transform": [
+      -124.047,
+      75.872,
+      0.3,
+      0.0,
+      -90.511,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe",
+     "color": "217,217,217",
+     "transform": [
+      -125.066,
+      -13.322,
+      0.3,
+      0.0,
+      -90.424,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.european_hgv",
+     "color": "255,255,255",
+     "transform": [
+      -44.031,
+      -11.262,
+      0.45,
+      0.0,
+      -90.391,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.jeep.wrangler_rubicon",
+     "color": "0,39,105",
+     "transform": [
+      -121.51,
+      -25.894,
+      0.3,
+      0.0,
+      -89.606,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.patrol_2021",
+     "color": "159,0,0",
+     "transform": [
+      34.907,
+      -14.627,
+      0.3,
+      0.0,
+      -89.801,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.seat.leon",
+     "color": "155,0,0",
+     "transform": [
+      24.599,
+      31.598,
+      0.3,
+      0.0,
+      90.023,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.citroen.c3",
+     "color": "16,44,21",
+     "transform": [
+      28.082,
+      12.414,
+      0.3,
+      0.0,
+      89.488,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_police_2020",
+     "color": "0,0,0",
+     "transform": [
+      -54.6,
+      -22.81,
+      0.45,
+      0.0,
+      89.663,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.patrol_2021",
+     "color": "0,38,105",
+     "transform": [
+      -108.283,
+      91.443,
+      0.3,
+      0.0,
+      0.066,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.crown",
+     "color": "255,185,0",
+     "transform": [
+      43.581,
+      -190.138,
+      0.3,
+      0.0,
+      -0.243,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.citroen.c3",
+     "color": "0,39,105",
+     "transform": [
+      -43.686,
+      53.914,
+      0.6,
+      0.0,
+      -89.621,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.micro.microlino",
+     "color": "21,158,255",
+     "transform": [
+      37.588,
+      -117.87,
+      0.3,
+      0.0,
+      -88.468,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.tesla.model3",
+     "color": "137,0,0",
+     "transform": [
+      -54.711,
+      -41.65,
+      0.45,
+      0.0,
+      89.663,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.ambulance",
+     "color": "231,231,231",
+     "transform": [
+      -188.079,
+      -29.37,
+      0.6,
+      0.0,
+      -90.016,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2",
+     "color": "158,40,82",
+     "transform": [
+      -0.929,
+      -0.944,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.ambulance",
+     "color": "231,231,231",
+     "transform": [
+      -131.231,
+      55.246,
+      0.3,
+      0.0,
+      89.489,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.lincoln.mkz_2017",
+     "color": "16,16,16",
+     "transform": [
+      35.079,
+      -154.97,
+      0.3,
+      0.0,
+      -88.468,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.citroen.c3",
+     "color": "16,44,21",
+     "transform": [
+      31.705,
+      -50.847,
+      0.3,
+      0.0,
+      -88.468,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe",
+     "color": "217,217,217",
+     "transform": [
+      -54.06,
+      34.895,
+      0.6,
+      0.0,
+      90.379,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe_2020",
+     "color": "0,21,81",
+     "transform": [
+      -143.807,
+      -91.61,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.toyota.prius",
+     "color": "215,255,143",
+     "transform": [
+      -115.981,
+      -138.739,
+      0.6,
+      0.0,
+      0.443,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.jeep.wrangler_rubicon",
+     "color": "217,217,217",
+     "transform": [
+      -63.547,
+      87.994,
+      0.3,
+      0.0,
+      -179.934,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.carlacola",
+     "color": "255,68,0",
+     "transform": [
+      -120.98,
+      27.293,
+      0.3,
+      0.0,
+      -90.511,
+      0.0
+     ]
+    }
+   ],
+   "drone_start": [
+    -180.823,
+    203.179,
+    23.749,
+    -36.87,
+    10.547,
+    0.0
+   ],
+   "condition": "A2",
+   "distractor": "twin",
+   "intent": "front",
+   "event": {
+    "kind": "queue",
+    "window_s": [
+     15.0,
+     45.0
+    ],
+    "queue_distance_m": 1.0,
+    "distractor_ahead": false,
+    "light_m": 174.0
+   },
+   "distractor_car": {
+    "blueprint": "vehicle.audi.tt",
+    "color": "33,33,33",
+    "near_twin_way": null,
+    "transform": [
+     -173.84,
+     203.659,
+     9.375,
+     -0.605,
+     17.618,
+     0.0
+    ],
+    "lane_offset": 0,
+    "along_m": -12.0
+   },
+   "sentence": {
+    "en": "follow the black coupe furthest ahead",
+    "ko": "가장 앞에 있는 검은색 쿠페를 따라가",
+    "expression": "front"
+   },
+   "check": {
+    "target_pixels": 1990,
+    "lookalike_pixels": [
+     8286,
+     0,
+     5809
+    ],
+    "visible_lookalikes": 2,
+    "expressions_possible": [
+     "front"
+    ]
+   }
+  },
+  {
+   "id": "fsmoke-A2-004",
+   "split": "smoke",
+   "seed": 1940425,
+   "map": "Town05_Opt",
+   "duration_s": 60.0,
+   "target": {
+    "blueprint": "vehicle.mercedes.sprinter",
+    "color": "255,255,255",
+    "transform": [
+     -187.745,
+     -180.534,
+     10.509,
+     360.009,
+     329.38,
+     0.0
+    ],
+    "road": 37,
+    "lane": 2,
+    "index_from_left": 0,
+    "lanes": 3
+   },
+   "lookalikes": [
+    {
+     "color": "255,255,255",
+     "transform": [
+      -197.151,
+      -174.169,
+      10.507,
+      360.008,
+      322.449,
+      0.0
+     ],
+     "lane_offset": 0,
+     "along_m": -12.0
+    },
+    {
+     "color": "255,255,255",
+     "transform": [
+      -206.394,
+      -166.048,
+      10.506,
+      360.007,
+      314.941,
+      0.0
+     ],
+     "lane_offset": 0,
+     "along_m": -25.0
+    }
+   ],
+   "background": [
+    {
+     "blueprint": "vehicle.dodge.charger_police",
+     "color": "0,0,0",
+     "transform": [
+      35.238,
+      -52.053,
+      0.3,
+      0.0,
+      -88.468,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.micro.microlino",
+     "color": "21,158,255",
+     "transform": [
+      -98.201,
+      -4.212,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.bmw.grandtourer",
+     "color": "12,38,88",
+     "transform": [
+      32.147,
+      -176.244,
+      0.3,
+      0.0,
+      91.532,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mini.cooper_s",
+     "color": "0,39,105",
+     "transform": [
+      -268.63,
+      -21.157,
+      0.3,
+      0.0,
+      -89.583,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.micro.microlino",
+     "color": "255,208,0",
+     "transform": [
+      27.369,
+      -128.487,
+      0.3,
+      0.0,
+      91.532,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2_2021",
+     "color": "0,33,5",
+     "transform": [
+      -159.701,
+      6.438,
+      0.3,
+      0.0,
+      -0.139,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.a2",
+     "color": "168,0,27",
+     "transform": [
+      -78.551,
+      -88.012,
+      0.3,
+      0.0,
+      0.086,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mini.cooper_s",
+     "color": "16,44,21",
+     "transform": [
+      -184.575,
+      -13.592,
+      0.6,
+      0.0,
+      -90.016,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.etron",
+     "color": "168,0,27",
+     "transform": [
+      -115.239,
+      154.671,
+      0.5,
+      0.0,
+      0.27,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.micra",
+     "color": "243,243,243",
+     "transform": [
+      -54.6,
+      -22.81,
+      0.45,
+      0.0,
+      89.663,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.european_hgv",
+     "color": "28,28,28",
+     "transform": [
+      -219.997,
+      3.179,
+      0.3,
+      0.0,
+      -0.139,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.lincoln.mkz_2017",
+     "color": "16,16,16",
+     "transform": [
+      28.1,
+      30.199,
+      0.3,
+      0.0,
+      90.023,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe_2020",
+     "color": "73,0,0",
+     "transform": [
+      -44.031,
+      -11.262,
+      0.45,
+      0.0,
+      -90.391,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.ambulance",
+     "color": "231,231,231",
+     "transform": [
+      37.918,
+      -130.206,
+      0.3,
+      0.0,
+      -88.468,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.lincoln.mkz_2017",
+     "color": "16,16,16",
+     "transform": [
+      -140.374,
+      -0.609,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.micro.microlino",
+     "color": "255,33,0",
+     "transform": [
+      24.597,
+      14.145,
+      0.3,
+      0.0,
+      89.488,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.lincoln.mkz_2017",
+     "color": "16,16,16",
+     "transform": [
+      -36.142,
+      2.637,
+      0.3,
+      0.0,
+      -0.139,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mitsubishi.fusorosa",
+     "color": "255,255,255",
+     "transform": [
+      -188.074,
+      -11.59,
+      0.6,
+      0.0,
+      -90.016,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.a2",
+     "color": "16,44,21",
+     "transform": [
+      31.705,
+      -28.794,
+      0.3,
+      0.0,
+      -88.468,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_police",
+     "color": "8,53,0",
+     "transform": [
+      143.922,
+      -1.962,
+      0.5,
+      0.0,
+      -179.745,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.jeep.wrangler_rubicon",
+     "color": "33,33,33",
+     "transform": [
+      29.487,
+      -76.775,
+      0.3,
+      0.0,
+      91.532,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe_2020",
+     "color": "73,0,0",
+     "transform": [
+      -81.394,
+      6.247,
+      0.3,
+      0.0,
+      -0.139,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.crown",
+     "color": "255,185,0",
+     "transform": [
+      38.52,
+      205.258,
+      0.3,
+      0.0,
+      0.288,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mini.cooper_s_2021",
+     "color": "73,0,0",
+     "transform": [
+      -50.685,
+      53.868,
+      0.6,
+      0.0,
+      90.379,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.seat.leon",
+     "color": "42,61,214",
+     "transform": [
+      31.264,
+      -143.219,
+      0.3,
+      0.0,
+      91.532,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.firetruck",
+     "color": "234,0,0",
+     "transform": [
+      -130.667,
+      118.453,
+      0.3,
+      0.0,
+      89.489,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.a2",
+     "color": "168,0,27",
+     "transform": [
+      -158.21,
+      2.934,
+      0.3,
+      0.0,
+      -0.139,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.tesla.model3",
+     "color": "0,0,0",
+     "transform": [
+      -82.602,
+      2.75,
+      0.3,
+      0.0,
+      -0.139,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.mustang",
+     "color": "0,21,0",
+     "transform": [
+      -158.202,
+      -4.066,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.bmw.grandtourer",
+     "color": "255,21,0",
+     "transform": [
+      196.74,
+      -11.109,
+      0.3,
+      0.0,
+      89.331,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.bmw.grandtourer",
+     "color": "109,109,109",
+     "transform": [
+      35.099,
+      54.59,
+      0.3,
+      0.0,
+      -89.977,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.micra",
+     "color": "17,21,99",
+     "transform": [
+      8.572,
+      -203.989,
+      0.68,
+      0.767,
+      179.757,
+      -0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_2020",
+     "color": "0,39,105",
+     "transform": [
+      -114.023,
+      151.177,
+      0.5,
+      0.0,
+      0.27,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_police",
+     "color": "0,0,0",
+     "transform": [
+      -48.163,
+      -102.923,
+      0.45,
+      0.0,
+      -94.315,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.patrol",
+     "color": "66,52,33",
+     "transform": [
+      -9.641,
+      87.992,
+      0.3,
+      0.0,
+      -179.934,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.citroen.c3",
+     "color": "16,44,21",
+     "transform": [
+      -188.079,
+      -29.37,
+      0.6,
+      0.0,
+      -90.016,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.bmw.grandtourer",
+     "color": "255,255,255",
+     "transform": [
+      -37.034,
+      6.139,
+      0.3,
+      0.0,
+      -0.139,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.lincoln.mkz_2017",
+     "color": "16,16,16",
+     "transform": [
+      30.915,
+      -130.183,
+      0.3,
+      0.0,
+      91.532,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.firetruck",
+     "color": "234,0,0",
+     "transform": [
+      -195.067,
+      15.851,
+      0.6,
+      0.0,
+      89.984,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.seat.leon",
+     "color": "38,38,38",
+     "transform": [
+      -195.056,
+      55.261,
+      0.6,
+      0.0,
+      89.984,
+      0.0
+     ]
+    }
+   ],
+   "drone_start": [
+    -204.956,
+    -170.347,
+    25.009,
+    -36.87,
+    -30.62,
+    0.0
+   ],
+   "condition": "A2",
+   "distractor": "other",
+   "intent": "front",
+   "event": {
+    "kind": "queue",
+    "window_s": [
+     15.0,
+     45.0
+    ],
+    "queue_distance_m": 1.0,
+    "distractor_ahead": true,
+    "light_m": 212.0
+   },
+   "distractor_car": {
+    "blueprint": "vehicle.mercedes.sprinter",
+    "color": "115,115,115",
+    "near_twin_way": null,
+    "transform": [
+     -172.409,
+     -187.828,
+     10.512,
+     360.01,
+     339.749,
+     0.0
+    ],
+    "lane_offset": 0,
+    "along_m": 18.0
+   },
+   "sentence": {
+    "en": "follow the white van furthest ahead",
+    "ko": "가장 앞에 있는 흰색 승합차를 따라가",
+    "expression": "front"
+   },
+   "check": {
+    "target_pixels": 3168,
+    "lookalike_pixels": [
+     10408,
+     0
+    ],
+    "visible_lookalikes": 1,
+    "expressions_possible": [
+     "front"
+    ]
+   }
+  },
+  {
+   "id": "fsmoke-A2-005",
+   "split": "smoke",
+   "seed": 1940547,
+   "map": "Town05_Opt",
+   "duration_s": 60.0,
+   "target": {
+    "blueprint": "vehicle.tesla.model3",
+    "color": "137,0,0",
+    "transform": [
+     -176.771,
+     198.965,
+     9.417,
+     -0.605,
+     19.974,
+     0.0
+    ],
+    "road": 37,
+    "lane": -2,
+    "index_from_left": 1,
+    "lanes": 3
+   },
+   "lookalikes": [
+    {
+     "color": "137,0,0",
+     "transform": [
+      -184.041,
+      199.832,
+      9.481,
+      -0.605,
+      23.509,
+      0.0
+     ],
+     "lane_offset": 1,
+     "along_m": -6.0
+    },
+    {
+     "color": "137,0,0",
+     "transform": [
+      -200.113,
+      186.897,
+      9.681,
+      -0.605,
+      34.704,
+      0.0
+     ],
+     "lane_offset": 0,
+     "along_m": -25.0
+    },
+    {
+     "color": "137,0,0",
+     "transform": [
+      -193.864,
+      186.809,
+      9.628,
+      -0.605,
+      31.758,
+      0.0
+     ],
+     "lane_offset": -1,
+     "along_m": -20.0
+    }
+   ],
+   "background": [
+    {
+     "blueprint": "vehicle.audi.a2",
+     "color": "0,39,105",
+     "transform": [
+      -201.94,
+      -0.459,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.a2",
+     "color": "168,0,27",
+     "transform": [
+      35.057,
+      163.657,
+      0.3,
+      0.0,
+      -89.977,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_police",
+     "color": "0,0,0",
+     "transform": [
+      -50.685,
+      53.868,
+      0.6,
+      0.0,
+      90.379,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.carlacola",
+     "color": "255,68,0",
+     "transform": [
+      35.079,
+      -154.97,
+      0.3,
+      0.0,
+      -88.468,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_police",
+     "color": "0,0,0",
+     "transform": [
+      -128.172,
+      -75.087,
+      0.3,
+      0.0,
+      90.394,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.mustang",
+     "color": "0,21,0",
+     "transform": [
+      18.012,
+      -94.867,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.tesla.cybertruck",
+     "color": null,
+     "transform": [
+      -64.943,
+      84.492,
+      0.3,
+      0.0,
+      -179.934,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.tesla.model3",
+     "color": "0,0,0",
+     "transform": [
+      8.534,
+      -189.989,
+      0.481,
+      -0.767,
+      -0.243,
+      -0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_police_2020",
+     "color": "0,0,0",
+     "transform": [
+      -115.981,
+      -138.739,
+      0.6,
+      0.0,
+      0.443,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_police_2020",
+     "color": "0,0,0",
+     "transform": [
+      -131.776,
+      -60.014,
+      0.3,
+      0.0,
+      90.394,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.carlacola",
+     "color": "255,68,0",
+     "transform": [
+      207.571,
+      11.122,
+      0.3,
+      0.0,
+      -89.335,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_2020",
+     "color": "0,39,105",
+     "transform": [
+      27.369,
+      -128.487,
+      0.3,
+      0.0,
+      91.532,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.mustang",
+     "color": "0,12,58",
+     "transform": [
+      37.338,
+      201.752,
+      0.3,
+      0.0,
+      0.29,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2",
+     "color": "158,40,82",
+     "transform": [
+      -188.074,
+      -11.59,
+      0.6,
+      0.0,
+      -90.016,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2",
+     "color": "0,33,5",
+     "transform": [
+      30.915,
+      -130.183,
+      0.3,
+      0.0,
+      91.532,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.seat.leon",
+     "color": "0,0,0",
+     "transform": [
+      44.273,
+      -145.965,
+      0.6,
+      0.0,
+      -1.313,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.european_hgv",
+     "color": "28,28,28",
+     "transform": [
+      -44.031,
+      -11.262,
+      0.45,
+      0.0,
+      -90.391,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.toyota.prius",
+     "color": "23,51,236",
+     "transform": [
+      24.571,
+      55.747,
+      0.3,
+      0.0,
+      90.023,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mini.cooper_s",
+     "color": "0,39,105",
+     "transform": [
+      38.52,
+      205.258,
+      0.3,
+      0.0,
+      0.288,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.patrol_2021",
+     "color": "12,42,12",
+     "transform": [
+      -17.602,
+      2.592,
+      0.3,
+      0.0,
+      -0.139,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.toyota.prius",
+     "color": "23,51,236",
+     "transform": [
+      -47.06,
+      34.942,
+      0.6,
+      0.0,
+      -89.621,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.carlacola",
+     "color": "255,68,0",
+     "transform": [
+      -112.302,
+      2.823,
+      0.3,
+      0.0,
+      -0.139,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.lincoln.mkz_2020",
+     "color": "0,0,0",
+     "transform": [
+      -43.686,
+      53.914,
+      0.6,
+      0.0,
+      -89.621,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.seat.leon",
+     "color": "42,61,214",
+     "transform": [
+      -51.199,
+      -39.571,
+      0.45,
+      0.0,
+      89.663,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mini.cooper_s",
+     "color": "16,44,21",
+     "transform": [
+      -161.372,
+      91.382,
+      0.3,
+      0.0,
+      0.066,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.lincoln.mkz_2020",
+     "color": "0,0,0",
+     "transform": [
+      -220.049,
+      -3.915,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.tt",
+     "color": "16,44,21",
+     "transform": [
+      -48.163,
+      -102.923,
+      0.45,
+      0.0,
+      -94.315,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.sprinter",
+     "color": "115,115,115",
+     "transform": [
+      -95.267,
+      -95.037,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe_2020",
+     "color": "0,0,0",
+     "transform": [
+      55.864,
+      191.345,
+      0.3,
+      0.0,
+      -179.712,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.etron",
+     "color": "168,0,27",
+     "transform": [
+      -37.034,
+      6.139,
+      0.3,
+      0.0,
+      -0.139,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.citroen.c3",
+     "color": "0,39,105",
+     "transform": [
+      -191.567,
+      14.351,
+      0.6,
+      0.0,
+      89.984,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.a2",
+     "color": "16,44,21",
+     "transform": [
+      -203.449,
+      -3.955,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.micro.microlino",
+     "color": "255,208,0",
+     "transform": [
+      -20.178,
+      -94.924,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2",
+     "color": "73,12,12",
+     "transform": [
+      -20.188,
+      -87.924,
+      0.3,
+      0.0,
+      0.086,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.patrol",
+     "color": "183,187,162",
+     "transform": [
+      28.678,
+      -177.437,
+      0.3,
+      0.0,
+      91.532,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.mustang",
+     "color": "85,0,0",
+     "transform": [
+      -88.973,
+      84.465,
+      0.3,
+      0.0,
+      -179.934,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.mustang",
+     "color": "160,160,160",
+     "transform": [
+      -51.405,
+      -76.344,
+      0.45,
+      0.0,
+      89.663,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.patrol_2021",
+     "color": "12,42,12",
+     "transform": [
+      -63.547,
+      87.994,
+      0.3,
+      0.0,
+      -179.934,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.bmw.grandtourer",
+     "color": "109,109,109",
+     "transform": [
+      -43.837,
+      76.781,
+      0.6,
+      0.0,
+      -89.621,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.toyota.prius",
+     "color": "23,51,236",
+     "transform": [
+      28.1,
+      30.199,
+      0.3,
+      0.0,
+      90.023,
+      0.0
+     ]
+    }
+   ],
+   "drone_start": [
+    -195.568,
+    192.133,
+    23.917,
+    -36.87,
+    19.974,
+    0.0
+   ],
+   "condition": "A2",
+   "distractor": "near_twin",
+   "intent": "front",
+   "event": {
+    "kind": "queue",
+    "window_s": [
+     15.0,
+     45.0
+    ],
+    "queue_distance_m": 1.0,
+    "distractor_ahead": false,
+    "light_m": 190.0
+   },
+   "distractor_car": {
+    "blueprint": "vehicle.tesla.model3",
+    "color": "180,42,42",
+    "near_twin_way": "rgb",
+    "transform": [
+     -188.362,
+     193.923,
+     9.544,
+     -0.605,
+     27.045,
+     0.0
+    ],
+    "lane_offset": 0,
+    "along_m": -12.0
+   },
+   "sentence": {
+    "en": "follow the red sedan furthest ahead",
+    "ko": "가장 앞에 있는 빨간색 세단을 따라가",
+    "expression": "front"
+   },
+   "check": {
+    "target_pixels": 2167,
+    "lookalike_pixels": [
+     4359,
+     0,
+     0,
+     6979
+    ],
+    "visible_lookalikes": 2,
+    "expressions_possible": [
+     "front"
+    ]
+   }
+  },
+  {
+   "id": "fsmoke-A2-006",
+   "split": "smoke",
+   "seed": 1940681,
+   "map": "Town05_Opt",
+   "duration_s": 60.0,
+   "target": {
+    "blueprint": "vehicle.mini.cooper_s",
+    "color": "33,33,33",
+    "transform": [
+     202.992,
+     -75.186,
+     0.5,
+     0.0,
+     -90.669,
+     0.0
+    ],
+    "road": 34,
+    "lane": -1,
+    "index_from_left": 0,
+    "lanes": 3
+   },
+   "lookalikes": [
+    {
+     "color": "33,33,33",
+     "transform": [
+      206.562,
+      -69.227,
+      0.5,
+      0.0,
+      -90.669,
+      0.0
+     ],
+     "lane_offset": 1,
+     "along_m": -6.0
+    },
+    {
+     "color": "33,33,33",
+     "transform": [
+      203.284,
+      -50.188,
+      0.5,
+      0.0,
+      -90.669,
+      0.0
+     ],
+     "lane_offset": 0,
+     "along_m": -25.0
+    }
+   ],
+   "background": [
+    {
+     "blueprint": "vehicle.micro.microlino",
+     "color": "181,255,0",
+     "transform": [
+      -110.7,
+      -88.061,
+      0.3,
+      0.0,
+      0.086,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.micra",
+     "color": "187,0,0",
+     "transform": [
+      -121.51,
+      -25.894,
+      0.3,
+      0.0,
+      -89.606,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.citroen.c3",
+     "color": "168,0,27",
+     "transform": [
+      -219.997,
+      3.179,
+      0.3,
+      0.0,
+      -0.139,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.sprinter",
+     "color": "255,255,255",
+     "transform": [
+      -17.588,
+      -4.414,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.patrol_2021",
+     "color": "0,0,0",
+     "transform": [
+      -80.082,
+      -91.515,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.patrol_2021",
+     "color": "0,0,0",
+     "transform": [
+      -110.894,
+      6.319,
+      0.3,
+      0.0,
+      -0.139,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.patrol_2021",
+     "color": "159,0,0",
+     "transform": [
+      28.053,
+      121.198,
+      0.3,
+      0.0,
+      90.023,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.seat.leon",
+     "color": "79,33,85",
+     "transform": [
+      -124.229,
+      55.411,
+      0.3,
+      0.0,
+      -90.511,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.jeep.wrangler_rubicon",
+     "color": "217,217,217",
+     "transform": [
+      35.238,
+      -30.0,
+      0.3,
+      0.0,
+      -88.468,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_police",
+     "color": "0,0,0",
+     "transform": [
+      -96.746,
+      -84.54,
+      0.3,
+      0.0,
+      0.086,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.european_hgv",
+     "color": "255,255,255",
+     "transform": [
+      -120.149,
+      120.387,
+      0.3,
+      0.0,
+      -90.511,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.firetruck",
+     "color": "234,0,0",
+     "transform": [
+      -191.567,
+      14.351,
+      0.6,
+      0.0,
+      89.984,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe_2020",
+     "color": "187,187,187",
+     "transform": [
+      -121.555,
+      -11.948,
+      0.3,
+      0.0,
+      -90.424,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.chevrolet.impala",
+     "color": "0,12,49",
+     "transform": [
+      43.388,
+      -87.594,
+      0.3,
+      0.0,
+      -1.444,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.lincoln.mkz_2020",
+     "color": "0,0,0",
+     "transform": [
+      151.525,
+      5.319,
+      0.6,
+      0.0,
+      89.947,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.lincoln.mkz_2017",
+     "color": "16,16,16",
+     "transform": [
+      -127.98,
+      27.356,
+      0.3,
+      0.0,
+      89.489,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.sprinter",
+     "color": "255,255,255",
+     "transform": [
+      24.547,
+      161.944,
+      0.3,
+      0.0,
+      90.023,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.chevrolet.impala",
+     "color": "0,12,49",
+     "transform": [
+      31.599,
+      31.601,
+      0.3,
+      0.0,
+      -89.977,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.carlacola",
+     "color": "255,68,0",
+     "transform": [
+      -143.807,
+      -91.61,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.micro.microlino",
+     "color": "181,255,0",
+     "transform": [
+      28.071,
+      54.348,
+      0.3,
+      0.0,
+      90.023,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.crown",
+     "color": "255,185,0",
+     "transform": [
+      -43.686,
+      53.914,
+      0.6,
+      0.0,
+      -89.621,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mitsubishi.fusorosa",
+     "color": "255,255,255",
+     "transform": [
+      -50.602,
+      13.267,
+      0.6,
+      0.0,
+      88.908,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe",
+     "color": "217,217,217",
+     "transform": [
+      -268.978,
+      20.832,
+      0.3,
+      0.0,
+      -90.584,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.tesla.cybertruck",
+     "color": null,
+     "transform": [
+      204.04,
+      13.781,
+      0.3,
+      0.0,
+      -89.335,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.etron",
+     "color": "0,39,105",
+     "transform": [
+      -88.963,
+      91.465,
+      0.3,
+      0.0,
+      0.066,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.patrol_2021",
+     "color": "0,38,105",
+     "transform": [
+      -188.079,
+      -29.37,
+      0.6,
+      0.0,
+      -90.016,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mini.cooper_s",
+     "color": "217,217,217",
+     "transform": [
+      -109.687,
+      94.941,
+      0.3,
+      0.0,
+      0.066,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.a2",
+     "color": "168,0,27",
+     "transform": [
+      -220.049,
+      -3.915,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.patrol_2021",
+     "color": "159,0,0",
+     "transform": [
+      -162.537,
+      -91.639,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_2020",
+     "color": "0,0,0",
+     "transform": [
+      24.707,
+      -28.981,
+      0.3,
+      0.0,
+      91.532,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.european_hgv",
+     "color": "127,127,127",
+     "transform": [
+      -159.694,
+      -0.562,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.tesla.model3",
+     "color": "0,0,0",
+     "transform": [
+      -164.732,
+      -88.142,
+      0.3,
+      0.0,
+      0.086,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.citroen.c3",
+     "color": "217,217,217",
+     "transform": [
+      143.922,
+      -1.962,
+      0.5,
+      0.0,
+      -179.745,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.firetruck",
+     "color": "234,0,0",
+     "transform": [
+      -124.457,
+      28.924,
+      0.3,
+      0.0,
+      -90.511,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.micro.microlino",
+     "color": "145,255,181",
+     "transform": [
+      -191.58,
+      -31.799,
+      0.6,
+      0.0,
+      89.984,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_2020",
+     "color": "211,142,0",
+     "transform": [
+      22.263,
+      187.676,
+      0.3,
+      0.0,
+      -179.72,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.firetruck",
+     "color": "234,0,0",
+     "transform": [
+      -123.521,
+      134.803,
+      0.3,
+      0.0,
+      -90.511,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.tesla.model3",
+     "color": "180,42,42",
+     "transform": [
+      30.915,
+      -130.183,
+      0.3,
+      0.0,
+      91.532,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.patrol",
+     "color": "0,0,0",
+     "transform": [
+      31.557,
+      138.834,
+      0.3,
+      0.0,
+      -89.977,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mini.cooper_s_2021",
+     "color": "73,0,0",
+     "transform": [
+      8.534,
+      -189.989,
+      0.481,
+      -0.767,
+      -0.243,
+      -0.0
+     ]
+    }
+   ],
+   "drone_start": [
+    203.226,
+    -55.187,
+    15.0,
+    -36.87,
+    -90.669,
+    0.0
+   ],
+   "condition": "A2",
+   "distractor": "twin",
+   "intent": "front",
+   "event": {
+    "kind": "queue",
+    "window_s": [
+     15.0,
+     45.0
+    ],
+    "queue_distance_m": 1.0,
+    "distractor_ahead": false,
+    "light_m": 232.0
+   },
+   "distractor_car": {
+    "blueprint": "vehicle.mini.cooper_s",
+    "color": "33,33,33",
+    "near_twin_way": null,
+    "transform": [
+     203.133,
+     -63.187,
+     0.5,
+     0.0,
+     -90.669,
+     0.0
+    ],
+    "lane_offset": 0,
+    "along_m": -12.0
+   },
+   "sentence": {
+    "en": "follow the black hatchback furthest ahead",
+    "ko": "가장 앞에 있는 검은색 해치백을 따라가",
+    "expression": "front"
+   },
+   "check": {
+    "target_pixels": 1853,
+    "lookalike_pixels": [
+     3517,
+     0,
+     6596
+    ],
+    "visible_lookalikes": 2,
+    "expressions_possible": [
+     "front"
+    ]
+   }
+  },
+  {
+   "id": "fsmoke-A2-007",
+   "split": "smoke",
+   "seed": 1940747,
+   "map": "Town05_Opt",
+   "duration_s": 60.0,
+   "target": {
+    "blueprint": "vehicle.nissan.patrol_2021",
+    "color": "0,0,0",
+    "transform": [
+     -174.14,
+     -187.17,
+     10.512,
+     360.01,
+     338.62,
+     0.0
+    ],
+    "road": 37,
+    "lane": 2,
+    "index_from_left": 0,
+    "lanes": 3
+   },
+   "lookalikes": [
+    {
+     "color": "0,0,0",
+     "transform": [
+      -162.459,
+      -187.274,
+      10.514,
+      360.01,
+      345.55,
+      0.0
+     ],
+     "lane_offset": 1,
+     "along_m": 12.0
+    },
+    {
+     "color": "0,0,0",
+     "transform": [
+      -182.787,
+      -179.316,
+      10.51,
+      360.009,
+      331.69,
+      0.0
+     ],
+     "lane_offset": 1,
+     "along_m": -12.0
+    }
+   ],
+   "background": [
+    {
+     "blueprint": "vehicle.bmw.grandtourer",
+     "color": "255,255,255",
+     "transform": [
+      -47.6,
+      -22.85,
+      0.45,
+      0.0,
+      -90.337,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe_2020",
+     "color": "0,0,0",
+     "transform": [
+      -88.963,
+      91.465,
+      0.3,
+      0.0,
+      0.066,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe",
+     "color": "16,44,21",
+     "transform": [
+      -130.803,
+      103.262,
+      0.3,
+      0.0,
+      89.489,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.crown",
+     "color": "255,185,0",
+     "transform": [
+      28.052,
+      149.836,
+      0.3,
+      0.0,
+      90.023,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.a2",
+     "color": "16,44,21",
+     "transform": [
+      29.487,
+      -76.775,
+      0.3,
+      0.0,
+      91.532,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.carlacola",
+     "color": "255,68,0",
+     "transform": [
+      -162.537,
+      -91.639,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2",
+     "color": "158,40,82",
+     "transform": [
+      35.082,
+      76.119,
+      0.3,
+      0.0,
+      -89.977,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.crown",
+     "color": "255,185,0",
+     "transform": [
+      -114.008,
+      -135.224,
+      0.6,
+      0.0,
+      0.443,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.european_hgv",
+     "color": "127,127,127",
+     "transform": [
+      25.953,
+      -75.569,
+      0.3,
+      0.0,
+      91.532,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.bmw.grandtourer",
+     "color": "68,68,77",
+     "transform": [
+      -20.178,
+      -94.924,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.carlacola",
+     "color": "255,68,0",
+     "transform": [
+      31.541,
+      178.36,
+      0.3,
+      0.0,
+      -89.977,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_police",
+     "color": "0,0,0",
+     "transform": [
+      35.238,
+      -30.0,
+      0.3,
+      0.0,
+      -88.468,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.micro.microlino",
+     "color": "181,255,0",
+     "transform": [
+      37.302,
+      208.752,
+      0.3,
+      0.0,
+      0.288,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mitsubishi.fusorosa",
+     "color": "255,255,255",
+     "transform": [
+      -51.016,
+      103.802,
+      0.5,
+      0.0,
+      90.379,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.micro.microlino",
+     "color": "255,208,0",
+     "transform": [
+      -128.396,
+      -42.55,
+      0.3,
+      0.0,
+      90.394,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mini.cooper_s",
+     "color": "16,44,21",
+     "transform": [
+      -17.588,
+      -4.414,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.citroen.c3",
+     "color": "33,33,33",
+     "transform": [
+      28.071,
+      102.152,
+      0.3,
+      0.0,
+      90.023,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_police_2020",
+     "color": "0,0,0",
+     "transform": [
+      28.082,
+      12.414,
+      0.3,
+      0.0,
+      89.488,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.citroen.c3",
+     "color": "16,44,21",
+     "transform": [
+      -90.767,
+      94.963,
+      0.3,
+      0.0,
+      0.066,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.micra",
+     "color": "17,21,99",
+     "transform": [
+      -125.066,
+      -13.322,
+      0.3,
+      0.0,
+      -90.424,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.ambulance",
+     "color": "231,231,231",
+     "transform": [
+      -121.397,
+      -42.367,
+      0.3,
+      0.0,
+      -89.606,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.lincoln.mkz_2017",
+     "color": "16,16,16",
+     "transform": [
+      28.1,
+      30.199,
+      0.3,
+      0.0,
+      90.023,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.chevrolet.impala",
+     "color": "61,86,143",
+     "transform": [
+      -265.116,
+      -23.032,
+      0.3,
+      0.0,
+      -89.583,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2",
+     "color": "105,103,0",
+     "transform": [
+      31.599,
+      55.988,
+      0.3,
+      0.0,
+      -89.977,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.mustang",
+     "color": "160,160,160",
+     "transform": [
+      -90.777,
+      87.963,
+      0.3,
+      0.0,
+      -179.934,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.citroen.c3",
+     "color": "16,44,21",
+     "transform": [
+      -164.732,
+      -88.142,
+      0.3,
+      0.0,
+      0.086,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.tt",
+     "color": "168,0,27",
+     "transform": [
+      -78.551,
+      -88.012,
+      0.3,
+      0.0,
+      0.086,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.mustang",
+     "color": "0,12,58",
+     "transform": [
+      -20.188,
+      -87.924,
+      0.3,
+      0.0,
+      0.086,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_police_2020",
+     "color": "0,0,0",
+     "transform": [
+      -128.284,
+      -58.79,
+      0.3,
+      0.0,
+      90.394,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.patrol_2021",
+     "color": "159,0,0",
+     "transform": [
+      -141.602,
+      -95.107,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.sprinter",
+     "color": "255,255,255",
+     "transform": [
+      -164.732,
+      -95.142,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.seat.leon",
+     "color": "79,33,85",
+     "transform": [
+      16.356,
+      -0.99,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_police",
+     "color": "8,53,0",
+     "transform": [
+      31.705,
+      -28.794,
+      0.3,
+      0.0,
+      -88.468,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mitsubishi.fusorosa",
+     "color": "255,255,255",
+     "transform": [
+      0.562,
+      -4.458,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.mustang",
+     "color": "0,21,0",
+     "transform": [
+      31.399,
+      -12.339,
+      0.3,
+      0.0,
+      -89.801,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.micra",
+     "color": "187,0,0",
+     "transform": [
+      1.036,
+      -84.392,
+      0.3,
+      0.0,
+      0.086,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2",
+     "color": "22,31,73",
+     "transform": [
+      -184.561,
+      38.028,
+      0.6,
+      0.0,
+      -90.016,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.a2",
+     "color": "33,33,33",
+     "transform": [
+      58.183,
+      187.857,
+      0.3,
+      0.0,
+      -179.72,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.sprinter",
+     "color": "115,115,115",
+     "transform": [
+      -96.993,
+      -0.715,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.firetruck",
+     "color": "234,0,0",
+     "transform": [
+      -120.746,
+      53.58,
+      0.3,
+      0.0,
+      -90.511,
+      0.0
+     ]
+    }
+   ],
+   "drone_start": [
+    -192.763,
+    -179.878,
+    25.012,
+    -36.87,
+    -21.38,
+    0.0
+   ],
+   "condition": "A2",
+   "distractor": "other",
+   "intent": "lane",
+   "event": {
+    "kind": "queue",
+    "window_s": [
+     15.0,
+     45.0
+    ],
+    "queue_distance_m": 1.0,
+    "distractor_ahead": true,
+    "light_m": 196.0
+   },
+   "distractor_car": {
+    "blueprint": "vehicle.nissan.patrol_2021",
+    "color": "0,38,105",
+    "near_twin_way": null,
+    "transform": [
+     -163.373,
+     -190.653,
+     10.514,
+     360.01,
+     345.524,
+     0.0
+    ],
+    "lane_offset": 0,
+    "along_m": 12.0
+   },
+   "sentence": {
+    "en": "follow the black SUV in the left lane",
+    "ko": "왼쪽 차선의 검은색 SUV를 따라가",
+    "expression": "lane"
+   },
+   "check": {
+    "target_pixels": 3011,
+    "lookalike_pixels": [
+     1339,
+     11776
+    ],
+    "visible_lookalikes": 2,
+    "expressions_possible": [
+     "lane"
+    ]
+   }
+  },
+  {
+   "id": "fsmoke-A4a-001",
+   "split": "smoke",
+   "seed": 1980006,
+   "map": "Town05_Opt",
+   "duration_s": 60.0,
+   "target": {
+    "blueprint": "vehicle.seat.leon",
+    "color": "155,0,0",
+    "transform": [
+     84.134,
+     208.987,
+     0.5,
+     0.0,
+     0.288,
+     0.0
+    ],
+    "road": 38,
+    "lane": -3,
+    "index_from_left": 2,
+    "lanes": 3
+   },
+   "lookalikes": [
+    {
+     "color": "155,0,0",
+     "transform": [
+      78.17,
+      201.957,
+      0.5,
+      0.0,
+      0.288,
+      0.0
+     ],
+     "lane_offset": -2,
+     "along_m": -6.0
+    },
+    {
+     "color": "155,0,0",
+     "transform": [
+      64.152,
+      205.387,
+      0.5,
+      0.0,
+      0.288,
+      0.0
+     ],
+     "lane_offset": -1,
+     "along_m": -20.0
+    }
+   ],
+   "background": [
+    {
+     "blueprint": "vehicle.toyota.prius",
+     "color": "28,46,58",
+     "transform": [
+      -44.031,
+      -11.262,
+      0.45,
+      0.0,
+      -90.391,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe_2020",
+     "color": "0,21,81",
+     "transform": [
+      -98.201,
+      -4.212,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_police_2020",
+     "color": "0,0,0",
+     "transform": [
+      7.149,
+      -186.483,
+      0.5,
+      -0.767,
+      -0.243,
+      -0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_police",
+     "color": "0,0,0",
+     "transform": [
+      -121.285,
+      -58.607,
+      0.3,
+      0.0,
+      -89.606,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.chevrolet.impala",
+     "color": "0,12,49",
+     "transform": [
+      -184.58,
+      -31.771,
+      0.6,
+      0.0,
+      -90.016,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mini.cooper_s_2021",
+     "color": "22,31,73",
+     "transform": [
+      -54.6,
+      -22.81,
+      0.45,
+      0.0,
+      89.663,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.lincoln.mkz_2017",
+     "color": "16,16,16",
+     "transform": [
+      -275.63,
+      -21.208,
+      0.3,
+      0.0,
+      90.417,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.bmw.grandtourer",
+     "color": "0,0,0",
+     "transform": [
+      -175.941,
+      6.478,
+      0.3,
+      0.0,
+      -0.139,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.tesla.model3",
+     "color": "137,0,0",
+     "transform": [
+      -133.159,
+      -142.372,
+      0.6,
+      0.0,
+      -179.557,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2_2021",
+     "color": "105,103,0",
+     "transform": [
+      -161.358,
+      84.382,
+      0.3,
+      0.0,
+      -179.934,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.tt",
+     "color": "168,0,27",
+     "transform": [
+      -141.882,
+      -4.105,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.carlacola",
+     "color": "255,68,0",
+     "transform": [
+      -131.457,
+      28.987,
+      0.3,
+      0.0,
+      89.489,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.sprinter",
+     "color": "115,115,115",
+     "transform": [
+      43.581,
+      -190.138,
+      0.3,
+      0.0,
+      -0.243,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.lincoln.mkz_2020",
+     "color": "0,0,0",
+     "transform": [
+      -131.776,
+      -60.014,
+      0.3,
+      0.0,
+      90.394,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.lincoln.mkz_2017",
+     "color": "16,16,16",
+     "transform": [
+      28.052,
+      149.836,
+      0.3,
+      0.0,
+      90.023,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.micro.microlino",
+     "color": "255,208,0",
+     "transform": [
+      -191.58,
+      -31.799,
+      0.6,
+      0.0,
+      89.984,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mini.cooper_s_2021",
+     "color": "22,31,73",
+     "transform": [
+      -54.081,
+      14.434,
+      0.6,
+      0.0,
+      88.908,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2_2021",
+     "color": "73,12,12",
+     "transform": [
+      -203.449,
+      -3.955,
+      0.3,
+      0.0,
+      179.86,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.nissan.patrol_2021",
+     "color": "0,38,105",
+     "transform": [
+      -81.394,
+      6.247,
+      0.3,
+      0.0,
+      -0.139,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.coupe",
+     "color": "168,0,27",
+     "transform": [
+      7.087,
+      -200.483,
+      0.3,
+      0.767,
+      179.757,
+      -0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.bmw.grandtourer",
+     "color": "68,68,77",
+     "transform": [
+      -0.358,
+      -87.894,
+      0.3,
+      0.0,
+      0.086,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.tt",
+     "color": "33,33,33",
+     "transform": [
+      189.741,
+      -11.027,
+      0.3,
+      0.0,
+      89.331,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2",
+     "color": "22,31,73",
+     "transform": [
+      -121.555,
+      -11.948,
+      0.3,
+      0.0,
+      -90.424,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mitsubishi.fusorosa",
+     "color": "255,255,255",
+     "transform": [
+      -43.837,
+      76.781,
+      0.6,
+      0.0,
+      -89.621,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mitsubishi.fusorosa",
+     "color": "255,255,255",
+     "transform": [
+      -124.484,
+      -102.441,
+      0.3,
+      0.0,
+      -89.606,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.firetruck",
+     "color": "234,0,0",
+     "transform": [
+      -161.372,
+      91.382,
+      0.3,
+      0.0,
+      0.066,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mitsubishi.fusorosa",
+     "color": "255,255,255",
+     "transform": [
+      -36.262,
+      95.025,
+      0.3,
+      0.0,
+      0.066,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.micro.microlino",
+     "color": "145,255,181",
+     "transform": [
+      -164.732,
+      -95.142,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.audi.etron",
+     "color": "0,39,105",
+     "transform": [
+      -123.665,
+      118.618,
+      0.3,
+      0.0,
+      -90.511,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.volkswagen.t2_2021",
+     "color": "105,103,0",
+     "transform": [
+      33.727,
+      -104.399,
+      0.3,
+      0.0,
+      -88.468,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mini.cooper_s_2021",
+     "color": "0,28,0",
+     "transform": [
+      -124.229,
+      55.411,
+      0.3,
+      0.0,
+      -90.511,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_2020",
+     "color": "0,39,105",
+     "transform": [
+      -135.932,
+      -145.894,
+      0.6,
+      0.0,
+      -179.557,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_police_2020",
+     "color": "0,0,0",
+     "transform": [
+      -80.082,
+      -91.515,
+      0.3,
+      0.0,
+      -179.914,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mini.cooper_s",
+     "color": "0,39,105",
+     "transform": [
+      207.271,
+      -13.931,
+      0.3,
+      0.0,
+      -90.669,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.bmw.grandtourer",
+     "color": "12,38,88",
+     "transform": [
+      16.211,
+      84.585,
+      0.3,
+      0.0,
+      -179.934,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.chevrolet.impala",
+     "color": "0,0,0",
+     "transform": [
+      -51.405,
+      -76.344,
+      0.45,
+      0.0,
+      89.663,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.ford.mustang",
+     "color": "0,12,58",
+     "transform": [
+      -123.521,
+      134.803,
+      0.3,
+      0.0,
+      -90.511,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.mercedes.sprinter",
+     "color": "255,255,255",
+     "transform": [
+      26.449,
+      -200.565,
+      0.3,
+      0.0,
+      179.757,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.carlamotors.european_hgv",
+     "color": "42,61,156",
+     "transform": [
+      29.487,
+      -76.775,
+      0.3,
+      0.0,
+      91.532,
+      0.0
+     ]
+    },
+    {
+     "blueprint": "vehicle.dodge.charger_2020",
+     "color": "0,0,0",
+     "transform": [
+      197.04,
+      13.699,
+      0.3,
+      0.0,
+      90.665,
+      0.0
+     ]
+    }
+   ],
+   "drone_start": [
+    64.135,
+    208.887,
+    15.0,
+    -36.87,
+    0.288,
+    0.0
+   ],
+   "condition": "A4a",
+   "distractor": "twin",
+   "intent": "lane",
+   "event": {
+    "kind": "lane_single",
+    "window_s": [
+     15.0,
+     45.0
+    ],
+    "first_side": "right",
+    "junction_free_m": 204.0
+   },
+   "sentence": {
+    "en": "follow the red hatchback in the right lane",
+    "ko": "오른쪽 차선의 빨간색 해치백을 따라가",
+    "expression": "lane"
+   },
+   "check": {
+    "target_pixels": 1760,
+    "lookalike_pixels": [
+     3672,
+     0
+    ],
+    "visible_lookalikes": 1,
+    "expressions_possible": [
+     "lane"
+    ]
+   }
+  }
+ ]
+}

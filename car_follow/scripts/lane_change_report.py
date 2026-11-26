@@ -19,7 +19,8 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from scripts.failure_labels import EVAL, OUT, SEALED, flights, lock_and_pick, sources, word_match  # noqa: E402
+from scripts.failure_labels import (EVAL, FAILURE_SEALED, OUT, SEALED, flights, lock_and_pick,  # noqa: E402
+                                    sources, word_match)
 from src.car_follow import failure_trials, labels, lane_phases, trials  # noqa: E402
 
 CONDITION_NAMES = {"A4a": "single", "A4b": "weave", "A4c": "swap"}
@@ -60,7 +61,7 @@ def main():
     result = json.loads((EVAL / f"{args.run}.json").read_text(encoding="utf-8"))
     if "failure_run" not in result:
         p.error(f"{args.run} did not fly a failure trial run")
-    if set(result["split"].split("+")) & set(SEALED) and not args.open_sealed:
+    if set(result["split"].split("+")) & (set(SEALED) | set(FAILURE_SEALED)) and not args.open_sealed:
         p.error(f"{args.run} flew sealed trials: --open-sealed is needed")
     by_id, traffic = sources(result, args.open_sealed)
     types = trials.load_types()
