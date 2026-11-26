@@ -571,6 +571,80 @@ def flight_figure(plt, stem, lab, sig):
     return fig
 
 
+def cmd_events(args):
+    """The failure-trial generator's runs (outputs/failure_trials/<name>/pilot.json, dev cells only): event yield per
+    condition and level, event times, and one example of each event over time."""
+    path = OUTPUTS / "failure_trials" / args.name / "pilot.json"
+    d = json.loads(path.read_text(encoding="utf-8"))
+    rows = d["trials"]
+    if any(r.get("split", "generator") not in ("generator", "dev") for r in rows):
+        refuse(f"the generator run {args.name} holds a list other than dev")
+    md = [f"생성기 실행 `{args.name}` (seed 기준 {d['seed_base']} + {d.get('seed_offset', 0)}), 사건 창 {d['window_s']} s, "
+          f"통과 기준 {d['pass_yield']:.0%}"]
+    md.append("## 1. 조건별 사건 비율\n\n" + md_table(
+        ["조건", "기록", "일어남", "비율", "통과", "단계별", "기록 전에 버린 뽑기"],
+        [[c, s["recorded"], s["happened"], s["yield"], s["passes"], s["by_level"], s["draws_rejected"]]
+         for c, s in d["summary"].items()]))
+    md.append("## 2. 시험별\n\n" + md_table(
+        ["시험", "조건", "단계", "대본 상태", "사건", "시각 s", "값"],
+        [[r["id"], r["condition"], r["level"], r["script"].get("state", "")[:40], r["check"].get("happened"),
+          r["check"].get("t_s"), {k: v for k, v in r["check"].items() if k not in ("happened", "t_s", "tick")}]
+         for r in rows]))
+    plt = pyplot()
+    fig, axes = plt.subplots(2, 3, figsize=(7.2, 3.8), gridspec_kw={"height_ratios": [1.3, 1]})
+    from src.car_follow import failure_trials as ft
+    examples = {}
+    for r in rows:
+        if r["check"].get("happened") and r["condition"] not in examples:
+            examples[r["condition"]] = r
+    for col, cond in enumerate(("A1", "A2", "A3")):
+        ax = axes[0, col]
+        r = examples.get(cond)
+        if r is None:
+            ax.set_axis_off()
+            continue
+        rec = dict(np.load(OUTPUTS / "failure_trials" / args.name / "traffic" / f"{r['id']}.npz"))
+        t = np.arange(len(rec["pos"])) * DT
+        if cond in ("A1", "A2"):
+            di = int(np.flatnonzero(rec["kind"] == "distractor")[0])
+            along, lateral, _, vt, vd = ft.pair_relation(rec, 0, di)
+            if cond == "A1":   # one quantity per panel: the distractor's offset to the side of the target
+                ax.plot(t, np.abs(lateral), color=SLOTS[0])
+                ax.set_ylabel("distractor to the side, m")
+                ax.set_ylim(0, 8)
+                ax.set_title(f"A1 cut-in ({r['id']}, {r['level']})")
+            else:
+                ax.plot(t, vt, color=SLOTS[0], label="target")
+                ax.plot(t, vd, color=SLOTS[1], label="distractor")
+                ax.set_ylabel("speed, m/s")
+                ax.legend(loc="upper left", fontsize=6)
+                ax.set_title(f"A2 queue ({r['id']}, {r['level']})")
+        else:
+            pos = rec["pos"][:, 0, :2].astype(float)
+            speed = np.r_[0.0, np.linalg.norm(np.diff(pos, axis=0), axis=1) / DT]
+            ax.plot(t, speed, color=SLOTS[0])
+            ax.set_ylabel("target speed, m/s")
+            ax.set_title(f"A3 occlusion ({r['id']})")
+        ax.axvspan(r["check"]["t_s"], r["check"]["t_s"] + r["check"].get("hidden_s", r["check"].get("stood_s", 1.0)),
+                   color=SHADE, zorder=0, linewidth=0)
+        ax.axvline(r["check"]["t_s"], color=INK2, linewidth=0.8)
+        ax.set_xlabel("s")
+    for ax in axes[0]:
+        ax.set_xlim(0, 60)
+    gs = axes[1, 0].get_gridspec()
+    for ax in axes[1]:
+        ax.remove()
+    bottom = fig.add_subplot(gs[1, :])
+    strip(bottom, {c: [r["check"].get("t_s") for r in rows if r["condition"] == c and r["check"].get("happened")]
+                   for c in d["summary"]}, "Event onset per condition (the window shaded)", "s after the start")
+    bottom.axvspan(*d["window_s"], color=SHADE, zorder=0, linewidth=0)
+    bottom.set_xlim(0, 60)
+    fig.tight_layout()
+    md.append("위 줄의 회색 띠는 확인된 사건 구간(가림, 정지)이고 세로선은 사건 시작이다. ![events](fig_events.png)")
+    write(f"events_{args.name}", "\n\n".join(md), {"run": args.name, "summary": d["summary"]},
+          [("fig_events.png", fig)])
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     common = argparse.ArgumentParser(add_help=False)
@@ -592,9 +666,11 @@ def main():
     s.add_argument("--runs", nargs="+", required=True)
     s.add_argument("--flight", default=None, help="one flight (<trial>_<lang>) as a time series")
     s.add_argument("--index", default="configs/demo1_trials.json", help="the trial index the runs flew")
+    s = sub.add_parser("events", parents=[common], help="the failure-trial generator's event yield and examples")
+    s.add_argument("--name", default="confirm", help="a run under outputs/failure_trials")
     args = p.parse_args()
     {"inventory": cmd_inventory, "trials": cmd_trials, "run": cmd_run, "labels": cmd_labels,
-     "signals": cmd_signals}[args.cmd](args)
+     "signals": cmd_signals, "events": cmd_events}[args.cmd](args)
 
 
 if __name__ == "__main__":
