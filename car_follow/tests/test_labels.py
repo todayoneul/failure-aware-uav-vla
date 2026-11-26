@@ -152,6 +152,13 @@ class ExposureTests(unittest.TestCase):
         ev, rec = flight(others=((0.0, 4.0),))
         self.assertEqual(label(ev, rec, match=(True, False))["exposure"]["crossing"], [])
 
+    def test_box_cover(self):
+        _, rec = flight(others=((-5.0, 0.0), (5.0, 0.0), (10.0, 0.0), (0.0, 3.5)))
+        cover = [float(labels.box_cover(rec, i)[100]) for i in (1, 2, 3, 4)]
+        self.assertGreater(cover[0], cover[1])       # behind covers more than ahead (the camera is behind)
+        self.assertGreater(cover[1], 0.1)
+        self.assertEqual(cover[2:], [0.0, 0.0])      # 10 m ahead, or the next lane: apart
+
     def test_queue(self):
         ev, rec = flight(others=((8.0, 0.0),), speed=0.0)
         self.assertEqual(label(ev, rec)["exposure_s"]["queue"], N * labels.DT)

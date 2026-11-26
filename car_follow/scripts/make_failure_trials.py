@@ -9,6 +9,8 @@ Run from the car_follow folder (starts and stops the simulator):
 Outputs go to outputs/failure_trials/<name>/ (local only): pilot.json, trials/<id>.json and traffic/<id>.npz.
 --list dev names the trials dev-<condition>-NN with split dev and draws them from their own seeds (A4 only for now:
 the lane-change condition added on 2026-11-26 is checked on its own dev trials, apart from batch A's dev list).
+--tight gives A1 and A2 trials the tight event values (failure_trials.TIGHT: a closer cut-in, a closer queue). Every
+row with a distractor also reports how much of the target's image box (nominal follow pose) the distractor covered.
 """
 import argparse
 import collections
@@ -23,7 +25,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from scripts.demo1_follow import DT, HZ, Recorder  # noqa: E402
-from src.car_follow import failure_trials, sim, trials  # noqa: E402
+from src.car_follow import failure_trials, labels, sim, trials  # noqa: E402
 
 OUT = ROOT / "outputs" / "failure_trials"
 PILOT_SEED = 1_050_000       # the pilot's own seeds (the dev list starts at 1,100,000, docs/failure_plan.md 4.3)
@@ -137,6 +139,20 @@ def record(client, world, tm, trial, path):
         sim.clear(client, world)
 
 
+def cover(path, window=failure_trials.WINDOW_S):
+    """How much of the target's image box (nominal follow pose) the distractor covered from the window's start on:
+    the largest share and the seconds over 10% (None without a distractor)."""
+    if not path.exists():
+        return None
+    rec = dict(np.load(path))
+    found = np.flatnonzero(rec["kind"] == "distractor")
+    if not len(found):
+        return None
+    share = labels.box_cover(rec, int(found[0]))
+    share[:int(window[0] / DT)] = 0.0
+    return {"max": round(float(share.max()), 3), "over_10pct_s": round(float((share > 0.1).sum() * DT), 2)}
+
+
 def runs_s(mask):
     """[(start s, length s)] of the True runs, or None."""
     if mask is None:
@@ -184,6 +200,10 @@ def cmd_pilot(args):
                     rejected[condition][why] += 1
                     continue
                 kept += 1
+                if args.tight and condition in failure_trials.TIGHT:
+                    trial["event"].update(failure_trials.TIGHT[condition])
+                if args.cut_behind and condition == "A1":
+                    trial["event"].update(failure_trials.CUT_BEHIND)
                 # 'gen-': the generator's own trial run, not the gate list called pilot (docs/failure_plan.md 4.4)
                 prefix = "gen" if args.list == "generator" else args.list
                 trial = {"id": f"{prefix}-{condition}-{kept:02d}", "split": args.list, "seed": seed, **trial}
@@ -195,6 +215,7 @@ def cmd_pilot(args):
                        "check": result, "occluded_s": None if occluded is None else round(float(occluded.sum() * DT), 2),
                        "occluded_runs": runs_s(occluded), "travelled_m": travelled(out / "traffic" / f"{trial['id']}.npz"),
                        "seconds": round(time.monotonic() - w, 1)}
+                row["cover"] = cover(out / "traffic" / f"{trial['id']}.npz")
                 rows.append(row)
                 (out / "trials").mkdir(exist_ok=True)
                 (out / "trials" / f"{trial['id']}.json").write_text(json.dumps(trial, indent=1, ensure_ascii=False),
@@ -210,7 +231,7 @@ def cmd_pilot(args):
         summary[condition] = {"recorded": len(rs), "happened": ok, "yield": round(ok / len(rs), 3) if rs else None,
                               "passes": bool(rs) and ok / len(rs) >= PASS_YIELD, "by_level": by_level,
                               "draws_rejected": dict(rejected[condition])}
-    result = {"list": args.list, "seed_base": {c: seed_for(c, args.list, 0, 0) for c in args.conditions},
+    result = {"list": args.list, "tight": args.tight, "cut_behind": args.cut_behind, "seed_base": {c: seed_for(c, args.list, 0, 0) for c in args.conditions},
               "seed_offset": args.seed_offset, "pass_yield": PASS_YIELD, "window_s": list(failure_trials.WINDOW_S),
               "summary": summary, "trials": rows, "elapsed_s": round(time.monotonic() - t0, 1)}
     (out / "pilot.json").write_text(json.dumps(result, indent=1, ensure_ascii=False), encoding="utf-8")
@@ -228,6 +249,10 @@ def main():
     s.add_argument("--seed-offset", type=int, default=0,
                    help="draw from other seeds (the tuning used offset 0; the confirming run fresh ones)")
     s.add_argument("--name", default="pilot", help="output folder under outputs/failure_trials")
+    s.add_argument("--tight", action="store_true",
+                   help="A1 and A2 with the tight event values (failure_trials.TIGHT, proposed after step 4)")
+    s.add_argument("--cut-behind", action="store_true",
+                   help="A1 cuts in behind the target, between it and the drone (failure_trials.CUT_BEHIND)")
     s.add_argument("--list", default="generator", choices=("generator", "dev"),
                    help="dev: the trials are dev trials (ids dev-..., split dev, own seeds; A4 only)")
     s.add_argument("--no-start", action="store_true", help="use a simulator that is already running")

@@ -91,6 +91,14 @@ class CheckTests(unittest.TestCase):
         rec3 = recording()
         rec3["pos"][:, 1, 0] += 10.0                                    # ahead in the lane from the start
         self.assertFalse(ft.check_cut_in(rec3, 1)["happened"])          # never came from the next lane
+        rec4 = recording()
+        rec4["pos"][:, 1, 1] = 3.5
+        rec4["pos"][:, 1, 0] -= 5.0                                     # 5 m behind in the next lane ...
+        rec4["pos"][k0:, 1, 1] = np.maximum(0.0, 3.5 - 0.1 * np.arange(N - k0))   # ... then across behind the target
+        self.assertFalse(ft.check_cut_in(rec4, 1)["happened"])          # not ahead
+        out = ft.check_cut_in(rec4, 1, behind=True)
+        self.assertTrue(out["happened"])
+        self.assertAlmostEqual(out["ahead_m"], -5.0, places=3)
 
     def test_queue(self):
         rec = recording()

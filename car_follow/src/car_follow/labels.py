@@ -194,6 +194,33 @@ def crossing_runs(rec, match, ticks=None, cross_m=CROSS_M, camera=CAMERA):
     return true_runs(hit)
 
 
+def nominal_camera(rec, k, camera=CAMERA):
+    """The camera at the nominal follow pose of tick k (20 m behind the target, 15 m up, aimed at it)."""
+    pos, yaw = rec["pos"][k, 0].astype(float), float(rec["rot"][k, 0, 1])
+    eye = follow.goal_point(pos, yaw)
+    cyaw, cpitch = screen.look_at(eye, pos + np.array([0.0, 0.0, estimate.AIM_ABOVE_M]))
+    return screen.Camera(eye, cyaw, cpitch, camera["width"], camera["height"], camera["fov"])
+
+
+def box_cover(rec, other, ticks=None, camera=CAMERA):
+    """Per tick: the share of the target's image box (nominal follow pose) that car `other`'s box covers (0 when
+    either is out of the image or the car is over 40 m away). Traffic only."""
+    n = len(rec["pos"]) if ticks is None else ticks
+    pos, rot = rec["pos"][:n].astype(float), rec["rot"][:n].astype(float)
+    out = np.zeros(n)
+    near = np.flatnonzero(np.linalg.norm(pos[:, other, :2] - pos[:, 0, :2], axis=1) < 40.0)
+    for k in near:
+        cam = nominal_camera(rec, k, camera)
+        tb = _image_box(cam, pos[k, 0], rot[k, 0], rec["box_center"][0], rec["box_extent"][0])
+        ob = _image_box(cam, pos[k, other], rot[k, other], rec["box_center"][other], rec["box_extent"][other])
+        if tb is None or ob is None:
+            continue
+        ix = max(0.0, min(tb[2], ob[2]) - max(tb[0], ob[0]))
+        iy = max(0.0, min(tb[3], ob[3]) - max(tb[1], ob[1]))
+        out[k] = ix * iy / max(1e-6, (tb[2] - tb[0]) * (tb[3] - tb[1]))
+    return out
+
+
 def _image_box(cam, position, rot, center, extent):
     uv, depth = cam.project(screen.box_vertices(position, rot, center, extent))
     if (depth <= 0.1).any():

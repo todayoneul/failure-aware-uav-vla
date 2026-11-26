@@ -27,8 +27,19 @@ def gpu_memory_mib():
     return used, total
 
 
+# This PC has an AMD integrated GPU next to the RTX 5070. Left to choose, the simulator rendered on the integrated GPU
+# once (2026-11-26, while the desktop session was disconnected): the NVIDIA card held only the models and flights ran
+# at about half speed. -preferNvidia (Unreal's adapter vendor preference) keeps it on the NVIDIA card; -preferAMD moved
+# it to the integrated GPU in a check, so the flag is honoured. session() also checks it after every start.
+SIM_MIN_NVIDIA_MIB = 1500.0   # the simulator adds about 3.3 GB to the NVIDIA card with the map loaded; 25 MB if not
+
+
+class WrongGPU(RuntimeError):
+    pass
+
+
 def server_args(quality, port, offscreen):
-    args = [f"-quality-level={quality}", f"-carla-rpc-port={port}", "-nosound"]
+    args = [f"-quality-level={quality}", f"-carla-rpc-port={port}", "-nosound", "-preferNvidia"]
     return args + (["-RenderOffScreen"] if offscreen else ["-windowed", "-ResX=640", "-ResY=360"])
 
 
@@ -91,6 +102,7 @@ def session(map_name, hz=20.0, quality="Low", start=True, offscreen=False, port=
     switches synchronous mode off and stops the simulator it started."""
     if start:
         gpu_order.before_map_load()
+        nvidia_before = gpu_order.gpu_memory_mib()[0]
         process, client = start_and_connect(server, server_args(quality, port, offscreen), port, connect_timeout)
     else:
         process, client = None, connect(port, connect_timeout)
@@ -108,6 +120,13 @@ def session(map_name, hz=20.0, quality="Low", start=True, offscreen=False, port=
         tm = client.get_trafficmanager(tm_port)
         tm.set_synchronous_mode(True)
         tm.set_random_device_seed(seed)
+        if process is not None:   # we started it: it must render on the NVIDIA card
+            for _ in range(10):
+                world.tick()
+            added = gpu_order.gpu_memory_mib()[0] - nvidia_before
+            if added < SIM_MIN_NVIDIA_MIB:
+                raise WrongGPU(f"the simulator added only {added:.0f} MiB to the NVIDIA card (expected about 3300): "
+                               "it is not rendering there")
         gpu_order.simulator_ready()
         yield client, world, tm
     finally:

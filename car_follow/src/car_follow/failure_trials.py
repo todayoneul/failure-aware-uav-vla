@@ -56,6 +56,16 @@ CLEAR_AHEAD_M = 20.0                 # no junction this far ahead of either car 
 A2_LIGHT_M = (60.0, 250.0)           # A2 starts: a signalled junction this far along the straight-on route
 QUEUE_DISTANCE_M = 4.0               # Traffic Manager distance to the car ahead for the pair (6-10 m centre to centre)
 CUT_AHEAD_M = 8.0                    # how far ahead the distractor must be before it is forced across
+# Tight variant (proposed after step 4, docs/failure.md 8): at the nominal follow pose two cars in one lane overlap in
+# the image only within about 6-7 m centre to centre (0-2 m bumper gap); the default events stop at 6.8-11 m. A trial
+# carries the tight values in its event (cut_ahead_m, change_speed_extra_mps, target_follow_m, queue_distance_m).
+TIGHT = {"A1": {"cut_ahead_m": 4.5, "change_speed_extra_mps": 0.0, "target_follow_m": 1.5},
+         "A2": {"queue_distance_m": 1.0}}
+# A cut-in ahead overlaps little even when tight (the camera is behind): the cut-in behind puts the distractor between
+# the drone and the target. It escorts the target ESCORT 5 m behind in the next lane, cuts into the target's lane when
+# 3.5-7.5 m behind and then tails it 1 m bumper to bumper (Traffic Manager distance), holding 5 m centre to centre.
+CUT_BEHIND = {"cut_side": "behind", "escort_along_m": -5.0, "cut_from_m": [-7.5, -3.5], "tail_m": 1.0}
+CUT_CHECK_BEHIND_M = (-9.0, -3.0)    # the distractor in the target's lane this far behind (centre to centre)
 CUT_CHECK_AHEAD_M = 25.0
 OVERTAKE_TIMEOUT_S, CHANGE_TIMEOUT_S = 20.0, 6.0
 A2_ALONG_M = (12.0, 18.0)            # the A2 distractor's distance ahead of or behind the target in its lane
@@ -341,22 +351,38 @@ class CutIn(Event):
         twp, dwp = m.get_waypoint(t.get_location()), m.get_waypoint(d.get_location())
         along, lateral, dyaw = relation(t, d)
         vt = _speed(t)
+        ev = self.trial["event"]
+        behind = ev.get("cut_side") == "behind"
+        hold = ev.get("escort_along_m", -ESCORT_ALONG_M)
+        if behind and s in ("change", "done"):   # stay close behind the target in its lane
+            self.drive(tm, d, min(vt + ESCORT_GAIN * (hold - along), vt + OVERTAKE_MPS))
         if s == "wait":
-            self.drive(tm, d, min(vt + ESCORT_GAIN * (-ESCORT_ALONG_M - along), vt + OVERTAKE_MPS))
+            self.drive(tm, d, min(vt + ESCORT_GAIN * (hold - along), vt + OVERTAKE_MPS))
             if now < self.window[0]:
                 return
             if now > self.window[1]:
                 self.log["state"] = "missed: never beside the target on a clear stretch in the window"
                 return
             beside = NEXT_LANE_M[0] <= abs(lateral) <= NEXT_LANE_M[1] and dyaw < SAME_WAY_DEG
+            lo, hi = ev["cut_from_m"] if behind else (-CUT_BEHIND_M, CUT_UNTIL_M)
             blocked = ("not in the next lane" if not beside
                        else "not both moving" if vt <= 2.0 or _speed(d) <= 2.0
-                       else "too far behind or ahead" if not -CUT_BEHIND_M <= along <= CUT_UNTIL_M
+                       else "too far behind or ahead" if not lo <= along <= hi
                        else "in a junction" if twp.is_junction or dwp.is_junction
                        else "junction ahead" if not (trials.free_of_junctions(twp, CLEAR_AHEAD_M)
                                                      and trials.free_of_junctions(dwp, CLEAR_AHEAD_M)) else None)
             if blocked:
                 self.block(blocked)
+                return
+            if behind:   # no overtaking: straight into the target's lane behind it
+                right = dwp.get_right_lane()
+                to_right = right is not None and right.road_id == twp.road_id and right.lane_id == twp.lane_id
+                tm.distance_to_leading_vehicle(d, ev["tail_m"])
+                tm.auto_lane_change(d, True)
+                tm.ignore_vehicles_percentage(d, 100.0)
+                tm.force_lane_change(d, to_right)
+                self.log.update(state="change", trigger_tick=k, change_tick=k, change_along_m=round(along, 2),
+                                to="right" if to_right else "left", from_lane=dwp.lane_id, to_lane=twp.lane_id)
                 return
             tm.vehicle_percentage_speed_difference(t, TARGET_SLOW_DIFF)
             self.log.update(state="overtake", trigger_tick=k, trigger_along_m=round(along, 2),
@@ -367,7 +393,8 @@ class CutIn(Event):
                 tm.vehicle_percentage_speed_difference(t, DEFAULT_SPEED_DIFF)
                 self.drive(tm, d, vt)
                 self.log["state"] = "failed: did not get ahead"
-            elif along >= CUT_AHEAD_M and not dwp.is_junction and not twp.is_junction:
+            elif along >= self.trial["event"].get("cut_ahead_m", CUT_AHEAD_M) and not dwp.is_junction \
+                    and not twp.is_junction:
                 # Steer it by a path along the target's lane ahead (force_lane_change did not move it in the pilot,
                 # with automatic lane changes off).
                 # Which neighbour of the distractor's lane is the target's (from the map, not the camera-free offset,
@@ -377,13 +404,16 @@ class CutIn(Event):
                 right = dwp.get_right_lane()
                 to_right = right is not None and right.road_id == twp.road_id and right.lane_id == twp.lane_id
                 tm.vehicle_percentage_speed_difference(t, DEFAULT_SPEED_DIFF)
+                if "target_follow_m" in self.trial["event"]:   # tight: the target closes up behind the cut-in
+                    tm.distance_to_leading_vehicle(t, self.trial["event"]["target_follow_m"])
                 tm.auto_lane_change(d, True)
                 tm.ignore_vehicles_percentage(d, 100.0)
                 tm.force_lane_change(d, to_right)
                 self.log.update(state="change", change_tick=k, change_along_m=round(along, 2),
                                 to="right" if to_right else "left", from_lane=dwp.lane_id, to_lane=twp.lane_id)
         elif s == "change":
-            self.drive(tm, d, vt + 1.0)
+            if not behind:
+                self.drive(tm, d, vt + ev.get("change_speed_extra_mps", 1.0))
             tm.force_lane_change(d, self.log["to"] == "right")
             if (dwp.road_id == twp.road_id and dwp.lane_id == twp.lane_id) or abs(lateral) < 1.0:
                 tm.auto_lane_change(d, False)
@@ -404,7 +434,7 @@ class Queue(Event):
         for a in (actors["target"], actors["distractor"]):
             tm.set_route(a, list(ROUTE))
             tm.auto_lane_change(a, False)
-            tm.distance_to_leading_vehicle(a, QUEUE_DISTANCE_M)
+            tm.distance_to_leading_vehicle(a, self.trial["event"].get("queue_distance_m", QUEUE_DISTANCE_M))
         self.light = None
         self.stood = 0
 
@@ -807,11 +837,13 @@ def _runs(mask):
     return [(int(a), int(b - a)) for a, b in zip(edges[::2], edges[1::2])]
 
 
-def check_cut_in(rec, d, window=WINDOW_S, dt=0.05):
-    """The distractor entered the target's lane ahead (within CUT_CHECK_AHEAD_M) from the next lane and stayed for
-    at least 1 s, entering between the window's start and 15 s after its end."""
+def check_cut_in(rec, d, window=WINDOW_S, dt=0.05, behind=False):
+    """The distractor entered the target's lane ahead (within CUT_CHECK_AHEAD_M; behind: CUT_CHECK_BEHIND_M) from
+    the next lane and stayed for at least 1 s, entering between the window's start and 15 s after its end."""
     along, lateral, dyaw, _, _ = pair_relation(rec, 0, d)
-    in_lane = (np.abs(lateral) < LANE_HALF_M) & (dyaw < SAME_WAY_DEG) & (along > 0) & (along <= CUT_CHECK_AHEAD_M)
+    span = (CUT_CHECK_BEHIND_M[0] <= along) & (along <= CUT_CHECK_BEHIND_M[1]) if behind else \
+        (along > 0) & (along <= CUT_CHECK_AHEAD_M)
+    in_lane = (np.abs(lateral) < LANE_HALF_M) & (dyaw < SAME_WAY_DEG) & span
     beside = (np.abs(lateral) > 2.0) & (np.abs(lateral) < 5.5) & (dyaw < SAME_WAY_DEG)
     lo, hi = int(window[0] / dt), int((window[1] + 15.0) / dt)
     for s, n in _runs(in_lane):
@@ -954,7 +986,7 @@ def check(trial, rec, occluded=None, dt=0.05):
         return check_lane(trial, rec, trial["event"]["window_s"], dt)
     d = int(np.flatnonzero(np.asarray(rec["kind"]) == "distractor")[0]) if kind in ("cut_in", "queue") else None
     if kind == "cut_in":
-        return check_cut_in(rec, d, trial["event"]["window_s"], dt)
+        return check_cut_in(rec, d, trial["event"]["window_s"], dt, trial["event"].get("cut_side") == "behind")
     if kind == "queue":
         return check_queue(rec, d, trial["event"]["window_s"], dt)
     return check_occlusion(occluded, trial["event"]["window_s"], dt)
