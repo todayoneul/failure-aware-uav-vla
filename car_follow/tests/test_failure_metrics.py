@@ -98,6 +98,25 @@ class BoundTests(unittest.TestCase):
         self.assertEqual(s["by_failure"], {"drift": {"flights": 1, "detected": 1},
                                            "loss": {"flights": 1, "detected": 0}})
 
+    def test_groups_are_reported_apart(self):
+        """The pooled rate must not hide a group: an easy loss caught and a silent drift missed."""
+        rows = [fm.flight_metrics(labels(t_fail=200, failure="loss"), alarm_at(205)),
+                fm.flight_metrics(labels(t_fail=200, failure="loss"), alarm_at(190)),
+                fm.flight_metrics(labels(t_fail=200, failure="drift"), alarm_at())]
+        s = fm.summarize(rows)
+        self.assertEqual(s["detected"]["k"], 2)                                 # pooled 2/3 ...
+        self.assertEqual(s["by_group"]["silent"]["detected"]["k"], 0)          # ... but silent 0/1
+        self.assertEqual(s["by_group"]["loss"]["detected"]["k"], 2)
+        self.assertEqual(s["by_group"]["loss"]["lead"]["early"], 1)            # one alarm 0.5 s before t_fail
+        self.assertEqual(s["by_group"]["loss"]["lead"]["lead_s_median"], 0.5)
+        self.assertEqual(s["by_group"]["first_pick"]["flights"], 0)
+        for r, declared, reacquired in zip(rows, ("loss", "drift", "loss"), (True, False, None)):
+            r.update(declared=declared, reacquired=reacquired)
+        s = fm.summarize(rows)
+        self.assertEqual(s["by_group"]["loss"]["type_accuracy"]["k"], 1)       # one loss declared as a drift
+        self.assertEqual((s["by_group"]["loss"]["reacquired"]["k"], s["by_group"]["loss"]["reacquired"]["n"]), (1, 2))
+        self.assertEqual(s["by_group"]["silent"]["type_accuracy"]["k"], 0)
+
 
 if __name__ == "__main__":
     unittest.main()

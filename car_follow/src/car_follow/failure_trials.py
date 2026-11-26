@@ -53,14 +53,21 @@ NEXT_LANE_M = (2.5, 6.0)             # lateral offset of a car in the next lane 
 A1_SLOTS = [(k, a) for k in (-1, 1) for a in (-12.0, -6.0, -20.0)]   # the distractor's start: next lane, behind
 A1_FREE_M = 180.0                    # A1 starts: no junction this far along the straight-on route (traffic keeps moving)
 CLEAR_AHEAD_M = 20.0                 # no junction this far ahead of either car when the cut-in starts
-A2_LIGHT_M = (60.0, 250.0)           # A2 starts: a signalled junction this far along the straight-on route
-QUEUE_DISTANCE_M = 4.0               # Traffic Manager distance to the car ahead for the pair (6-10 m centre to centre)
+A2_LIGHT_M = (100.0, 250.0)          # A2 starts: a signalled junction this far along the straight-on route. From
+                                     # 60 m, with the tight queue 8 of 25 fresh pairs stood at their first light before
+                                     # the window (lights 62-82 m ahead); from 102 m the stand began in the window
+QUEUE_DISTANCE_M = 1.0               # Traffic Manager distance to the car ahead for the pair: the tight queue, adopted
+                                     # 2026-11-26 (docs/failure.md 8.7). 4.0 stood them 6.8-8.6 m apart centre to
+                                     # centre, never overlapping in the image; 1.0 stands them 3.9-5.7 m apart
+A2_AHEAD_MATCHED = 2.0 / 3.0         # word-match distractors (twin, near-twin) stand ahead of the target ('furthest
+                                     # back') this often, else behind ('furthest ahead'); 'other' ones always ahead:
+                                     # the tight queue's switches all came with the distractor ahead (8.4)
 CUT_AHEAD_M = 8.0                    # how far ahead the distractor must be before it is forced across
 # Tight variant (proposed after step 4, docs/failure.md 8): at the nominal follow pose two cars in one lane overlap in
 # the image only within about 6-7 m centre to centre (0-2 m bumper gap); the default events stop at 6.8-11 m. A trial
 # carries the tight values in its event (cut_ahead_m, change_speed_extra_mps, target_follow_m, queue_distance_m).
-TIGHT = {"A1": {"cut_ahead_m": 4.5, "change_speed_extra_mps": 0.0, "target_follow_m": 1.5},
-         "A2": {"queue_distance_m": 1.0}}
+TIGHT = {"A1": {"cut_ahead_m": 4.5, "change_speed_extra_mps": 0.0, "target_follow_m": 1.5}}   # tested, not adopted
+# (the tight A2 queue is now the default, QUEUE_DISTANCE_M)
 # A cut-in ahead overlaps little even when tight (the camera is behind): the cut-in behind puts the distractor between
 # the drone and the target. It escorts the target ESCORT 5 m behind in the next lane, cuts into the target's lane when
 # 3.5-7.5 m behind and then tails it 1 m bumper to bumper (Traffic Manager distance), holding 5 m centre to centre.
@@ -150,8 +157,13 @@ def distractor_car(rng, level, blueprint, color, types, colors):
 
 def plan(rng, condition, level, world_map, cells, types, colors, spawn_points):
     """Draw one trial of `condition` (without id, split, sentence or check), or None if this draw does not fit."""
+    ahead = None
     if condition == "A2":
-        intent = rng.choice(("front", "back"))
+        if level == "other":   # its words do not fit: any expression, the distractor always ahead
+            ahead, intent = True, rng.choice(trials.INTENTS)
+        else:                  # a word-match car ahead of the target needs 'back', behind it 'front'
+            ahead = rng.random() < A2_AHEAD_MATCHED
+            intent = "back" if ahead else "front"
     elif condition == "A1" and level != "other":
         intent = rng.choice(("lane", "lane", "front"))   # a word-match car behind the target rules out 'back'
     else:
@@ -162,6 +174,8 @@ def plan(rng, condition, level, world_map, cells, types, colors, spawn_points):
                                                                    "window_s": list(WINDOW_S)})
     if condition in ("A4a", "A4b"):
         trial["event"]["first_side"] = rng.choice(("left", "right"))
+    if condition == "A2":
+        trial["event"].update(queue_distance_m=QUEUE_DISTANCE_M, distractor_ahead=ahead)
     if condition not in WITH_DISTRACTOR:
         return trial
     t = trial["target"]
@@ -170,7 +184,7 @@ def plan(rng, condition, level, world_map, cells, types, colors, spawn_points):
         return None
     wp = world_map.get_waypoint(trials.as_transform(t["transform"]).location)
     match = level != "other"
-    side = 1.0 if intent == "back" else -1.0      # a word-match car ahead of the target needs 'back', behind 'front'
+    side = 1.0 if ahead else -1.0                 # A2: the distractor ahead of the target or behind it
     slots = (list(A1_SLOTS) if condition == "A1" else list(A4C_SLOTS) if condition == "A4c"
              else [(0, side * a) for a in A2_ALONG_M])
     rng.shuffle(slots)

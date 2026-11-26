@@ -11,6 +11,15 @@ labels.label_flight's output.
     delay                 that alarm's tick minus t_fail (negative: it came early)
     wrong-follow time     t_fail to the alarm (0 if the alarm came early); without one, to the recovery, else to the
                           flight's end (the main metric)
+
+Reporting rule (decided 2026-11-26, docs/failure_plan.md 6.5): the pooled detection rate is never reported alone. The
+failure groups below are reported side by side with it, each with its own detection rate (95% interval), lead time
+and wrong-follow time, because occlusion losses are frequent and easy to see (no box) and would inflate a pooled rate:
+    silent      switch_box, switch_estimate, drift: the box or estimate on the wrong car while the system looks fine
+    loss        the target hidden or its track dropped, split by cause (hidden, track_dropped)
+    first_pick  the first pick was not the target
+When the rows carry a monitor's declared failure type ('declared') or the response's outcome ('reacquired'), each group
+also gets the type accuracy and the reacquisition rate.
 """
 import math
 
@@ -19,6 +28,15 @@ import numpy as np
 from .labels import DT
 
 L_S = 3.0
+FAILURE_GROUPS = {"silent": ("switch_box", "switch_estimate", "drift"), "loss": ("loss",),
+                  "first_pick": ("first_pick",)}
+
+
+def group_of(kind):
+    for g, kinds in FAILURE_GROUPS.items():
+        if kind in kinds:
+            return g
+    return None
 
 
 def _ticks(seconds, dt=DT):
@@ -75,8 +93,11 @@ def flight_metrics(labels, alarm, lead_s=L_S, dt=DT):
     near = near_miss_mask(labels, n, lead_s, dt)
     fa = first_true(alarm & normal)
     minutes = normal.sum() * dt / 60.0
+    chain = labels.get("chain") or []
     row = {
         "failure": labels["failure"],
+        "group": group_of(labels["failure"]),
+        "cause": chain[0].get("cause") if chain else None,
         "false_alarm": fa is not None,
         "false_alarm_strict": first_true(alarm & strict) is not None,
         "first_false_alarm_s": None if fa is None else round(fa * dt, 2),
@@ -181,4 +202,31 @@ def summarize(rows, trial_of=None):
     kinds = sorted({r["failure"] for r in fails})
     out["by_failure"] = {k: {"flights": sum(r["failure"] == k for r in fails),
                              "detected": sum(bool(r["detected"]) for r in fails if r["failure"] == k)} for k in kinds}
+    out["by_group"] = {g: group_summary([r for r in fails if group_of(r["failure"]) == g])
+                       for g in FAILURE_GROUPS}
+    losses = [r for r in fails if r["failure"] == "loss"]
+    out["by_group"]["loss"]["by_cause"] = {c: group_summary([r for r in losses if r.get("cause") == c])
+                                           for c in sorted({r.get("cause") for r in losses if r.get("cause")})}
+    return out
+
+
+def group_summary(rows):
+    """Detection rate (95% interval), lead time, wrong-follow time of one failure group's flights; type accuracy and
+    reacquisition rate when the rows carry 'declared' (the monitor's failure type) and 'reacquired'."""
+    out = {"flights": len(rows), "detected": _rate(sum(bool(r["detected"]) for r in rows), len(rows))}
+    delays = [r["delay_s"] for r in rows if r["delay_s"] is not None]
+    early = [-d for d in delays if d <= 0]
+    out["lead"] = {"early": len(early), "early_share": round(len(early) / len(rows), 4) if rows else None,
+                   "lead_s_median": round(float(np.median(early)), 2) if early else None,
+                   "delay_s_median": round(float(np.median(delays)), 2) if delays else None}
+    wrong = [r["wrong_follow_s"] for r in rows if r["wrong_follow_s"] is not None]
+    out["wrong_follow_s"] = ({"total": round(float(np.sum(wrong)), 2), "median": round(float(np.median(wrong)), 2)}
+                             if wrong else None)
+    typed = [r for r in rows if r.get("declared") is not None]
+    if typed:
+        out["type_accuracy"] = _rate(sum(group_of(r["declared"]) == group_of(r["failure"]) or
+                                         r["declared"] == r["failure"] for r in typed), len(typed))
+    responded = [r for r in rows if r.get("reacquired") is not None]
+    if responded:
+        out["reacquired"] = _rate(sum(bool(r["reacquired"]) for r in responded), len(responded))
     return out
