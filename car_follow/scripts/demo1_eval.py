@@ -15,7 +15,9 @@ The altitude guard (src/car_follow/clearance.py, docs/demo1.md 4.6) reads a 160 
     --guard observe  it runs and is recorded, but the drone ignores it (for comparison)
     --guard off      no depth camera
 
-Per trial the evidence (owner of the box, target pixels, guard, drone log) goes to outputs/demo1_eval/<name>/<trial>.npz
+Per trial the evidence (owner of the box, target pixels, guard, drone log, and since stage 3 the flight record of
+src/car_follow/flight_log.py: every car's pixels, every detection and track, the target track's association) goes to
+outputs/demo1_eval/<name>/<trial>.npz
 and the scores to outputs/demo1_eval/<name>.json (local only). --video <trial ids> also writes the three-view screen
 (src/car_follow/screen.py); for config 3 it adds the steps and the VLM's pick (src/car_follow/pick_view.py, display
 only) and <trial>_<lang>_pick.png, what the VLM saw in its first question with its answer (docs/demo1.md 8.7).
@@ -38,8 +40,8 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from scripts.demo1_follow import DT, HZ, OUT as FOLLOW_OUT, XODR, select, target_track  # noqa: E402
-from src.car_follow import (clearance, detector, drone, estimate, first_pick, follow, pick_view,  # noqa: E402
-                            replay, scorer, screen, sim, tracker, trials, vlm)
+from src.car_follow import (clearance, detector, drone, estimate, first_pick, flight_log, follow,  # noqa: E402
+                            pick_view, replay, scorer, screen, sim, tracker, trials, vlm)
 
 OUT = ROOT / "outputs" / "demo1_eval"
 WARMUP_TICKS = 2   # camera warm-up before each trial (see fly_trial)
@@ -65,6 +67,7 @@ def fly_trial(client, world, trial, rec, config, guard_mode="on", raster=None, v
     target_track_id, follow_filter = None, None
     pending, lock_tick, handoff = None, None, None   # config 3: the picked track, until the pick's time has passed
     car_index = {int(a): i for i, a in enumerate(rp.ids)}
+    flog = flight_log.FlightLog(ticks, rp.ids)   # stage 3 record: reads only (docs/failure_plan.md 5.2)
 
     def pose():
         return carla.Transform(carla.Location(*state.position), carla.Rotation(pitch=state.pitch, yaw=state.yaw))
@@ -125,6 +128,7 @@ def fly_trial(client, world, trial, rec, config, guard_mode="on", raster=None, v
             frame = world.tick()
             seg_img = sim.frame_at(cams["seg"][1], frame)
             ids_img = sim.instance_ids(seg_img)
+            flog.pixels(k, ids_img)
             depth = sim.depth_m(sim.frame_at(cams["depth"][1], frame)) if guard is not None else None
             bgr = sim.bgr(sim.frame_at(cams["rgb"][1], frame)) if need_rgb else None
             if probe is not None:
@@ -146,6 +150,7 @@ def fly_trial(client, world, trial, rec, config, guard_mode="on", raster=None, v
                         ev["target_det_score"][k] = best.score
                         if config == 2 and target_track_id is None:  # config 2's first pick is ground truth
                             target_det = best
+                flog.before_update(mot.tracks, DT)
                 mot.update(dets, DT)
                 ev["detections"][k], ev["tracks"][k] = len(dets), len(mot.tracks)
                 if target_track_id is None and target_det is not None:  # config 2: the first pick is ground truth
@@ -188,6 +193,7 @@ def fly_trial(client, world, trial, rec, config, guard_mode="on", raster=None, v
                 if live is not None and live.matched:
                     ev["target_score"][k] = live.score
                 ev["track_id"][k] = target_track_id if live is not None else -1
+                flog.after(k, dets, mot.tracks, target_track_id)
                 if follow_filter is not None:
                     tpos = follow_filter.position
                     tyaw = follow_filter.yaw if follow_filter.yaw is not None else state.yaw
@@ -274,6 +280,7 @@ def fly_trial(client, world, trial, rec, config, guard_mode="on", raster=None, v
         rp.destroy()
         world.tick()
     log["t"] = np.arange(ticks) * DT
+    ev.update(flog.arrays())
     return ev, log, wall
 
 
