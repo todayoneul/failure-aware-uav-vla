@@ -20,7 +20,8 @@ CARLA에서 자연어로 지정한 차량("오른쪽 차선의 흰색 SUV를 따
 | 첫 데모 구현 5: 탐지기와 추적기 (구성 2) | 완료. 위치 추정: 땅 평면 투영은 고가도로 위에서 중앙값 11.3m 틀려 깊이 맵(0.12m)을 씀. 세계 좌표 ByteTrack 방식 추적기를 완벽한 탐지로 재 보니 본 구간 바뀜 없음 20/20, 목표 유지 99.97%, 거리 오차 1.49m. 실제 탐지기는 RF-DETR-Small(Apache-2.0)로 정해 설치함: 8ms/영상, 0.5GB. 목표 탐지율 95%(점수 0.3)지만 50m 넘는 작은 차와 위에서 본 일부 차(회색 승합차, 주황 Mini)를 놓침. RF-DETR + 추적기(구성 2)는 dev 20개 본 구간에서 바뀜 없음 20/20, 목표 유지 98.7%, 거리 오차 1.52m로 합격선을 넘음. 회색 승합차는 탐지 공백이 1.4초까지 길어져 트랙 지움(1.5초) 직전 | [demo1](docs/demo1.md) 5절 |
 | 첫 데모 구현 6: VLM 처음 지정 (구성 3) | 완료. Apache-2.0 VLM 3종 zero-shot: Qwen3-VL-4B(4-bit)가 가장 나아 VLM dev 100장 영어 79%·한국어 80%, dev 20장 영어 90%·한국어 70%로 90% 미달(차선·앞뒤 표현에서 비슷한 차를 고름). 2B bf16을 시뮬레이터·RF-DETR와 함께 올려도 GPU 10.1GB. 4B 4-bit QLoRA 뒤 VLM dev 99%, dev 20장 100%(저장 화면 기준). 답할 수 없는 지시는 log(p1/p2) 임계값으로 거름 | [demo1](docs/demo1.md) 6–7절 |
 | 첫 데모 구현 7: 구성 3 평가 | 완료. dev 20, pilot 3(2회), smoke 10 통과 뒤 봉인한 본평가 30개를 열어 영어·한국어 모두 합격: 처음 지정 30/30, 바뀜 없음 영어 30/30·한국어 29/30, 목표 유지 97.4%, 거리 오차 1.8m. 바뀜 1회는 회색 승합차의 위치 추정이 앞의 비슷한 차 쪽으로 끌려가 트랙이 넘어간 경우. 첫 데모 baseline | [demo1](docs/demo1.md) 8–9절 |
-| 연구 3단계 계획: 실패 시험 목록, 실패 시점 자동 라벨, 보정 묶음 | 계획 결정 (2026-11-26), 구현 중. main-024의 탐지 미연결, 추정 점프, 깊이 시야 경계를 감시 신호 후보에 넣음 | [failure_plan](docs/failure_plan.md) |
+| 연구 3단계 계획: 실패 시험 목록, 실패 시점 자동 라벨, 보정 묶음 | 계획 결정 (2026-11-26). main-024의 탐지 미연결, 추정 점프, 깊이 시야 경계를 감시 신호 후보에 넣음 | [failure_plan](docs/failure_plan.md) |
+| 연구 3단계 구현 1: 실패 라벨, 지표, 보정 코드 | 완료. 바뀜(상자, 추정), 이탈, 소실, 위기, 교차·대기열·깊이 시야 노출을 기록에서 자동으로 붙임. 첫 데모 공개 72회 비행에서 바뀜·이탈·위기 0, 소실 11(긴 가림 10, 탐지 누락으로 트랙 지움 1). main-024는 한국어 "이탈 47.3초 → 바뀜(추정) 50.15초 → 바뀜(상자) 51.3초", 영어는 위기만 | [failure](docs/failure.md) |
 
 ![구성 3 비행: 말 입력, VLM 선택, 락온, 추종](outputs/examples/demo1_config3_flow.gif)
 
@@ -62,12 +63,14 @@ src/car_follow/    simulator 시작·연결과 카메라(sim.py), 첫 데모의 
                    상자에서 목표 위치와 Kalman filter(estimate.py), 다중 객체 추적기(tracker.py),
                    탐지기 인터페이스와 RF-DETR adapter(detector.py), VLM 처음 지정(vlm.py),
                    구성 3의 첫 지정(first_pick.py)과 그 영상 표시(pick_view.py), GPU 로드 순서(gpu_order.py), VLM 학습 데이터와 신뢰도 지표(vlm_data.py, vlm_metrics.py)
+                   연구 3단계의 실패 라벨(labels.py), 경보 지표(failure_metrics.py), 시험 단위 보정(calibrate.py)
 scripts/           설치 확인(carla_check.py), 시험 목록 생성(make_demo1_trials.py),
                    교통 기록·추종 비행(demo1_follow.py), 재생 확인(demo1_replay_check.py),
                    재생 위 채점(demo1_eval.py), 채점된 비행 다시 그리기(demo1_scene.py), 위치 추정 오차(demo1_estimate.py), 탐지율(demo1_detector_check.py),
                    VLM 시작 화면·지정 평가·GPU 공존(demo1_vlm_scenes.py, demo1_vlm_eval.py, demo1_vlm_memory_check.py),
                    VLM 학습과 신뢰도 시험(demo1_vlm_train_scenes.py, demo1_vlm_train.py, demo1_vlm_report.py,
                    demo1_vlm_stress.py),
+                   실패 라벨 붙이기(failure_labels.py),
                    CARLA-Air 확인(carla_air/)
 configs/           차종 이름표, 첫 데모 시험 목록 (본평가는 봉인)
 tests/             simulator 없이 도는 테스트
@@ -76,12 +79,15 @@ outputs/examples/  문서에 쓰는 그림 (나머지 실행 결과는 로컬에
 assets/            (로컬에만) CARLA 0.9.16, 탐지기와 VLM 가중치(models/)
 ```
 
+저장소 맨 위의 `.claude/skills/phase2-analysis/`는 시험 목록과 결과의 분포 표와 논문 스타일 그림을 만드는 Claude Code skill입니다. 봉인 목록(`main`, `calibration`)은 사용자의 명시적 허락 없이 열거나 그리지 않습니다.
+
 ## 4. 문서
 
 | 문서 | 내용 |
 |---|---|
 | [research_plan](docs/research_plan.md) | 연구 계획: 주제와 차별점, 가설, 실패 종류와 방해 차 단계, 감시기와 대응, 지표, 진행 순서, CARLA-Air 확인 항목 |
 | [failure_plan](docs/failure_plan.md) | 연구 3단계 계획: main-024에서 본 신호, 결과·노출·조건 라벨, 사건을 넣은 실패 시험 목록과 나누기, 감시 신호 후보와 늘릴 기록, 시험 단위 보정 |
+| [failure](docs/failure.md) | 연구 3단계 구현 기록: 라벨, 지표, 보정 코드(1단계)와 첫 데모 기록 위의 확인 |
 | [carla_air_check](docs/carla_air_check.md) | CARLA-Air 확인 기록: client 연결, 동기 모드, 드론에 붙인 카메라, 속도 응답, 지도와 자원, 판정 |
 | [setup](docs/setup.md) | uv Python 환경, CARLA 버전 선택, 설치 확인(속도, GPU 메모리, 자동 정답, 다른 GPU 작업과 함께) |
 | [demo1_plan](docs/demo1_plan.md) | 첫 데모 계획: 범위, 구성(처음 지정, 추적, 추종 제어, 화면), 채점 지표와 합격선, 구현 순서 |

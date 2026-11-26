@@ -98,3 +98,6 @@ __pycache__/
 .env
 .env.*
 !.env.example
+
+# Claude Code: project skills are shared, personal settings are not.
+/.claude/settings.local.json
