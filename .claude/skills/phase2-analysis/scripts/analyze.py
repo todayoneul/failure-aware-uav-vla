@@ -34,7 +34,7 @@ CONFIGS, OUTPUTS = CF / "configs", CF / "outputs"
 EVAL, LABELS, TRAFFIC = OUTPUTS / "demo1_eval", OUTPUTS / "failure_labels", OUTPUTS / "demo1_follow" / "traffic"
 OUT = OUTPUTS / "analysis"
 SEALED = ("main", "calibration")
-OPEN_FAILURE_LISTS = ("dev", "aux")   # stage 3 step 5: calibration, pilot, smoke and main are sealed
+OPEN_FAILURE_LISTS = ("dev", "aux", "dev_extra")   # stage 3 step 5: calibration, pilot, smoke and main are sealed
 DT = 0.05
 WINDOW_S = 2.0
 
@@ -583,7 +583,7 @@ def cmd_events(args):
         refuse(f"the failure list {folder.name}")
     d = json.loads((folder / "pilot.json").read_text(encoding="utf-8"))
     rows = d["trials"]
-    if any(r.get("split", "generator") not in ("generator", "dev", "aux") for r in rows) and not args.allow_sealed:
+    if any(r.get("split", "generator") not in ("generator",) + OPEN_FAILURE_LISTS for r in rows) and not args.allow_sealed:
         refuse(f"the generator run {args.name} holds a list other than dev")
     if "stats" in d:   # a step 5 list: its generation statistics stand in for the generator's summary
         d = dict(d, seed_base=d["list"], window_s=[15.0, 45.0], pass_yield=0.70, summary={

@@ -49,12 +49,13 @@ LANE_KINDS = ("lane_single", "lane_weave", "lane_swap")
 LISTS = {
     "dev": {"A0": 7, "A4a": 2, "A4c": 1, "A1": 7, "A2": 41, "A3": 10},
     "aux": {"A4b": 10},
+    "dev_extra": {"A2": 60},   # 2026-11-27: more silent failures for monitor development, dev cells only (9.6)
     "calibration": {"A0": 6, "A4a": 2, "A4c": 1, "A1": 6, "A2": 36},
     "pilot": {"A0": 1, "A1": 1, "A2": 1},
     "smoke": {"A0": 1, "A4a": 1, "A1": 1, "A2": 7},
     "main": {"A0": 10, "A4a": 3, "A4c": 2, "A1": 10, "A2": 60},
 }
-OPEN_LISTS = ("dev", "aux")
+OPEN_LISTS = ("dev", "aux", "dev_extra")
 SEALED_LISTS = ("calibration", "pilot", "smoke", "main")   # pooled cells; opened only with the user's permission
 WITH_DISTRACTOR = ("A1", "A2", "A4c")
 LEVELS = ("other", "near_twin", "twin")

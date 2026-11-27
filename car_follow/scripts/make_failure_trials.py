@@ -250,7 +250,8 @@ def cmd_pilot(args):
 
 LIST_SEED = {"open": 1_100_000, "pooled": 1_900_000}   # docs/failure_plan.md 4.3
 SEED_STRIDE = 20_000                                       # per condition: CONDITIONS.index(condition) * SEED_STRIDE
-PREFIX = {"dev": "fdev", "aux": "faux", "calibration": "fcal", "pilot": "fpilot", "smoke": "fsmoke", "main": "fmain"}
+LIST_SEED_OFFSET = {"dev_extra": 10_000}    # within each condition's block, clear of the dev draws (under 1,000)
+PREFIX = {"dev": "fdev", "aux": "faux", "dev_extra": "fdevx", "calibration": "fcal", "pilot": "fpilot", "smoke": "fsmoke", "main": "fmain"}
 INDEX = ROOT / "configs" / "failure_trials.json"
 LISTS_OUT = OUT / "lists"
 
@@ -301,7 +302,7 @@ def write_list(name, trials_kept, rows, stats):
 
 def cmd_lists(args):
     types = trials.load_types()
-    groups = [["dev"], ["aux"]] if args.lists != ["pooled"] else [list(failure_trials.SEALED_LISTS)]
+    groups = [["dev"], ["aux"], ["dev_extra"]] if args.lists != ["pooled"] else [list(failure_trials.SEALED_LISTS)]
     groups = [g for g in groups if g == list(failure_trials.SEALED_LISTS) or g[0] in args.lists]
     t0 = time.monotonic()
     with sim.session(trials.MAP, hz=HZ, start=not args.no_start) as (client, world, tm):
@@ -326,8 +327,9 @@ def cmd_lists(args):
                 count = {n: 0 for n in group}
                 st = {n: {"quota": quota[n], "attempts": 0, "recorded": 0, "kept": 0,
                           "rejected": collections.Counter()} for n in group if quota[n]}
-                base = LIST_SEED["pooled" if pooled else "open"] + SEED_STRIDE * failure_trials.CONDITIONS.index(condition)
-                for attempt in range(SEED_STRIDE):
+                base = (LIST_SEED["pooled" if pooled else "open"] + SEED_STRIDE * failure_trials.CONDITIONS.index(condition)
+                        + (0 if pooled else LIST_SEED_OFFSET.get(group[0], 0)))
+                for attempt in range(SEED_STRIDE - (0 if pooled else LIST_SEED_OFFSET.get(group[0], 0))):
                     if all(count[n] >= quota[n] for n in group):
                         break
                     seed = base + attempt
@@ -392,7 +394,7 @@ def main():
                    help="dev: the trials are dev trials (ids dev-..., split dev, own seeds; A4 only)")
     s.add_argument("--no-start", action="store_true", help="use a simulator that is already running")
     s = sub.add_parser("lists", help="step 5: the lists of failure_trials.LISTS (sealed ones print counts only)")
-    s.add_argument("--lists", nargs="+", default=["dev", "aux"], choices=("dev", "aux", "pooled"),
+    s.add_argument("--lists", nargs="+", default=["dev", "aux"], choices=("dev", "aux", "dev_extra", "pooled"),
                    help="pooled: calibration, pilot, smoke and main together (their seeds are shared out by sha256)")
     s.add_argument("--no-start", action="store_true", help="use a simulator that is already running")
     args = p.parse_args()
